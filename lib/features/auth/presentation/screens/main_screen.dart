@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'recipes_screen.dart';
 import 'shopping_screen.dart';
 import 'what_to_cook_screen.dart';
+import 'add_recipe_screen.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -48,7 +49,11 @@ class _MainScreenState extends State<MainScreen> {
       floatingActionButton: _selectedIndex == 0
           ? FloatingActionButton(
         onPressed: () {
-          // Az új recept oldalt később kötjük ide.
+          Navigator.of(context).push(
+            MaterialPageRoute<void>(
+              builder: (context) => const AddRecipeScreen(),
+            ),
+          );
         },
         tooltip: 'Új recept',
         child: const Icon(Icons.add),
