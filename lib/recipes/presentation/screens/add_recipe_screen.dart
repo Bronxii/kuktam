@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:kuktam/recipes/presentation/widgets/ingredient_row.dart';
 import 'package:kuktam/recipes/presentation/widgets/spice_row.dart';
 import 'package:kuktam/recipes/domain/models/recipe.dart';
+import 'package:kuktam/recipes/data/repositories/recipe_repository.dart';
 
 class AddRecipeScreen extends StatefulWidget {
   const AddRecipeScreen({super.key});
@@ -25,6 +26,8 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
   final List<SpiceRowData> _spices = [
     SpiceRowData(),
   ];
+
+  final RecipeRepository _recipeRepository = RecipeRepository();
 
   static const List<String> _units = [
     'g',
@@ -113,7 +116,7 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
       preparation: _preparationController.text.trim(),
     );
   }
-  void _saveRecipe() {
+  Future<void> _saveRecipe() async {
     final String recipeName = _recipeNameController.text.trim();
     final recipe = _buildRecipe();
 
@@ -154,12 +157,25 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
       );
       return;
     }
+try {
+await _recipeRepository.saveRecipe(recipe);
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('$recipeName mentésre kész.'),
-      ),
-    );
+if (!mounted) return;
+
+ScaffoldMessenger.of(context).showSnackBar(
+const SnackBar(
+content: Text('Recept sikeresen elmentve!'),
+),
+);
+} catch (e) {
+if (!mounted) return;
+
+ScaffoldMessenger.of(context).showSnackBar(
+SnackBar(
+content: Text('Mentési hiba: $e'),
+),
+);
+}
   }
 
   @override
