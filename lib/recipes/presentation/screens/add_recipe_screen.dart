@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:kuktam/recipes/presentation/widgets/ingredient_row.dart';
 import 'package:kuktam/recipes/presentation/widgets/spice_row.dart';
+import 'package:kuktam/recipes/domain/models/recipe.dart';
 
 class AddRecipeScreen extends StatefulWidget {
   const AddRecipeScreen({super.key});
@@ -89,8 +90,46 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
       _spices.removeAt(index);
     });
   }
+  Recipe _buildRecipe() {
+    return Recipe(
+      name: _recipeNameController.text.trim(),
+      ingredients: _ingredients
+          .map(
+            (ingredient) => RecipeIngredient(
+          name: ingredient.nameController.text.trim(),
+              quantity:
+              double.tryParse(ingredient.amountController.text.trim()) ?? 0,
+          unit: ingredient.selectedUnit,
+        ),
+      )
+          .toList(),
+      spices: _spices
+          .map(
+            (spice) => RecipeSpice(
+          name: spice.nameController.text.trim(),
+        ),
+      )
+          .toList(),
+      preparation: _preparationController.text.trim(),
+    );
+  }
   void _saveRecipe() {
     final String recipeName = _recipeNameController.text.trim();
+    final recipe = _buildRecipe();
+
+    debugPrint('Recept neve: ${recipe.name}');
+
+    for (final ingredient in recipe.ingredients) {
+      debugPrint(
+        'Hozzávaló: ${ingredient.quantity} ${ingredient.unit} ${ingredient.name}',
+      );
+    }
+
+    for (final spice in recipe.spices) {
+      debugPrint('Fűszer: ${spice.name}');
+    }
+
+    debugPrint('Elkészítés: ${recipe.preparation}');
 
     if (recipeName.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
