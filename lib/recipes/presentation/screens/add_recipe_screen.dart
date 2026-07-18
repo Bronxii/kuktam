@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:kuktam/recipes/presentation/widgets/ingredient_row.dart';
+import 'package:kuktam/recipes/presentation/widgets/spice_row.dart';
 
 class AddRecipeScreen extends StatefulWidget {
   const AddRecipeScreen({super.key});
@@ -13,8 +14,15 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
   final TextEditingController _recipeNameController =
   TextEditingController();
 
+  final TextEditingController _preparationController =
+  TextEditingController();
+
   final List<IngredientRowData> _ingredients = [
     IngredientRowData(),
+  ];
+
+  final List<SpiceRowData> _spices = [
+    SpiceRowData(),
   ];
 
   static const List<String> _units = [
@@ -30,11 +38,14 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
   @override
   void dispose() {
     _recipeNameController.dispose();
+    _preparationController.dispose();
 
     for (final ingredient in _ingredients) {
       ingredient.dispose();
     }
-
+    for (final spice in _spices) {
+      spice.dispose();
+    }
     super.dispose();
   }
 
@@ -43,7 +54,11 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
       _ingredients.add(IngredientRowData());
     });
   }
-
+  void _addSpice() {
+    setState(() {
+      _spices.add(SpiceRowData());
+    });
+  }
   void _removeIngredient(int index) {
     if (_ingredients.length == 1) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -59,7 +74,21 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
       _ingredients.removeAt(index);
     });
   }
+  void _removeSpice(int index) {
+    if (_spices.length == 1) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Legalább egy fűszer sort hagyj meg.'),
+        ),
+      );
+      return;
+    }
 
+    setState(() {
+      _spices[index].dispose();
+      _spices.removeAt(index);
+    });
+  }
   void _saveRecipe() {
     final String recipeName = _recipeNameController.text.trim();
 
@@ -136,6 +165,51 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
               label: const Text('Hozzávaló hozzáadása'),
             ),
             const SizedBox(height: 32),
+            Text(
+              'Fűszerek',
+              style: Theme.of(context).textTheme.titleLarge,
+            ),
+            const SizedBox(height: 16),
+
+            ...List.generate(
+              _spices.length,
+                  (index) => Padding(
+                padding: const EdgeInsets.only(bottom: 12),
+                child: SpiceRow(
+                  data: _spices[index],
+                  onRemove: () => _removeSpice(index),
+                ),
+              ),
+            ),
+
+            OutlinedButton.icon(
+              onPressed: _addSpice,
+              icon: const Icon(Icons.add),
+              label: const Text('Fűszer hozzáadása'),
+            ),
+
+            const SizedBox(height: 32),
+
+            Text(
+              'Elkészítés',
+              style: Theme.of(context).textTheme.titleLarge,
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: _preparationController,
+              minLines: 5,
+              maxLines: null,
+              keyboardType: TextInputType.multiline,
+              textCapitalization: TextCapitalization.sentences,
+              decoration: const InputDecoration(
+                labelText: 'Elkészítés menete',
+                hintText: 'Írd le lépésről lépésre a recept elkészítését...',
+                border: OutlineInputBorder(),
+                alignLabelWithHint: true,
+              ),
+            ),
+            const SizedBox(height: 32),
+
             FilledButton.icon(
               onPressed: _saveRecipe,
               icon: const Icon(Icons.save_outlined),
