@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/theme/app_colors.dart';
-import 'main_screen.dart';
+import '../../../../home/presentation/screens/main_screen.dart';
 
 class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key});

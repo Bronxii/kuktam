@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
-import 'recipes_screen.dart';
-import 'shopping_screen.dart';
-import 'what_to_cook_screen.dart';
-import 'add_recipe_screen.dart';
+import '../../../recipes/presentation/screens/recipes_screen.dart';
+import '../../../shopping/presentation/screens/shopping_screen.dart';
+import '../../../what_to_cook/presentation/screens/what_to_cook_screen.dart';
+import '../../../recipes/presentation/screens/add_recipe_screen.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});

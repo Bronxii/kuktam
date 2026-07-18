@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../core/theme/app_colors.dart';
-import '../features/auth/presentation/screens/login_screen.dart';
+import 'package:kuktam/core/theme/app_colors.dart';
+import 'package:kuktam/features/auth/presentation/screens/login_screen.dart';
 
 class KuktamApp extends StatelessWidget {
   const KuktamApp({super.key});
