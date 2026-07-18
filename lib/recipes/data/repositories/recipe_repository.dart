@@ -32,4 +32,21 @@ Future<void> saveRecipe(Recipe recipe) async {
     'createdAt': FieldValue.serverTimestamp(),
   });
 }
+  Future<List<Recipe>> getRecipes() async {
+    final snapshot = await _firestore
+        .collection('recipes')
+        .orderBy('createdAt', descending: true)
+        .get();
+
+    return snapshot.docs.map((document) {
+      final data = document.data();
+
+      return Recipe(
+        name: data['name'] as String,
+        ingredients: const [],
+        spices: const [],
+        preparation: data['preparation'] as String,
+      );
+    }).toList();
+  }
 }
