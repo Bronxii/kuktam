@@ -25,12 +25,33 @@ class RecipeDetailsScreen extends StatelessWidget {
           ),
           const SizedBox(height: 12),
           ...recipe.ingredients.map(
-                (ingredient) => ListTile(
-              contentPadding: EdgeInsets.zero,
-              leading: const Icon(Icons.circle, size: 8),
-              title: Text(ingredient.name),
-              trailing: Text(
-                '${ingredient.quantity} ${ingredient.unit}',
+                (ingredient) => Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              child: Row(
+                children: [
+                  const Icon(
+                    Icons.circle,
+                    size: 8,
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    flex: 2,
+                    child: Text(
+                      ingredient.name,
+                      style: Theme.of(context).textTheme.bodyLarge,
+                    ),
+                  ),
+                  Expanded(
+                    flex: 2,
+                    child: Text(
+                      '${ingredient.quantity} ${ingredient.unit}',
+                      textAlign: TextAlign.left,
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
           ),

@@ -24,6 +24,14 @@ class RecipeIngredient {
       'unit': unit,
     };
   }
+
+  String get formattedQuantity {
+    if (quantity == quantity.toInt()) {
+      return quantity.toInt().toString();
+    }
+
+    return quantity.toString();
+  }
 }
 
 class RecipeSpice {
