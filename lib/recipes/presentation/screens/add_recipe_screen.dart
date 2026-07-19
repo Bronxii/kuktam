@@ -4,6 +4,7 @@ import 'package:kuktam/recipes/presentation/widgets/ingredient_row.dart';
 import 'package:kuktam/recipes/presentation/widgets/spice_row.dart';
 import 'package:kuktam/recipes/domain/models/recipe.dart';
 import 'package:kuktam/recipes/data/repositories/recipe_repository.dart';
+import 'package:kuktam/recipes/data/repositories/ingredient_repository.dart';
 
 class AddRecipeScreen extends StatefulWidget {
   const AddRecipeScreen({
@@ -33,6 +34,10 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
   ];
 
   final RecipeRepository _recipeRepository = RecipeRepository();
+  final IngredientRepository _ingredientRepository =
+  IngredientRepository();
+
+  List<String> _ingredientSuggestions = [];
 
   static const List<String> _units = [
     'g',
@@ -43,9 +48,22 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
     'kk',
     'ek',
   ];
+
+  Future<void> _loadIngredientSuggestions() async {
+    final ingredients = await _ingredientRepository.getIngredients();
+
+    if (!mounted) {
+      return;
+    }
+
+    setState(() {
+      _ingredientSuggestions = ingredients;
+    });
+  }
   @override
   void initState() {
     super.initState();
+    _loadIngredientSuggestions();
 
     final recipe = widget.recipe;
 
@@ -261,6 +279,7 @@ content: Text('Mentési hiba: $e'),
                 child: IngredientRow(
                   data: _ingredients[index],
                   units: _units,
+                  suggestions: _ingredientSuggestions,
                   onRemove: () => _removeIngredient(index),
                 ),
               ),
