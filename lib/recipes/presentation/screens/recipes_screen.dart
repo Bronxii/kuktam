@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:kuktam/recipes/data/repositories/recipe_repository.dart';
 import 'package:kuktam/recipes/domain/models/recipe.dart';
+import 'package:kuktam/recipes/presentation/screens/recipe_details_screen.dart';
 
 class RecipesScreen extends StatefulWidget {
   const RecipesScreen({super.key});
@@ -80,10 +81,20 @@ itemBuilder: (context, index) {
 final recipe = recipes[index];
 
 return Card(
-child: ListTile(
-leading: const Icon(Icons.restaurant_menu),
-title: Text(recipe.name),
-),
+  child: ListTile(
+    leading: const Icon(Icons.restaurant_menu),
+    title: Text(recipe.name),
+    trailing: const Icon(Icons.chevron_right),
+    onTap: () {
+      Navigator.of(context).push(
+        MaterialPageRoute<void>(
+          builder: (context) => RecipeDetailsScreen(
+            recipe: recipe,
+          ),
+        ),
+      );
+    },
+  ),
 );
 },
 );

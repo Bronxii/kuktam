@@ -10,27 +10,11 @@ class RecipeRepository {
   final FirebaseFirestore _firestore;
 
 Future<void> saveRecipe(Recipe recipe) async {
-  await _firestore.collection('recipes').add({
-    'name': recipe.name,
-    'ingredients': recipe.ingredients
-        .map(
-          (ingredient) => {
-        'name': ingredient.name,
-        'quantity': ingredient.quantity,
-        'unit': ingredient.unit,
-      },
-    )
-        .toList(),
-    'spices': recipe.spices
-        .map(
-          (spice) => {
-        'name': spice.name,
-      },
-    )
-        .toList(),
-    'preparation': recipe.preparation,
-    'createdAt': FieldValue.serverTimestamp(),
-  });
+  final data = recipe.toMap();
+
+  data['createdAt'] = FieldValue.serverTimestamp();
+
+  await _firestore.collection('recipes').add(data);
 }
   Future<List<Recipe>> getRecipes() async {
     final snapshot = await _firestore
@@ -38,15 +22,10 @@ Future<void> saveRecipe(Recipe recipe) async {
         .orderBy('createdAt', descending: true)
         .get();
 
-    return snapshot.docs.map((document) {
-      final data = document.data();
-
-      return Recipe(
-        name: data['name'] as String,
-        ingredients: const [],
-        spices: const [],
-        preparation: data['preparation'] as String,
-      );
-    }).toList();
+    return snapshot.docs
+        .map(
+          (document) => Recipe.fromMap(document.data()),
+    )
+        .toList();
   }
 }
