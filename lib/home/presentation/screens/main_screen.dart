@@ -47,14 +47,15 @@ class _MainScreenState extends State<MainScreen> {
         children: _screens,
       ),
       floatingActionButton: _selectedIndex == 0
-          ? FloatingActionButton(
-        onPressed: () {
-          Navigator.of(context).push(
-            MaterialPageRoute<void>(
-              builder: (context) => const AddRecipeScreen(),
-            ),
-          );
-        },
+          ? FloatingActionButton(onPressed: () async {
+        await Navigator.of(context).push(
+          MaterialPageRoute<void>(
+            builder: (context) => const AddRecipeScreen(),
+          ),
+        );
+
+        setState(() {});
+      },
         tooltip: 'Új recept',
         child: const Icon(Icons.add),
       )
