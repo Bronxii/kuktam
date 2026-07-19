@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
 class SpiceRowData {
-  SpiceRowData() : nameController = TextEditingController();
+  SpiceRowData({
+    String name = '',
+  }) : nameController = TextEditingController(text: name);
 
   final TextEditingController nameController;
 

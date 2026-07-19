@@ -1,14 +1,18 @@
 import 'package:flutter/material.dart';
 
 class IngredientRowData {
-  IngredientRowData()
-      : nameController = TextEditingController(),
-        amountController = TextEditingController();
+  IngredientRowData({
+    String name = '',
+    String quantity = '',
+    String unit = 'g',
+  })  : nameController = TextEditingController(text: name),
+        amountController = TextEditingController(text: quantity),
+        selectedUnit = unit;
 
   final TextEditingController nameController;
   final TextEditingController amountController;
 
-  String selectedUnit = 'g';
+  String selectedUnit;
 
   void dispose() {
     nameController.dispose();

@@ -56,19 +56,24 @@ Map<String, dynamic> toMap() {
 
 class Recipe {
   const Recipe({
+    this.id,
     required this.name,
     required this.ingredients,
     required this.spices,
     required this.preparation,
   });
-
+  final String? id;
   final String name;
   final List<RecipeIngredient> ingredients;
   final List<RecipeSpice> spices;
   final String preparation;
 
-  factory Recipe.fromMap(Map<String, dynamic> map) {
+  factory Recipe.fromMap(
+      Map<String, dynamic> map, {
+        String? id,
+      }) {
     return Recipe(
+      id: id,
       name: map['name'] as String,
       ingredients: (map['ingredients'] as List<dynamic>)
           .map(

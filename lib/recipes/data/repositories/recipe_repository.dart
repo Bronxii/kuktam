@@ -16,6 +16,21 @@ Future<void> saveRecipe(Recipe recipe) async {
 
   await _firestore.collection('recipes').add(data);
 }
+  Future<void> updateRecipe(Recipe recipe) async {
+    final id = recipe.id;
+
+    if (id == null) {
+      throw StateError(
+        'A recept nem frissíthető Firestore dokumentumazonosító nélkül.',
+      );
+    }
+
+    final data = recipe.toMap();
+
+    data['updatedAt'] = FieldValue.serverTimestamp();
+
+    await _firestore.collection('recipes').doc(id).update(data);
+  }
   Future<List<Recipe>> getRecipes() async {
     final snapshot = await _firestore
         .collection('recipes')
@@ -24,7 +39,10 @@ Future<void> saveRecipe(Recipe recipe) async {
 
     return snapshot.docs
         .map(
-          (document) => Recipe.fromMap(document.data()),
+          (document) => Recipe.fromMap(
+        document.data(),
+        id: document.id,
+      ),
     )
         .toList();
   }

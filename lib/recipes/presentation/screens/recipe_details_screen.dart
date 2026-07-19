@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:kuktam/recipes/domain/models/recipe.dart';
+import 'package:kuktam/recipes/presentation/screens/add_recipe_screen.dart';
 
 class RecipeDetailsScreen extends StatelessWidget {
   const RecipeDetailsScreen({
@@ -13,10 +14,32 @@ class RecipeDetailsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(recipe.name),
-      ),
-      body: ListView(
+appBar: AppBar(
+title: Text(recipe.name),
+actions: [
+IconButton(
+tooltip: 'Szerkesztés',
+icon: const Icon(Icons.edit_outlined),
+onPressed: () async {
+final updatedRecipe = await Navigator.of(context).push<Recipe>(
+MaterialPageRoute<Recipe>(
+builder: (context) => AddRecipeScreen(
+recipe: recipe,
+),
+),
+);
+
+if (updatedRecipe == null || !context.mounted) {
+  return;
+}
+
+Navigator.of(context).pop(true);
+},
+),
+],
+),
+
+body: ListView(
         padding: const EdgeInsets.all(20),
         children: [
           Text(

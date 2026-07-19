@@ -81,20 +81,27 @@ itemBuilder: (context, index) {
 final recipe = recipes[index];
 
 return Card(
-  child: ListTile(
-    leading: const Icon(Icons.restaurant_menu),
-    title: Text(recipe.name),
-    trailing: const Icon(Icons.chevron_right),
-    onTap: () {
-      Navigator.of(context).push(
-        MaterialPageRoute<void>(
-          builder: (context) => RecipeDetailsScreen(
-            recipe: recipe,
-          ),
-        ),
-      );
-    },
-  ),
+child: ListTile(
+leading: const Icon(Icons.restaurant_menu),
+title: Text(recipe.name),
+trailing: const Icon(Icons.chevron_right),
+onTap: () async {
+final shouldRefresh =
+await Navigator.of(context).push<bool>(
+MaterialPageRoute<bool>(
+builder: (context) => RecipeDetailsScreen(
+recipe: recipe,
+),
+),
+);
+
+if (shouldRefresh == true) {
+setState(() {
+_recipesFuture = _recipeRepository.getRecipes();
+});
+}
+},
+),
 );
 },
 );

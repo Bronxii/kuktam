@@ -6,7 +6,12 @@ import 'package:kuktam/recipes/domain/models/recipe.dart';
 import 'package:kuktam/recipes/data/repositories/recipe_repository.dart';
 
 class AddRecipeScreen extends StatefulWidget {
-  const AddRecipeScreen({super.key});
+  const AddRecipeScreen({
+    this.recipe,
+    super.key,
+  });
+
+  final Recipe? recipe;
 
   @override
   State<AddRecipeScreen> createState() => _AddRecipeScreenState();
@@ -38,7 +43,47 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
     'kk',
     'ek',
   ];
+  @override
+  void initState() {
+    super.initState();
 
+    final recipe = widget.recipe;
+
+    if (recipe == null) {
+      return;
+    }
+
+    _recipeNameController.text = recipe.name;
+    _preparationController.text = recipe.preparation;
+    for (final ingredient in _ingredients) {
+      ingredient.dispose();
+    }
+
+    _ingredients
+      ..clear()
+      ..addAll(
+        recipe.ingredients.map(
+              (ingredient) => IngredientRowData(
+            name: ingredient.name,
+            quantity: ingredient.formattedQuantity,
+            unit: ingredient.unit,
+          ),
+        ),
+      );
+    for (final spice in _spices) {
+      spice.dispose();
+    }
+
+    _spices
+      ..clear()
+      ..addAll(
+        recipe.spices.map(
+              (spice) => SpiceRowData(
+            name: spice.name,
+          ),
+        ),
+      );
+  }
   @override
   void dispose() {
     _recipeNameController.dispose();
@@ -95,6 +140,7 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
   }
   Recipe _buildRecipe() {
     return Recipe(
+      id: widget.recipe?.id,
       name: _recipeNameController.text.trim(),
       ingredients: _ingredients
           .map(
@@ -158,7 +204,11 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
       return;
     }
 try {
-await _recipeRepository.saveRecipe(recipe);
+  if (widget.recipe == null) {
+    await _recipeRepository.saveRecipe(recipe);
+  } else {
+    await _recipeRepository.updateRecipe(recipe);
+  }
 
 if (!mounted) return;
 
@@ -167,7 +217,7 @@ const SnackBar(
 content: Text('Recept sikeresen elmentve!'),
 ),
 );
-Navigator.of(context).pop();
+  Navigator.of(context).pop(recipe);
 } catch (e) {
 if (!mounted) return;
 
