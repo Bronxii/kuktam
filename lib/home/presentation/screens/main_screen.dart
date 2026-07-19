@@ -21,10 +21,12 @@ class _MainScreenState extends State<MainScreen> {
     'Mit főzzek?',
   ];
 
-  static const List<Widget> _screens = [
-    RecipesScreen(),
-    ShoppingListScreen(),
-    WhatToCookScreen(),
+  int _recipesVersion = 0;
+
+  List<Widget> get _screens => [
+    RecipesScreen(key: ValueKey(_recipesVersion)),
+    const ShoppingListScreen(),
+    const WhatToCookScreen(),
   ];
 
   @override
@@ -54,7 +56,9 @@ class _MainScreenState extends State<MainScreen> {
           ),
         );
 
-        setState(() {});
+        setState(() {
+          _recipesVersion++;
+        });
       },
         tooltip: 'Új recept',
         child: const Icon(Icons.add),
