@@ -31,6 +31,9 @@ Future<void> saveRecipe(Recipe recipe) async {
 
     await _firestore.collection('recipes').doc(id).update(data);
   }
+  Future<void> deleteRecipe(String id) async {
+    await _firestore.collection('recipes').doc(id).delete();
+  }
   Future<List<Recipe>> getRecipes() async {
     final snapshot = await _firestore
         .collection('recipes')

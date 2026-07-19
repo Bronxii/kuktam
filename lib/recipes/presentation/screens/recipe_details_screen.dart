@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:kuktam/recipes/domain/models/recipe.dart';
 import 'package:kuktam/recipes/presentation/screens/add_recipe_screen.dart';
+import 'package:kuktam/recipes/data/repositories/recipe_repository.dart';
 
 class RecipeDetailsScreen extends StatelessWidget {
   const RecipeDetailsScreen({
@@ -36,6 +37,49 @@ if (updatedRecipe == null || !context.mounted) {
 Navigator.of(context).pop(true);
 },
 ),
+  IconButton(
+    tooltip: 'Törlés',
+    icon: const Icon(Icons.delete_outline),
+    onPressed: () async {
+      final shouldDelete = await showDialog<bool>(
+        context: context,
+        builder: (dialogContext) {
+          return AlertDialog(
+            title: const Text('Recept törlése'),
+            content: Text(
+              'Biztosan törölni szeretnéd ezt a receptet?\n\n${recipe.name}',
+            ),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(dialogContext).pop(false);
+                },
+                child: const Text('Mégse'),
+              ),
+              FilledButton(
+                onPressed: () {
+                  Navigator.of(dialogContext).pop(true);
+                },
+                child: const Text('Törlés'),
+              ),
+            ],
+          );
+        },
+      );
+
+      if (shouldDelete != true) {
+        return;
+      }
+
+      await RecipeRepository().deleteRecipe(recipe.id!);
+
+      if (!context.mounted) {
+        return;
+      }
+
+      Navigator.of(context).pop(true);
+    },
+  ),
 ],
 ),
 
