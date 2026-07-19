@@ -44,7 +44,7 @@ class RecipeDetailsScreen extends StatelessWidget {
                   Expanded(
                     flex: 2,
                     child: Text(
-                      '${ingredient.quantity} ${ingredient.unit}',
+                      '${ingredient.formattedQuantity} ${ingredient.unit}',
                       textAlign: TextAlign.left,
                       style: Theme.of(context).textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.w600,
