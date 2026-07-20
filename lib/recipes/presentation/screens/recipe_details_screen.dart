@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:share_plus/share_plus.dart';
 
 import 'package:kuktam/recipes/domain/models/recipe.dart';
 import 'package:kuktam/recipes/presentation/screens/add_recipe_screen.dart';
@@ -14,12 +15,64 @@ class RecipeDetailsScreen extends StatelessWidget {
 
   final Recipe recipe;
 
+  String _formatQuantity(double quantity) {
+    if (quantity == quantity.roundToDouble()) {
+      return quantity.toInt().toString();
+    }
+
+    return quantity.toString();
+  }
+
+  String _buildRecipeShareText(Recipe recipe) {
+    final buffer = StringBuffer();
+
+    buffer.writeln(recipe.name);
+    buffer.writeln();
+
+    buffer.writeln('Hozzávalók:');
+
+    for (final ingredient in recipe.ingredients) {
+      buffer.writeln(
+        '• ${_formatQuantity(ingredient.quantity)} '
+            '${ingredient.unit} ${ingredient.name}',
+      );
+    }
+
+    if (recipe.spices.isNotEmpty) {
+      buffer.writeln();
+      buffer.writeln('Fűszerek:');
+
+      for (final spice in recipe.spices) {
+        buffer.writeln('• ${spice.name}');
+      }
+    }
+
+    if (recipe.preparation.trim().isNotEmpty) {
+      buffer.writeln();
+      buffer.writeln('Elkészítés:');
+      buffer.writeln(recipe.preparation.trim());
+    }
+
+    return buffer.toString().trim();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
 appBar: AppBar(
 title: Text(recipe.name),
 actions: [
+  IconButton(
+    tooltip: 'Megosztás',
+    icon: const Icon(Icons.share_outlined),
+    onPressed: () async {
+      await SharePlus.instance.share(
+        ShareParams(
+          text: _buildRecipeShareText(recipe),
+        ),
+      );
+    },
+  ),
 IconButton(
 tooltip: 'Szerkesztés',
 icon: const Icon(Icons.edit_outlined),
@@ -307,6 +360,7 @@ body: ListView(
                     ),
                   ),
                 );
+                Navigator.of(context).pop();
               },
               icon: const Icon(Icons.shopping_cart_outlined),
               label: const Text('Bevásárlólistához adás'),

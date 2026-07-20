@@ -1,10 +1,54 @@
 import 'package:flutter/material.dart';
+import '../../data/repositories/auth_repository.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../home/presentation/screens/main_screen.dart';
 
-class LoginScreen extends StatelessWidget {
+class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
+
+  @override
+  State<LoginScreen> createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends State<LoginScreen> {
+  bool _isGoogleLoading = false;
+  final AuthRepository _authRepository = AuthRepository();
+  Future<void> _signInWithGoogle() async {
+    setState(() {
+      _isGoogleLoading = true;
+    });
+
+    try {
+      await _authRepository.signInWithGoogle();
+
+      if (!mounted) {
+        return;
+      }
+
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute<void>(
+          builder: (context) => const MainScreen(),
+        ),
+      );
+    } catch (error) {
+      if (!mounted) {
+        return;
+      }
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('A Google-bejelentkezés sikertelen: $error'),
+        ),
+      );
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isGoogleLoading = false;
+        });
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
