@@ -14,6 +14,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "44537266968-07od8j3d4hn1f0e8noif8s7c3g0qjnaa.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.bronxii.kuktam",
+            "certificate_hash": "5cd63001f891f336f4fff065f732f3e2d526b3d1"
+          }
+        },
+        {
           "client_id": "44537266968-55u1b9ekc1k5293af999qogt57i4mic6.apps.googleusercontent.com",
           "client_type": 3
         }
