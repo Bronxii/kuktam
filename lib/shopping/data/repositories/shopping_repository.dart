@@ -1,17 +1,35 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 import '../../domain/models/shopping_item.dart';
 
 class ShoppingRepository {
-  ShoppingRepository();
+  ShoppingRepository({
+    FirebaseFirestore? firestore,
+    FirebaseAuth? firebaseAuth,
+  })  : _firestore = firestore ?? FirebaseFirestore.instance,
+        _firebaseAuth = firebaseAuth ?? FirebaseAuth.instance;
 
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FirebaseFirestore _firestore;
+  final FirebaseAuth _firebaseAuth;
 
-  CollectionReference<Map<String, dynamic>> get _shoppingItems =>
-      _firestore.collection('shopping_items');
+  CollectionReference<Map<String, dynamic>> get _shoppingCollection {
+    final user = _firebaseAuth.currentUser;
+
+    if (user == null) {
+      throw StateError(
+        'Bevásárlólista csak bejelentkezett felhasználóhoz érhető el.',
+      );
+    }
+
+    return _firestore
+        .collection('users')
+        .doc(user.uid)
+        .collection('shopping');
+  }
 
   Future<List<ShoppingItem>> getShoppingItems() async {
-    final snapshot = await _shoppingItems.get();
+    final snapshot = await _shoppingCollection.get();
 
     return snapshot.docs.map((document) {
       final data = document.data();
@@ -26,7 +44,7 @@ class ShoppingRepository {
     }).toList();
   }
   Stream<List<ShoppingItem>> watchShoppingItems() {
-    return _shoppingItems
+    return _shoppingCollection
         .orderBy('createdAt')
         .snapshots()
         .map((snapshot) {
@@ -68,7 +86,7 @@ class ShoppingRepository {
       unit: unit,
     );
 
-    final existingItems = await _shoppingItems
+    final existingItems = await _shoppingCollection
         .where('name', isEqualTo: normalizedName)
         .where('unit', isEqualTo: normalizedData.unit)
         .limit(1)
@@ -82,7 +100,7 @@ class ShoppingRepository {
       return;
     }
 
-    await _shoppingItems.add({
+    await _shoppingCollection.add({
       'name': normalizedName,
       'quantity': normalizedData.quantity,
       'unit': normalizedData.unit,
@@ -106,7 +124,7 @@ class ShoppingRepository {
       unit: unit,
     );
 
-    await _shoppingItems.doc(id).update({
+    await _shoppingCollection.doc(id).update({
       'name': normalizedName,
       'quantity': normalizedData.quantity,
       'unit': normalizedData.unit,
@@ -116,15 +134,15 @@ class ShoppingRepository {
     required String id,
     required bool isChecked,
   }) async {
-    await _shoppingItems.doc(id).update({
+    await _shoppingCollection.doc(id).update({
       'isChecked': isChecked,
     });
   }
   Future<void> deleteItem(String id) async {
-    await _shoppingItems.doc(id).delete();
+    await _shoppingCollection.doc(id).delete();
   }
   Future<void> clearShoppingList() async {
-    final snapshot = await _shoppingItems.get();
+    final snapshot = await _shoppingCollection.get();
     final batch = _firestore.batch();
 
     for (final document in snapshot.docs) {
