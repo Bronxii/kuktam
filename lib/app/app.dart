@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:kuktam/core/theme/app_colors.dart';
-import 'package:kuktam/features/auth/presentation/screens/login_screen.dart';
+import 'package:kuktam/features/auth/presentation/widgets/auth_gate.dart';
 
 class KuktamApp extends StatelessWidget {
   const KuktamApp({super.key});
@@ -21,7 +21,7 @@ class KuktamApp extends StatelessWidget {
           surface: AppColors.cream,
         ),
       ),
-      home: const LoginScreen(),
+      home: const AuthGate(),
     );
   }
 }

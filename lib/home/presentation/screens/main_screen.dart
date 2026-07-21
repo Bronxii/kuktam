@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../features/auth/data/repositories/auth_repository.dart';
 
 import '../../../recipes/presentation/screens/recipes_screen.dart';
 import '../../../shopping/presentation/screens/shopping_screen.dart';
@@ -14,6 +15,8 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   int _selectedIndex = 0;
+
+  final _authRepository = AuthRepository();
 
   static const List<String> _titles = [
     'Receptek',
@@ -36,11 +39,30 @@ class _MainScreenState extends State<MainScreen> {
         title: Text(_titles[_selectedIndex]),
         actions: [
           IconButton(
-            onPressed: () {
-              // A Beállítások oldalt később kötjük ide.
+            tooltip: 'Profil',
+            icon: const Icon(Icons.account_circle_outlined),
+            onPressed: () async {
+              final selected = await showMenu<String>(
+                context: context,
+                position: const RelativeRect.fromLTRB(1000, 80, 16, 0),
+                items: const [
+                  PopupMenuItem(
+                    value: 'logout',
+                    child: Row(
+                      children: [
+                        Icon(Icons.logout),
+                        SizedBox(width: 12),
+                        Text('Kijelentkezés'),
+                      ],
+                    ),
+                  ),
+                ],
+              );
+
+              if (selected == 'logout') {
+                await _authRepository.signOut();
+              }
             },
-            tooltip: 'Beállítások',
-            icon: const Icon(Icons.settings_outlined),
           ),
         ],
       ),

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import '../../data/repositories/auth_repository.dart';
 
 import '../../../../core/theme/app_colors.dart';
-import '../../../../home/presentation/screens/main_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -26,11 +25,6 @@ class _LoginScreenState extends State<LoginScreen> {
         return;
       }
 
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute<void>(
-          builder: (context) => const MainScreen(),
-        ),
-      );
     } catch (error) {
       if (!mounted) {
         return;
@@ -90,15 +84,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
                 Navigator.of(dialogContext).pop();
 
-                if (!mounted) {
-                  return;
-                }
-
-                Navigator.of(context).pushReplacement(
-                  MaterialPageRoute<void>(
-                    builder: (context) => const MainScreen(),
-                  ),
-                );
               } catch (error) {
                 if (!dialogContext.mounted) {
                   return;
