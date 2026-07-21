@@ -221,6 +221,24 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
       );
       return;
     }
+    final recipeAlreadyExists =
+    await _recipeRepository.recipeNameExists(
+      name: recipe.name,
+      excludedRecipeId: widget.recipe?.id,
+    );
+
+    if (recipeAlreadyExists) {
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Már létezik ilyen nevű recept!'),
+        ),
+      );
+
+      return;
+    }
+
 try {
   if (widget.recipe == null) {
     await _recipeRepository.saveRecipe(recipe);
