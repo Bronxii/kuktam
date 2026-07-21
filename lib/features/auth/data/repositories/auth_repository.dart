@@ -29,4 +29,28 @@ class AuthRepository {
 
     return _firebaseAuth.signInWithCredential(credential);
   }
+  Future<UserCredential> signInWithEmail({
+    required String email,
+    required String password,
+  }) {
+    return _firebaseAuth.signInWithEmailAndPassword(
+      email: email.trim(),
+      password: password,
+    );
+  }
+  Future<UserCredential> registerWithEmail({
+    required String email,
+    required String password,
+  }) async {
+    final userCredential =
+    await _firebaseAuth.createUserWithEmailAndPassword(
+      email: email.trim(),
+      password: password,
+    );
+
+    await userCredential.user?.sendEmailVerification();
+    await _firebaseAuth.signOut();
+
+    return userCredential;
+  }
 }
