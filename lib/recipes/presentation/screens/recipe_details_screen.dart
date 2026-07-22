@@ -33,8 +33,9 @@ class RecipeDetailsScreen extends StatelessWidget {
 
     for (final ingredient in recipe.ingredients) {
       buffer.writeln(
-        '• ${_formatQuantity(ingredient.quantity)} '
-            '${ingredient.unit} ${ingredient.name}',
+        '• ${ingredient.name} – '
+            '${_formatQuantity(ingredient.quantity)} '
+            '${ingredient.unit}',
       );
     }
 
@@ -52,6 +53,10 @@ class RecipeDetailsScreen extends StatelessWidget {
       buffer.writeln('Elkészítés:');
       buffer.writeln(recipe.preparation.trim());
     }
+
+    buffer.writeln();
+    buffer.writeln('──────────────');
+    buffer.writeln('Készült a Kuktám alkalmazással');
 
     return buffer.toString().trim();
   }

@@ -6,12 +6,14 @@ class ShoppingItemTile extends StatelessWidget {
   const ShoppingItemTile({
     required this.item,
     required this.onItemTap,
+    required this.onItemLongPress,
     required this.onCheckedChanged,
     super.key,
   });
 
   final ShoppingItem item;
   final VoidCallback onItemTap;
+  final VoidCallback onItemLongPress;
   final VoidCallback onCheckedChanged;
 
   @override
@@ -23,6 +25,7 @@ class ShoppingItemTile extends StatelessWidget {
           Expanded(
             child: InkWell(
               onTap: onItemTap,
+              onLongPress: onItemLongPress,
               child: Padding(
                 padding: const EdgeInsets.only(left: 20, right: 12),
                 child: Row(
@@ -93,6 +96,9 @@ class ShoppingItemTile extends StatelessWidget {
       return quantity.toInt().toString();
     }
 
-    return quantity.toString();
+    return quantity.toStringAsFixed(2).replaceFirst(
+      RegExp(r'([.,]?\d*?)0+$'),
+      r'\1',
+    ).replaceFirst(RegExp(r'[.,]$'), '');
   }
 }

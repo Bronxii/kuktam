@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../data/repositories/shopping_repository.dart';
 import '../widgets/shopping_item_tile.dart';
+import '../widgets/shopping_item_dialog.dart';
 
 class ShoppingListScreen extends StatelessWidget {
   const ShoppingListScreen({super.key});
@@ -65,6 +66,71 @@ class ShoppingListScreen extends StatelessWidget {
             return ShoppingItemTile(
               item: item,
               onItemTap: () {},
+              onItemLongPress: () async {
+                await showModalBottomSheet(
+                  context: context,
+                  builder: (sheetContext) {
+                    return SafeArea(
+                      child: Wrap(
+                        children: [
+                          ListTile(
+                            leading: const Icon(Icons.edit_outlined),
+                            title: const Text('Szerkesztés'),
+                            onTap: () {
+                              Navigator.pop(sheetContext);
+
+                              showShoppingItemDialog(
+                                context: context,
+                                item: item,
+                                shoppingRepository: shoppingRepository,
+                              );
+                            },
+                          ),
+                          ListTile(
+                            leading: const Icon(Icons.delete_outline),
+                            title: const Text('Törlés'),
+                            onTap: () async {
+                              Navigator.pop(sheetContext);
+
+                              final shouldDelete = await showDialog<bool>(
+                                context: context,
+                                builder: (dialogContext) {
+                                  return AlertDialog(
+                                    title: const Text('Tétel törlése'),
+                                    content: Text(
+                                      'Biztosan törölni szeretnéd ezt a tételt?\n\n${item.name}',
+                                    ),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () {
+                                          Navigator.pop(dialogContext, false);
+                                        },
+                                        child: const Text('Mégse'),
+                                      ),
+                                      FilledButton(
+                                        onPressed: () {
+                                          Navigator.pop(dialogContext, true);
+                                        },
+                                        child: const Text('Törlés'),
+                                      ),
+                                    ],
+                                  );
+                                },
+                              );
+
+                              if (shouldDelete != true) {
+                                return;
+                              }
+
+                              await shoppingRepository.deleteItem(item.id);
+                            },
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                );
+              },
               onCheckedChanged: () {
                 shoppingRepository.setItemChecked(
                   id: item.id,
