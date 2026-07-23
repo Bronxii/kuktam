@@ -154,32 +154,36 @@ body: ListView(
           ...recipe.ingredients.map(
                 (ingredient) => Padding(
               padding: const EdgeInsets.symmetric(vertical: 8),
-              child: Row(
-                children: [
-                  const Icon(
-                    Icons.circle,
-                    size: 8,
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    flex: 2,
-                    child: Text(
-                      ingredient.name,
-                      style: Theme.of(context).textTheme.bodyLarge,
-                    ),
-                  ),
-                  Expanded(
-                    flex: 2,
-                    child: Text(
-                      '${ingredient.formattedQuantity} ${ingredient.unit}',
-                      textAlign: TextAlign.left,
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.w600,
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Padding(
+                        padding: EdgeInsets.only(top: 7),
+                        child: Icon(
+                          Icons.circle,
+                          size: 8,
+                        ),
                       ),
-                    ),
+                      const SizedBox(width: 16),
+                      SizedBox(
+                        width: 88,
+                        child: Text(
+                          '${ingredient.formattedQuantity} ${ingredient.unit}',
+                          textAlign: TextAlign.right,
+                          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: Text(
+                          ingredient.name,
+                          style: Theme.of(context).textTheme.bodyLarge,
+                        ),
+                      ),
+                    ],
                   ),
-                ],
-              ),
             ),
           ),
           const SizedBox(height: 24),

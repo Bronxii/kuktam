@@ -68,11 +68,9 @@ Future<void> saveRecipe(Recipe recipe) async {
     await _recipesCollection.doc(id).delete();
   }
   Future<List<Recipe>> getRecipes() async {
-    final snapshot = await _recipesCollection
-        .orderBy('createdAt', descending: true)
-        .get();
+    final snapshot = await _recipesCollection.get();
 
-    return snapshot.docs
+    final recipes = snapshot.docs
         .map(
           (document) => Recipe.fromMap(
         document.data(),
@@ -80,5 +78,35 @@ Future<void> saveRecipe(Recipe recipe) async {
       ),
     )
         .toList();
+
+    recipes.sort(
+          (a, b) => a.name.toLowerCase().compareTo(
+        b.name.toLowerCase(),
+      ),
+    );
+
+    return recipes;
+  }
+  Stream<List<Recipe>> watchRecipes() {
+    return _recipesCollection.snapshots().map(
+          (snapshot) {
+        final recipes = snapshot.docs
+            .map(
+              (document) => Recipe.fromMap(
+            document.data(),
+            id: document.id,
+          ),
+        )
+            .toList();
+
+        recipes.sort(
+              (a, b) => a.name.toLowerCase().compareTo(
+            b.name.toLowerCase(),
+          ),
+        );
+
+        return recipes;
+      },
+    );
   }
 }

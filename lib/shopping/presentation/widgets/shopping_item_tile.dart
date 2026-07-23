@@ -91,14 +91,16 @@ class ShoppingItemTile extends StatelessWidget {
 
     return '${_formatQuantity(quantity)} $unit';
   }
+
   String _formatQuantity(double quantity) {
     if (quantity == quantity.roundToDouble()) {
       return quantity.toInt().toString();
     }
 
-    return quantity.toStringAsFixed(2).replaceFirst(
-      RegExp(r'([.,]?\d*?)0+$'),
-      r'\1',
-    ).replaceFirst(RegExp(r'[.,]$'), '');
+    return quantity
+        .toStringAsFixed(2)
+        .replaceFirst(RegExp(r'0+$'), '')
+        .replaceFirst(RegExp(r'[.,]$'), '')
+        .replaceAll('.', ',');
   }
 }

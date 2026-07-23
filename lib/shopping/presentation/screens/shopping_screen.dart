@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
 import '../../data/repositories/shopping_repository.dart';
-import '../widgets/shopping_item_tile.dart';
 import '../widgets/shopping_item_dialog.dart';
+import '../widgets/shopping_item_tile.dart';
 
 class ShoppingListScreen extends StatelessWidget {
   const ShoppingListScreen({super.key});
@@ -22,11 +22,48 @@ class ShoppingListScreen extends StatelessWidget {
 
         if (snapshot.hasError) {
           return const Center(
-            child: Text('Nem sikerült betölteni a bevásárlólistát.'),
+            child: Text(
+              'Nem sikerült betölteni a bevásárlólistát.',
+            ),
           );
         }
 
         final items = snapshot.data ?? [];
+
+        Future<void> finishShopping() async {
+          final shouldFinish = await showDialog<bool>(
+            context: context,
+            builder: (dialogContext) {
+              return AlertDialog(
+                title: const Text('Bevásárlás befejezése'),
+                content: const Text(
+                  'Biztosan befejezed a bevásárlást?\n\n'
+                      'A teljes bevásárlólista törlődni fog.',
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(dialogContext).pop(false);
+                    },
+                    child: const Text('Mégsem'),
+                  ),
+                  FilledButton(
+                    onPressed: () {
+                      Navigator.of(dialogContext).pop(true);
+                    },
+                    child: const Text('Befejezés'),
+                  ),
+                ],
+              );
+            },
+          );
+
+          if (shouldFinish != true) {
+            return;
+          }
+
+          await shoppingRepository.clearShoppingList();
+        }
 
         if (items.isEmpty) {
           return Center(
@@ -56,89 +93,125 @@ class ShoppingListScreen extends StatelessWidget {
           );
         }
 
-        return ListView.separated(
-          padding: const EdgeInsets.symmetric(vertical: 8),
-          itemCount: items.length,
-          separatorBuilder: (context, index) => const Divider(height: 1),
-          itemBuilder: (context, index) {
-            final item = items[index];
+        return Column(
+          children: [
+            Expanded(
+              child: ListView.separated(
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                itemCount: items.length,
+                separatorBuilder: (context, index) =>
+                const Divider(height: 1),
+                itemBuilder: (context, index) {
+                  final item = items[index];
 
-            return ShoppingItemTile(
-              item: item,
-              onItemTap: () {},
-              onItemLongPress: () async {
-                await showModalBottomSheet(
-                  context: context,
-                  builder: (sheetContext) {
-                    return SafeArea(
-                      child: Wrap(
-                        children: [
-                          ListTile(
-                            leading: const Icon(Icons.edit_outlined),
-                            title: const Text('Szerkesztés'),
-                            onTap: () {
-                              Navigator.pop(sheetContext);
+                  return ShoppingItemTile(
+                    item: item,
+                    onItemTap: () {},
+                    onItemLongPress: () async {
+                      await showModalBottomSheet(
+                        context: context,
+                        builder: (sheetContext) {
+                          return SafeArea(
+                            child: Wrap(
+                              children: [
+                                ListTile(
+                                  leading: const Icon(Icons.edit_outlined),
+                                  title: const Text('Szerkesztés'),
+                                  onTap: () {
+                                    Navigator.pop(sheetContext);
 
-                              showShoppingItemDialog(
-                                context: context,
-                                item: item,
-                                shoppingRepository: shoppingRepository,
-                              );
-                            },
-                          ),
-                          ListTile(
-                            leading: const Icon(Icons.delete_outline),
-                            title: const Text('Törlés'),
-                            onTap: () async {
-                              Navigator.pop(sheetContext);
+                                    showShoppingItemDialog(
+                                      context: context,
+                                      item: item,
+                                      shoppingRepository:
+                                      shoppingRepository,
+                                    );
+                                  },
+                                ),
+                                ListTile(
+                                  leading: const Icon(Icons.delete_outline),
+                                  title: const Text('Törlés'),
+                                  onTap: () async {
+                                    Navigator.pop(sheetContext);
 
-                              final shouldDelete = await showDialog<bool>(
-                                context: context,
-                                builder: (dialogContext) {
-                                  return AlertDialog(
-                                    title: const Text('Tétel törlése'),
-                                    content: Text(
-                                      'Biztosan törölni szeretnéd ezt a tételt?\n\n${item.name}',
-                                    ),
-                                    actions: [
-                                      TextButton(
-                                        onPressed: () {
-                                          Navigator.pop(dialogContext, false);
-                                        },
-                                        child: const Text('Mégse'),
-                                      ),
-                                      FilledButton(
-                                        onPressed: () {
-                                          Navigator.pop(dialogContext, true);
-                                        },
-                                        child: const Text('Törlés'),
-                                      ),
-                                    ],
-                                  );
-                                },
-                              );
+                                    final shouldDelete =
+                                    await showDialog<bool>(
+                                      context: context,
+                                      builder: (dialogContext) {
+                                        return AlertDialog(
+                                          title: const Text(
+                                            'Tétel törlése',
+                                          ),
+                                          content: Text(
+                                            'Biztosan törölni szeretnéd ezt a tételt?\n\n${item.name}',
+                                          ),
+                                          actions: [
+                                            TextButton(
+                                              onPressed: () {
+                                                Navigator.pop(
+                                                  dialogContext,
+                                                  false,
+                                                );
+                                              },
+                                              child:
+                                              const Text('Mégse'),
+                                            ),
+                                            FilledButton(
+                                              onPressed: () {
+                                                Navigator.pop(
+                                                  dialogContext,
+                                                  true,
+                                                );
+                                              },
+                                              child:
+                                              const Text('Törlés'),
+                                            ),
+                                          ],
+                                        );
+                                      },
+                                    );
 
-                              if (shouldDelete != true) {
-                                return;
-                              }
+                                    if (shouldDelete != true) {
+                                      return;
+                                    }
 
-                              await shoppingRepository.deleteItem(item.id);
-                            },
-                          ),
-                        ],
-                      ),
-                    );
-                  },
-                );
-              },
-              onCheckedChanged: () {
-                shoppingRepository.setItemChecked(
-                  id: item.id,
-                  isChecked: !item.isChecked,
-                );
-              },
-            );
-          },
+                                    await shoppingRepository
+                                        .deleteItem(item.id);
+                                  },
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                      );
+                    },
+                    onCheckedChanged: () {
+                      shoppingRepository.setItemChecked(
+                        id: item.id,
+                        isChecked: !item.isChecked,
+                      );
+                    },
+                  );
+                },
+              ),
+            ),
+            Padding(
+              padding:
+              const EdgeInsets.fromLTRB(16, 12, 16, 16),
+              child: SizedBox(
+                width: double.infinity,
+                child: FilledButton.icon(
+                  onPressed: finishShopping,
+                  icon: const Icon(
+                    Icons.check_circle_outline,
+                  ),
+                  label: const Text(
+                    'Bevásárlás befejezése',
+                  ),
+                ),
+              ),
+            ),
+          ],
         );
       },
     );
