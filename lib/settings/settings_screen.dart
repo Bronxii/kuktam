@@ -1,11 +1,74 @@
 import 'package:flutter/material.dart';
 
 import '../features/auth/data/repositories/auth_repository.dart';
+import 'package:package_info_plus/package_info_plus.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'screens/privacy_screen.dart';
 
-class SettingsScreen extends StatelessWidget {
-  SettingsScreen({super.key});
+class SettingsScreen extends StatefulWidget {
+  const SettingsScreen({super.key});
 
+  @override
+  State<SettingsScreen> createState() => _SettingsScreenState();
+}
+
+class _SettingsScreenState extends State<SettingsScreen> {
   final AuthRepository _authRepository = AuthRepository();
+
+  String _appVersion = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _loadVersion();
+  }
+
+  Future<void> _loadVersion() async {
+    final packageInfo = await PackageInfo.fromPlatform();
+
+    if (!mounted) {
+      return;
+    }
+
+    setState(() {
+      _appVersion =
+      'v${packageInfo.version} (${packageInfo.buildNumber})';
+    });
+  }
+
+  Future<void> _sendFeedback() async {
+    final emailUri = Uri(
+      scheme: 'mailto',
+      path: 'kuktam.support@gmail.com',
+      query: _encodeQueryParameters({
+        'subject': 'Kuktám – visszajelzés',
+        'body': 'Szia!\n\n'
+            'Az alábbi visszajelzést szeretném küldeni a Kuktám alkalmazással kapcsolatban:\n\n',
+      }),
+    );
+
+    final launched = await launchUrl(emailUri);
+
+    if (!launched && mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Nem sikerült megnyitni a levelezőalkalmazást.',
+          ),
+        ),
+      );
+    }
+  }
+
+  String? _encodeQueryParameters(Map<String, String> parameters) {
+    return parameters.entries
+        .map(
+          (entry) =>
+      '${Uri.encodeComponent(entry.key)}='
+          '${Uri.encodeComponent(entry.value)}',
+    )
+        .join('&');
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -41,8 +104,159 @@ class SettingsScreen extends StatelessWidget {
               leading: const Icon(Icons.alternate_email),
               title: const Text('E-mail-cím módosítása'),
               trailing: const Icon(Icons.chevron_right),
-              onTap: () {},
+              onTap: () async {
+                final messenger = ScaffoldMessenger.of(context);
+
+                final emailController = TextEditingController();
+                final passwordController = TextEditingController();
+
+                final emailChanged = await showDialog<bool>(
+                  context: context,
+                  barrierDismissible: false,
+                  builder: (dialogContext) {
+                    String? errorText;
+                    bool isLoading = false;
+
+                    return StatefulBuilder(
+                      builder: (context, setDialogState) {
+                        Future<void> submitEmailChange() async {
+                          final newEmail = emailController.text.trim();
+                          final password = passwordController.text;
+
+                          if (newEmail.isEmpty || password.isEmpty) {
+                            setDialogState(() {
+                              errorText = 'Minden mezőt tölts ki!';
+                            });
+                            return;
+                          }
+
+                          final emailRegex = RegExp(
+                            r'^[^\s@]+@[^\s@]+\.[^\s@]+$',
+                          );
+
+                          if (!emailRegex.hasMatch(newEmail)) {
+                            setDialogState(() {
+                              errorText = 'Adj meg egy érvényes e-mail címet!';
+                            });
+                            return;
+                          }
+
+                          if (newEmail.toLowerCase() == email.toLowerCase()) {
+                            setDialogState(() {
+                              errorText =
+                              'Az új e-mail cím nem lehet azonos a jelenlegivel.';
+                            });
+                            return;
+                          }
+
+                          setDialogState(() {
+                            isLoading = true;
+                            errorText = null;
+                          });
+
+                          try {
+                            await _authRepository.changeEmail(
+                              currentPassword: password,
+                              newEmail: newEmail,
+                            );
+
+                            if (!dialogContext.mounted) {
+                              return;
+                            }
+
+                            Navigator.of(dialogContext).pop(true);
+                          } catch (_) {
+                            if (!dialogContext.mounted) {
+                              return;
+                            }
+
+                            setDialogState(() {
+                              isLoading = false;
+                              errorText =
+                              'Hibás jelszó vagy sikertelen e-mail módosítás.';
+                            });
+                          }
+                        }
+
+                        return AlertDialog(
+                          title: const Text('E-mail cím módosítása'),
+                          content: SingleChildScrollView(
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                TextField(
+                                  controller: emailController,
+                                  enabled: !isLoading,
+                                  keyboardType: TextInputType.emailAddress,
+                                  decoration: const InputDecoration(
+                                    labelText: 'Új e-mail cím',
+                                    border: OutlineInputBorder(),
+                                  ),
+                                ),
+                                const SizedBox(height: 16),
+                                TextField(
+                                  controller: passwordController,
+                                  enabled: !isLoading,
+                                  obscureText: true,
+                                  decoration: const InputDecoration(
+                                    labelText: 'Jelenlegi jelszó',
+                                    border: OutlineInputBorder(),
+                                  ),
+                                ),
+                                if (errorText != null) ...[
+                                  const SizedBox(height: 16),
+                                  Text(
+                                    errorText!,
+                                    style: TextStyle(
+                                      color: Theme.of(context).colorScheme.error,
+                                    ),
+                                  ),
+                                ],
+                              ],
+                            ),
+                          ),
+                          actions: [
+                            TextButton(
+                              onPressed: isLoading
+                                  ? null
+                                  : () {
+                                Navigator.of(dialogContext).pop(false);
+                              },
+                              child: const Text('Mégsem'),
+                            ),
+                            FilledButton(
+                              onPressed:
+                              isLoading ? null : submitEmailChange,
+                              child: isLoading
+                                  ? const SizedBox(
+                                width: 20,
+                                height: 20,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                ),
+                              )
+                                  : const Text('Mentés'),
+                            ),
+                          ],
+                        );
+                      },
+                    );
+                  },
+                );
+
+
+                if (emailChanged == true) {
+                  messenger.showSnackBar(
+                    const SnackBar(
+                      content: Text(
+                        'Ellenőrző e-mailt küldtünk az új címre. A módosítás a megerősítés után lép életbe.',
+                      ),
+                    ),
+                  );
+                }
+              },
             ),
+
     ListTile(
     leading: const Icon(Icons.lock_outline),
     title: const Text('Jelszó módosítása'),
@@ -208,9 +422,6 @@ class SettingsScreen extends StatelessWidget {
     },
     );
 
-    currentPasswordController.dispose();
-    newPasswordController.dispose();
-    confirmPasswordController.dispose();
 
     if (passwordChanged == true) {
       messenger.showSnackBar(
@@ -233,16 +444,63 @@ class SettingsScreen extends StatelessWidget {
             ),
           ),
 
-          const ListTile(
-            leading: Icon(Icons.feedback_outlined),
-            title: Text('Kapcsolat és visszajelzés'),
-            trailing: Icon(Icons.chevron_right),
+          ListTile(
+            leading: const Icon(Icons.feedback_outlined),
+            title: const Text('Kapcsolat és visszajelzés'),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () {
+              showDialog<void>(
+                context: context,
+                builder: (dialogContext) {
+                  return AlertDialog(
+                    icon: const Icon(
+                      Icons.feedback_outlined,
+                      size: 40,
+                    ),
+                    title: const Text(
+                      'Kapcsolat és visszajelzés',
+                      textAlign: TextAlign.center,
+                    ),
+                    content: const Text(
+                      'Kérdésed vagy ötleted van, esetleg hibát találtál?\n\n'
+                          'Írd le minél pontosabban a tapasztalataidat. '
+                          'Hibajelentés esetén lehetőség szerint azt is írd meg, '
+                          'hogy milyen művelet közben jelentkezett a probléma.',
+                      textAlign: TextAlign.center,
+                    ),
+                    actions: [
+                      TextButton(
+                        onPressed: () {
+                          Navigator.of(dialogContext).pop();
+                        },
+                        child: const Text('Mégsem'),
+                      ),
+                      FilledButton.icon(
+                        onPressed: () {
+                          Navigator.of(dialogContext).pop();
+                          _sendFeedback();
+                        },
+                        icon: const Icon(Icons.email_outlined),
+                        label: const Text('Visszajelzés küldése'),
+                      ),
+                    ],
+                  );
+                },
+              );
+            },
           ),
 
-          const ListTile(
-            leading: Icon(Icons.privacy_tip_outlined),
-            title: Text('Adatvédelem'),
-            trailing: Icon(Icons.chevron_right),
+          ListTile(
+            leading: const Icon(Icons.privacy_tip_outlined),
+            title: const Text('Adatvédelem'),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () {
+              Navigator.of(context).push(
+                MaterialPageRoute<void>(
+                  builder: (context) => const PrivacyScreen(),
+                ),
+              );
+            },
           ),
 
           const Divider(height: 32),
@@ -305,16 +563,23 @@ class SettingsScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  'v0.1.0',
+                  _appVersion,
                   style: theme.textTheme.bodySmall,
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  '© 2026 Bronxii',
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: Colors.grey,
+                  ),
                 ),
               ],
             ),
           ),
 
-              const SizedBox(height: 24),
-    ],
-    ),
+          const SizedBox(height: 24),
+        ],
+      ),
     );
   }
 }

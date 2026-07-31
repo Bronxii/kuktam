@@ -87,4 +87,27 @@ class AuthRepository {
     await user.reauthenticateWithCredential(credential);
     await user.updatePassword(newPassword);
   }
+
+  Future<void> changeEmail({
+    required String currentPassword,
+    required String newEmail,
+  }) async {
+    final user = _firebaseAuth.currentUser;
+    final currentEmail = user?.email;
+
+    if (user == null || currentEmail == null) {
+      throw Exception('Nincs bejelentkezett felhasználó.');
+    }
+
+    final credential = EmailAuthProvider.credential(
+      email: currentEmail,
+      password: currentPassword,
+    );
+
+    await user.reauthenticateWithCredential(credential);
+
+    await user.verifyBeforeUpdateEmail(
+      newEmail.trim(),
+    );
+  }
 }
