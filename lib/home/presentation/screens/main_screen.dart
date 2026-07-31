@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:share_plus/share_plus.dart';
 
-import '../../../features/auth/data/repositories/auth_repository.dart';
 import '../../../recipes/presentation/screens/recipes_screen.dart';
 import '../../../shopping/presentation/screens/shopping_screen.dart';
 import '../../../what_to_cook/presentation/screens/what_to_cook_screen.dart';
 import '../../../recipes/presentation/screens/add_recipe_screen.dart';
 import '../../../shopping/data/repositories/shopping_repository.dart';
 import '../../../shopping/presentation/widgets/shopping_item_dialog.dart';
+import '../../../settings/settings_screen.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -19,7 +19,6 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> {
   int _selectedIndex = 0;
 
-  final _authRepository = AuthRepository();
   final _shoppingRepository = ShoppingRepository();
 
   static const List<String> _titles = [
@@ -172,29 +171,14 @@ class _MainScreenState extends State<MainScreen> {
               onPressed: _shareShoppingList,
             ),
           IconButton(
-            tooltip: 'Profil',
+            tooltip: 'Profil és beállítások',
             icon: const Icon(Icons.account_circle_outlined),
-            onPressed: () async {
-              final selected = await showMenu<String>(
-                context: context,
-                position: const RelativeRect.fromLTRB(1000, 80, 16, 0),
-                items: const [
-                  PopupMenuItem(
-                    value: 'logout',
-                    child: Row(
-                      children: [
-                        Icon(Icons.logout),
-                        SizedBox(width: 12),
-                        Text('Kijelentkezés'),
-                      ],
-                    ),
-                  ),
-                ],
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute<void>(
+                  builder: (context) => SettingsScreen(),
+                ),
               );
-
-              if (selected == 'logout') {
-                await _authRepository.signOut();
-              }
             },
           ),
         ],

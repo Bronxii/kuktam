@@ -12,6 +12,17 @@ class AuthRepository {
   final GoogleSignIn _googleSignIn;
 
   User? get currentUser => _firebaseAuth.currentUser;
+  bool get isEmailPasswordUser {
+    final user = _firebaseAuth.currentUser;
+
+    if (user == null) {
+      return false;
+    }
+
+    return user.providerData.any(
+          (provider) => provider.providerId == 'password',
+    );
+  }
 
   Stream<User?> authStateChanges() {
     return _firebaseAuth.authStateChanges();
@@ -56,5 +67,24 @@ class AuthRepository {
   Future<void> signOut() async {
     await _googleSignIn.signOut();
     await _firebaseAuth.signOut();
+  }
+
+  Future<void> changePassword({
+    required String currentPassword,
+    required String newPassword,
+  }) async {
+    final user = _firebaseAuth.currentUser;
+
+    if (user == null || user.email == null) {
+      throw Exception('Nincs bejelentkezett felhasználó.');
+    }
+
+    final credential = EmailAuthProvider.credential(
+      email: user.email!,
+      password: currentPassword,
+    );
+
+    await user.reauthenticateWithCredential(credential);
+    await user.updatePassword(newPassword);
   }
 }

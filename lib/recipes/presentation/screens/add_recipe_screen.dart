@@ -48,20 +48,34 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
     'ml',
     'l',
     'db',
-    'kk',
+    'tk',
     'ek',
   ];
 
   Future<void> _loadIngredientSuggestions() async {
-    final ingredients = await _ingredientRepository.getIngredients();
+    try {
+      final ingredients = await _ingredientRepository.getIngredients();
 
-    if (!mounted) {
-      return;
+      if (!mounted) {
+        return;
+      }
+
+      setState(() {
+        _ingredientSuggestions = ingredients;
+      });
+    } catch (error) {
+      debugPrint(
+        'Az alapanyag-ajánlások betöltése sikertelen: $error',
+      );
+
+      if (!mounted) {
+        return;
+      }
+
+      setState(() {
+        _ingredientSuggestions = [];
+      });
     }
-
-    setState(() {
-      _ingredientSuggestions = ingredients;
-    });
   }
 
   @override
@@ -84,11 +98,11 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
         ..addAll(
           recipe.ingredients.map(
                 (ingredient) =>
-                IngredientRowData(
-                  name: ingredient.name,
-                  quantity: ingredient.formattedQuantity,
-                  unit: ingredient.unit,
-                ),
+                    IngredientRowData(
+                      name: ingredient.name,
+                      quantity: ingredient.formattedQuantity,
+                      unit: ingredient.unit == 'kk' ? 'tk' : ingredient.unit,
+                    ),
           ),
         );
 
@@ -398,18 +412,23 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
                     .titleLarge,
               ),
               const SizedBox(height: 16),
-              ...List.generate(
-          _ingredients.length,
-          (index) => Padding(
-      padding: const EdgeInsets.only(bottom: 12),
-      child: IngredientRow(
-        data: _ingredients[index],
-        units: _units,
-        suggestions: _ingredientSuggestions,
-        onRemove: () => _removeIngredient(index),
-      ),
-    ),
-    ),
+                  ...List.generate(
+                    _ingredients.length,
+                        (index) {
+                      final ingredient = _ingredients[index];
+
+                      return Padding(
+                        key: ObjectKey(ingredient),
+                        padding: const EdgeInsets.only(bottom: 12),
+                        child: IngredientRow(
+                          data: ingredient,
+                          units: _units,
+                          suggestions: _ingredientSuggestions,
+                          onRemove: () => _removeIngredient(index),
+                        ),
+                      );
+                    },
+                  ),
     OutlinedButton.icon(
     onPressed: _addIngredient,
     icon: const Icon(Icons.add),
@@ -422,16 +441,21 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
     ),
     const SizedBox(height: 16),
 
-    ...List.generate(
-    _spices.length,
-    (index) => Padding(
-    padding: const EdgeInsets.only(bottom: 12),
-    child: SpiceRow(
-    data: _spices[index],
-    onRemove: () => _removeSpice(index),
-    ),
-    ),
-    ),
+                  ...List.generate(
+                    _spices.length,
+                        (index) {
+                      final spice = _spices[index];
+
+                      return Padding(
+                        key: ObjectKey(spice),
+                        padding: const EdgeInsets.only(bottom: 12),
+                        child: SpiceRow(
+                          data: spice,
+                          onRemove: () => _removeSpice(index),
+                        ),
+                      );
+                    },
+                  ),
 
     OutlinedButton.icon(
     onPressed: _addSpice,

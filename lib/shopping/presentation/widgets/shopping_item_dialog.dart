@@ -40,7 +40,7 @@ class _ShoppingItemDialogState extends State<_ShoppingItemDialog> {
     'l',
     'db',
     'ek',
-    'kk',
+    'tk',
   ];
 
   late final TextEditingController _nameController;
