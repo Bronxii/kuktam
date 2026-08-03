@@ -28,7 +28,10 @@ class AuthRepository {
     return _firebaseAuth.authStateChanges();
   }
   Future<UserCredential> signInWithGoogle() async {
-    await _googleSignIn.initialize();
+    await _googleSignIn.initialize(
+      serverClientId:
+      '44537266968-55u1b9ekc1k5293af999qogt57i4mic6.apps.googleusercontent.com',
+    );
 
     final googleUser = await _googleSignIn.authenticate();
 

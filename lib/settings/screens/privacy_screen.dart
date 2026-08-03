@@ -7,12 +7,8 @@ class PrivacyScreen extends StatelessWidget {
   static const String _supportEmail = 'kuktam.support@gmail.com';
 
   Future<void> _openSupportEmail(BuildContext context) async {
-    final emailUri = Uri(
-      scheme: 'mailto',
-      path: _supportEmail,
-      queryParameters: const {
-        'subject': 'Kuktám – adatvédelmi kérdés',
-      },
+    final emailUri = Uri.parse(
+      'mailto:$_supportEmail?subject=${Uri.encodeComponent('Kuktám - adatvédelmi kérdés')}',
     );
 
     final launched = await launchUrl(emailUri);

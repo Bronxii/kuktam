@@ -4,7 +4,6 @@ import 'package:kuktam/recipes/presentation/widgets/ingredient_row.dart';
 import 'package:kuktam/recipes/presentation/widgets/spice_row.dart';
 import 'package:kuktam/recipes/domain/models/recipe.dart';
 import 'package:kuktam/recipes/data/repositories/recipe_repository.dart';
-import 'package:kuktam/recipes/data/repositories/ingredient_repository.dart';
 
 class AddRecipeScreen extends StatefulWidget {
   const AddRecipeScreen({
@@ -34,10 +33,6 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
   ];
 
   final RecipeRepository _recipeRepository = RecipeRepository();
-  final IngredientRepository _ingredientRepository =
-  IngredientRepository();
-
-  List<String> _ingredientSuggestions = [];
 
   late String _initialFormState;
   bool _allowPop = false;
@@ -52,36 +47,9 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
     'ek',
   ];
 
-  Future<void> _loadIngredientSuggestions() async {
-    try {
-      final ingredients = await _ingredientRepository.getIngredients();
-
-      if (!mounted) {
-        return;
-      }
-
-      setState(() {
-        _ingredientSuggestions = ingredients;
-      });
-    } catch (error) {
-      debugPrint(
-        'Az alapanyag-ajánlások betöltése sikertelen: $error',
-      );
-
-      if (!mounted) {
-        return;
-      }
-
-      setState(() {
-        _ingredientSuggestions = [];
-      });
-    }
-  }
-
   @override
   void initState() {
     super.initState();
-    _loadIngredientSuggestions();
 
     final recipe = widget.recipe;
 
@@ -423,7 +391,7 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
                         child: IngredientRow(
                           data: ingredient,
                           units: _units,
-                          suggestions: _ingredientSuggestions,
+                          suggestions: const [],
                           onRemove: () => _removeIngredient(index),
                         ),
                       );
