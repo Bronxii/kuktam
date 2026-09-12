@@ -105,8 +105,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
               title: const Text('E-mail-cím módosítása'),
               trailing: const Icon(Icons.chevron_right),
               onTap: () async {
-                final messenger = ScaffoldMessenger.of(context);
-
                 final emailController = TextEditingController();
                 final passwordController = TextEditingController();
                 bool isPasswordVisible = false;
@@ -261,11 +259,28 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 );
 
 
-                if (emailChanged == true) {
-                  messenger.showSnackBar(
-                    const SnackBar(
-                      content: Text(
-                        'Ellenőrző e-mailt küldtünk az új címre. A módosítás a megerősítés után lép életbe.',
+                if (emailChanged == true && context.mounted) {
+                  await showDialog<void>(
+                    context: context,
+                    barrierDismissible: false,
+                    builder: (successContext) => PopScope(
+                      canPop: false,
+                      child: AlertDialog(
+                        title: const Text('E-mail-cím módosítása'),
+                        content: const SingleChildScrollView(
+                          child: Text(
+                            'Megerősítő e-mailt küldtünk az új e-mail-címre.\n\n'
+                            'A módosítás véglegesítéséhez nyisd meg a levelet, '
+                            'és erősítsd meg az új címet.\n\n'
+                            'Ha nem találod, ellenőrizd a Spam mappát is.',
+                          ),
+                        ),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.of(successContext).pop(),
+                            child: const Text('Rendben'),
+                          ),
+                        ],
                       ),
                     ),
                   );
@@ -278,8 +293,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
     title: const Text('Jelszó módosítása'),
     trailing: const Icon(Icons.chevron_right),
     onTap: () async {
-    final messenger = ScaffoldMessenger.of(context);
-
     final currentPasswordController = TextEditingController();
     bool isCurrentPasswordVisible = false;
     final newPasswordController = TextEditingController();
@@ -487,10 +500,24 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
 
 
-    if (passwordChanged == true) {
-      messenger.showSnackBar(
-        const SnackBar(
-          content: Text('A jelszó sikeresen módosult.'),
+    if (passwordChanged == true && context.mounted) {
+      await showDialog<void>(
+        context: context,
+        barrierDismissible: false,
+        builder: (successContext) => PopScope(
+          canPop: false,
+          child: AlertDialog(
+            title: const Text('Jelszó módosítva'),
+            content: const SingleChildScrollView(
+              child: Text('A jelszavad sikeresen megváltozott.'),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(successContext).pop(),
+                child: const Text('Rendben'),
+              ),
+            ],
+          ),
         ),
       );
     }

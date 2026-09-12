@@ -295,10 +295,26 @@ class _LoginScreenState extends State<LoginScreen> {
       );
 
       if (sent == true && mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text(
-              'Ha a megadott e-mail-címhez tartozik Kuktám-fiók, elküldtük a jelszó-visszaállító levelet. Ellenőrizd a Spam mappát is.',
+        await showDialog<void>(
+          context: context,
+          barrierDismissible: false,
+          builder: (successContext) => PopScope(
+            canPop: false,
+            child: AlertDialog(
+              title: const Text('Jelszó-visszaállítás'),
+              content: const SingleChildScrollView(
+                child: Text(
+                  'Ha a megadott e-mail-címhez tartozik Kuktám-fiók, '
+                  'elküldtük a jelszó-visszaállító levelet.\n\n'
+                  'Ellenőrizd a Spam mappát is.',
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(successContext).pop(),
+                  child: const Text('Rendben'),
+                ),
+              ],
             ),
           ),
         );
@@ -359,6 +375,7 @@ class _LoginScreenState extends State<LoginScreen> {
               });
 
               try {
+                final navigator = Navigator.of(dialogContext);
                 await _authRepository.registerWithEmail(
                   email: email,
                   password: password,
@@ -370,15 +387,30 @@ class _LoginScreenState extends State<LoginScreen> {
 
                 Navigator.of(dialogContext).pop();
 
-                if (!mounted) {
+                if (!navigator.mounted) {
                   return;
                 }
 
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text(
-                      'Sikeres regisztráció! Megerősítő levelet küldtünk '
-                          'az e-mail-címedre.',
+                await showDialog<void>(
+                  context: navigator.context,
+                  barrierDismissible: false,
+                  builder: (successContext) => PopScope(
+                    canPop: false,
+                    child: AlertDialog(
+                      title: const Text('Sikeres regisztráció'),
+                      content: const SingleChildScrollView(
+                        child: Text(
+                          'Megerősítő e-mailt küldtünk a megadott címre.\n\n'
+                          'A bejelentkezés előtt erősítsd meg az e-mail-címedet.\n\n'
+                          'Ha nem találod a levelet, ellenőrizd a Spam mappát is.',
+                        ),
+                      ),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.of(successContext).pop(),
+                          child: const Text('Rendben'),
+                        ),
+                      ],
                     ),
                   ),
                 );
