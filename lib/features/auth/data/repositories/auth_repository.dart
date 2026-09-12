@@ -67,6 +67,17 @@ class AuthRepository {
 
     return userCredential;
   }
+  Future<void> resetPassword(String email) async {
+    try {
+      await _firebaseAuth.sendPasswordResetEmail(email: email.trim());
+    } on FirebaseAuthException catch (error) {
+      // Keep the response identical when account enumeration protection is off.
+      if (error.code != 'user-not-found') {
+        rethrow;
+      }
+    }
+  }
+
   Future<void> signOut() async {
     await _googleSignIn.signOut();
     await _firebaseAuth.signOut();

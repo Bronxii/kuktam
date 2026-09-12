@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart' show FirebaseAuthException;
 import 'package:flutter/material.dart';
 import '../../data/repositories/auth_repository.dart';
 
@@ -12,6 +13,7 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   bool _isGoogleLoading = false;
+  String _lastLoginEmail = '';
   final AuthRepository _authRepository = AuthRepository();
   Future<void> _signInWithGoogle() async {
     setState(() {
@@ -46,7 +48,11 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Future<void> _showEmailSignInDialog() async {
     final emailController = TextEditingController();
+    emailController.addListener(() {
+      _lastLoginEmail = emailController.text;
+    });
     final passwordController = TextEditingController();
+    bool isPasswordVisible = false;
 
     await showDialog<void>(
       context: context,
@@ -114,13 +120,28 @@ class _LoginScreenState extends State<LoginScreen> {
                   const SizedBox(height: 16),
                   TextField(
                     controller: passwordController,
-                    obscureText: true,
+                    obscureText: !isPasswordVisible,
                     textInputAction: TextInputAction.done,
                     autofillHints: const [AutofillHints.password],
                     onSubmitted: isLoading ? null : (_) => signIn(),
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
                       labelText: 'Jelszó',
-                      prefixIcon: Icon(Icons.lock_outline),
+                      prefixIcon: const Icon(Icons.lock_outline),
+                      suffixIcon: IconButton(
+                        tooltip: isPasswordVisible
+                            ? 'Jelszó elrejtése'
+                            : 'Jelszó megjelenítése',
+                        icon: Icon(
+                          isPasswordVisible
+                              ? Icons.visibility_off_outlined
+                              : Icons.visibility_outlined,
+                        ),
+                        onPressed: isLoading ? null : () {
+                          setDialogState(() {
+                            isPasswordVisible = !isPasswordVisible;
+                          });
+                        },
+                      ),
                     ),
                   ),
                   if (errorMessage != null) ...[
@@ -166,10 +187,134 @@ class _LoginScreenState extends State<LoginScreen> {
     emailController.dispose();
     passwordController.dispose();
   }
+  Future<void> _showPasswordResetDialog() async {
+    final emailController = TextEditingController(text: _lastLoginEmail);
+    bool isSending = false;
+    String? errorMessage;
+
+    try {
+      final sent = await showDialog<bool>(
+        context: context,
+        barrierDismissible: false,
+        builder: (dialogContext) {
+          return StatefulBuilder(
+            builder: (context, setDialogState) {
+              Future<void> sendResetEmail() async {
+                if (isSending) return;
+
+                final email = emailController.text.trim();
+                if (email.isEmpty) {
+                  setDialogState(() {
+                    errorMessage = 'Add meg az e-mail-címedet.';
+                  });
+                  return;
+                }
+                if (!RegExp(r'^[^\s@]+@[^\s@]+\.[^\s@]+$').hasMatch(email)) {
+                  setDialogState(() {
+                    errorMessage = 'Adj meg egy érvényes e-mail-címet.';
+                  });
+                  return;
+                }
+
+                setDialogState(() {
+                  isSending = true;
+                  errorMessage = null;
+                });
+
+                try {
+                  await _authRepository.resetPassword(email);
+                  if (!dialogContext.mounted) return;
+                  Navigator.of(dialogContext).pop(true);
+                } on FirebaseAuthException catch (error) {
+                  if (!dialogContext.mounted) return;
+                  setDialogState(() {
+                    isSending = false;
+                    errorMessage = switch (error.code) {
+                      'invalid-email' => 'Adj meg egy érvényes e-mail-címet.',
+                      'network-request-failed' =>
+                        'Hálózati hiba. Ellenőrizd az internetkapcsolatot, majd próbáld újra.',
+                      'too-many-requests' =>
+                        'Túl sok próbálkozás. Kérjük, próbáld újra később.',
+                      _ => 'Nem sikerült elküldeni a visszaállító e-mailt. Próbáld újra később.',
+                    };
+                  });
+                } catch (_) {
+                  if (!dialogContext.mounted) return;
+                  setDialogState(() {
+                    isSending = false;
+                    errorMessage =
+                        'Nem sikerült elküldeni a visszaállító e-mailt. Próbáld újra később.';
+                  });
+                }
+              }
+
+              return PopScope(
+                canPop: !isSending,
+                child: AlertDialog(
+                  title: const Text('Jelszó visszaállítása'),
+                  content: SingleChildScrollView(
+                    child: TextField(
+                      controller: emailController,
+                      autofocus: true,
+                      enabled: !isSending,
+                      keyboardType: TextInputType.emailAddress,
+                      textInputAction: TextInputAction.done,
+                      autofillHints: const [AutofillHints.email],
+                      onSubmitted: isSending ? null : (_) => sendResetEmail(),
+                      decoration: InputDecoration(
+                        labelText: 'E-mail-cím',
+                        prefixIcon: const Icon(Icons.email_outlined),
+                        errorText: errorMessage,
+                        errorMaxLines: 4,
+                      ),
+                    ),
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: isSending
+                          ? null
+                          : () => Navigator.of(dialogContext).pop(false),
+                      child: const Text('Mégse'),
+                    ),
+                    FilledButton(
+                      onPressed: isSending ? null : sendResetEmail,
+                      child: isSending
+                          ? const SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            )
+                          : const Text('Visszaállító e-mail küldése'),
+                    ),
+                  ],
+                ),
+              );
+            },
+          );
+        },
+      );
+
+      if (sent == true && mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              'Ha a megadott e-mail-címhez tartozik Kuktám-fiók, elküldtük a jelszó-visszaállító levelet. Ellenőrizd a Spam mappát is.',
+            ),
+          ),
+        );
+      }
+    } finally {
+      await Future<void>.delayed(const Duration(milliseconds: 300));
+      emailController.dispose();
+    }
+  }
+
   Future<void> _showRegistrationDialog() async {
     final emailController = TextEditingController();
     final passwordController = TextEditingController();
+    bool isPasswordVisible = false;
     final confirmPasswordController = TextEditingController();
+    bool isConfirmPasswordVisible = false;
 
     await showDialog<void>(
       context: context,
@@ -269,25 +414,55 @@ class _LoginScreenState extends State<LoginScreen> {
                     const SizedBox(height: 16),
                     TextField(
                       controller: passwordController,
-                      obscureText: true,
+                      obscureText: !isPasswordVisible,
                       textInputAction: TextInputAction.next,
                       autofillHints: const [AutofillHints.newPassword],
-                      decoration: const InputDecoration(
+                      decoration: InputDecoration(
                         labelText: 'Jelszó',
                         helperText: 'Legalább 6 karakter',
-                        prefixIcon: Icon(Icons.lock_outline),
+                        prefixIcon: const Icon(Icons.lock_outline),
+                        suffixIcon: IconButton(
+                          tooltip: isPasswordVisible
+                              ? 'Jelszó elrejtése'
+                              : 'Jelszó megjelenítése',
+                          icon: Icon(
+                            isPasswordVisible
+                                ? Icons.visibility_off_outlined
+                                : Icons.visibility_outlined,
+                          ),
+                          onPressed: isLoading ? null : () {
+                            setDialogState(() {
+                              isPasswordVisible = !isPasswordVisible;
+                            });
+                          },
+                        ),
                       ),
                     ),
                     const SizedBox(height: 16),
                     TextField(
                       controller: confirmPasswordController,
-                      obscureText: true,
+                      obscureText: !isConfirmPasswordVisible,
                       textInputAction: TextInputAction.done,
                       autofillHints: const [AutofillHints.newPassword],
                       onSubmitted: isLoading ? null : (_) => register(),
-                      decoration: const InputDecoration(
+                      decoration: InputDecoration(
                         labelText: 'Jelszó megerősítése',
-                        prefixIcon: Icon(Icons.lock_reset_outlined),
+                        prefixIcon: const Icon(Icons.lock_reset_outlined),
+                        suffixIcon: IconButton(
+                          tooltip: isConfirmPasswordVisible
+                              ? 'Jelszó elrejtése'
+                              : 'Jelszó megjelenítése',
+                          icon: Icon(
+                            isConfirmPasswordVisible
+                                ? Icons.visibility_off_outlined
+                                : Icons.visibility_outlined,
+                          ),
+                          onPressed: isLoading ? null : () {
+                            setDialogState(() {
+                              isConfirmPasswordVisible = !isConfirmPasswordVisible;
+                            });
+                          },
+                        ),
                       ),
                     ),
                     if (errorMessage != null) ...[
@@ -391,7 +566,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 const SizedBox(height: 4),
                 TextButton(
-                  onPressed: () {},
+                  onPressed: _showPasswordResetDialog,
                   child: const Text('Elfelejtett jelszó'),
                 ),
               ],

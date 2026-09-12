@@ -109,6 +109,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
                 final emailController = TextEditingController();
                 final passwordController = TextEditingController();
+                bool isPasswordVisible = false;
 
                 final emailChanged = await showDialog<bool>(
                   context: context,
@@ -197,10 +198,25 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                 TextField(
                                   controller: passwordController,
                                   enabled: !isLoading,
-                                  obscureText: true,
-                                  decoration: const InputDecoration(
+                                  obscureText: !isPasswordVisible,
+                                  decoration: InputDecoration(
                                     labelText: 'Jelenlegi jelszó',
-                                    border: OutlineInputBorder(),
+                                    border: const OutlineInputBorder(),
+                                    suffixIcon: IconButton(
+                                      tooltip: isPasswordVisible
+                                          ? 'Jelszó elrejtése'
+                                          : 'Jelszó megjelenítése',
+                                      icon: Icon(
+                                        isPasswordVisible
+                                            ? Icons.visibility_off_outlined
+                                            : Icons.visibility_outlined,
+                                      ),
+                                      onPressed: isLoading ? null : () {
+                                        setDialogState(() {
+                                          isPasswordVisible = !isPasswordVisible;
+                                        });
+                                      },
+                                    ),
                                   ),
                                 ),
                                 if (errorText != null) ...[
@@ -265,8 +281,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final messenger = ScaffoldMessenger.of(context);
 
     final currentPasswordController = TextEditingController();
+    bool isCurrentPasswordVisible = false;
     final newPasswordController = TextEditingController();
+    bool isNewPasswordVisible = false;
     final confirmPasswordController = TextEditingController();
+    bool isConfirmPasswordVisible = false;
 
     final passwordChanged = await showDialog<bool>(
     context: context,
@@ -354,31 +373,76 @@ class _SettingsScreenState extends State<SettingsScreen> {
     children: [
     TextField(
     controller: currentPasswordController,
-    obscureText: true,
+    obscureText: !isCurrentPasswordVisible,
     enabled: !isLoading,
-    decoration: const InputDecoration(
+    decoration: InputDecoration(
     labelText: 'Jelenlegi jelszó',
-    border: OutlineInputBorder(),
+    border: const OutlineInputBorder(),
+    suffixIcon: IconButton(
+      tooltip: isCurrentPasswordVisible
+          ? 'Jelszó elrejtése'
+          : 'Jelszó megjelenítése',
+      icon: Icon(
+        isCurrentPasswordVisible
+            ? Icons.visibility_off_outlined
+            : Icons.visibility_outlined,
+      ),
+      onPressed: isLoading ? null : () {
+        setDialogState(() {
+          isCurrentPasswordVisible = !isCurrentPasswordVisible;
+        });
+      },
+    ),
     ),
     ),
     const SizedBox(height: 16),
     TextField(
     controller: newPasswordController,
-    obscureText: true,
+    obscureText: !isNewPasswordVisible,
     enabled: !isLoading,
-    decoration: const InputDecoration(
+    decoration: InputDecoration(
     labelText: 'Új jelszó',
-    border: OutlineInputBorder(),
+    border: const OutlineInputBorder(),
+    suffixIcon: IconButton(
+      tooltip: isNewPasswordVisible
+          ? 'Jelszó elrejtése'
+          : 'Jelszó megjelenítése',
+      icon: Icon(
+        isNewPasswordVisible
+            ? Icons.visibility_off_outlined
+            : Icons.visibility_outlined,
+      ),
+      onPressed: isLoading ? null : () {
+        setDialogState(() {
+          isNewPasswordVisible = !isNewPasswordVisible;
+        });
+      },
+    ),
     ),
     ),
     const SizedBox(height: 16),
     TextField(
     controller: confirmPasswordController,
-    obscureText: true,
+    obscureText: !isConfirmPasswordVisible,
     enabled: !isLoading,
-    decoration: const InputDecoration(
+    decoration: InputDecoration(
     labelText: 'Új jelszó ismét',
-    border: OutlineInputBorder(),
+    border: const OutlineInputBorder(),
+    suffixIcon: IconButton(
+      tooltip: isConfirmPasswordVisible
+          ? 'Jelszó elrejtése'
+          : 'Jelszó megjelenítése',
+      icon: Icon(
+        isConfirmPasswordVisible
+            ? Icons.visibility_off_outlined
+            : Icons.visibility_outlined,
+      ),
+      onPressed: isLoading ? null : () {
+        setDialogState(() {
+          isConfirmPasswordVisible = !isConfirmPasswordVisible;
+        });
+      },
+    ),
     ),
     ),
     if (errorText != null) ...[
