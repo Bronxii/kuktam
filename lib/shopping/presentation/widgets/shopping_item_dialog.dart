@@ -41,6 +41,10 @@ class _ShoppingItemDialogState extends State<_ShoppingItemDialog> {
     'db',
     'ek',
     'tk',
+    'csomag',
+    'üveg',
+    'doboz',
+    'konzerv',
   ];
 
   late final TextEditingController _nameController;
@@ -175,6 +179,7 @@ class _ShoppingItemDialogState extends State<_ShoppingItemDialog> {
             const SizedBox(height: 16),
             DropdownButtonFormField<String>(
               initialValue: _selectedUnit,
+              menuMaxHeight: 240,
               decoration: const InputDecoration(
                 labelText: 'Mértékegység',
                 border: OutlineInputBorder(),

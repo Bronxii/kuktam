@@ -101,6 +101,8 @@ class _IngredientRowState extends State<IngredientRow> {
           width: 76,
           child: DropdownButtonFormField<String>(
             initialValue: widget.data.selectedUnit,
+            isExpanded: true,
+            menuMaxHeight: 240,
             decoration: const InputDecoration(
               labelText: 'Egység',
               border: OutlineInputBorder(),

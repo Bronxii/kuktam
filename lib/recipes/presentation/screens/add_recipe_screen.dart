@@ -45,6 +45,10 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
     'db',
     'tk',
     'ek',
+    'csomag',
+    'üveg',
+    'doboz',
+    'konzerv',
   ];
 
   @override
