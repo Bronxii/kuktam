@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../data/repositories/shopping_repository.dart';
 import '../../domain/models/shopping_item.dart';
+import '../../domain/shopping_units.dart';
 
 Future<void> showShoppingItemDialog({
   required BuildContext context,
@@ -33,19 +34,7 @@ class _ShoppingItemDialog extends StatefulWidget {
 }
 
 class _ShoppingItemDialogState extends State<_ShoppingItemDialog> {
-  static const List<String> _units = [
-    'g',
-    'kg',
-    'ml',
-    'l',
-    'db',
-    'ek',
-    'tk',
-    'csomag',
-    'üveg',
-    'doboz',
-    'konzerv',
-  ];
+  static const List<String> _units = shoppingUnits;
 
   late final TextEditingController _nameController;
   late final TextEditingController _quantityController;
