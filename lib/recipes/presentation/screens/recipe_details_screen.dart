@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:share_plus/share_plus.dart';
+import '../widgets/recipe_scaling_dialog.dart';
 
 import 'package:kuktam/recipes/domain/models/recipe.dart';
 import 'package:kuktam/recipes/presentation/screens/add_recipe_screen.dart';
@@ -151,6 +152,19 @@ body: ListView(
             style: Theme.of(context).textTheme.titleLarge,
           ),
           const SizedBox(height: 12),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: FilledButton(
+              onPressed: () => showDialog<void>(
+                context: context,
+                barrierDismissible: false,
+                builder: (context) => RecipeScalingDialog(
+                  ingredients: recipe.ingredients,
+                ),
+              ),
+              child: const Text('Átszámítás'),
+            ),
+          ),
           ...recipe.ingredients.map(
                 (ingredient) => Padding(
               padding: const EdgeInsets.symmetric(vertical: 8),
