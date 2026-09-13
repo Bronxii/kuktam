@@ -2,14 +2,27 @@ import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import '../../../shopping/data/repositories/shopping_repository.dart';
 
 import '../../domain/models/recipe.dart';
 import '../../domain/services/recipe_scaler.dart';
 
+typedef AddScalingShoppingItem =
+    Future<void> Function({
+      required String name,
+      required double quantity,
+      required String unit,
+    });
+
 class RecipeScalingDialog extends StatefulWidget {
-  const RecipeScalingDialog({super.key, required this.ingredients});
+  const RecipeScalingDialog({
+    super.key,
+    required this.ingredients,
+    this.addShoppingItem,
+  });
 
   final List<RecipeIngredient> ingredients;
+  final AddScalingShoppingItem? addShoppingItem;
 
   @override
   State<RecipeScalingDialog> createState() => _RecipeScalingDialogState();
@@ -24,6 +37,54 @@ class _RecipeScalingDialogState extends State<RecipeScalingDialog> {
   int _revision = 0;
   ({int index, int revision, String text, String unit})? _pending;
   bool _isConfirmingClose = false;
+  bool _isAdding = false;
+  String? _shoppingError;
+
+  Future<void> _addToShopping() async {
+    if (_isAdding || _isConfirmingClose || _rows.isEmpty) return;
+    _processPending();
+    for (final row in _rows) {
+      _finishEditing(row);
+    }
+    if (_rows.any((row) => row.error != null || row.initialDisplay == null)) {
+      return;
+    }
+    final items = <({String name, double quantity, String unit})>[];
+    for (final row in _rows) {
+      final ingredient = _scaledIngredients[row.index];
+      final shopping = _scaler.normalizeForShopping(
+        quantity: ingredient.quantity,
+        unit: ingredient.unit,
+      );
+      items.add((
+        name: row.original.name,
+        quantity: shopping.quantity,
+        unit: shopping.unit,
+      ));
+    }
+    final snapshot =
+        List<({String name, double quantity, String unit})>.unmodifiable(items);
+    setState(() {
+      _isAdding = true;
+      _shoppingError = null;
+    });
+    FocusScope.of(context).unfocus();
+    try {
+      final add = widget.addShoppingItem ?? ShoppingRepository().addOrMergeItem;
+      for (final item in snapshot) {
+        await add(name: item.name, quantity: item.quantity, unit: item.unit);
+      }
+      if (!mounted) return;
+      Navigator.of(context).pop(true);
+    } catch (_) {
+      if (!mounted) return;
+      setState(() {
+        _isAdding = false;
+        _shoppingError =
+            'Nem sikerült minden tételt hozzáadni a bevásárlólistához. Ellenőrizd a listát.';
+      });
+    }
+  }
 
   @override
   void initState() {
@@ -155,7 +216,7 @@ class _RecipeScalingDialogState extends State<RecipeScalingDialog> {
   }
 
   Future<void> _requestClose() async {
-    if (_isConfirmingClose) return;
+    if (_isConfirmingClose || _isAdding) return;
     _isConfirmingClose = true;
     FocusScope.of(context).unfocus();
     final shouldClose = await showDialog<bool>(
@@ -215,7 +276,7 @@ class _RecipeScalingDialogState extends State<RecipeScalingDialog> {
                         ),
                         IconButton(
                           tooltip: 'Bezárás',
-                          onPressed: _requestClose,
+                          onPressed: _isAdding ? null : _requestClose,
                           icon: const Icon(Icons.close),
                         ),
                       ],
@@ -241,15 +302,24 @@ class _RecipeScalingDialogState extends State<RecipeScalingDialog> {
                       overflowSpacing: 8,
                       children: [
                         TextButton(
-                          onPressed: _reset,
+                          onPressed: _isAdding ? null : _reset,
                           child: const Text('Visszaállítás'),
                         ),
-                        const FilledButton(
-                          onPressed: null,
-                          child: Text('Bevásárlólistához adás'),
+                        FilledButton(
+                          onPressed: _isAdding || _rows.isEmpty
+                              ? null
+                              : _addToShopping,
+                          child: const Text('Bevásárlólistához adás'),
                         ),
                       ],
                     ),
+                    if (_shoppingError != null)
+                      Text(
+                        _shoppingError!,
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.error,
+                        ),
+                      ),
                   ],
                 ),
               ),
@@ -265,7 +335,7 @@ class _RecipeScalingDialogState extends State<RecipeScalingDialog> {
       key: ValueKey('scaling-quantity-${row.index}'),
       controller: row.controller,
       focusNode: row.focusNode,
-      enabled: row.initialDisplay != null,
+      enabled: !_isAdding && row.initialDisplay != null,
       keyboardType: const TextInputType.numberWithOptions(decimal: true),
       textInputAction: TextInputAction.done,
       onChanged: (text) => _onChanged(row, text),

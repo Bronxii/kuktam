@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:share_plus/share_plus.dart';
 import '../widgets/recipe_scaling_dialog.dart';
+import '../../domain/services/recipe_scaler.dart';
 
 import 'package:kuktam/recipes/domain/models/recipe.dart';
 import 'package:kuktam/recipes/presentation/screens/add_recipe_screen.dart';
@@ -11,10 +12,14 @@ import 'package:kuktam/shopping/data/repositories/shopping_repository.dart';
 class RecipeDetailsScreen extends StatelessWidget {
   const RecipeDetailsScreen({
     required this.recipe,
+    this.addScalingShoppingItem,
+    this.addMultiplierShoppingItem,
     super.key,
   });
 
   final Recipe recipe;
+  final AddScalingShoppingItem? addScalingShoppingItem;
+  final AddScalingShoppingItem? addMultiplierShoppingItem;
 
   String _formatQuantity(double quantity) {
     if (quantity == quantity.roundToDouble()) {
@@ -155,13 +160,21 @@ body: ListView(
           Align(
             alignment: Alignment.centerLeft,
             child: FilledButton(
-              onPressed: () => showDialog<void>(
-                context: context,
-                barrierDismissible: false,
-                builder: (context) => RecipeScalingDialog(
-                  ingredients: recipe.ingredients,
-                ),
-              ),
+              onPressed: () async {
+                final added = await showDialog<bool>(
+                  context: context,
+                  barrierDismissible: false,
+                  builder: (context) => RecipeScalingDialog(
+                    ingredients: recipe.ingredients,
+                    addShoppingItem: addScalingShoppingItem,
+                  ),
+                );
+                if (added != true || !context.mounted) return;
+                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                  content: Text('A hozzávalók felkerültek a bevásárlólistára.'),
+                ));
+                Navigator.of(context).pop();
+              },
               child: const Text('Átszámítás'),
             ),
           ),
@@ -361,13 +374,17 @@ body: ListView(
                   return;
                 }
 
-                final shoppingRepository = ShoppingRepository();
+                final add = addMultiplierShoppingItem ?? ShoppingRepository().addOrMergeItem;
 
                 for (final ingredient in recipe.ingredients) {
-                  await shoppingRepository.addOrMergeItem(
-                    name: ingredient.name,
+                  final shopping = const RecipeScaler().normalizeForShopping(
                     quantity: ingredient.quantity * multiplier,
                     unit: ingredient.unit,
+                  );
+                  await add(
+                    name: ingredient.name,
+                    quantity: shopping.quantity,
+                    unit: shopping.unit,
                   );
                 }
 

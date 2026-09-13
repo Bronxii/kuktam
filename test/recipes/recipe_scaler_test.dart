@@ -525,6 +525,52 @@ void main() {
   });
 
   group('Formatting', () {
+    for (final c in <(double, String, double, String, String)>[
+      (356.56, 'g', 357, 'g', '357'),
+      (0.4, 'g', 1, 'g', '1'),
+      (356.56, 'ml', 357, 'ml', '357'),
+      (0.4, 'ml', 1, 'ml', '1'),
+      (8.82, 'db', 9, 'db', '9'),
+      (4.41, 'db', 4.5, 'db', '4,5'),
+      (0.1, 'db', 0.5, 'db', '0,5'),
+      (0.88, 'tk', 1, 'tk', '1'),
+      (0.08, 'tk', 0.25, 'tk', '0,25'),
+      (1.18, 'ek', 1.25, 'ek', '1,25'),
+      (0.08, 'ek', 0.25, 'ek', '0,25'),
+      (1.67, 'doboz', 1.7, 'doboz', '1,7'),
+      for (final unit in ['csomag', 'üveg', 'doboz', 'konzerv'])
+        (0.04, unit, 0.1, unit, '0,1'),
+      (2125, 'g', 2.13, 'kg', '2,13'),
+      (1325, 'ml', 1.33, 'l', '1,33'),
+      (0.125, 'kg', 125, 'g', '125'),
+      (0.125, 'l', 125, 'ml', '125'),
+      (999.6, 'g', 1000, 'g', '1000'),
+    ]) {
+      test('numeric shopping and display agree for ${c.$1} ${c.$2}', () {
+        final shopping = scaler.normalizeForShopping(
+          quantity: c.$1,
+          unit: c.$2,
+        );
+        expect(shopping, (quantity: c.$3, unit: c.$4));
+        final display = scaler.normalizeForDisplay(quantity: c.$1, unit: c.$2);
+        expect(
+          scaler.formatQuantity(display.quantity, unit: display.unit),
+          c.$5,
+        );
+      });
+    }
+    for (final invalid in [0.0, -1.0, double.nan, double.infinity]) {
+      test('minimum never makes $invalid valid', () {
+        expect(
+          () => scaler.normalizeForShopping(quantity: invalid, unit: 'db'),
+          throwsArgumentError,
+        );
+        expect(
+          () => scaler.formatQuantity(invalid, unit: 'db'),
+          throwsArgumentError,
+        );
+      });
+    }
     for (final c in <(double, String)>[
       (356.56, '357'),
       (176.47, '176'),

@@ -95,14 +95,34 @@ class RecipeScaler {
   }
 
   /// Hungarian display text, rounded to at most two decimals, without trailing
-  /// zeros. Never use this text as stored mathematical state. Tiny positive
-  /// quantities can display as zero; their numeric value remains unchanged.
+  /// zeros. Never use this text as stored mathematical state.
   /// Pass the final normalized display unit for kitchen-friendly increments.
   /// Unit selection must happen before formatting, using the exact quantity.
   String formatQuantity(double quantity, {String? unit}) {
+    final rounded = _roundKitchenQuantity(quantity, unit);
+    final text = rounded >= 1e21
+        ? rounded.toString()
+        : rounded.toStringAsFixed(2);
+    return _plainDecimal(text).replaceAll('.', ',');
+  }
+
+  /// Numeric purchasing output: select units from the exact quantity first.
+  /// Does not change the input or the full-precision scaling state.
+  ({double quantity, String unit}) normalizeForShopping({
+    required double quantity,
+    required String unit,
+  }) {
+    final display = normalizeForDisplay(quantity: quantity, unit: unit);
+    return (
+      quantity: _roundKitchenQuantity(display.quantity, display.unit),
+      unit: display.unit,
+    );
+  }
+
+  static double _roundKitchenQuantity(double quantity, String? unit) {
     _requireQuantity(quantity, 'quantity');
     // Large doubles already have integral spacing; do not multiply them.
-    if (quantity >= 1e21) return _plainDecimal(quantity.toString());
+    if (quantity >= 1e21) return quantity;
     final stepsPerUnit = switch (unit) {
       'g' || 'ml' => 1,
       'db' => 2,
@@ -117,7 +137,8 @@ class RecipeScaler {
     final rounded =
         (_closeForDisplay(steps, midpoint) ? midpoint : steps).roundToDouble() /
         stepsPerUnit;
-    return _plainDecimal(rounded.toStringAsFixed(2)).replaceAll('.', ',');
+    if (rounded == 0 && stepsPerUnit != 100) return 1 / stepsPerUnit;
+    return rounded;
   }
 
   static double _requireQuantity(double value, String name) {

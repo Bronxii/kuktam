@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:kuktam/recipes/domain/models/recipe.dart';
@@ -27,6 +28,10 @@ void main() {
   }
 
   Finder quantity(int index) => find.byKey(ValueKey('scaling-quantity-$index'));
+  Finder shoppingButton() => find.descendant(
+    of: find.byType(RecipeScalingDialog),
+    matching: find.widgetWithText(FilledButton, 'Bevásárlólistához adás'),
+  );
 
   testWidgets(
     'details entry opens normalized ingredients only without autofocus',
@@ -71,7 +76,7 @@ void main() {
         FilledButton,
         'Bevásárlólistához adás',
       );
-      expect(tester.widget<FilledButton>(shopping).onPressed, isNull);
+      expect(tester.widget<FilledButton>(shopping).onPressed, isNotNull);
       expect(tester.takeException(), isNull);
     },
   );
@@ -377,6 +382,272 @@ void main() {
       ),
       findsOneWidget,
     );
+  });
+
+  Future<void> openShopping(
+    WidgetTester tester,
+    AddScalingShoppingItem add, {
+    List<RecipeIngredient> items = basic,
+  }) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Builder(
+          builder: (context) => Scaffold(
+            body: TextButton(
+              onPressed: () => Navigator.of(context).push(
+                MaterialPageRoute<void>(
+                  builder: (_) => RecipeDetailsScreen(
+                    recipe: Recipe(
+                      name: 'Shopping test',
+                      ingredients: items,
+                      spices: const [RecipeSpice(name: 'Só')],
+                      preparation: '',
+                    ),
+                    addScalingShoppingItem: add,
+                  ),
+                ),
+              ),
+              child: const Text('Recept megnyitása'),
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.tap(find.text('Recept megnyitása'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Átszámítás'));
+    await tester.pumpAndSettle();
+  }
+
+  Future<void> submitShopping(WidgetTester tester) async {
+    final button = shoppingButton();
+    await tester.ensureVisible(button);
+    await tester.tap(button);
+    await tester.pump();
+  }
+
+  testWidgets('shopping flushes latest draft once and closes both routes', (
+    tester,
+  ) async {
+    final calls = <double>[];
+    final gate = Completer<void>();
+    await openShopping(tester, ({
+      required name,
+      required quantity,
+      required unit,
+    }) async {
+      calls.add(quantity);
+      await gate.future;
+    });
+    await tester.enterText(quantity(0), '250');
+    await submitShopping(tester);
+    expect(calls, [250]);
+    expect(tester.widget<TextField>(quantity(0)).enabled, isFalse);
+    await tester.binding.handlePopRoute();
+    await tester.pump();
+    expect(find.text('Kilépsz az átszámításból?'), findsNothing);
+    expect(find.byType(RecipeScalingDialog), findsOneWidget);
+    final button = shoppingButton();
+    expect(tester.widget<FilledButton>(button).onPressed, isNull);
+    await tester.tap(button);
+    await tester.pump();
+    expect(calls, [250]);
+    gate.complete();
+    await tester.pumpAndSettle();
+    expect(calls, [250, 625, 375, 2.5]);
+    expect(find.byType(RecipeScalingDialog), findsNothing);
+    expect(find.byType(RecipeDetailsScreen), findsNothing);
+    expect(find.text('Hányszoros adagot szeretnél?'), findsNothing);
+  });
+
+  testWidgets('shopping uses final displayed quantity and unit, no spices', (
+    tester,
+  ) async {
+    final calls = <(double, String)>[];
+    const items = [
+      RecipeIngredient(name: 'Liszt', quantity: 356.558823, unit: 'g'),
+      RecipeIngredient(name: 'Másik liszt', quantity: 2125, unit: 'g'),
+      RecipeIngredient(name: 'Tortilla', quantity: 8.823529, unit: 'db'),
+      RecipeIngredient(name: 'Fokhagyma', quantity: 4.411764, unit: 'db'),
+      RecipeIngredient(name: 'Cukor', quantity: 1.17647, unit: 'tk'),
+      RecipeIngredient(name: 'Olaj', quantity: 1.17647, unit: 'ek'),
+      RecipeIngredient(name: 'A', quantity: 1.67, unit: 'csomag'),
+      RecipeIngredient(name: 'B', quantity: 2.36, unit: 'üveg'),
+      RecipeIngredient(name: 'C', quantity: 1.67, unit: 'doboz'),
+      RecipeIngredient(name: 'D', quantity: 0.84, unit: 'konzerv'),
+    ];
+    await openShopping(tester, ({
+      required name,
+      required quantity,
+      required unit,
+    }) async {
+      calls.add((quantity, unit));
+    }, items: items);
+    await submitShopping(tester);
+    await tester.pumpAndSettle();
+    expect(calls, [
+      (357.0, 'g'),
+      (2.13, 'kg'),
+      (9.0, 'db'),
+      (4.5, 'db'),
+      (1.25, 'tk'),
+      (1.25, 'ek'),
+      (1.7, 'csomag'),
+      (2.4, 'üveg'),
+      (1.7, 'doboz'),
+      (0.8, 'konzerv'),
+    ]);
+  });
+
+  testWidgets('invalid pending draft blocks shopping without stale fallback', (
+    tester,
+  ) async {
+    var calls = 0;
+    await openShopping(tester, ({
+      required name,
+      required quantity,
+      required unit,
+    }) async {
+      calls++;
+    });
+    await tester.enterText(quantity(0), '');
+    await submitShopping(tester);
+    expect(calls, 0);
+    expect(
+      tester.widget<TextField>(quantity(0)).decoration!.errorText,
+      isNotNull,
+    );
+    expect(find.byType(RecipeScalingDialog), findsOneWidget);
+  });
+
+  testWidgets('partial failure stops writes and keeps both routes', (
+    tester,
+  ) async {
+    var calls = 0;
+    await openShopping(tester, ({
+      required name,
+      required quantity,
+      required unit,
+    }) async {
+      calls++;
+      if (calls == 2) throw StateError('network');
+    });
+    await submitShopping(tester);
+    await tester.pumpAndSettle();
+    expect(calls, 2);
+    expect(
+      find.text(
+        'Nem sikerült minden tételt hozzáadni a bevásárlólistához. Ellenőrizd a listát.',
+      ),
+      findsOneWidget,
+    );
+    expect(find.byType(RecipeScalingDialog), findsOneWidget);
+    expect(
+      find.byType(RecipeDetailsScreen, skipOffstage: false),
+      findsOneWidget,
+    );
+    expect(
+      find.text('A hozzávalók felkerültek a bevásárlólistára.'),
+      findsNothing,
+    );
+  });
+
+  testWidgets('empty ingredients disable shopping', (tester) async {
+    await openShopping(tester, ({
+      required name,
+      required quantity,
+      required unit,
+    }) async {
+      fail('No writes');
+    }, items: []);
+    expect(tester.widget<FilledButton>(shoppingButton()).onPressed, isNull);
+  });
+
+  testWidgets('tiny positive quantity uses minimum shopping amount', (
+    tester,
+  ) async {
+    final calls = <double>[];
+    await openShopping(
+      tester,
+      ({required name, required quantity, required unit}) async {
+        calls.add(quantity);
+      },
+      items: const [RecipeIngredient(name: 'Kevés', quantity: 0.1, unit: 'db')],
+    );
+    await submitShopping(tester);
+    await tester.pumpAndSettle();
+    expect(calls, [0.5]);
+  });
+
+  testWidgets(
+    'legacy multiplier uses shared numeric kitchen output after multiplication',
+    (tester) async {
+      final calls = <(double, String)>[];
+      await tester.pumpWidget(
+        MaterialApp(
+          home: RecipeDetailsScreen(
+            recipe: const Recipe(
+              name: 'Multiplier',
+              ingredients: [
+                RecipeIngredient(name: 'A', quantity: 178.28, unit: 'g'),
+                RecipeIngredient(name: 'B', quantity: 1062.5, unit: 'g'),
+                RecipeIngredient(name: 'C', quantity: 178.28, unit: 'ml'),
+                RecipeIngredient(name: 'D', quantity: 662.5, unit: 'ml'),
+                RecipeIngredient(name: 'E', quantity: 4.41, unit: 'db'),
+                RecipeIngredient(name: 'F', quantity: 2.205, unit: 'db'),
+                RecipeIngredient(name: 'G', quantity: 0.44, unit: 'tk'),
+                RecipeIngredient(name: 'H', quantity: 0.59, unit: 'ek'),
+                RecipeIngredient(name: 'I', quantity: 0.835, unit: 'doboz'),
+              ],
+              spices: [],
+              preparation: '',
+            ),
+            addMultiplierShoppingItem:
+                ({required name, required quantity, required unit}) async {
+                  calls.add((quantity, unit));
+                },
+          ),
+        ),
+      );
+      final button = find.widgetWithText(
+        FilledButton,
+        'Bevásárlólistához adás',
+      );
+      await tester.scrollUntilVisible(button, 300);
+      await tester.tap(button);
+      await tester.pumpAndSettle();
+      await tester.enterText(find.byType(TextField), '2');
+      await tester.tap(find.text('Hozzáadás'));
+      await tester.pumpAndSettle();
+      expect(calls, [
+        (357.0, 'g'),
+        (2.13, 'kg'),
+        (357.0, 'ml'),
+        (1.33, 'l'),
+        (9.0, 'db'),
+        (4.5, 'db'),
+        (1.0, 'tk'),
+        (1.25, 'ek'),
+        (1.7, 'doboz'),
+      ]);
+    },
+  );
+
+  testWidgets('legacy shopping still opens its multiplier dialog', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      const MaterialApp(home: RecipeDetailsScreen(recipe: recipe)),
+    );
+    final button = find.widgetWithText(FilledButton, 'Bevásárlólistához adás');
+    await tester.scrollUntilVisible(button, 300);
+    await tester.tap(button);
+    await tester.pumpAndSettle();
+    expect(find.text('Hányszoros adagot szeretnél?'), findsOneWidget);
+    expect(find.byType(RecipeScalingDialog), findsNothing);
+    await tester.tap(find.text('Mégse'));
+    await tester.pumpAndSettle();
+    expect(find.byType(RecipeDetailsScreen), findsOneWidget);
   });
 
   testWidgets('small viewport, keyboard and long list stay scrollable', (
