@@ -1,14 +1,16 @@
-/// Canonical shopping units, in the existing manual dropdown order.
+import '../../core/domain/measurement_units.dart';
+
+/// Shared canonical units, in the existing manual shopping dropdown order.
 const shoppingUnits = <String>[
-  'g',
-  'kg',
-  'ml',
-  'l',
-  'db',
-  'ek',
-  'tk',
-  'csomag',
-  'üveg',
-  'doboz',
-  'konzerv',
+  MeasurementUnits.g,
+  MeasurementUnits.kg,
+  MeasurementUnits.ml,
+  MeasurementUnits.l,
+  MeasurementUnits.db,
+  MeasurementUnits.ek,
+  MeasurementUnits.tk,
+  MeasurementUnits.csomag,
+  MeasurementUnits.uveg,
+  MeasurementUnits.doboz,
+  MeasurementUnits.konzerv,
 ];

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:kuktam/core/domain/measurement_units.dart';
+import 'package:kuktam/core/domain/services/import_quantity_parser.dart';
 
 import 'package:kuktam/recipes/presentation/widgets/ingredient_row.dart';
 import 'package:kuktam/recipes/presentation/widgets/spice_row.dart';
@@ -8,10 +10,12 @@ import 'package:kuktam/recipes/data/repositories/recipe_repository.dart';
 class AddRecipeScreen extends StatefulWidget {
   const AddRecipeScreen({
     this.recipe,
+    this.recipeRepository,
     super.key,
   });
 
   final Recipe? recipe;
+  final RecipeRepository? recipeRepository;
 
   @override
   State<AddRecipeScreen> createState() => _AddRecipeScreenState();
@@ -32,28 +36,17 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
     SpiceRowData(),
   ];
 
-  final RecipeRepository _recipeRepository = RecipeRepository();
+  late final RecipeRepository _recipeRepository;
 
   late String _initialFormState;
   bool _allowPop = false;
 
-  static const List<String> _units = [
-    'g',
-    'kg',
-    'ml',
-    'l',
-    'db',
-    'tk',
-    'ek',
-    'csomag',
-    'üveg',
-    'doboz',
-    'konzerv',
-  ];
+  static const List<String> _units = MeasurementUnits.values;
 
   @override
   void initState() {
     super.initState();
+    _recipeRepository = widget.recipeRepository ?? RecipeRepository();
 
     final recipe = widget.recipe;
 
@@ -214,18 +207,17 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
     return shouldLeave ?? false;
   }
 
-  Recipe _buildRecipe() {
+  Recipe _buildRecipe(List<double> quantities) {
     return Recipe(
       id: widget.recipe?.id,
       name: _recipeNameController.text.trim(),
-      ingredients: _ingredients
+      ingredients: _ingredients.asMap().entries
           .map(
-            (ingredient) =>
+            (entry) =>
             RecipeIngredient(
-              name: ingredient.nameController.text.trim(),
-              quantity:
-              double.tryParse(ingredient.amountController.text.trim()) ?? 0,
-              unit: ingredient.selectedUnit,
+              name: entry.value.nameController.text.trim(),
+              quantity: quantities[entry.key],
+              unit: entry.value.selectedUnit,
             ),
       )
           .toList(),
@@ -243,23 +235,6 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
 
   Future<void> _saveRecipe() async {
     final String recipeName = _recipeNameController.text.trim();
-    final recipe = _buildRecipe();
-
-    debugPrint('Recept neve: ${recipe.name}');
-
-    for (final ingredient in recipe.ingredients) {
-      debugPrint(
-        'Hozzávaló: ${ingredient.quantity} ${ingredient.unit} ${ingredient
-            .name}',
-      );
-    }
-
-    for (final spice in recipe.spices) {
-      debugPrint('Fűszer: ${spice.name}');
-    }
-
-    debugPrint('Elkészítés: ${recipe.preparation}');
-
     if (recipeName.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -288,6 +263,38 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
       );
       return;
     }
+    final quantities = <double>[];
+    for (final ingredient in _ingredients) {
+      final quantity = const ImportQuantityParser().parse(
+        ingredient.amountController.text,
+      );
+      if (quantity == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text(
+            'Minden hozzávalónál adj meg érvényes, pozitív mennyiséget!',
+          )),
+        );
+        return;
+      }
+      quantities.add(quantity);
+    }
+    final recipe = _buildRecipe(quantities);
+
+    debugPrint('Recept neve: ${recipe.name}');
+
+    for (final ingredient in recipe.ingredients) {
+      debugPrint(
+        'Hozzávaló: ${ingredient.quantity} ${ingredient.unit} ${ingredient
+            .name}',
+      );
+    }
+
+    for (final spice in recipe.spices) {
+      debugPrint('Fűszer: ${spice.name}');
+    }
+
+    debugPrint('Elkészítés: ${recipe.preparation}');
+
     final recipeAlreadyExists =
     await _recipeRepository.recipeNameExists(
       name: recipe.name,

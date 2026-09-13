@@ -6,6 +6,57 @@ import 'package:kuktam/shopping/domain/shopping_units.dart';
 void main() {
   const parser = ShoppingTextParser();
   for (final c in <(String, String, double, String)>[
+    ('25 dkg vaj', 'vaj', 250, 'g'),
+    ('vaj 25 dkg', 'vaj', 250, 'g'),
+    ('25dkg vaj', 'vaj', 250, 'g'),
+    ('vaj 25dkg', 'vaj', 250, 'g'),
+    ('2 dl tej', 'tej', 200, 'ml'),
+    ('tej 2 dl', 'tej', 200, 'ml'),
+    ('2dl tej', 'tej', 200, 'ml'),
+    ('tej 2dl', 'tej', 200, 'ml'),
+    ('1,5 dl tejszín', 'tejszín', 150, 'ml'),
+    ('0,25 dl rum', 'rum', 25, 'ml'),
+    ('5 dkg sajt', 'sajt', 50, 'g'),
+    ('1,5 dkg élesztő', 'élesztő', 15, 'g'),
+    ('0,33 dkg vaj', 'vaj', 3, 'g'),
+    ('1 kk cukor', 'cukor', 1, 'tk'),
+    ('1/2 kg hús', 'hús', 0.5, 'kg'),
+    ('½kg hús', 'hús', 0.5, 'kg'),
+    ('dkg vaj', 'vaj', 10, 'g'),
+    ('1000 g liszt', 'liszt', 1, 'kg'),
+    ('1250 g liszt', 'liszt', 1.25, 'kg'),
+    ('1500 ml tej', 'tej', 1.5, 'l'),
+    ('125 dkg vaj', 'vaj', 1.25, 'kg'),
+    ('tej 15dl', 'tej', 1.5, 'l'),
+    ('12,34 dl tej', 'tej', 1.23, 'l'),
+  ]) {
+    test('canonical import quantity and editable text: ${c.$1}', () {
+      final item = parser.parse(c.$1).single;
+      expect(item.name, c.$2);
+      expect(item.quantity, closeTo(c.$3, 1e-12));
+      expect(item.unit, c.$4);
+      expect(item.issue, isNull);
+      expect(item.rawSegment, c.$1);
+      expect(
+        double.parse(item.quantityText.replaceAll(',', '.')),
+        closeTo(c.$3, 1e-12),
+      );
+    });
+  }
+  test('invalid converted quantities preserve raw draft without fallback', () {
+    for (final text in [
+      '0 dkg vaj',
+      '-1 dl tej',
+      '1/0 dl tej',
+      '${'9' * 309} dkg vaj',
+    ]) {
+      final item = parser.parse(text).single;
+      expect(item.quantity, isNull);
+      expect(item.issue, ShoppingImportIssue.invalidQuantity);
+      expect(item.rawSegment, text);
+    }
+  });
+  for (final c in <(String, String, double, String)>[
     ('3 db alma', 'alma', 3, 'db'),
     ('500g csirkemell', 'csirkemell', 500, 'g'),
     ('1,5 kg burgonya', 'burgonya', 1.5, 'kg'),
@@ -131,9 +182,9 @@ void main() {
     expect(item.rawSegment, raw);
     expect(item.name, 'Piros Alma');
   });
-  test('explicit precision and small quantities unchanged', () {
+  test('mass/volume rounded while other explicit quantities stay exact', () {
     for (final c in [
-      ('1,234 l tej', 1.234),
+      ('1,234 l tej', 1.23),
       ('2,5 db tojás', 2.5),
       ('0,04 csomag tea', 0.04),
     ]) {

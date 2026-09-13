@@ -1,5 +1,6 @@
 import '../models/shopping_import_draft.dart';
-import '../shopping_units.dart';
+import '../../../core/domain/services/import_quantity_parser.dart';
+import '../../../core/domain/services/import_unit_normalizer.dart';
 
 enum ShoppingTextLimit { characters, items }
 
@@ -15,28 +16,15 @@ class ShoppingTextParser {
   const ShoppingTextParser();
   static const maxCharacters = 20000;
   static const maxItems = 200;
-  static const _aliases = <String, String>{
-    'darab': 'db',
-    'gr': 'g',
-    'kiló': 'kg',
-    'kilo': 'kg',
-    'liter': 'l',
-    'teáskanál': 'tk',
-    'evőkanál': 'ek',
-    'csom': 'csomag',
-  };
+  static const _quantityParser = ImportQuantityParser();
+  static const _unitNormalizer = ImportUnitNormalizer();
 
   double? parseQuantity(String text) {
-    final trimmed = text.trim();
-    if (!RegExp(r'^\d+(?:[.,]\d+)?$').hasMatch(trimmed)) return null;
-    final value = double.tryParse(trimmed.replaceAll(',', '.'));
-    return value != null && value.isFinite && value > 0 ? value : null;
+    return _quantityParser.parse(text);
   }
 
   String? recognizeUnit(String text) {
-    var token = text.trim().toLowerCase();
-    if (token.endsWith('.')) token = token.substring(0, token.length - 1);
-    return shoppingUnits.contains(token) ? token : _aliases[token];
+    return _unitNormalizer.recognize(text)?.unit;
   }
 
   /// Throws a typed limit error instead of returning a truncated list.
@@ -81,7 +69,8 @@ class ShoppingTextParser {
   }
 
   bool _quantityLike(String token) =>
-      RegExp(r'^[+-]?\d[\d.,]*$').hasMatch(token) ||
+      RegExp(r'^[+-]?\d[\d.,/]*$').hasMatch(token) ||
+      const ['½', '¼', '¾'].contains(token) ||
       [
         'nan',
         'infinity',
@@ -99,7 +88,7 @@ class ShoppingTextParser {
     final tokens = <String>[];
     for (final token in text.split(RegExp(r'\s+'))) {
       final attached = RegExp(
-        r'^([+-]?\d[\d.,]*)([^\d.,]+\.?)$',
+        r'^([+-]?\d[\d.,/]*|[½¼¾])([^\d.,/]+\.?)$',
       ).firstMatch(token);
       if (attached != null && recognizeUnit(attached[2]!) != null) {
         tokens.addAll([attached[1]!, attached[2]!]);
@@ -123,6 +112,7 @@ class ShoppingTextParser {
     );
     if (quantities.length > 1) return ambiguous();
     var unit = 'db';
+    var conversion = const ImportUnitConversion('db', 1);
     var quantityText = '1';
     final missing = quantities.isEmpty;
     final removed = <int>{};
@@ -132,14 +122,16 @@ class ShoppingTextParser {
       removed.add(position);
       if (position == 0) {
         if (tokens.length > 1 && recognizeUnit(tokens[1]) != null) {
-          unit = recognizeUnit(tokens[1])!;
+          conversion = _unitNormalizer.recognize(tokens[1])!;
+          unit = conversion.unit;
           removed.add(1);
         }
       } else if (position == tokens.length - 1) {
         // name + quantity
       } else if (position == tokens.length - 2 &&
           recognizeUnit(tokens.last) != null) {
-        unit = recognizeUnit(tokens.last)!;
+        conversion = _unitNormalizer.recognize(tokens.last)!;
+        unit = conversion.unit;
         removed.add(tokens.length - 1);
       } else {
         return ambiguous();
@@ -152,9 +144,11 @@ class ShoppingTextParser {
       }
       if (first != null) {
         unit = first;
+        conversion = _unitNormalizer.recognize(tokens.first)!;
         removed.add(0);
       } else if (last != null) {
         unit = last;
+        conversion = _unitNormalizer.recognize(tokens.last)!;
         removed.add(tokens.length - 1);
       }
     }
@@ -162,7 +156,25 @@ class ShoppingTextParser {
       for (var i = 0; i < tokens.length; i++)
         if (!removed.contains(i)) tokens[i],
     ].join(' ').trim();
-    final quantity = parseQuantity(quantityText);
+    final parsed = parseQuantity(quantityText);
+    final normalized = parsed == null
+        ? null
+        : conversion.normalizeForImport(parsed);
+    final quantity = normalized?.quantity;
+    if (normalized != null) unit = normalized.unit;
+    // Editable text must describe the canonical unit as well. Raw source stays
+    // in rawSegment; unchanged decimals retain the user's original spelling.
+    if (quantity != null &&
+        (conversion.factor != 1 ||
+            unit != conversion.unit ||
+            quantity != parsed ||
+            quantityText.contains('/') ||
+            const ['½', '¼', '¾'].contains(quantityText))) {
+      quantityText = quantity
+          .toString()
+          .replaceFirst(RegExp(r'\.0$'), '')
+          .replaceAll('.', ',');
+    }
     return ShoppingImportDraft(
       rawSegment: raw,
       sourceIndex: index,

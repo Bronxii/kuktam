@@ -51,6 +51,65 @@ void main() {
   bool canSave(WidgetTester tester) =>
       tester.widget<FilledButton>(save).onPressed != null;
 
+  testWidgets('normalized import quantities reach preview and final snapshot', (
+    tester,
+  ) async {
+    List<ShoppingItemInput>? received;
+    await open(
+      tester,
+      addItems: (items) async {
+        received = items;
+      },
+    );
+    await preview(tester, '1250 g liszt;15 dl tej');
+    expect(fields(tester).map((field) => field.controller!.text), [
+      'liszt',
+      '1,25',
+      'tej',
+      '1,5',
+    ]);
+    expect(find.textContaining('A felismerés javítást igényel'), findsNothing);
+    await tester.ensureVisible(save);
+    await tester.tap(save);
+    await tester.pumpAndSettle();
+    expect(received, [
+      (name: 'liszt', quantity: 1.25, unit: 'kg'),
+      (name: 'tej', quantity: 1.5, unit: 'l'),
+    ]);
+  });
+
+  testWidgets(
+    'dkg and dl preview sends converted numeric quantities without warnings',
+    (tester) async {
+      List<ShoppingItemInput>? received;
+      await open(
+        tester,
+        addItems: (items) async {
+          received = items;
+        },
+      );
+      await preview(tester, 'vaj 25 dkg;1,5 dl tej');
+      expect(fields(tester).map((f) => f.controller!.text), [
+        'vaj',
+        '250',
+        'tej',
+        '150',
+      ]);
+      expect(
+        find.textContaining('A felismerés javítást igényel.'),
+        findsNothing,
+      );
+      expect(canSave(tester), isTrue);
+      await tester.ensureVisible(save);
+      await tester.tap(save);
+      await tester.pumpAndSettle();
+      expect(received, [
+        (name: 'vaj', quantity: 250.0, unit: 'g'),
+        (name: 'tej', quantity: 150.0, unit: 'ml'),
+      ]);
+    },
+  );
+
   testWidgets(
     'final validation rejects invalid fields and accepts localized precision',
     (tester) async {
@@ -138,18 +197,21 @@ void main() {
           received = items;
         },
       );
-      await preview(tester, 'vaj 25 dkg;1,234 l tej');
+      await preview(tester, 'vaj 25 bögre;1,234 l tej');
       await tester.enterText(find.byType(TextField).first, ' Vaj ');
       await tester.enterText(find.byType(TextField).at(1), '25');
       await tester.pump();
-      expect(find.textContaining('Eredeti szöveg: vaj 25 dkg'), findsOneWidget);
+      expect(
+        find.textContaining('Eredeti szöveg: vaj 25 bögre'),
+        findsOneWidget,
+      );
       expect(canSave(tester), isTrue);
       await tester.ensureVisible(save);
       await tester.tap(save);
       await tester.pumpAndSettle();
       expect(received, [
         (name: 'Vaj', quantity: 25.0, unit: 'db'),
-        (name: 'tej', quantity: 1.234, unit: 'l'),
+        (name: 'tej', quantity: 1.23, unit: 'l'),
       ]);
       expect(() => received!.clear(), throwsUnsupportedError);
       expect(find.byType(ShoppingImportDialog), findsNothing);
@@ -257,7 +319,7 @@ void main() {
         'alma',
         '1,5',
         'tej',
-        '1,234',
+        '1,23',
         'kenyér',
         '1',
       ]);
@@ -428,7 +490,7 @@ void main() {
       await open(tester);
       await preview(
         tester,
-        '1 konzerv Nagyon hosszú terméknév amely nem fér el;vaj 25 dkg',
+        '1 konzerv Nagyon hosszú terméknév amely nem fér el;vaj 25 bögre',
       );
       final textFields = find.byType(TextField);
       final units = find.byType(DropdownButtonFormField<String>);
@@ -446,7 +508,7 @@ void main() {
         expect(tester.widget<TextField>(textFields.at(row * 2)).maxLines, 1);
       }
       final warning = find.textContaining(
-        'A felismerés javítást igényel. Eredeti szöveg: vaj 25 dkg',
+        'A felismerés javítást igényel. Eredeti szöveg: vaj 25 bögre',
       );
       expect(warning, findsOneWidget);
       expect(
@@ -464,7 +526,7 @@ void main() {
       expect(fields(tester).map((f) => f.controller!.text), [
         'Módosított hosszú név',
         '1,234',
-        'vaj 25 dkg',
+        'vaj 25 bögre',
         '',
       ]);
       for (var i = 0; i < controllers.length; i++) {
