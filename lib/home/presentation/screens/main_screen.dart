@@ -7,6 +7,7 @@ import '../../../what_to_cook/presentation/screens/what_to_cook_screen.dart';
 import '../../../recipes/presentation/screens/add_recipe_screen.dart';
 import '../../../shopping/data/repositories/shopping_repository.dart';
 import '../../../shopping/presentation/widgets/shopping_item_dialog.dart';
+import '../../../shopping/presentation/widgets/shopping_import_dialog.dart';
 import '../../../settings/settings_screen.dart';
 
 class MainScreen extends StatefulWidget {
@@ -164,6 +165,12 @@ class _MainScreenState extends State<MainScreen> {
       appBar: AppBar(
         title: Text(_titles[_selectedIndex]),
         actions: [
+          if (_selectedIndex == 1)
+            IconButton(
+              tooltip: 'Importálás',
+              icon: const Icon(Icons.file_download_outlined),
+              onPressed: () => showShoppingImportDialog(context),
+            ),
           if (_selectedIndex == 1)
             IconButton(
               tooltip: 'Bevásárlólista megosztása',
