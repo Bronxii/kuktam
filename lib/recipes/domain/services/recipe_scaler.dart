@@ -82,38 +82,42 @@ class RecipeScaler {
   }) {
     _requireQuantity(quantity, 'quantity');
     if (unit == 'kg' || unit == 'l') {
-      if (!_fitsTwoDecimals(quantity)) {
+      if (quantity < 1 && !_fitsTwoDecimals(quantity)) {
         return (
           quantity: _requireQuantity(quantity * 1000, 'convertedQuantity'),
           unit: unit == 'kg' ? 'g' : 'ml',
         );
       }
     } else if ((unit == 'g' || unit == 'ml') && quantity >= 1000) {
-      final largerQuantity = quantity / 1000;
-      if (_fitsTwoDecimals(largerQuantity)) {
-        return (quantity: largerQuantity, unit: unit == 'g' ? 'kg' : 'l');
-      }
+      return (quantity: quantity / 1000, unit: unit == 'g' ? 'kg' : 'l');
     }
     return (quantity: quantity, unit: unit);
   }
 
-  /// Hungarian decimal text, with only machine-scale display noise removed.
-  /// Does not change the numeric input or impose a two-decimal rounding rule.
-  String formatQuantity(double quantity) {
+  /// Hungarian display text, rounded to at most two decimals, without trailing
+  /// zeros. Never use this text as stored mathematical state. Tiny positive
+  /// quantities can display as zero; their numeric value remains unchanged.
+  /// Pass the final normalized display unit for kitchen-friendly increments.
+  /// Unit selection must happen before formatting, using the exact quantity.
+  String formatQuantity(double quantity, {String? unit}) {
     _requireQuantity(quantity, 'quantity');
-    var text = quantity.toString();
-    for (var digits = 1; digits <= 17; digits++) {
-      final candidateText = quantity.toStringAsPrecision(digits);
-      final candidate = double.tryParse(candidateText);
-      if (candidate != null &&
-          candidate.isFinite &&
-          candidate > 0 &&
-          _closeForDisplay(quantity, candidate)) {
-        text = candidateText;
-        break;
-      }
-    }
-    return _plainDecimal(text).replaceAll('.', ',');
+    // Large doubles already have integral spacing; do not multiply them.
+    if (quantity >= 1e21) return _plainDecimal(quantity.toString());
+    final stepsPerUnit = switch (unit) {
+      'g' || 'ml' => 1,
+      'db' => 2,
+      'tk' || 'ek' => 4,
+      'csomag' || 'üveg' || 'doboz' || 'konzerv' => 10,
+      _ => 100,
+    };
+    final steps = quantity * stepsPerUnit;
+    final midpoint = steps.floorToDouble() + 0.5;
+    // Decimal halfway values (e.g. 1.005) may lie just below the midpoint
+    // in binary. Correct only machine-scale noise before display rounding.
+    final rounded =
+        (_closeForDisplay(steps, midpoint) ? midpoint : steps).roundToDouble() /
+        stepsPerUnit;
+    return _plainDecimal(rounded.toStringAsFixed(2)).replaceAll('.', ',');
   }
 
   static double _requireQuantity(double value, String name) {

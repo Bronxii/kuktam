@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
@@ -15,20 +16,35 @@ class RecipeScalingDialog extends StatefulWidget {
 }
 
 class _RecipeScalingDialogState extends State<RecipeScalingDialog> {
+  static const _scaler = RecipeScaler();
+  late final List<RecipeIngredient> _originalIngredients;
+  late List<RecipeIngredient> _scaledIngredients;
   late final List<_ScalingRowState> _rows;
+  Timer? _debounce;
+  int _revision = 0;
+  ({int index, int revision, String text, String unit})? _pending;
   bool _isConfirmingClose = false;
 
   @override
   void initState() {
     super.initState();
+    _originalIngredients = List.unmodifiable(widget.ingredients);
+    _scaledIngredients = _originalIngredients;
     _rows = List.unmodifiable([
-      for (var i = 0; i < widget.ingredients.length; i++)
-        _ScalingRowState(index: i, original: widget.ingredients[i]),
+      for (var i = 0; i < _originalIngredients.length; i++)
+        _ScalingRowState(index: i, original: _originalIngredients[i]),
     ]);
+    for (final row in _rows) {
+      row.focusListener = () {
+        if (!row.focusNode.hasFocus) _finishEditing(row);
+      };
+      row.focusNode.addListener(row.focusListener);
+    }
   }
 
   @override
   void dispose() {
+    _cancelPending();
     for (final row in _rows) {
       row.dispose();
     }
@@ -36,11 +52,105 @@ class _RecipeScalingDialogState extends State<RecipeScalingDialog> {
   }
 
   void _reset() {
-    FocusScope.of(context).unfocus();
+    _cancelPending();
+    _scaledIngredients = _originalIngredients;
     setState(() {
       for (final row in _rows) {
         row.reset();
       }
+    });
+    FocusScope.of(context).unfocus();
+  }
+
+  void _cancelPending() {
+    _debounce?.cancel();
+    _debounce = null;
+    _pending = null;
+    _revision++;
+  }
+
+  void _onChanged(_ScalingRowState row, String text) {
+    _cancelPending();
+    final revision = _revision;
+    setState(() {
+      row.hasUserDraft = true;
+      row.error = null;
+    });
+    _pending = (
+      index: row.index,
+      revision: revision,
+      text: text,
+      unit: row.displayUnit,
+    );
+    _debounce = Timer(const Duration(milliseconds: 500), () {
+      if (mounted && _pending?.revision == revision) _processPending();
+    });
+  }
+
+  void _processPending() {
+    final pending = _pending;
+    if (pending == null || !mounted) return;
+    // Consume before processing: Done followed by blur cannot scale twice.
+    _cancelPending();
+    final basis = _rows[pending.index];
+    final parsed = _scaler.parseQuantity(pending.text);
+    if (parsed == null) {
+      setState(() {
+        basis.error = 'Adj meg 0-nál nagyobb érvényes mennyiséget.';
+      });
+      return;
+    }
+    try {
+      final target = _scaler.convertQuantity(
+        quantity: parsed,
+        fromUnit: pending.unit,
+        toUnit: basis.original.unit,
+      );
+      final scaled = _scaler.scale(
+        originalIngredients: _originalIngredients,
+        basisIndex: pending.index,
+        targetQuantity: target,
+      );
+      // Prepare every display value before changing the last successful state.
+      final displays = [
+        for (final ingredient in scaled)
+          _scaler.normalizeForDisplay(
+            quantity: ingredient.quantity,
+            unit: ingredient.unit,
+          ),
+      ];
+      setState(() {
+        _scaledIngredients = scaled;
+        for (final row in _rows) {
+          row.error = null;
+          if (row == basis && row.focusNode.hasFocus) {
+            // Preserve the active raw text, selection, composing range and unit.
+            row.displayQuantity = parsed;
+          } else {
+            row.showDisplay(displays[row.index]);
+          }
+        }
+      });
+    } on ArgumentError {
+      setState(() {
+        basis.error = 'A megadott mennyiséggel a recept nem számítható át.';
+      });
+    }
+  }
+
+  void _finishEditing(_ScalingRowState row) {
+    if (!mounted) return;
+    if (_pending?.index == row.index) _processPending();
+    if (!row.hasUserDraft || row.error != null) return;
+    // A debounce may already have calculated this draft. Only format it here.
+    final ingredient = _scaledIngredients[row.index];
+    setState(() {
+      row.showDisplay(
+        _scaler.normalizeForDisplay(
+          quantity: ingredient.quantity,
+          unit: ingredient.unit,
+        ),
+      );
     });
   }
 
@@ -157,10 +267,15 @@ class _RecipeScalingDialogState extends State<RecipeScalingDialog> {
       focusNode: row.focusNode,
       enabled: row.initialDisplay != null,
       keyboardType: const TextInputType.numberWithOptions(decimal: true),
+      textInputAction: TextInputAction.done,
+      onChanged: (text) => _onChanged(row, text),
+      onSubmitted: (_) => _finishEditing(row),
       decoration: InputDecoration(
         labelText: 'Mennyiség',
         border: const OutlineInputBorder(),
-        errorText: row.initialDisplay == null ? 'Érvénytelen mennyiség' : null,
+        errorText: row.initialDisplay == null
+            ? 'Érvénytelen mennyiség'
+            : row.error,
         errorMaxLines: 3,
       ),
     );
@@ -227,13 +342,31 @@ class _ScalingRowState {
   late String displayUnit;
   final controller = TextEditingController();
   final focusNode = FocusNode();
+  late final VoidCallback focusListener;
+  String? error;
+  bool hasUserDraft = false;
+
+  void showDisplay(({double quantity, String unit}) display) {
+    displayQuantity = display.quantity;
+    displayUnit = display.unit;
+    hasUserDraft = false;
+    final text = _scaler.formatQuantity(display.quantity, unit: display.unit);
+    if (controller.text != text) {
+      controller.value = TextEditingValue(
+        text: text,
+        selection: TextSelection.collapsed(offset: text.length),
+      );
+    }
+  }
 
   void reset() {
+    error = null;
+    hasUserDraft = false;
     displayQuantity = initialDisplay?.quantity;
     displayUnit = initialDisplay?.unit ?? original.unit;
     final text = displayQuantity == null
         ? ''
-        : _scaler.formatQuantity(displayQuantity!);
+        : _scaler.formatQuantity(displayQuantity!, unit: displayUnit);
     controller.value = TextEditingValue(
       text: text,
       selection: TextSelection.collapsed(offset: text.length),
@@ -241,6 +374,7 @@ class _ScalingRowState {
   }
 
   void dispose() {
+    focusNode.removeListener(focusListener);
     controller.dispose();
     focusNode.dispose();
   }

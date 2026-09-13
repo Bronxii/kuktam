@@ -440,10 +440,19 @@ void main() {
       (1250, 'g', 1.25, 'kg', '1,25'),
       (1500, 'g', 1.5, 'kg', '1,5'),
       (1010, 'g', 1.01, 'kg', '1,01'),
-      (1325, 'g', 1325, 'g', '1325'),
+      (1325, 'g', 1.325, 'kg', '1,33'),
+      (2125, 'g', 2.125, 'kg', '2,13'),
+      (2500, 'g', 2.5, 'kg', '2,5'),
+      (2.125, 'kg', 2.125, 'kg', '2,13'),
       (1000, 'ml', 1, 'l', '1'),
       (1250, 'ml', 1.25, 'l', '1,25'),
-      (1325, 'ml', 1325, 'ml', '1325'),
+      (1325, 'ml', 1.325, 'l', '1,33'),
+      (2125, 'ml', 2.125, 'l', '2,13'),
+      (2.125, 'l', 2.125, 'l', '2,13'),
+      (4.411764705, 'db', 4.411764705, 'db', '4,5'),
+      (1.176470588, 'tk', 1.176470588, 'tk', '1,25'),
+      (2.5, 'db', 2.5, 'db', '2,5'),
+      (3, 'db', 3, 'db', '3'),
       (999, 'g', 999, 'g', '999'),
     ];
     for (final c in cases) {
@@ -451,7 +460,7 @@ void main() {
         final result = scaler.normalizeForDisplay(quantity: c.$1, unit: c.$2);
         expect(result.quantity, c.$3);
         expect(result.unit, c.$4);
-        expect(scaler.formatQuantity(result.quantity), c.$5);
+        expect(scaler.formatQuantity(result.quantity, unit: result.unit), c.$5);
       });
     }
     for (final unit in [
@@ -497,7 +506,7 @@ void main() {
       expect(result.quantity, 0.2500000001 * 1000);
       expect(
         scaler.normalizeForDisplay(quantity: 1250.0000001, unit: 'g').unit,
-        'g',
+        'kg',
       );
     });
     test('very small quantities are not treated as zero hundredths', () {
@@ -516,31 +525,154 @@ void main() {
   });
 
   group('Formatting', () {
+    for (final c in <(double, String)>[
+      (356.56, '357'),
+      (176.47, '176'),
+      (282.35, '282'),
+      (70.59, '71'),
+      (235.29, '235'),
+      (999.4, '999'),
+      (999.6, '1000'),
+      (12.5, '13'),
+    ]) {
+      test('${c.$1} grams rounds only the text to ${c.$2}', () {
+        final display = scaler.normalizeForDisplay(quantity: c.$1, unit: 'g');
+        expect(display.unit, 'g');
+        expect(display.quantity, c.$1);
+        expect(
+          scaler.formatQuantity(display.quantity, unit: display.unit),
+          c.$2,
+        );
+      });
+    }
+    for (final unit in ['kg', 'l']) {
+      test('$unit retains two-decimal formatting', () {
+        expect(scaler.formatQuantity(4.411764, unit: unit), '4,41');
+        expect(scaler.formatQuantity(1.176470, unit: unit), '1,18');
+        expect(scaler.formatQuantity(2.5, unit: unit), '2,5');
+      });
+    }
+    final kitchenCases = <String, List<(double, String)>>{
+      'ml': [
+        (176.47, '176'),
+        (282.35, '282'),
+        (356.56, '357'),
+        (70.59, '71'),
+        (999.6, '1000'),
+      ],
+      'db': [
+        (8.82, '9'),
+        (4.41, '4,5'),
+        (4.24, '4'),
+        (2.5, '2,5'),
+        (2.74, '2,5'),
+        (2.76, '3'),
+        (2.25, '2,5'),
+      ],
+      for (final unit in ['tk', 'ek'])
+        unit: [
+          (0.88, '1'),
+          (1.18, '1,25'),
+          (1.62, '1,5'),
+          (1.87, '1,75'),
+          (1.88, '2'),
+          (1.125, '1,25'),
+        ],
+      for (final unit in ['csomag', 'üveg', 'doboz', 'konzerv'])
+        unit: [
+          (1.67, '1,7'),
+          (1.64, '1,6'),
+          (2.34, '2,3'),
+          (2.36, '2,4'),
+          (0.84, '0,8'),
+          (0.86, '0,9'),
+          (2, '2'),
+          (1.65, '1,7'),
+        ],
+    };
+    for (final entry in kitchenCases.entries) {
+      for (final c in entry.value) {
+        test(
+          '${c.$1} ${entry.key} displays ${c.$2} without numeric rounding',
+          () {
+            final display = scaler.normalizeForDisplay(
+              quantity: c.$1,
+              unit: entry.key,
+            );
+            expect(display.unit, entry.key);
+            expect(display.quantity, c.$1);
+            expect(
+              scaler.formatQuantity(display.quantity, unit: display.unit),
+              c.$2,
+            );
+          },
+        );
+      }
+    }
     for (final entry in <double, String>{
       1.0: '1',
       1.5: '1,5',
       1.25: '1,25',
       2.5: '2,5',
-      0.125: '0,125',
-      1.23456789: '1,23456789',
-      2.5000000001: '2,5000000001',
-      1e-9: '0,000000001',
+      0.125: '0,13',
+      1.23456789: '1,23',
+      2.5000000001: '2,5',
+      1e-9: '0',
+      1.176470588: '1,18',
+      4.411764705: '4,41',
+      176.470588: '176,47',
+      282.352941: '282,35',
+      1.005: '1,01',
       1e21: '1000000000000000000000',
     }.entries) {
       test('${entry.key} becomes ${entry.value}', () {
         expect(scaler.formatQuantity(entry.key), entry.value);
       });
     }
-    test('removes only machine-scale noise', () {
+    test('machine-scale noise does not appear in rounded display', () {
       expect(scaler.formatQuantity(0.1 + 0.2), '0,3');
       expect(scaler.formatQuantity(2.5000000000000004), '2,5');
     });
-    test('extreme finite values remain parseable and nonzero', () {
+    test('extreme values obey display precision without changing input', () {
       for (final quantity in [double.minPositive, double.maxFinite]) {
         final text = scaler.formatQuantity(quantity);
         expect(text.contains('e'), isFalse);
-        expect(scaler.parseQuantity(text), quantity);
+        expect(
+          text,
+          quantity == double.minPositive
+              ? '0'
+              : scaler.formatQuantity(double.maxFinite),
+        );
+        if (quantity == double.maxFinite) {
+          expect(scaler.parseQuantity(text), quantity);
+        }
       }
     });
+  });
+
+  test('display rounding preserves full precision scaling results', () {
+    final result = scaler.scale(
+      originalIngredients: original,
+      basisIndex: 0,
+      targetQuantity: 200 * (20 / 17),
+    );
+    final before = result.map((item) => item.quantity).toList();
+    for (final item in result) {
+      final display = scaler.normalizeForDisplay(
+        quantity: item.quantity,
+        unit: item.unit,
+      );
+      scaler.formatQuantity(display.quantity, unit: display.unit);
+    }
+    expect(scaler.formatQuantity(result.first.quantity, unit: 'g'), '235');
+    expect(result.map((item) => item.quantity), before);
+    expect(result.first.quantity, 200 * (20 / 17));
+    expect(result.first.quantity, isNot(235));
+    final next = scaler.scale(
+      originalIngredients: original,
+      basisIndex: 2,
+      targetQuantity: 450,
+    );
+    expect(next.map((item) => item.quantity), [300, 750, 450, 3]);
   });
 }
