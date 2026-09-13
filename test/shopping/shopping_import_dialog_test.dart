@@ -1,17 +1,28 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:kuktam/shopping/data/repositories/shopping_repository.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:kuktam/shopping/presentation/widgets/shopping_import_dialog.dart';
 import 'package:kuktam/shopping/domain/shopping_units.dart';
 
 void main() {
   final input = find.byKey(const ValueKey('import-text'));
-  Future<void> open(WidgetTester tester) async {
+  Future<void> open(
+    WidgetTester tester, {
+    Future<void> Function(List<ShoppingItemInput>)? addItems,
+  }) async {
     await tester.pumpWidget(
       MaterialApp(
         home: Scaffold(
           body: Builder(
             builder: (context) => TextButton(
-              onPressed: () => showShoppingImportDialog(context),
+              onPressed: () => addItems == null
+                  ? showShoppingImportDialog(context)
+                  : showDialog<void>(
+                      context: context,
+                      barrierDismissible: false,
+                      builder: (_) => ShoppingImportDialog(addItems: addItems),
+                    ),
               child: const Text('Importálás'),
             ),
           ),
@@ -32,6 +43,195 @@ void main() {
 
   List<TextField> fields(WidgetTester tester) =>
       tester.widgetList<TextField>(find.byType(TextField)).toList();
+
+  final save = find.widgetWithText(
+    FilledButton,
+    'Hozzáadás a bevásárlólistához',
+  );
+  bool canSave(WidgetTester tester) =>
+      tester.widget<FilledButton>(save).onPressed != null;
+
+  testWidgets(
+    'final validation rejects invalid fields and accepts localized precision',
+    (tester) async {
+      await open(tester);
+      await preview(tester, 'alma');
+      expect(canSave(tester), isTrue);
+      await tester.enterText(find.byType(TextField).first, '  ');
+      await tester.pump();
+      expect(canSave(tester), isFalse);
+      await tester.enterText(find.byType(TextField).first, 'alma');
+      for (final invalid in ['', '0', '-1', 'NaN', 'Infinity', '1,2.3']) {
+        await tester.enterText(find.byType(TextField).last, invalid);
+        await tester.pump();
+        expect(canSave(tester), isFalse, reason: invalid);
+      }
+      await tester.enterText(find.byType(TextField).last, '1,234');
+      await tester.pump();
+      expect(canSave(tester), isTrue);
+    },
+  );
+
+  testWidgets(
+    'middle deletion preserves remaining controllers; empty list cannot save',
+    (tester) async {
+      await open(tester);
+      await preview(tester, 'alma;tej;kenyér');
+      final first = fields(tester)[0].controller;
+      final last = fields(tester)[4].controller;
+      await tester.enterText(find.byType(TextField).at(4), 'barna kenyér');
+      await tester.tap(find.byTooltip('Tétel törlése').at(1));
+      await tester.pumpAndSettle();
+      expect(fields(tester).map((f) => f.controller!.text), [
+        'alma',
+        '1',
+        'barna kenyér',
+        '1',
+      ]);
+      expect(fields(tester)[0].controller, same(first));
+      expect(fields(tester)[2].controller, same(last));
+      await tester.tap(find.byTooltip('Tétel törlése').last);
+      await tester.pumpAndSettle();
+      await tester.tap(find.byTooltip('Tétel törlése'));
+      await tester.pumpAndSettle();
+      expect(fields(tester), isEmpty);
+      expect(canSave(tester), isFalse);
+      expect(tester.takeException(), isNull);
+    },
+  );
+
+  testWidgets(
+    'manual row defaults invalid then becomes valid without changing existing row',
+    (tester) async {
+      await open(tester);
+      await preview(tester, 'alma');
+      final original = fields(tester).first.controller;
+      await tester.tap(find.text('Tétel hozzáadása'));
+      await tester.pumpAndSettle();
+      expect(fields(tester).map((f) => f.controller!.text), [
+        'alma',
+        '1',
+        '',
+        '1',
+      ]);
+      expect(canSave(tester), isFalse);
+      await tester.enterText(find.byType(TextField).at(2), 'tej');
+      await tester.pump();
+      expect(canSave(tester), isTrue);
+      expect(fields(tester).first.controller, same(original));
+      await tester.binding.handlePopRoute();
+      await tester.pumpAndSettle();
+      expect(
+        find.text('Az importált lista módosításai elvesznek.'),
+        findsOneWidget,
+      );
+    },
+  );
+
+  testWidgets(
+    'valid corrected warning saves exact ordered canonical snapshot and closes',
+    (tester) async {
+      List<ShoppingItemInput>? received;
+      await open(
+        tester,
+        addItems: (items) async {
+          received = items;
+        },
+      );
+      await preview(tester, 'vaj 25 dkg;1,234 l tej');
+      await tester.enterText(find.byType(TextField).first, ' Vaj ');
+      await tester.enterText(find.byType(TextField).at(1), '25');
+      await tester.pump();
+      expect(find.textContaining('Eredeti szöveg: vaj 25 dkg'), findsOneWidget);
+      expect(canSave(tester), isTrue);
+      await tester.ensureVisible(save);
+      await tester.tap(save);
+      await tester.pumpAndSettle();
+      expect(received, [
+        (name: 'Vaj', quantity: 25.0, unit: 'db'),
+        (name: 'tej', quantity: 1.234, unit: 'l'),
+      ]);
+      expect(() => received!.clear(), throwsUnsupportedError);
+      expect(find.byType(ShoppingImportDialog), findsNothing);
+      expect(
+        find.text('2 tétel hozzáadva a bevásárlólistához.'),
+        findsOneWidget,
+      );
+    },
+  );
+
+  testWidgets(
+    'pending save locks fields removal close and duplicate submission',
+    (tester) async {
+      final completion = Completer<void>();
+      var calls = 0;
+      await open(
+        tester,
+        addItems: (_) {
+          calls++;
+          return completion.future;
+        },
+      );
+      await preview(tester, 'alma');
+      final submit = tester.widget<FilledButton>(save).onPressed!;
+      submit();
+      submit();
+      await tester.pump();
+      expect(calls, 1);
+      expect(fields(tester).every((field) => field.enabled == false), isTrue);
+      expect(
+        tester
+            .widget<IconButton>(
+              find.byWidgetPredicate(
+                (w) => w is IconButton && w.tooltip == 'Tétel törlése',
+              ),
+            )
+            .onPressed,
+        isNull,
+      );
+      expect(
+        tester
+            .widget<TextButton>(
+              find.widgetWithText(TextButton, 'Tétel hozzáadása'),
+            )
+            .onPressed,
+        isNull,
+      );
+      await tester.binding.handlePopRoute();
+      await tester.pump();
+      expect(find.text('Megszakítod az importálást?'), findsNothing);
+      expect(find.byType(ShoppingImportDialog), findsOneWidget);
+      completion.complete();
+      await tester.pumpAndSettle();
+      expect(find.byType(ShoppingImportDialog), findsNothing);
+    },
+  );
+
+  testWidgets('save error keeps edited data and permits retry', (tester) async {
+    var calls = 0;
+    await open(
+      tester,
+      addItems: (_) async {
+        if (++calls == 1) throw StateError('test failure');
+      },
+    );
+    await preview(tester, 'alma');
+    await tester.enterText(find.byType(TextField).first, 'piros alma');
+    await tester.pump();
+    await tester.tap(save);
+    await tester.pumpAndSettle();
+    expect(find.byType(ShoppingImportDialog), findsOneWidget);
+    expect(fields(tester).first.controller!.text, 'piros alma');
+    expect(
+      find.text('Nem sikerült hozzáadni a tételeket. Próbáld újra.'),
+      findsOneWidget,
+    );
+    expect(canSave(tester), isTrue);
+    await tester.tap(save);
+    await tester.pumpAndSettle();
+    expect(calls, 2);
+    expect(find.byType(ShoppingImportDialog), findsNothing);
+  });
 
   testWidgets('input enables processing only for non-whitespace text', (
     tester,
@@ -84,7 +284,7 @@ void main() {
               ),
             )
             .onPressed,
-        isNull,
+        isNotNull,
       );
       expect(
         tester.takeException(),
