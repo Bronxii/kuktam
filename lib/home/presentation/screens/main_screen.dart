@@ -9,9 +9,18 @@ import '../../../shopping/data/repositories/shopping_repository.dart';
 import '../../../shopping/presentation/widgets/shopping_item_dialog.dart';
 import '../../../shopping/presentation/widgets/shopping_import_dialog.dart';
 import '../../../settings/settings_screen.dart';
+import '../../../recipes/presentation/widgets/recipe_import_dialog.dart';
+import '../../../recipes/data/repositories/recipe_repository.dart';
+import '../../../recipes/domain/models/recipe.dart';
 
 class MainScreen extends StatefulWidget {
-  const MainScreen({super.key});
+  const MainScreen({super.key, this.tabBodies, this.recipeRepository, this.shoppingRepository})
+      : assert(tabBodies == null || tabBodies.length == 3);
+
+  // Optional dependencies keep navigation tests independent of Firebase.
+  final List<Widget>? tabBodies;
+  final RecipeRepository? recipeRepository;
+  final ShoppingRepository? shoppingRepository;
 
   @override
   State<MainScreen> createState() => _MainScreenState();
@@ -20,7 +29,7 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> {
   int _selectedIndex = 0;
 
-  final _shoppingRepository = ShoppingRepository();
+  late final _shoppingRepository = widget.shoppingRepository ?? ShoppingRepository();
 
   static const List<String> _titles = [
     'Receptek',
@@ -29,8 +38,31 @@ class _MainScreenState extends State<MainScreen> {
   ];
 
   int _recipesVersion = 0;
+  bool _importingRecipe = false;
 
-  List<Widget> get _screens => [
+  Future<void> _importRecipe() async {
+    if (_importingRecipe) return;
+    _importingRecipe = true;
+    try {
+      final draft = await showRecipeImportDialog(context);
+      if (!mounted || draft == null) return;
+      final saved = await Navigator.of(context).push<Recipe>(
+        MaterialPageRoute<Recipe>(
+          builder: (_) => AddRecipeScreen(
+            initialImport: draft,
+            recipeRepository: widget.recipeRepository,
+          ),
+        ),
+      );
+      if (mounted && saved != null) {
+        setState(() => _recipesVersion++);
+      }
+    } finally {
+      _importingRecipe = false;
+    }
+  }
+
+  List<Widget> get _screens => widget.tabBodies ?? [
     RecipesScreen(key: ValueKey(_recipesVersion)),
     const ShoppingListScreen(),
     const WhatToCookScreen(),
@@ -123,7 +155,7 @@ class _MainScreenState extends State<MainScreen> {
           onPressed: () async {
             await Navigator.of(context).push(
               MaterialPageRoute<void>(
-                builder: (context) => const AddRecipeScreen(),
+                builder: (context) => AddRecipeScreen(recipeRepository: widget.recipeRepository),
               ),
             );
 
@@ -165,6 +197,12 @@ class _MainScreenState extends State<MainScreen> {
       appBar: AppBar(
         title: Text(_titles[_selectedIndex]),
         actions: [
+          if (_selectedIndex == 0)
+            IconButton(
+              tooltip: 'Recept importálása',
+              icon: const Icon(Icons.file_download_outlined),
+              onPressed: _importRecipe,
+            ),
           if (_selectedIndex == 1)
             IconButton(
               tooltip: 'Importálás',
