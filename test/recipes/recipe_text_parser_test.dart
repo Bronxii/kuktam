@@ -9,6 +9,86 @@ void main() {
   const missing = RecipeImportWarning.missingQuantity;
   const invalid = RecipeImportWarning.invalidQuantity;
   const ambiguous = RecipeImportWarning.ambiguousIngredient;
+  for (final c in <(String, String, List<String>)>[
+    ('Csirkés tészta\nHozzávalók:', 'Csirkés tészta', []),
+    ('Csirkés tészta\n4 adag\nHozzávalók:', 'Csirkés tészta', ['4 adag']),
+    (
+      'Csirkés tészta\nkb. 4-5 adag\nIdő: 45 perc\nKalória: 650 kcal\nHozzávalók:',
+      'Csirkés tészta',
+      ['kb. 4-5 adag', 'Idő: 45 perc', 'Kalória: 650 kcal'],
+    ),
+    (
+      'Csirkés tészta\nElkészítési idő: 45 perc\nSütési idő: 20 perc\nHozzávalók:',
+      'Csirkés tészta',
+      ['Elkészítési idő: 45 perc', 'Sütési idő: 20 perc'],
+    ),
+    (
+      'Nagymama kedvence\nA család vasárnapi receptje\nHozzávalók:',
+      '',
+      ['Nagymama kedvence', 'A család vasárnapi receptje'],
+    ),
+    ('Hozzávalók:', '', []),
+    (
+      '4 adag\nElkészítési idő: 30 perc\nHozzávalók:',
+      '',
+      ['4 adag', 'Elkészítési idő: 30 perc'],
+    ),
+    (
+      'BRUTÁL KRÉMES CSIRKÉS-SAJTOS TÉSZTA / sütőben\n\nkb. 5 adag\nIdő: 1 óra körül\nKalória: fogalmam sincs 😄\n\nHOZZÁVALÓK:',
+      'BRUTÁL KRÉMES CSIRKÉS-SAJTOS TÉSZTA / sütőben',
+      ['kb. 5 adag', 'Idő: 1 óra körül', 'Kalória: fogalmam sincs 😄'],
+    ),
+  ]) {
+    test('title metadata regression: ${c.$1}', () {
+      final result = parser.parse('${c.$1}\n500 g liszt');
+      expect(result.title, c.$2);
+      expect(result.unprocessedSegments, c.$3);
+      expect(result.ingredients.single.name, 'liszt');
+      expect(result.ingredients.single.quantity, 500);
+      expect(result.originalText, '${c.$1}\n500 g liszt');
+    });
+  }
+  test('metadata forms preserve raw text and never become ingredients', () {
+    for (final meta in [
+      'Adag: 4 fő',
+      '4 fő',
+      'kb. 4 fő',
+      'KB. 4–5 ADAG',
+      'FŐZÉSI IDŐ: 10 perc',
+      'Pihentetési idő: 20 perc',
+      '650 kcal',
+      'kb. 650 KCAL',
+      'kcal: 650',
+    ]) {
+      final raw = '  $meta  ';
+      final result = parser.parse('Recept\n$raw\nHozzávalók:\n$raw\n2 tojás');
+      expect(result.title, 'Recept', reason: meta);
+      expect(result.unprocessedSegments, [raw, raw]);
+      expect(result.ingredients.single.name, 'tojás');
+    }
+  });
+  test(
+    'metadata words inside names or prose do not remove title candidates',
+    () {
+      for (final text in [
+        'A fő kedvencünk',
+        'Adag szeretet',
+        'Kalória nélkül finoman',
+        'Idő nekünk főzni',
+      ]) {
+        final result = parser.parse(
+          'Nagymama kedvence\n$text\nHozzávalók:\n4 adag liszt',
+        );
+        expect(result.title, '');
+        expect(result.unprocessedSegments, ['Nagymama kedvence', text]);
+        expect(result.ingredients.single.name, 'adag liszt');
+      }
+    },
+  );
+  test('metadata in preparation remains opaque', () {
+    const body = '4 adag\nIdő: 45 perc\nAdj hozzá 1/2 dl vizet.';
+    expect(parser.parse('Elkészítés:\n$body').preparationText, body);
+  });
   for (final c
       in <(String, String, double?, String, List<RecipeImportWarning>)>[
         ('500 g liszt', 'liszt', 500, 'g', []),

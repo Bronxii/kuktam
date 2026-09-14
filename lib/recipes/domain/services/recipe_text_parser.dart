@@ -111,10 +111,18 @@ class RecipeTextParser {
     };
   }
 
-  bool _isMeta(String line) => RegExp(
-    r'^(?:elkészítési idő|sütési idő|adag|kalória)\s*:',
-    caseSensitive: false,
-  ).hasMatch(line.trim());
+  bool _isMeta(String line) {
+    final text = line.trim();
+    return RegExp(
+          r'^(?:idő|elkészítési idő|sütési idő|főzési idő|pihentetési idő|adag|kalória|kcal)\s*:',
+          caseSensitive: false,
+        ).hasMatch(text) ||
+        RegExp(
+          // Whole-line amounts/ranges only: "4 adag liszt" is not metadata.
+          r'^(?:kb\.?\s*)?\d+(?:[.,]\d+)?(?:\s*[-–]\s*\d+(?:[.,]\d+)?)?\s*(?:adag|fő|kcal)\.?$',
+          caseSensitive: false,
+        ).hasMatch(text);
+  }
 
   bool _hasListPrefix(String line) =>
       RegExp(r'^(?:[•*–-]\s|\d+[.)]\s)').hasMatch(line.trim());
