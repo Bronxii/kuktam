@@ -1,16 +1,19 @@
 import 'package:flutter/material.dart';
+import '../../domain/models/recipe_import_draft.dart';
 
 class IngredientRowData {
   IngredientRowData({
     String name = '',
     String quantity = '',
     String unit = 'g',
+    this.importDraft,
   })  : nameController = TextEditingController(text: name),
         amountController = TextEditingController(text: quantity),
         selectedUnit = unit;
 
   final TextEditingController nameController;
   final TextEditingController amountController;
+  final RecipeImportIngredientDraft? importDraft;
 
   String selectedUnit;
 

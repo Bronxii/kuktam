@@ -5,16 +5,19 @@ import 'package:kuktam/core/domain/services/import_quantity_parser.dart';
 import 'package:kuktam/recipes/presentation/widgets/ingredient_row.dart';
 import 'package:kuktam/recipes/presentation/widgets/spice_row.dart';
 import 'package:kuktam/recipes/domain/models/recipe.dart';
+import 'package:kuktam/recipes/domain/models/recipe_import_draft.dart';
 import 'package:kuktam/recipes/data/repositories/recipe_repository.dart';
 
 class AddRecipeScreen extends StatefulWidget {
   const AddRecipeScreen({
     this.recipe,
+    this.initialImport,
     this.recipeRepository,
     super.key,
-  });
+  }) : assert(recipe == null || initialImport == null);
 
   final Recipe? recipe;
+  final RecipeImportDraft? initialImport;
   final RecipeRepository? recipeRepository;
 
   @override
@@ -87,7 +90,42 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
         );
     }
 
+    final imported = widget.initialImport;
+    if (imported != null) {
+      _recipeNameController.text = imported.title;
+      _preparationController.text = imported.preparationText;
+      for (final ingredient in _ingredients) {
+        ingredient.dispose();
+      }
+      _ingredients
+        ..clear()
+        ..addAll(imported.ingredients.map((draft) => IngredientRowData(
+          name: draft.name,
+          quantity: _importQuantityText(draft),
+          unit: draft.unit,
+          importDraft: draft,
+        )));
+      if (_ingredients.isEmpty) _ingredients.add(IngredientRowData());
+      for (final spice in _spices) {
+        spice.dispose();
+      }
+      _spices.clear();
+    }
+
     _initialFormState = _createFormStateSnapshot();
+  }
+
+  String _importQuantityText(RecipeImportIngredientDraft draft) {
+    final quantity = draft.quantity;
+    if (quantity != null) {
+      // Reuse the editor's existing non-rounding ingredient formatting.
+      return RecipeIngredient(name: draft.name, quantity: quantity, unit: draft.unit)
+          .formattedQuantity.replaceAll('.', ',');
+    }
+    final raw = draft.rawQuantityText ?? '';
+    // Conversion overflow may leave a parseable raw number in the old unit.
+    // A null draft must not silently become a valid quantity during prefill.
+    return const ImportQuantityParser().parse(raw) == null ? raw : '';
   }
 
   @override
@@ -117,6 +155,13 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
   }
 
   void _removeIngredient(int index) {
+    if (_ingredients.length == 1 && widget.initialImport != null) {
+      setState(() {
+        _ingredients.single.dispose();
+        _ingredients[0] = IngredientRowData();
+      });
+      return;
+    }
     if (_ingredients.length == 1) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -170,7 +215,43 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
   }
 
   bool get _hasUnsavedChanges {
-    return _createFormStateSnapshot() != _initialFormState;
+    return widget.initialImport != null ||
+        _createFormStateSnapshot() != _initialFormState;
+  }
+
+  String _warningText(RecipeImportWarning warning) => switch (warning) {
+    RecipeImportWarning.unknownUnit =>
+      'A mértékegységet nem sikerült felismerni. Ellenőrzés szükséges.',
+    RecipeImportWarning.missingQuantity =>
+      'A mennyiséget nem sikerült felismerni. Ellenőrzés szükséges.',
+    RecipeImportWarning.invalidQuantity =>
+      'A mennyiség hibás vagy nem értelmezhető. Módosítás szükséges.',
+    RecipeImportWarning.ambiguousIngredient =>
+      'Ezt a hozzávalósort nem sikerült egyértelműen felismerni. Ellenőrzés szükséges.',
+  };
+
+  Widget _ingredientEditor(IngredientRowData ingredient, int index) {
+    final row = IngredientRow(
+      data: ingredient,
+      units: _units,
+      suggestions: const [],
+      onRemove: () => _removeIngredient(index),
+    );
+    final draft = ingredient.importDraft;
+    if (draft == null || draft.warnings.isEmpty) return row;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        row,
+        const SizedBox(height: 4),
+        Text(
+          '${draft.warnings.map(_warningText).join('\n')}\nEredeti: ${draft.rawText}',
+          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+            color: Theme.of(context).colorScheme.error,
+          ),
+        ),
+      ],
+    );
   }
 
   Future<bool> _confirmLeaveWithoutSaving() async {
@@ -383,6 +464,17 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
                 textCapitalization: TextCapitalization.sentences,
               ),
               const SizedBox(height: 32),
+              if (widget.initialImport?.unprocessedSegments.isNotEmpty ?? false)
+                ExpansionTile(
+                  title: const Text('A recept egyes részeit nem sikerült felismerni.'),
+                  childrenPadding: const EdgeInsets.only(bottom: 16),
+                  children: [
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(widget.initialImport!.unprocessedSegments.join('\n')),
+                    ),
+                  ],
+                ),
               Text(
                 'Hozzávalók',
                 style: Theme
@@ -399,12 +491,7 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
                       return Padding(
                         key: ObjectKey(ingredient),
                         padding: const EdgeInsets.only(bottom: 12),
-                        child: IngredientRow(
-                          data: ingredient,
-                          units: _units,
-                          suggestions: const [],
-                          onRemove: () => _removeIngredient(index),
-                        ),
+                        child: _ingredientEditor(ingredient, index),
                       );
                     },
                   ),
