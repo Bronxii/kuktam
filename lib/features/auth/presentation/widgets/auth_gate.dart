@@ -3,28 +3,34 @@ import 'package:flutter/material.dart';
 
 import '../../../../home/presentation/screens/main_screen.dart';
 import '../screens/login_screen.dart';
+import '../../data/repositories/auth_repository.dart';
 
 class AuthGate extends StatelessWidget {
-  const AuthGate({super.key});
+  const AuthGate({super.key, this.authRepository, this.mainBuilder});
+
+  final AuthRepository? authRepository;
+  final WidgetBuilder? mainBuilder;
 
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<User?>(
-      stream: FirebaseAuth.instance.authStateChanges(),
+      stream:
+          authRepository?.authStateChanges() ??
+          FirebaseAuth.instance.authStateChanges(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Scaffold(
-            body: Center(
-              child: CircularProgressIndicator(),
-            ),
+            body: Center(child: CircularProgressIndicator()),
           );
         }
 
-        if (snapshot.hasData) {
-          return const MainScreen();
+        if (snapshot.hasData &&
+            !AuthRepository.requiresEmailVerification(snapshot.data)) {
+          return mainBuilder?.call(context) ?? const MainScreen();
         }
 
-        return const LoginScreen();
+        // No sign-out side effect in build: registration and login own it.
+        return LoginScreen(authRepository: authRepository);
       },
     );
   }

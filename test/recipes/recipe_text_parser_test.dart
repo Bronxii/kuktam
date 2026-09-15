@@ -282,7 +282,8 @@ void main() {
     expect(parser.parse(' \r\n\n').ingredients, isEmpty);
     final result = parser.parse('Hozzávalók:\n•\n-\n*\n1.');
     expect(result.ingredients, isEmpty);
-    expect(result.unprocessedSegments, ['•', '-', '*', '1.']);
+    // P5.1 discards empty structural markup, while preserving other raw input.
+    expect(result.unprocessedSegments, ['1.']);
   });
 
   test('bullets keep raw whitespace casing and line identity', () {

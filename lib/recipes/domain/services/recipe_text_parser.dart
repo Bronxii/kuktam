@@ -17,6 +17,8 @@ class RecipeTextParser {
         .replaceAll('\r\n', '\n')
         .replaceAll('\r', '\n')
         .split('\n');
+    final normalized = lines.map(_normalizeLine).toList();
+    final webMeta = _webMetaLines(normalized);
     final ingredients = <RecipeImportIngredientDraft>[];
     final unprocessed = <String>[];
     var end = lines.length;
@@ -36,24 +38,29 @@ class RecipeTextParser {
       }
     }
 
-    final firstSection = lines
+    final firstSection = normalized
         .take(footerStart)
         .toList()
         .indexWhere((line) => _section(line) != null);
     var titleIndex = -1;
     if (firstSection >= 0 &&
-        _section(lines[firstSection]) == _Section.ingredients) {
+        _section(normalized[firstSection]) == _Section.ingredients) {
       final candidates = <int>[
         for (var i = 0; i < firstSection; i++)
-          if (lines[i].trim().isNotEmpty && !_isMeta(lines[i])) i,
+          if (!_structural(normalized[i]) &&
+              !_isMeta(normalized[i]) &&
+              !webMeta.contains(i) &&
+              !_wholeLink(lines[i]) &&
+              !_numericValue(normalized[i]))
+            i,
       ];
       if (candidates.length == 1) {
         final i = candidates.single;
-        final tokens = _tokens(_clean(lines[i]));
-        if (RegExp(r'\p{L}', unicode: true).hasMatch(lines[i]) &&
+        final tokens = _tokens(_clean(normalized[i]));
+        if (RegExp(r'\p{L}', unicode: true).hasMatch(normalized[i]) &&
             !tokens.any(_quantityLike) &&
-            !_hasListPrefix(lines[i]) &&
-            !RegExp(r'[.!?:]$').hasMatch(lines[i].trim())) {
+            !_hasListPrefix(normalized[i]) &&
+            !RegExp(r'[.!?:]$').hasMatch(normalized[i])) {
           titleIndex = i;
         }
       }
@@ -63,21 +70,39 @@ class RecipeTextParser {
     var preparation = '';
     for (var i = 0; i < footerStart; i++) {
       final raw = lines[i];
-      if (i == titleIndex || raw.trim().isEmpty) continue;
-      final section = _section(raw);
+      final line = normalized[i];
+      if (i == titleIndex || _structural(line)) continue;
+      final section = _section(line);
       if (section == _Section.preparation) {
-        preparation = lines.sublist(i + 1, footerStart).join('\n').trim();
+        var preparationEnd = footerStart;
+        for (var j = i + 1; j < footerStart; j++) {
+          if (_infoHeading(normalized[j])) {
+            final next = _nextContent(normalized, j + 1);
+            if (next < footerStart && _isMeta(_clean(normalized[next]))) {
+              preparationEnd = j;
+              break;
+            }
+          }
+        }
+        preparation = lines.sublist(i + 1, preparationEnd).join('\n').trim();
+        unprocessed.addAll(
+          lines
+              .sublist(preparationEnd, footerStart)
+              .where((line) => !_structural(_normalizeLine(line))),
+        );
         break;
       }
       if (section == _Section.ingredients) {
         inIngredients = true;
         continue;
       }
-      if (_isMeta(raw)) {
+      if (_isMeta(line) ||
+          webMeta.contains(i) ||
+          (i < firstSection && (_wholeLink(raw) || _numericValue(line)))) {
         unprocessed.add(raw);
         continue;
       }
-      final clean = _clean(raw);
+      final clean = _clean(line);
       if (clean.isEmpty) {
         unprocessed.add(raw);
         continue;
@@ -91,11 +116,127 @@ class RecipeTextParser {
     unprocessed.addAll(lines.sublist(footerStart, end));
     return RecipeImportDraft(
       originalText: text,
-      title: titleIndex < 0 ? '' : lines[titleIndex].trim(),
+      title: titleIndex < 0 ? '' : normalized[titleIndex],
       ingredients: ingredients,
       preparationText: preparation,
       unprocessedSegments: unprocessed,
     );
+  }
+
+  // Recognition view only: raw lines and preparation retain their source text.
+  String _normalizeLine(String line) => line
+      .trim()
+      .replaceFirst(RegExp(r'^#{1,6}(?!#)\s*'), '')
+      .replaceAllMapped(
+        RegExp(r'\[([^\[\]\n]*)\]\([^()\s]*\)'),
+        (match) => match[1]!,
+      )
+      .trim();
+
+  bool _wholeLink(String line) =>
+      RegExp(r'^\s*\[[^\[\]\n]+\]\([^()\s]*\)\s*$').hasMatch(line);
+
+  bool _structural(String line) =>
+      line.isEmpty || RegExp(r'^[\s*#•–_\-]+$').hasMatch(line);
+
+  bool _numericValue(String line) => RegExp(
+    r'^\d+(?:[.,]\d+)?\s*(?:g|mg|µg|kcal|kj|%)?$',
+    caseSensitive: false,
+  ).hasMatch(line);
+
+  int _nextContent(List<String> lines, int start) {
+    while (start < lines.length && _structural(lines[start])) {
+      start++;
+    }
+    return start;
+  }
+
+  bool _infoHeading(String line) => const {
+    'recept infó',
+    'receptinformáció',
+    'recipe info',
+    'információk',
+  }.contains(line.toLowerCase().replaceFirst(RegExp(r':$'), '').trim());
+
+  Set<int> _webMetaLines(List<String> lines) {
+    final result = <int>{};
+    const labels = {
+      'kalória',
+      'kcal',
+      'fehérje',
+      'protein',
+      'szénhidrát',
+      'zsír',
+      'víz',
+      'koleszterin',
+      'élelmi rost',
+      'rost',
+      'cukor',
+      'só',
+      'nátrium',
+    };
+    // A run needs multiple labels AND values. Bare ingredient names never
+    // establish nutrition context, nor does "100 g cukor" match a value.
+    for (var start = 0; start < lines.length;) {
+      var end = start;
+      var labelCount = 0;
+      var valueCount = 0;
+      while (end < lines.length) {
+        final line = lines[end];
+        if (labels.contains(line.toLowerCase())) {
+          labelCount++;
+        } else if (_numericValue(line)) {
+          valueCount++;
+        } else if (!_structural(line)) {
+          break;
+        }
+        end++;
+      }
+      if (labelCount >= 2 && valueCount >= 2) {
+        result.addAll(
+          Iterable.generate(end - start, (offset) => start + offset),
+        );
+      }
+      start = end > start ? end : start + 1;
+    }
+    for (var i = 0; i < lines.length; i++) {
+      final line = lines[i].toLowerCase();
+      if (const {'hirdetés', 'advertisement', 'ad'}.contains(line) ||
+          RegExp(
+            r'^(?:\d+\s*)?(?:értékelés|hozzászólás)(?:\s*•\s*(?:\d+\s*)?(?:értékelés|hozzászólás))*$',
+          ).hasMatch(line) ||
+          RegExp(r'^állítsd be itt(?:\s|,)').hasMatch(line) ||
+          line.replaceAll('*', '').trim() == 'adag') {
+        result.add(i);
+      }
+      if (!const {'idő', 'költség', 'nehézség', 'adag'}.contains(line)) {
+        continue;
+      }
+      result.add(i);
+      final next = _nextContent(lines, i + 1);
+      if (next == lines.length) continue;
+      final value = lines[next].toLowerCase();
+      final matches = switch (line) {
+        'idő' => RegExp(
+          r'^\d+(?:[.,]\d+)?\s*(?:p|perc|óra|h|min)\.?$',
+        ).hasMatch(value),
+        'költség' => const {
+          'megfizethető',
+          'olcsó',
+          'közepes',
+          'drága',
+        }.contains(value),
+        'nehézség' => const {
+          'könnyű',
+          'egyszerű',
+          'közepes',
+          'nehéz',
+        }.contains(value),
+        _ => _isMeta(value) || _numericValue(value),
+      };
+      if (matches) result.add(next);
+    }
+    return result;
   }
 
   _Section? _section(String line) {
@@ -114,7 +255,7 @@ class RecipeTextParser {
   bool _isMeta(String line) {
     final text = line.trim();
     return RegExp(
-          r'^(?:idő|elkészítési idő|sütési idő|főzési idő|pihentetési idő|adag|kalória|kcal)\s*:',
+          r'^(?:idő|elkészítési idő|sütési idő|főzési idő|pihentetési idő|előkészítés ideje|sütés ideje|teljes idő|adag|kalória|kcal)\s*:',
           caseSensitive: false,
         ).hasMatch(text) ||
         RegExp(

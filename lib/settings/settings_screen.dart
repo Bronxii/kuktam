@@ -4,18 +4,46 @@ import '../features/auth/data/repositories/auth_repository.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'screens/privacy_screen.dart';
+import '../features/auth/data/repositories/account_deletion_repository.dart';
+import '../features/auth/presentation/widgets/account_deletion_dialog.dart';
 
 class SettingsScreen extends StatefulWidget {
-  const SettingsScreen({super.key});
+  const SettingsScreen({super.key, this.authRepository, this.deletionRepository});
+
+  final AuthRepository? authRepository;
+  final AccountDeletionRepository? deletionRepository;
 
   @override
   State<SettingsScreen> createState() => _SettingsScreenState();
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
-  final AuthRepository _authRepository = AuthRepository();
+  late final AuthRepository _authRepository =
+      widget.authRepository ?? AuthRepository();
 
   String _appVersion = '';
+  bool _deletionDialogOpen = false;
+
+  Future<void> _deleteAccount() async {
+    if (_deletionDialogOpen) return;
+    _deletionDialogOpen = true;
+    final navigator = Navigator.of(context);
+    try {
+      final repository = widget.deletionRepository ?? AccountDeletionRepository();
+      final deleted = await showDialog<bool>(
+        context: context,
+        barrierDismissible: false,
+        builder: (_) => AccountDeletionDialog(
+          repository: repository,
+        ),
+      );
+      if (deleted == true && navigator.mounted) {
+        navigator.popUntil((route) => route.isFirst);
+      }
+    } finally {
+      _deletionDialogOpen = false;
+    }
+  }
 
   @override
   void initState() {
@@ -524,6 +552,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
     },
     ),
           ],
+
+          ListTile(
+            leading: Icon(Icons.delete_forever_outlined, color: theme.colorScheme.error),
+            title: Text('Fiók törlése', style: TextStyle(color: theme.colorScheme.error)),
+            onTap: _deleteAccount,
+          ),
 
           const Divider(height: 32),
 

@@ -5,7 +5,9 @@ import '../../data/repositories/auth_repository.dart';
 import '../../../../core/theme/app_colors.dart';
 
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+  const LoginScreen({super.key, this.authRepository});
+
+  final AuthRepository? authRepository;
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -14,7 +16,8 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   bool _isGoogleLoading = false;
   String _lastLoginEmail = '';
-  final AuthRepository _authRepository = AuthRepository();
+  late final AuthRepository _authRepository =
+      widget.authRepository ?? AuthRepository();
   Future<void> _signInWithGoogle() async {
     setState(() {
       _isGoogleLoading = true;
@@ -97,7 +100,10 @@ class _LoginScreenState extends State<LoginScreen> {
 
                 setDialogState(() {
                   isLoading = false;
-                  errorMessage = 'A bejelentkezés sikertelen. Ellenőrizd az adatokat.';
+                  errorMessage = error is EmailVerificationRequiredException
+                      ? 'A bejelentkezés előtt erősítsd meg az e-mail-címedet. '
+                          'Ellenőrizd a beérkező leveleket és a Spam mappát is.'
+                      : 'A bejelentkezés sikertelen. Ellenőrizd az adatokat.';
                 });
               }
             }
