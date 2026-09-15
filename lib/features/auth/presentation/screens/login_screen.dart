@@ -1,13 +1,15 @@
 import 'package:firebase_auth/firebase_auth.dart' show FirebaseAuthException;
 import 'package:flutter/material.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import '../../data/repositories/auth_repository.dart';
 
 import '../../../../core/theme/app_colors.dart';
 
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key, this.authRepository});
+  const LoginScreen({super.key, this.authRepository, this.verificationRequired = false});
 
   final AuthRepository? authRepository;
+  final bool verificationRequired;
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -15,10 +17,12 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   bool _isGoogleLoading = false;
+  bool _authDialogOpen = false;
   String _lastLoginEmail = '';
   late final AuthRepository _authRepository =
       widget.authRepository ?? AuthRepository();
   Future<void> _signInWithGoogle() async {
+    if (_isGoogleLoading || _authDialogOpen) return;
     setState(() {
       _isGoogleLoading = true;
     });
@@ -37,7 +41,9 @@ class _LoginScreenState extends State<LoginScreen> {
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('A Google-bejelentkezés sikertelen: $error'),
+          content: Text(error is GoogleSignInException && error.code == GoogleSignInExceptionCode.canceled
+              ? 'A Google-bejelentkezést megszakítottad.'
+              : 'A Google-bejelentkezés sikertelen. Próbáld újra.'),
         ),
       );
     } finally {
@@ -50,6 +56,8 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<void> _showEmailSignInDialog() async {
+    if (_authDialogOpen || _isGoogleLoading) return;
+    setState(() => _authDialogOpen = true);
     final emailController = TextEditingController();
     emailController.addListener(() {
       _lastLoginEmail = emailController.text;
@@ -57,15 +65,17 @@ class _LoginScreenState extends State<LoginScreen> {
     final passwordController = TextEditingController();
     bool isPasswordVisible = false;
 
+    bool isLoading = false;
+    String? errorMessage;
     await showDialog<void>(
       context: context,
+      barrierDismissible: false,
       builder: (dialogContext) {
-        bool isLoading = false;
-        String? errorMessage;
 
         return StatefulBuilder(
           builder: (context, setDialogState) {
             Future<void> signIn() async {
+              if (isLoading) return;
               final email = emailController.text.trim();
               final password = passwordController.text;
 
@@ -108,7 +118,9 @@ class _LoginScreenState extends State<LoginScreen> {
               }
             }
 
-            return AlertDialog(
+            return PopScope(
+              canPop: !isLoading,
+              child: AlertDialog(
               title: const Text('Bejelentkezés e-maillel'),
               content: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -183,6 +195,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       : const Text('Bejelentkezés'),
                 ),
               ],
+              ),
             );
           },
         );
@@ -192,8 +205,11 @@ class _LoginScreenState extends State<LoginScreen> {
 
     emailController.dispose();
     passwordController.dispose();
+    if (mounted) setState(() => _authDialogOpen = false);
   }
   Future<void> _showPasswordResetDialog() async {
+    if (_authDialogOpen || _isGoogleLoading) return;
+    setState(() => _authDialogOpen = true);
     final emailController = TextEditingController(text: _lastLoginEmail);
     bool isSending = false;
     String? errorMessage;
@@ -328,25 +344,30 @@ class _LoginScreenState extends State<LoginScreen> {
     } finally {
       await Future<void>.delayed(const Duration(milliseconds: 300));
       emailController.dispose();
+      if (mounted) setState(() => _authDialogOpen = false);
     }
   }
 
   Future<void> _showRegistrationDialog() async {
+    if (_authDialogOpen || _isGoogleLoading) return;
+    setState(() => _authDialogOpen = true);
     final emailController = TextEditingController();
     final passwordController = TextEditingController();
     bool isPasswordVisible = false;
     final confirmPasswordController = TextEditingController();
     bool isConfirmPasswordVisible = false;
 
+    bool isLoading = false;
+    String? errorMessage;
     await showDialog<void>(
       context: context,
+      barrierDismissible: false,
       builder: (dialogContext) {
-        bool isLoading = false;
-        String? errorMessage;
 
         return StatefulBuilder(
           builder: (context, setDialogState) {
             Future<void> register() async {
+              if (isLoading) return;
               final email = emailController.text.trim();
               final password = passwordController.text;
               final confirmPassword = confirmPasswordController.text;
@@ -433,7 +454,9 @@ class _LoginScreenState extends State<LoginScreen> {
               }
             }
 
-            return AlertDialog(
+            return PopScope(
+              canPop: !isLoading,
+              child: AlertDialog(
               title: const Text('Regisztráció'),
               content: SingleChildScrollView(
                 child: Column(
@@ -537,6 +560,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       : const Text('Regisztráció'),
                 ),
               ],
+              ),
             );
           },
         );
@@ -548,6 +572,7 @@ class _LoginScreenState extends State<LoginScreen> {
     emailController.dispose();
     passwordController.dispose();
     confirmPasswordController.dispose();
+    if (mounted) setState(() => _authDialogOpen = false);
   }
   @override
   Widget build(BuildContext context) {
@@ -573,6 +598,10 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 ),
                 const SizedBox(height: 48),
+                if (widget.verificationRequired) ...[
+                  const Text('A bejelentkezés előtt erősítsd meg az e-mail-címedet. Ellenőrizd a beérkező leveleket és a Spam mappát is.'),
+                  const SizedBox(height: 16),
+                ],
                 SizedBox(
                   width: double.infinity,
                   height: 52,

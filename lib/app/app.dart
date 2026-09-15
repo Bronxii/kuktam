@@ -2,9 +2,15 @@ import 'package:flutter/material.dart';
 
 import 'package:kuktam/core/theme/app_colors.dart';
 import 'package:kuktam/features/auth/presentation/widgets/auth_gate.dart';
+import 'package:kuktam/features/auth/data/repositories/auth_repository.dart';
+import 'package:kuktam/features/walkthrough/data/walkthrough_store.dart';
+import 'package:kuktam/features/walkthrough/presentation/walkthrough_gate.dart';
 
 class KuktamApp extends StatelessWidget {
-  const KuktamApp({super.key});
+  const KuktamApp({super.key, this.authRepository, this.walkthroughStore});
+
+  final AuthRepository? authRepository;
+  final WalkthroughStore? walkthroughStore;
 
   @override
   Widget build(BuildContext context) {
@@ -21,7 +27,10 @@ class KuktamApp extends StatelessWidget {
           surface: AppColors.cream,
         ),
       ),
-      home: const AuthGate(),
+      home: WalkthroughGate(
+        store: walkthroughStore ?? const SharedPreferencesWalkthroughStore(),
+        child: AuthGate(authRepository: authRepository),
+      ),
     );
   }
 }

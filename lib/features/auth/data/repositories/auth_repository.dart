@@ -116,8 +116,11 @@ class AuthRepository {
       password: password,
     );
 
-    await userCredential.user?.sendEmailVerification();
-    await _firebaseAuth.signOut();
+    try {
+      await userCredential.user?.sendEmailVerification();
+    } finally {
+      await _firebaseAuth.signOut();
+    }
 
     return userCredential;
   }
@@ -133,8 +136,18 @@ class AuthRepository {
   }
 
   Future<void> signOut() async {
-    await _googleSignIn.signOut();
     await _firebaseAuth.signOut();
+    try {
+      await _googleSignIn.signOut();
+    } catch (_) {
+      // Provider cleanup must not prevent Firebase logout.
+    }
+  }
+
+  Future<void> signOutUnverifiedSession() async {
+    if (requiresEmailVerification(_firebaseAuth.currentUser)) {
+      await _firebaseAuth.signOut();
+    }
   }
 
   Future<void> changePassword({

@@ -5,32 +5,64 @@ import '../../../../home/presentation/screens/main_screen.dart';
 import '../screens/login_screen.dart';
 import '../../data/repositories/auth_repository.dart';
 
-class AuthGate extends StatelessWidget {
+class AuthGate extends StatefulWidget {
   const AuthGate({super.key, this.authRepository, this.mainBuilder});
-
   final AuthRepository? authRepository;
   final WidgetBuilder? mainBuilder;
+  @override
+  State<AuthGate> createState() => _AuthGateState();
+}
+
+class _AuthGateState extends State<AuthGate> {
+  late final AuthRepository _repository;
+  late final Stream<User?> _users;
+  bool _firstEvent = true;
+  bool _restoredVerificationRequired = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _repository = widget.authRepository ?? AuthRepository();
+    _users = _repository.authStateChanges().asyncMap((user) async {
+      final first = _firstEvent;
+      _firstEvent = false;
+      if (user != null && !AuthRepository.requiresEmailVerification(user)) {
+        _restoredVerificationRequired = false;
+      }
+      // Only restored sessions: registration/login own their temporary sessions.
+      if (first && AuthRepository.requiresEmailVerification(user)) {
+        _restoredVerificationRequired = true;
+        try {
+          await _repository.signOutUnverifiedSession();
+        } catch (_) {
+          // Fail closed without repeatedly signing out from widget rebuilds.
+        }
+      }
+      return user;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<User?>(
-      stream:
-          authRepository?.authStateChanges() ??
-          FirebaseAuth.instance.authStateChanges(),
+      stream: _users,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Scaffold(
             body: Center(child: CircularProgressIndicator()),
           );
         }
-
-        if (snapshot.hasData &&
-            !AuthRepository.requiresEmailVerification(snapshot.data)) {
-          return mainBuilder?.call(context) ?? const MainScreen();
+        final user = snapshot.data;
+        if (user != null && !AuthRepository.requiresEmailVerification(user)) {
+          return KeyedSubtree(
+            key: ValueKey(user.uid),
+            child: widget.mainBuilder?.call(context) ?? const MainScreen(),
+          );
         }
-
-        // No sign-out side effect in build: registration and login own it.
-        return LoginScreen(authRepository: authRepository);
+        return LoginScreen(
+          authRepository: _repository,
+          verificationRequired: _restoredVerificationRequired,
+        );
       },
     );
   }

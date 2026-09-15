@@ -23,6 +23,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   String _appVersion = '';
   bool _deletionDialogOpen = false;
+  bool _isSigningOut = false;
 
   Future<void> _deleteAccount() async {
     if (_deletionDialogOpen) return;
@@ -137,16 +138,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 final passwordController = TextEditingController();
                 bool isPasswordVisible = false;
 
-                final emailChanged = await showDialog<bool>(
+                String? errorText;
+                bool isLoading = false;
+                bool? emailChanged;
+                try {
+                emailChanged = await showDialog<bool>(
                   context: context,
                   barrierDismissible: false,
                   builder: (dialogContext) {
-                    String? errorText;
-                    bool isLoading = false;
 
                     return StatefulBuilder(
                       builder: (context, setDialogState) {
                         Future<void> submitEmailChange() async {
+                          if (isLoading) return;
                           final newEmail = emailController.text.trim();
                           final password = passwordController.text;
 
@@ -205,7 +209,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           }
                         }
 
-                        return AlertDialog(
+                        return PopScope(
+                          canPop: !isLoading,
+                          child: AlertDialog(
                           title: const Text('E-mail cím módosítása'),
                           content: SingleChildScrollView(
                             child: Column(
@@ -280,6 +286,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                   : const Text('Mentés'),
                             ),
                           ],
+                          ),
                         );
                       },
                     );
@@ -287,6 +294,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 );
 
 
+                } finally {
+                  await Future<void>.delayed(const Duration(milliseconds: 300));
+                  emailController.dispose();
+                  passwordController.dispose();
+                }
                 if (emailChanged == true && context.mounted) {
                   await showDialog<void>(
                     context: context,
@@ -328,22 +340,25 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final confirmPasswordController = TextEditingController();
     bool isConfirmPasswordVisible = false;
 
-    final passwordChanged = await showDialog<bool>(
+    String? errorText;
+    bool isLoading = false;
+    bool? passwordChanged;
+    try {
+    passwordChanged = await showDialog<bool>(
     context: context,
     barrierDismissible: false,
     builder: (dialogContext) {
-    String? errorText;
-    bool isLoading = false;
 
     return StatefulBuilder(
     builder: (context, setDialogState) {
     Future<void> submitPasswordChange() async {
+    if (isLoading) return;
     final currentPassword =
-    currentPasswordController.text.trim();
+    currentPasswordController.text;
     final newPassword =
-    newPasswordController.text.trim();
+    newPasswordController.text;
     final confirmPassword =
-    confirmPasswordController.text.trim();
+    confirmPasswordController.text;
 
     if (currentPassword.isEmpty ||
     newPassword.isEmpty ||
@@ -406,7 +421,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
     }
     }
 
-    return AlertDialog(
+    return PopScope(
+    canPop: !isLoading,
+    child: AlertDialog(
     title: const Text('Jelszó módosítása'),
     content: SingleChildScrollView(
     child: Column(
@@ -521,6 +538,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         : const Text('Mentés'),
     ),
     ],
+    ),
     );
     },
     );
@@ -528,6 +546,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
 
 
+    } finally {
+      await Future<void>.delayed(const Duration(milliseconds: 300));
+      currentPasswordController.dispose();
+      newPasswordController.dispose();
+      confirmPasswordController.dispose();
+    }
     if (passwordChanged == true && context.mounted) {
       await showDialog<void>(
         context: context,
@@ -635,8 +659,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
             title: const Text('Kijelentkezés'),
             trailing: const Icon(Icons.chevron_right),
             onTap: () async {
+              if (_isSigningOut) return;
+              _isSigningOut = true;
               final navigator = Navigator.of(context);
-
+              try {
               final shouldSignOut = await showDialog<bool>(
                 context: context,
                 builder: (dialogContext) {
@@ -674,6 +700,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
               }
 
               navigator.popUntil((route) => route.isFirst);
+              } catch (_) {
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                    content: Text('A kijelentkezés sikertelen. Próbáld újra.'),
+                  ));
+                }
+              } finally {
+                _isSigningOut = false;
+              }
             },
           ),
 

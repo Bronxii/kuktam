@@ -19,6 +19,8 @@ class TestUser implements User {
   final bool emailVerified;
   final List<String> providers;
   @override
+  String get uid => 'test-user';
+  @override
   List<UserInfo> get providerData => providers.map(TestProvider.new).toList();
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
@@ -39,6 +41,10 @@ class TestAuth implements FirebaseAuth {
   int signOutCalls = 0;
   final releaseLogin = Completer<void>();
   bool pauseLogin = false;
+  bool failSignOut = false;
+  User? user;
+  @override
+  User? get currentUser => user;
   @override
   Stream<User?> authStateChanges() => changes.stream;
   @override
@@ -46,6 +52,7 @@ class TestAuth implements FirebaseAuth {
     required String email,
     required String password,
   }) async {
+    user = loginUser;
     changes.add(loginUser);
     if (pauseLogin) await releaseLogin.future;
     return TestCredential(loginUser);
@@ -54,6 +61,10 @@ class TestAuth implements FirebaseAuth {
   @override
   Future<void> signOut() async {
     signOutCalls++;
+    if (failSignOut) {
+      throw FirebaseAuthException(code: 'network-request-failed');
+    }
+    user = null;
     changes.add(null);
   }
 
@@ -62,6 +73,62 @@ class TestAuth implements FirebaseAuth {
 }
 
 void main() {
+  testWidgets(
+    'restored sign-out failure stays blocked without rebuild retry loop',
+    (tester) async {
+      final auth = TestAuth(TestUser(false, ['password']))..failSignOut = true;
+      auth.user = auth.loginUser;
+      final repo = AuthRepository(firebaseAuth: auth);
+      Widget app() => MaterialApp(
+        home: AuthGate(
+          authRepository: repo,
+          mainBuilder: (_) => const Text('Main'),
+        ),
+      );
+      await tester.pumpWidget(app());
+      auth.changes.add(auth.user);
+      await tester.pumpAndSettle();
+      await tester.pumpWidget(app());
+      await tester.pumpAndSettle();
+      auth.changes.add(auth.user);
+      await tester.pumpAndSettle();
+      expect(auth.signOutCalls, 1);
+      expect(find.text('Main'), findsNothing);
+      expect(find.textContaining('Spam mappát'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+      await tester.pumpWidget(const SizedBox());
+      await auth.changes.close();
+    },
+  );
+  testWidgets(
+    'rapid auth changes and later verified login clear stale verification notice',
+    (tester) async {
+      final auth = TestAuth(TestUser(false, ['password']));
+      auth.user = auth.loginUser;
+      await tester.pumpWidget(
+        MaterialApp(
+          home: AuthGate(
+            authRepository: AuthRepository(firebaseAuth: auth),
+            mainBuilder: (_) => const Text('Main'),
+          ),
+        ),
+      );
+      auth.changes.add(auth.user);
+      await tester.pumpAndSettle();
+      expect(auth.signOutCalls, 1);
+      auth.user = TestUser(true, ['password']);
+      auth.changes.add(null);
+      auth.changes.add(auth.user);
+      await tester.pumpAndSettle();
+      expect(find.text('Main'), findsOneWidget);
+      await auth.signOut();
+      await tester.pumpAndSettle();
+      expect(find.text('Bejelentkezés e-maillel'), findsOneWidget);
+      expect(find.textContaining('Spam mappát'), findsNothing);
+      await tester.pumpWidget(const SizedBox());
+      await auth.changes.close();
+    },
+  );
   for (final entry in [
     (false, ['password'], false),
     (true, ['password'], true),
@@ -85,6 +152,7 @@ void main() {
         ),
       );
       await tester.pumpWidget(app());
+      auth.user = auth.loginUser;
       auth.changes.add(auth.loginUser);
       await tester.pumpAndSettle();
       await tester.pumpWidget(app());
@@ -94,7 +162,7 @@ void main() {
         entry.$3 ? findsOneWidget : findsNothing,
       );
       if (!entry.$3) expect(mainBuilds, 0);
-      expect(auth.signOutCalls, 0);
+      expect(auth.signOutCalls, entry.$3 ? 0 : 1);
       await tester.pumpWidget(const SizedBox());
       await auth.changes.close();
     });
