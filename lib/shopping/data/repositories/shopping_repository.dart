@@ -63,54 +63,18 @@ class ShoppingRepository {
         );
       }).toList();
 
-      items.sort((first, second) {
-        if (first.isChecked == second.isChecked) {
-          return 0;
-        }
-
-        return first.isChecked ? 1 : -1;
-      });
-
-      return items;
+      // Stable partition preserves the query's creation order within groups.
+      return [
+        ...items.where((item) => !item.isChecked),
+        ...items.where((item) => item.isChecked),
+      ];
     });
   }
   Future<void> addOrMergeItem({
     required String name,
     required double quantity,
     required String unit,
-  }) async {
-    if (quantity <= 0) {
-      throw ArgumentError('A mennyiségnek pozitívnak kell lennie.');
-    }
-
-    final normalizedName = _normalizeName(name);
-    final normalizedData = _normalizeQuantityAndUnit(
-      quantity: quantity,
-      unit: unit,
-    );
-
-    final existingItems = await _shoppingCollection
-        .where('name', isEqualTo: normalizedName)
-        .where('unit', isEqualTo: normalizedData.unit)
-        .limit(1)
-        .get();
-
-    if (existingItems.docs.isNotEmpty) {
-      await existingItems.docs.first.reference.update({
-        'quantity': FieldValue.increment(normalizedData.quantity),
-      });
-
-      return;
-    }
-
-    await _shoppingCollection.add({
-      'name': normalizedName,
-      'quantity': normalizedData.quantity,
-      'unit': normalizedData.unit,
-      'isChecked': false,
-      'createdAt': FieldValue.serverTimestamp(),
-    });
-  }
+  }) => addOrMergeItems([(name: name, quantity: quantity, unit: unit)]);
   /// All import writes commit together. Query-based target discovery retains
   /// the existing cross-client merge race; it is not a transactional lookup.
   Future<void> addOrMergeItems(List<ShoppingItemInput> items) async {
@@ -162,7 +126,7 @@ class ShoppingRepository {
     required double quantity,
     required String unit,
   }) async {
-    if (quantity <= 0) {
+    if (!quantity.isFinite || quantity <= 0 || name.trim().isEmpty || !shoppingUnits.contains(unit)) {
       throw ArgumentError('A mennyiségnek pozitívnak kell lennie.');
     }
 
@@ -172,7 +136,23 @@ class ShoppingRepository {
       unit: unit,
     );
 
-    await _shoppingCollection.doc(id).update({
+    if (!normalizedData.quantity.isFinite) throw ArgumentError('Túl nagy mennyiség.');
+    final collection = _shoppingCollection;
+    final matches = await collection
+        .where('name', isEqualTo: normalizedName)
+        .where('unit', isEqualTo: normalizedData.unit)
+        .get();
+    final targets = matches.docs.where((document) => document.id != id);
+    if (targets.isNotEmpty) {
+      final batch = _firestore.batch();
+      batch.update(targets.first.reference, {
+        'quantity': FieldValue.increment(normalizedData.quantity),
+      });
+      batch.delete(collection.doc(id));
+      await batch.commit();
+      return;
+    }
+    await collection.doc(id).update({
       'name': normalizedName,
       'quantity': normalizedData.quantity,
       'unit': normalizedData.unit,

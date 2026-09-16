@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:share_plus/share_plus.dart';
+import '../../../shopping/domain/shopping_quantity_formatter.dart';
 
 import '../../../recipes/presentation/screens/recipes_screen.dart';
 import '../../../shopping/presentation/screens/shopping_screen.dart';
@@ -64,48 +65,14 @@ class _MainScreenState extends State<MainScreen> {
 
   List<Widget> get _screens => widget.tabBodies ?? [
     RecipesScreen(key: ValueKey(_recipesVersion), recipeRepository: widget.recipeRepository),
-    const ShoppingListScreen(),
-    const WhatToCookScreen(),
+    ShoppingListScreen(shoppingRepository: _shoppingRepository),
+    WhatToCookScreen(recipeRepository: widget.recipeRepository),
   ];
-  String _formatQuantity(num quantity) {
-    final rounded = (quantity * 100).round() / 100;
-
-    if (rounded % 1 == 0) {
-      return rounded.toInt().toString();
-    }
-
-    return rounded
-        .toStringAsFixed(2)
-        .replaceAll(RegExp(r'0+$'), '')
-        .replaceAll(RegExp(r'\.$'), '')
-        .replaceAll('.', ',');
-  }
-  ({num quantity, String unit}) _formatShoppingAmount(
-      num quantity,
-      String unit,
-      ) {
-    final normalizedUnit = unit.trim().toLowerCase();
-
-    if (normalizedUnit == 'g' && quantity >= 1000) {
-      return (
-      quantity: quantity / 1000,
-      unit: 'kg',
-      );
-    }
-
-    if (normalizedUnit == 'ml' && quantity >= 1000) {
-      return (
-      quantity: quantity / 1000,
-      unit: 'l',
-      );
-    }
-
-    return (
-    quantity: quantity,
-    unit: unit,
-    );
-  }
+  bool _sharingShopping = false;
   Future<void> _shareShoppingList() async {
+    if (_sharingShopping) return;
+    _sharingShopping = true;
+    try {
     final items = await _shoppingRepository.watchShoppingItems().first;
 
     if (!mounted) {
@@ -127,16 +94,7 @@ class _MainScreenState extends State<MainScreen> {
     buffer.writeln();
 
     for (final item in items) {
-      final formattedAmount = _formatShoppingAmount(
-        item.quantity,
-        item.unit,
-      );
-
-      buffer.writeln(
-        '• ${item.name} – '
-            '${_formatQuantity(formattedAmount.quantity)} '
-            '${formattedAmount.unit}',
-      );
+      buffer.writeln('• ${item.name} – ${formatShoppingAmount(item.quantity, item.unit)}');
     }
     buffer.writeln();
     buffer.writeln('──────────────');
@@ -147,6 +105,13 @@ class _MainScreenState extends State<MainScreen> {
         text: buffer.toString().trim(),
       ),
     );
+    } catch (_) {
+      if (mounted) { ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text('Nem sikerült megosztani a bevásárlólistát. Próbáld újra.'),
+      )); }
+    } finally {
+      _sharingShopping = false;
+    }
   }
   Widget? _buildFloatingActionButton(BuildContext context) {
     switch (_selectedIndex) {

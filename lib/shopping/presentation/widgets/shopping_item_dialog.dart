@@ -21,10 +21,7 @@ Future<void> showShoppingItemDialog({
 }
 
 class _ShoppingItemDialog extends StatefulWidget {
-  const _ShoppingItemDialog({
-    required this.shoppingRepository,
-    this.item,
-  });
+  const _ShoppingItemDialog({required this.shoppingRepository, this.item});
 
   final ShoppingRepository shoppingRepository;
   final ShoppingItem? item;
@@ -51,9 +48,7 @@ class _ShoppingItemDialogState extends State<_ShoppingItemDialog> {
 
     final item = widget.item;
 
-    _nameController = TextEditingController(
-      text: item?.name ?? '',
-    );
+    _nameController = TextEditingController(text: item?.name ?? '');
 
     _quantityController = TextEditingController(
       text: item == null
@@ -63,8 +58,9 @@ class _ShoppingItemDialogState extends State<_ShoppingItemDialog> {
           : item.quantity.toString(),
     );
 
-    _selectedUnit =
-    item != null && _units.contains(item.unit) ? item.unit : 'db';
+    _selectedUnit = item != null && _units.contains(item.unit)
+        ? item.unit
+        : 'db';
   }
 
   @override
@@ -75,6 +71,7 @@ class _ShoppingItemDialogState extends State<_ShoppingItemDialog> {
   }
 
   Future<void> _save() async {
+    if (_isSaving) return;
     final name = _nameController.text.trim();
 
     final quantity = double.tryParse(
@@ -88,7 +85,7 @@ class _ShoppingItemDialogState extends State<_ShoppingItemDialog> {
       return;
     }
 
-    if (quantity == null || quantity <= 0) {
+    if (quantity == null || !quantity.isFinite || quantity <= 0) {
       setState(() {
         _errorMessage = 'Adj meg érvényes mennyiséget.';
       });
@@ -135,98 +132,93 @@ class _ShoppingItemDialogState extends State<_ShoppingItemDialog> {
 
   @override
   Widget build(BuildContext context) {
-    return AlertDialog(
-      title: Text(
-        _isEditing ? 'Tétel szerkesztése' : 'Új tétel',
-      ),
-      content: SingleChildScrollView(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: _nameController,
-              autofocus: true,
-              enabled: !_isSaving,
-              textCapitalization: TextCapitalization.sentences,
-              decoration: const InputDecoration(
-                labelText: 'Név',
-                border: OutlineInputBorder(),
-              ),
-            ),
-            const SizedBox(height: 16),
-            TextField(
-              controller: _quantityController,
-              enabled: !_isSaving,
-              keyboardType: const TextInputType.numberWithOptions(
-                decimal: true,
-              ),
-              decoration: const InputDecoration(
-                labelText: 'Mennyiség',
-                border: OutlineInputBorder(),
-              ),
-            ),
-            const SizedBox(height: 16),
-            DropdownButtonFormField<String>(
-              initialValue: _selectedUnit,
-              menuMaxHeight: 240,
-              decoration: const InputDecoration(
-                labelText: 'Mértékegység',
-                border: OutlineInputBorder(),
-              ),
-              items: _units.map((unit) {
-                return DropdownMenuItem<String>(
-                  value: unit,
-                  child: Text(unit),
-                );
-              }).toList(),
-              onChanged: _isSaving
-                  ? null
-                  : (value) {
-                if (value == null) {
-                  return;
-                }
-
-                setState(() {
-                  _selectedUnit = value;
-                });
-              },
-            ),
-            if (_errorMessage != null) ...[
-              const SizedBox(height: 12),
-              Text(
-                _errorMessage!,
-                style: TextStyle(
-                  color: Theme.of(context).colorScheme.error,
+    return PopScope(
+      canPop: !_isSaving,
+      child: AlertDialog(
+        title: Text(_isEditing ? 'Tétel szerkesztése' : 'Új tétel'),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: _nameController,
+                autofocus: true,
+                enabled: !_isSaving,
+                textCapitalization: TextCapitalization.sentences,
+                decoration: const InputDecoration(
+                  labelText: 'Név',
+                  border: OutlineInputBorder(),
                 ),
               ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: _quantityController,
+                enabled: !_isSaving,
+                keyboardType: const TextInputType.numberWithOptions(
+                  decimal: true,
+                ),
+                decoration: const InputDecoration(
+                  labelText: 'Mennyiség',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              const SizedBox(height: 16),
+              DropdownButtonFormField<String>(
+                initialValue: _selectedUnit,
+                menuMaxHeight: 240,
+                decoration: const InputDecoration(
+                  labelText: 'Mértékegység',
+                  border: OutlineInputBorder(),
+                ),
+                items: _units.map((unit) {
+                  return DropdownMenuItem<String>(
+                    value: unit,
+                    child: Text(unit),
+                  );
+                }).toList(),
+                onChanged: _isSaving
+                    ? null
+                    : (value) {
+                        if (value == null) {
+                          return;
+                        }
+
+                        setState(() {
+                          _selectedUnit = value;
+                        });
+                      },
+              ),
+              if (_errorMessage != null) ...[
+                const SizedBox(height: 12),
+                Text(
+                  _errorMessage!,
+                  style: TextStyle(color: Theme.of(context).colorScheme.error),
+                ),
+              ],
             ],
-          ],
-        ),
-      ),
-      actions: [
-        TextButton(
-          onPressed: _isSaving
-              ? null
-              : () {
-            Navigator.pop(context);
-          },
-          child: const Text('Mégse'),
-        ),
-        FilledButton(
-          onPressed: _isSaving ? null : _save,
-          child: _isSaving
-              ? const SizedBox(
-            width: 18,
-            height: 18,
-            child: CircularProgressIndicator(
-              strokeWidth: 2,
-            ),
-          )
-              : Text(
-            _isEditing ? 'Mentés' : 'Hozzáadás',
           ),
         ),
-      ],
+        actions: [
+          TextButton(
+            onPressed: _isSaving
+                ? null
+                : () {
+                    Navigator.pop(context);
+                  },
+            child: const Text('Mégse'),
+          ),
+          FilledButton(
+            onPressed: _isSaving ? null : _save,
+            child: _isSaving
+                ? const SizedBox(
+                    width: 18,
+                    height: 18,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  )
+                : Text(_isEditing ? 'Mentés' : 'Hozzáadás'),
+          ),
+        ],
+      ),
     );
   }
 }

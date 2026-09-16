@@ -12,15 +12,15 @@ import 'package:kuktam/shopping/data/repositories/shopping_repository.dart';
 class RecipeDetailsScreen extends StatefulWidget {
   const RecipeDetailsScreen({
     required this.recipe,
-    this.addScalingShoppingItem,
-    this.addMultiplierShoppingItem,
+    this.addScalingShoppingItems,
+    this.addMultiplierShoppingItems,
     this.recipeRepository,
     super.key,
   });
 
   final Recipe recipe;
-  final AddScalingShoppingItem? addScalingShoppingItem;
-  final AddScalingShoppingItem? addMultiplierShoppingItem;
+  final AddScalingShoppingItems? addScalingShoppingItems;
+  final AddScalingShoppingItems? addMultiplierShoppingItems;
   final RecipeRepository? recipeRepository;
 
   @override
@@ -29,8 +29,8 @@ class RecipeDetailsScreen extends StatefulWidget {
 
 class _RecipeDetailsScreenState extends State<RecipeDetailsScreen> {
   Recipe get recipe => widget.recipe;
-  AddScalingShoppingItem? get addScalingShoppingItem => widget.addScalingShoppingItem;
-  AddScalingShoppingItem? get addMultiplierShoppingItem => widget.addMultiplierShoppingItem;
+  AddScalingShoppingItems? get addScalingShoppingItems => widget.addScalingShoppingItems;
+  AddScalingShoppingItems? get addMultiplierShoppingItems => widget.addMultiplierShoppingItems;
   late final RecipeRepository _repository = widget.recipeRepository ?? RecipeRepository();
   bool _deleting = false;
   bool _confirmingDelete = false;
@@ -189,7 +189,7 @@ body: ListView(
                   barrierDismissible: false,
                   builder: (context) => RecipeScalingDialog(
                     ingredients: recipe.ingredients,
-                    addShoppingItem: addScalingShoppingItem,
+                    addShoppingItems: addScalingShoppingItems,
                   ),
                 );
                 if (added != true || !context.mounted) return;
@@ -412,15 +412,11 @@ body: ListView(
                 ];
                 if (items.isEmpty) return;
                 setState(() => _addingMultiplier = true);
-                final add = addMultiplierShoppingItem ?? ShoppingRepository().addOrMergeItem;
-
-                for (final item in items) {
-                  await add(
-                    name: item.name,
-                    quantity: item.amount.quantity,
-                    unit: item.amount.unit,
-                  );
-                }
+                final add = addMultiplierShoppingItems ?? ShoppingRepository().addOrMergeItems;
+                await add(List<ShoppingItemInput>.unmodifiable([
+                  for (final item in items)
+                    (name: item.name, quantity: item.amount.quantity, unit: item.amount.unit),
+                ]));
 
                 if (!context.mounted) {
                   return;
@@ -439,13 +435,13 @@ body: ListView(
                   if (!mounted) return;
                   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                     content: Text(_addingMultiplier
-                        ? 'Nem sikerült minden tételt hozzáadni a bevásárlólistához. Ellenőrizd a listát.'
+                        ? 'Nem sikerült hozzáadni a tételeket a bevásárlólistához. Ellenőrizd a listát, majd próbáld újra.'
                         : 'A megadott mennyiséggel a recept nem számítható át.'),
                   ));
                 } catch (_) {
                   if (!mounted) return;
                   ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                    content: Text('Nem sikerült minden tételt hozzáadni a bevásárlólistához. Ellenőrizd a listát.'),
+                    content: Text('Nem sikerült hozzáadni a tételeket a bevásárlólistához. Ellenőrizd a listát, majd próbáld újra.'),
                   ));
                 } finally {
                   _multiplierFlowActive = false;

@@ -386,7 +386,7 @@ void main() {
 
   Future<void> openShopping(
     WidgetTester tester,
-    AddScalingShoppingItem add, {
+    AddScalingShoppingItems add, {
     List<RecipeIngredient> items = basic,
   }) async {
     await tester.pumpWidget(
@@ -403,7 +403,7 @@ void main() {
                       spices: const [RecipeSpice(name: 'Só')],
                       preparation: '',
                     ),
-                    addScalingShoppingItem: add,
+                    addScalingShoppingItems: add,
                   ),
                 ),
               ),
@@ -431,13 +431,12 @@ void main() {
   ) async {
     final calls = <double>[];
     final gate = Completer<void>();
-    await openShopping(tester, ({
-      required name,
-      required quantity,
-      required unit,
-    }) async {
-      calls.add(quantity);
-      await gate.future;
+    await openShopping(tester, (items) async {
+      for (final item in items) {
+        final quantity = item.quantity;
+        calls.add(quantity);
+        await gate.future;
+      }
     });
     await tester.enterText(quantity(0), '250');
     await submitShopping(tester);
@@ -476,12 +475,12 @@ void main() {
       RecipeIngredient(name: 'C', quantity: 1.67, unit: 'doboz'),
       RecipeIngredient(name: 'D', quantity: 0.84, unit: 'konzerv'),
     ];
-    await openShopping(tester, ({
-      required name,
-      required quantity,
-      required unit,
-    }) async {
-      calls.add((quantity, unit));
+    await openShopping(tester, (items) async {
+      for (final item in items) {
+        final quantity = item.quantity;
+        final unit = item.unit;
+        calls.add((quantity, unit));
+      }
     }, items: items);
     await submitShopping(tester);
     await tester.pumpAndSettle();
@@ -503,12 +502,10 @@ void main() {
     tester,
   ) async {
     var calls = 0;
-    await openShopping(tester, ({
-      required name,
-      required quantity,
-      required unit,
-    }) async {
-      calls++;
+    await openShopping(tester, (items) async {
+      for (var i = 0; i < items.length; i++) {
+        calls++;
+      }
     });
     await tester.enterText(quantity(0), '');
     await submitShopping(tester);
@@ -520,24 +517,20 @@ void main() {
     expect(find.byType(RecipeScalingDialog), findsOneWidget);
   });
 
-  testWidgets('partial failure stops writes and keeps both routes', (
-    tester,
-  ) async {
+  testWidgets('batch failure keeps both routes', (tester) async {
     var calls = 0;
-    await openShopping(tester, ({
-      required name,
-      required quantity,
-      required unit,
-    }) async {
-      calls++;
-      if (calls == 2) throw StateError('network');
+    await openShopping(tester, (items) async {
+      for (var i = 0; i < items.length; i++) {
+        calls++;
+        if (calls == 2) throw StateError('network');
+      }
     });
     await submitShopping(tester);
     await tester.pumpAndSettle();
     expect(calls, 2);
     expect(
       find.text(
-        'Nem sikerült minden tételt hozzáadni a bevásárlólistához. Ellenőrizd a listát.',
+        'Nem sikerült hozzáadni a tételeket a bevásárlólistához. Ellenőrizd a listát, majd próbáld újra.',
       ),
       findsOneWidget,
     );
@@ -553,11 +546,7 @@ void main() {
   });
 
   testWidgets('empty ingredients disable shopping', (tester) async {
-    await openShopping(tester, ({
-      required name,
-      required quantity,
-      required unit,
-    }) async {
+    await openShopping(tester, (items) async {
       fail('No writes');
     }, items: []);
     expect(tester.widget<FilledButton>(shoppingButton()).onPressed, isNull);
@@ -569,8 +558,11 @@ void main() {
     final calls = <double>[];
     await openShopping(
       tester,
-      ({required name, required quantity, required unit}) async {
-        calls.add(quantity);
+      (items) async {
+        for (final item in items) {
+          final quantity = item.quantity;
+          calls.add(quantity);
+        }
       },
       items: const [RecipeIngredient(name: 'Kevés', quantity: 0.1, unit: 'db')],
     );
@@ -602,10 +594,13 @@ void main() {
               spices: [],
               preparation: '',
             ),
-            addMultiplierShoppingItem:
-                ({required name, required quantity, required unit}) async {
-                  calls.add((quantity, unit));
-                },
+            addMultiplierShoppingItems: (items) async {
+              for (final item in items) {
+                final quantity = item.quantity;
+                final unit = item.unit;
+                calls.add((quantity, unit));
+              }
+            },
           ),
         ),
       );

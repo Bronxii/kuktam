@@ -7,22 +7,17 @@ import '../../../shopping/data/repositories/shopping_repository.dart';
 import '../../domain/models/recipe.dart';
 import '../../domain/services/recipe_scaler.dart';
 
-typedef AddScalingShoppingItem =
-    Future<void> Function({
-      required String name,
-      required double quantity,
-      required String unit,
-    });
+typedef AddScalingShoppingItems = Future<void> Function(List<ShoppingItemInput> items);
 
 class RecipeScalingDialog extends StatefulWidget {
   const RecipeScalingDialog({
     super.key,
     required this.ingredients,
-    this.addShoppingItem,
+    this.addShoppingItems,
   });
 
   final List<RecipeIngredient> ingredients;
-  final AddScalingShoppingItem? addShoppingItem;
+  final AddScalingShoppingItems? addShoppingItems;
 
   @override
   State<RecipeScalingDialog> createState() => _RecipeScalingDialogState();
@@ -70,10 +65,8 @@ class _RecipeScalingDialogState extends State<RecipeScalingDialog> {
     });
     FocusScope.of(context).unfocus();
     try {
-      final add = widget.addShoppingItem ?? ShoppingRepository().addOrMergeItem;
-      for (final item in snapshot) {
-        await add(name: item.name, quantity: item.quantity, unit: item.unit);
-      }
+      final add = widget.addShoppingItems ?? ShoppingRepository().addOrMergeItems;
+      await add(snapshot);
       if (!mounted) return;
       Navigator.of(context).pop(true);
     } catch (_) {
@@ -81,7 +74,7 @@ class _RecipeScalingDialogState extends State<RecipeScalingDialog> {
       setState(() {
         _isAdding = false;
         _shoppingError =
-            'Nem sikerült minden tételt hozzáadni a bevásárlólistához. Ellenőrizd a listát.';
+            'Nem sikerült hozzáadni a tételeket a bevásárlólistához. Ellenőrizd a listát, majd próbáld újra.';
       });
     }
   }

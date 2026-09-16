@@ -11,28 +11,25 @@ class RecipeMatcher {
       final sortedRecipes = [...recipes];
 
       sortedRecipes.sort(
-            (a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()),
+        (a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()),
       );
 
       return sortedRecipes;
     }
 
-    final normalizedIngredients = selectedIngredients
-        .map(_normalize)
-        .toSet();
+    final normalizedIngredients = selectedIngredients.map(_normalize).toSet();
 
     final matchingRecipes = recipes.where((recipe) {
       final recipeIngredients = recipe.ingredients
           .map((ingredient) => _normalize(ingredient.name))
           .toSet();
 
-      return normalizedIngredients.every(
-        recipeIngredients.contains,
-      );
+      return recipeIngredients.isNotEmpty &&
+          recipeIngredients.every(normalizedIngredients.contains);
     }).toList();
 
     matchingRecipes.sort(
-          (a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()),
+      (a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()),
     );
 
     return matchingRecipes;

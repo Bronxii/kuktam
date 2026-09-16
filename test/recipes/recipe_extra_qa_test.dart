@@ -22,7 +22,7 @@ const original = Recipe(
 
 Future<void> openMultiplier(
   WidgetTester tester,
-  AddScalingShoppingItem add, {
+  AddScalingShoppingItems add, {
   Recipe recipe = original,
 }) async {
   await tester.pumpWidget(
@@ -34,7 +34,7 @@ Future<void> openMultiplier(
               MaterialPageRoute<void>(
                 builder: (_) => RecipeDetailsScreen(
                   recipe: recipe,
-                  addMultiplierShoppingItem: add,
+                  addMultiplierShoppingItems: add,
                 ),
               ),
             ),
@@ -70,13 +70,14 @@ void main() {
         final before = original.toMap();
         final calls = <(double, String)>[];
         final names = <String>[];
-        await openMultiplier(tester, ({
-          required name,
-          required quantity,
-          required unit,
-        }) async {
-          names.add(name);
-          calls.add((quantity, unit));
+        await openMultiplier(tester, (items) async {
+          for (final item in items) {
+            final name = item.name;
+            final quantity = item.quantity;
+            final unit = item.unit;
+            names.add(name);
+            calls.add((quantity, unit));
+          }
         });
         await tester.enterText(find.byType(TextField), example.$1);
         await tester.tap(find.text('Hozzáadás'));
@@ -106,12 +107,10 @@ void main() {
       tester,
     ) async {
       var calls = 0;
-      await openMultiplier(tester, ({
-        required name,
-        required quantity,
-        required unit,
-      }) async {
-        calls++;
+      await openMultiplier(tester, (items) async {
+        for (var i = 0; i < items.length; i++) {
+          calls++;
+        }
       });
       // Exercise validation independently of the keyboard's restrictive formatter.
       tester.widget<TextField>(find.byType(TextField)).controller!.text = input;
@@ -129,8 +128,10 @@ void main() {
     var calls = 0;
     await openMultiplier(
       tester,
-      ({required name, required quantity, required unit}) async {
-        calls++;
+      (items) async {
+        for (var i = 0; i < items.length; i++) {
+          calls++;
+        }
       },
       recipe: const Recipe(
         name: 'Nagy',
@@ -159,13 +160,12 @@ void main() {
   ) async {
     var failWrite = true;
     final calls = <String>[];
-    await openMultiplier(tester, ({
-      required name,
-      required quantity,
-      required unit,
-    }) async {
-      if (failWrite) throw StateError('network');
-      calls.add(name);
+    await openMultiplier(tester, (items) async {
+      for (final item in items) {
+        final name = item.name;
+        if (failWrite) throw StateError('network');
+        calls.add(name);
+      }
     });
     await tester.tap(find.text('Hozzáadás'));
     await tester.pumpAndSettle();
@@ -261,10 +261,14 @@ void main() {
         MaterialApp(
           home: RecipeDetailsScreen(
             recipe: saved,
-            addScalingShoppingItem:
-                ({required name, required quantity, required unit}) async {
-                  calls.add((name, quantity, unit));
-                },
+            addScalingShoppingItems: (items) async {
+              for (final item in items) {
+                final name = item.name;
+                final quantity = item.quantity;
+                final unit = item.unit;
+                calls.add((name, quantity, unit));
+              }
+            },
           ),
         ),
       );
@@ -293,13 +297,11 @@ void main() {
     'multiplier repository failure stays on detail and hides raw exception',
     (tester) async {
       var calls = 0;
-      await openMultiplier(tester, ({
-        required name,
-        required quantity,
-        required unit,
-      }) async {
-        calls++;
-        if (calls == 2) throw StateError('private backend detail');
+      await openMultiplier(tester, (items) async {
+        for (var i = 0; i < items.length; i++) {
+          calls++;
+          if (calls == 2) throw StateError('private backend detail');
+        }
       });
       await tester.tap(find.text('Hozzáadás'));
       await tester.pumpAndSettle();
@@ -307,7 +309,7 @@ void main() {
       expect(calls, 2);
       expect(find.byType(RecipeDetailsScreen), findsOneWidget);
       expect(
-        find.textContaining('Nem sikerült minden tételt hozzáadni'),
+        find.textContaining('Nem sikerült hozzáadni a tételeket'),
         findsOneWidget,
       );
       expect(find.textContaining('private backend'), findsNothing);
@@ -318,12 +320,10 @@ void main() {
     tester,
   ) async {
     var calls = 0;
-    await openMultiplier(tester, ({
-      required name,
-      required quantity,
-      required unit,
-    }) async {
-      calls++;
+    await openMultiplier(tester, (items) async {
+      for (var i = 0; i < items.length; i++) {
+        calls++;
+      }
     });
     await tester.enterText(find.byType(TextField), '9' * 400);
     await tester.tap(find.text('Hozzáadás'));
@@ -338,13 +338,11 @@ void main() {
     (tester) async {
       final pending = Completer<void>();
       var calls = 0;
-      await openMultiplier(tester, ({
-        required name,
-        required quantity,
-        required unit,
-      }) async {
-        calls++;
-        await pending.future;
+      await openMultiplier(tester, (items) async {
+        for (var i = 0; i < items.length; i++) {
+          calls++;
+          await pending.future;
+        }
       });
       final submit = tester
           .widget<FilledButton>(find.widgetWithText(FilledButton, 'Hozzáadás'))

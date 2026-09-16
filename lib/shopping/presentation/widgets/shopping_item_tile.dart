@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../domain/models/shopping_item.dart';
+import '../../domain/shopping_quantity_formatter.dart';
 
 class ShoppingItemTile extends StatelessWidget {
   const ShoppingItemTile({
@@ -42,10 +43,7 @@ class ShoppingItemTile extends StatelessWidget {
                     ),
                     const SizedBox(width: 12),
                     Text(
-                      _formatQuantityAndUnit(
-                        quantity: item.quantity,
-                        unit: item.unit,
-                      ),
+                      formatShoppingAmount(item.quantity, item.unit),
                       style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                         decoration: item.isChecked
                             ? TextDecoration.lineThrough
@@ -76,31 +74,5 @@ class ShoppingItemTile extends StatelessWidget {
         ],
       ),
     );
-  }
-  String _formatQuantityAndUnit({
-    required double quantity,
-    required String unit,
-  }) {
-    if (unit == 'g' && quantity >= 1000) {
-      return '${_formatQuantity(quantity / 1000)} kg';
-    }
-
-    if (unit == 'ml' && quantity >= 1000) {
-      return '${_formatQuantity(quantity / 1000)} l';
-    }
-
-    return '${_formatQuantity(quantity)} $unit';
-  }
-
-  String _formatQuantity(double quantity) {
-    if (quantity == quantity.roundToDouble()) {
-      return quantity.toInt().toString();
-    }
-
-    return quantity
-        .toStringAsFixed(2)
-        .replaceFirst(RegExp(r'0+$'), '')
-        .replaceFirst(RegExp(r'[.,]$'), '')
-        .replaceAll('.', ',');
   }
 }

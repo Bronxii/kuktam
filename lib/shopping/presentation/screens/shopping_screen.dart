@@ -1,18 +1,45 @@
 import 'package:flutter/material.dart';
 
+import '../../domain/models/shopping_item.dart';
 import '../../data/repositories/shopping_repository.dart';
 import '../widgets/shopping_item_dialog.dart';
 import '../widgets/shopping_item_tile.dart';
 
-class ShoppingListScreen extends StatelessWidget {
-  const ShoppingListScreen({super.key});
+class ShoppingListScreen extends StatefulWidget {
+  const ShoppingListScreen({super.key, this.shoppingRepository});
+  final ShoppingRepository? shoppingRepository;
+  @override
+  State<ShoppingListScreen> createState() => _ShoppingListScreenState();
+}
+
+class _ShoppingListScreenState extends State<ShoppingListScreen> {
+  late final shoppingRepository = widget.shoppingRepository ?? ShoppingRepository();
+  late Stream<List<ShoppingItem>> _items = shoppingRepository.watchShoppingItems();
+  bool _busy = false;
+  bool _confirming = false;
+
+  Future<void> _write(Future<void> Function() action) async {
+    if (_busy || !mounted) return;
+    setState(() => _busy = true);
+    try {
+      await action();
+    } catch (_) {
+      if (mounted) { ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text('Nem sikerült módosítani a bevásárlólistát. Próbáld újra.'),
+      )); }
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    final shoppingRepository = ShoppingRepository();
 
-    return StreamBuilder(
-      stream: shoppingRepository.watchShoppingItems(),
+
+    return PopScope(
+      canPop: !_busy,
+      child: AbsorbPointer(absorbing: _busy, child: StreamBuilder<List<ShoppingItem>>(
+      stream: _items,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(
@@ -21,16 +48,18 @@ class ShoppingListScreen extends StatelessWidget {
         }
 
         if (snapshot.hasError) {
-          return const Center(
-            child: Text(
-              'Nem sikerült betölteni a bevásárlólistát.',
-            ),
-          );
+          return Center(child: Column(mainAxisSize: MainAxisSize.min, children: [
+            const Text('Nem sikerült betölteni a bevásárlólistát.'),
+            TextButton(onPressed: () => setState(() => _items = shoppingRepository.watchShoppingItems()), child: const Text('Újra')),
+          ]));
         }
 
         final items = snapshot.data ?? [];
 
         Future<void> finishShopping() async {
+          if (_busy || _confirming) return;
+          _confirming = true;
+          var answered = false;
           final shouldFinish = await showDialog<bool>(
             context: context,
             builder: (dialogContext) {
@@ -43,13 +72,17 @@ class ShoppingListScreen extends StatelessWidget {
                 actions: [
                   TextButton(
                     onPressed: () {
-                      Navigator.of(dialogContext).pop(false);
+                      if (answered) return;
+                                answered = true;
+                                Navigator.of(dialogContext).pop(false);
                     },
                     child: const Text('Mégsem'),
                   ),
                   FilledButton(
                     onPressed: () {
-                      Navigator.of(dialogContext).pop(true);
+                      if (answered) return;
+                                answered = true;
+                                Navigator.of(dialogContext).pop(true);
                     },
                     child: const Text('Befejezés'),
                   ),
@@ -58,11 +91,12 @@ class ShoppingListScreen extends StatelessWidget {
             },
           );
 
-          if (shouldFinish != true) {
+          _confirming = false;
+          if (!mounted || shouldFinish != true) {
             return;
           }
 
-          await shoppingRepository.clearShoppingList();
+          await _write(shoppingRepository.clearShoppingList);
         }
 
         if (items.isEmpty) {
@@ -95,6 +129,7 @@ class ShoppingListScreen extends StatelessWidget {
 
         return Column(
           children: [
+            if (_busy) const LinearProgressIndicator(),
             Expanded(
               child: ListView.separated(
                 padding: const EdgeInsets.symmetric(vertical: 8),
@@ -134,6 +169,9 @@ class ShoppingListScreen extends StatelessWidget {
                                   onTap: () async {
                                     Navigator.pop(sheetContext);
 
+                                    if (_busy || _confirming) return;
+                                    _confirming = true;
+          var answered = false;
                                     final shouldDelete =
                                     await showDialog<bool>(
                                       context: context,
@@ -148,6 +186,8 @@ class ShoppingListScreen extends StatelessWidget {
                                           actions: [
                                             TextButton(
                                               onPressed: () {
+                                                if (answered) return;
+                                                answered = true;
                                                 Navigator.pop(
                                                   dialogContext,
                                                   false,
@@ -158,6 +198,8 @@ class ShoppingListScreen extends StatelessWidget {
                                             ),
                                             FilledButton(
                                               onPressed: () {
+                                                if (answered) return;
+                                                answered = true;
                                                 Navigator.pop(
                                                   dialogContext,
                                                   true,
@@ -171,12 +213,12 @@ class ShoppingListScreen extends StatelessWidget {
                                       },
                                     );
 
-                                    if (shouldDelete != true) {
+                                    _confirming = false;
+                                    if (!mounted || shouldDelete != true) {
                                       return;
                                     }
 
-                                    await shoppingRepository
-                                        .deleteItem(item.id);
+                                    await _write(() => shoppingRepository.deleteItem(item.id));
                                   },
                                 ),
                               ],
@@ -186,10 +228,10 @@ class ShoppingListScreen extends StatelessWidget {
                       );
                     },
                     onCheckedChanged: () {
-                      shoppingRepository.setItemChecked(
+                      _write(() => shoppingRepository.setItemChecked(
                         id: item.id,
                         isChecked: !item.isChecked,
-                      );
+                      ));
                     },
                   );
                 },
@@ -214,6 +256,7 @@ class ShoppingListScreen extends StatelessWidget {
           ],
         );
       },
+    )),
     );
   }
 }

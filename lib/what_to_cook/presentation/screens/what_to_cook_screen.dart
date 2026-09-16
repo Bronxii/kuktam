@@ -8,20 +8,23 @@ import '../../domain/services/recipe_matcher.dart';
 import '../widgets/ingredient_input_field.dart';
 import '../widgets/selected_ingredients_box.dart';
 import '../widgets/what_to_cook_recipe_tile.dart';
+
 class WhatToCookScreen extends StatefulWidget {
-  const WhatToCookScreen({super.key});
+  const WhatToCookScreen({super.key, this.recipeRepository});
+  final RecipeRepository? recipeRepository;
 
   @override
   State<WhatToCookScreen> createState() => _WhatToCookScreenState();
 }
 
 class _WhatToCookScreenState extends State<WhatToCookScreen> {
-  final RecipeRepository _recipeRepository = RecipeRepository();
+  late final RecipeRepository _recipeRepository =
+      widget.recipeRepository ?? RecipeRepository();
   final RecipeMatcher _recipeMatcher = const RecipeMatcher();
 
   final List<String> _selectedIngredients = [];
 
-  late final Stream<List<Recipe>> _recipesStream;
+  late Stream<List<Recipe>> _recipesStream;
 
   @override
   void initState() {
@@ -31,21 +34,18 @@ class _WhatToCookScreenState extends State<WhatToCookScreen> {
   }
 
   void _addIngredient(String ingredient) {
-    final normalizedIngredient =
-    _recipeMatcher.normalizeIngredient(ingredient);
+    final normalizedIngredient = _recipeMatcher.normalizeIngredient(ingredient);
 
     final alreadySelected = _selectedIngredients.any(
-          (selectedIngredient) =>
-      _recipeMatcher.normalizeIngredient(selectedIngredient) ==
+      (selectedIngredient) =>
+          _recipeMatcher.normalizeIngredient(selectedIngredient) ==
           normalizedIngredient,
     );
 
     if (alreadySelected) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(
-            'A(z) „$ingredient” alapanyagot már hozzáadtad.',
-          ),
+          content: Text('A(z) „$ingredient” alapanyagot már hozzáadtad.'),
         ),
       );
 
@@ -68,6 +68,7 @@ class _WhatToCookScreenState extends State<WhatToCookScreen> {
       MaterialPageRoute<void>(
         builder: (context) => RecipeDetailsScreen(
           recipe: recipe,
+          recipeRepository: _recipeRepository,
         ),
       ),
     );
@@ -87,15 +88,13 @@ class _WhatToCookScreenState extends State<WhatToCookScreen> {
           const SizedBox(height: 8),
           Text(
             'Add meg az alapanyagokat, és megmutatjuk azokat a '
-                'recepteket, amelyek mindegyiket tartalmazzák.',
+            'recepteket, amelyek minden hozzávalója rendelkezésre áll.',
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
               color: Theme.of(context).colorScheme.onSurfaceVariant,
             ),
           ),
           const SizedBox(height: 20),
-          IngredientInputField(
-            onIngredientAdded: _addIngredient,
-          ),
+          IngredientInputField(onIngredientAdded: _addIngredient),
           const SizedBox(height: 12),
           SelectedIngredientsBox(
             ingredients: _selectedIngredients,
@@ -108,16 +107,13 @@ class _WhatToCookScreenState extends State<WhatToCookScreen> {
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting &&
                     !snapshot.hasData) {
-                  return const Center(
-                    child: CircularProgressIndicator(),
-                  );
+                  return const Center(child: CircularProgressIndicator());
                 }
 
                 if (snapshot.hasError) {
                   return Center(
                     child: Text(
-                      'Nem sikerült betölteni a recepteket.\n'
-                          '${snapshot.error}',
+                      'Nem sikerült betölteni a recepteket.',
                       textAlign: TextAlign.center,
                     ),
                   );
@@ -125,8 +121,7 @@ class _WhatToCookScreenState extends State<WhatToCookScreen> {
 
                 final recipes = snapshot.data ?? [];
 
-                final matchingRecipes =
-                _recipeMatcher.findMatchingRecipes(
+                final matchingRecipes = _recipeMatcher.findMatchingRecipes(
                   recipes: recipes,
                   selectedIngredients: _selectedIngredients,
                 );
@@ -181,16 +176,12 @@ class _WhatToCookScreenState extends State<WhatToCookScreen> {
         icon: Icons.search_off_rounded,
         title: 'Nincs megfelelő recept',
         message:
-        'Nincs olyan recept, amely az összes megadott alapanyagot '
-            'tartalmazza.',
+            'Nincs olyan recept, amelyhez minden hozzávaló rendelkezésre áll.',
       );
     }
 
     return ListView.builder(
-      padding: const EdgeInsets.only(
-        top: 4,
-        bottom: 20,
-      ),
+      padding: const EdgeInsets.only(top: 4, bottom: 20),
       itemCount: matchingRecipes.length,
       itemBuilder: (context, index) {
         final recipe = matchingRecipes[index];
@@ -225,11 +216,7 @@ class _EmptyResult extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
-              icon,
-              size: 64,
-              color: Theme.of(context).colorScheme.primary,
-            ),
+            Icon(icon, size: 64, color: Theme.of(context).colorScheme.primary),
             const SizedBox(height: 16),
             Text(
               title,
@@ -240,8 +227,7 @@ class _EmptyResult extends StatelessWidget {
             Text(
               message,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color:
-                Theme.of(context).colorScheme.onSurfaceVariant,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
               textAlign: TextAlign.center,
             ),
