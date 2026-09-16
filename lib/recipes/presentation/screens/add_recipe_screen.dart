@@ -43,6 +43,8 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
 
   late String _initialFormState;
   bool _allowPop = false;
+  bool _saving = false;
+  bool _confirmingLeave = false;
 
   static const List<String> _units = MeasurementUnits.values;
 
@@ -315,6 +317,7 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
   }
 
   Future<void> _saveRecipe() async {
+    if (_saving) return;
     final String recipeName = _recipeNameController.text.trim();
     if (recipeName.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -361,40 +364,27 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
     }
     final recipe = _buildRecipe(quantities);
 
-    debugPrint('Recept neve: ${recipe.name}');
-
-    for (final ingredient in recipe.ingredients) {
-      debugPrint(
-        'Hozzávaló: ${ingredient.quantity} ${ingredient.unit} ${ingredient
-            .name}',
-      );
-    }
-
-    for (final spice in recipe.spices) {
-      debugPrint('Fűszer: ${spice.name}');
-    }
-
-    debugPrint('Elkészítés: ${recipe.preparation}');
-
-    final recipeAlreadyExists =
-    await _recipeRepository.recipeNameExists(
-      name: recipe.name,
-      excludedRecipeId: widget.recipe?.id,
-    );
-
-    if (recipeAlreadyExists) {
-      if (!mounted) return;
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Már létezik ilyen nevű recept!'),
-        ),
-      );
-
-      return;
-    }
-
+    FocusManager.instance.primaryFocus?.unfocus();
+    setState(() => _saving = true);
     try {
+      final recipeAlreadyExists = await _recipeRepository.recipeNameExists(
+        name: recipe.name,
+        excludedRecipeId: widget.recipe?.id,
+      );
+
+      if (recipeAlreadyExists) {
+        if (!mounted) return;
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Már létezik ilyen nevű recept!'),
+          ),
+        );
+
+        return;
+      }
+
+      if (!mounted) return;
       if (widget.recipe == null) {
         await _recipeRepository.saveRecipe(recipe);
       } else {
@@ -412,14 +402,16 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
         _allowPop = true;
       });
       Navigator.of(context).pop(recipe);
-    } catch (e) {
+    } catch (_) {
       if (!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Mentési hiba: $e'),
+        const SnackBar(
+          content: Text('Nem sikerült elmenteni a receptet. Próbáld újra.'),
         ),
       );
+    } finally {
+      if (mounted) setState(() => _saving = false);
     }
   }
 
@@ -428,13 +420,15 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
     return PopScope(
       canPop: _allowPop,
       onPopInvokedWithResult: (didPop, result) async {
-        if (didPop) {
+        if (didPop || _saving || _confirmingLeave) {
           return;
         }
 
         final navigator = Navigator.of(context);
 
+        _confirmingLeave = true;
         final shouldLeave = await _confirmLeaveWithoutSaving();
+        _confirmingLeave = false;
 
         if (!mounted || !shouldLeave) {
           return;
@@ -451,7 +445,9 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
             title: const Text('Új recept'),
           ),
           body: SafeArea(
-              child: ListView(
+              child: AbsorbPointer(
+                absorbing: _saving,
+                child: ListView(
                 padding: const EdgeInsets.all(20),
                 children: [
                 TextField(
@@ -552,11 +548,12 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
     const SizedBox(height: 32),
 
                   FilledButton.icon(
-                    onPressed: _saveRecipe,
+                    onPressed: _saving ? null : _saveRecipe,
                     icon: const Icon(Icons.save_outlined),
-                    label: const Text('Mentés'),
+                    label: Text(_saving ? 'Mentés folyamatban…' : 'Mentés'),
                   ),
     ],
+    ),
     ),
     ),
     ),

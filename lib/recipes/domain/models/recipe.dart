@@ -26,11 +26,18 @@ class RecipeIngredient {
   }
 
   String get formattedQuantity {
-    if (quantity == quantity.toInt()) {
-      return quantity.toInt().toString();
-    }
-
-    return quantity.toString();
+    final text = quantity.toString();
+    if (!text.contains('e')) return text.replaceFirst(RegExp(r'\.0$'), '');
+    // The editor accepts decimal tokens, not exponent notation. Expand the
+    // double's shortest representation without rounding or integer overflow.
+    final parts = text.split('e');
+    final mantissa = parts.first;
+    final digits = mantissa.replaceAll('.', '');
+    final point = (mantissa.contains('.') ? mantissa.indexOf('.') : mantissa.length)
+        + int.parse(parts.last);
+    if (point <= 0) return '0.${'0' * -point}$digits';
+    if (point >= digits.length) return '$digits${'0' * (point - digits.length)}';
+    return '${digits.substring(0, point)}.${digits.substring(point)}';
   }
 }
 

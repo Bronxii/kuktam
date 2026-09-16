@@ -9,17 +9,64 @@ import 'package:kuktam/recipes/presentation/screens/add_recipe_screen.dart';
 import 'package:kuktam/recipes/data/repositories/recipe_repository.dart';
 import 'package:kuktam/shopping/data/repositories/shopping_repository.dart';
 
-class RecipeDetailsScreen extends StatelessWidget {
+class RecipeDetailsScreen extends StatefulWidget {
   const RecipeDetailsScreen({
     required this.recipe,
     this.addScalingShoppingItem,
     this.addMultiplierShoppingItem,
+    this.recipeRepository,
     super.key,
   });
 
   final Recipe recipe;
   final AddScalingShoppingItem? addScalingShoppingItem;
   final AddScalingShoppingItem? addMultiplierShoppingItem;
+  final RecipeRepository? recipeRepository;
+
+  @override
+  State<RecipeDetailsScreen> createState() => _RecipeDetailsScreenState();
+}
+
+class _RecipeDetailsScreenState extends State<RecipeDetailsScreen> {
+  Recipe get recipe => widget.recipe;
+  AddScalingShoppingItem? get addScalingShoppingItem => widget.addScalingShoppingItem;
+  AddScalingShoppingItem? get addMultiplierShoppingItem => widget.addMultiplierShoppingItem;
+  late final RecipeRepository _repository = widget.recipeRepository ?? RecipeRepository();
+  bool _deleting = false;
+  bool _confirmingDelete = false;
+
+  Future<void> _deleteRecipe() async {
+    if (_deleting || _confirmingDelete) return;
+    _confirmingDelete = true;
+    final shouldDelete = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Recept törlése'),
+        content: Text('Biztosan törölni szeretnéd ezt a receptet?\n\n${recipe.name}'),
+        actions: [
+          TextButton(onPressed: () => Navigator.of(dialogContext).pop(false), child: const Text('Mégse')),
+          FilledButton(onPressed: () => Navigator.of(dialogContext).pop(true), child: const Text('Törlés')),
+        ],
+      ),
+    );
+    _confirmingDelete = false;
+    if (!mounted || shouldDelete != true) return;
+    setState(() => _deleting = true);
+    try {
+      final id = recipe.id;
+      if (id == null) throw StateError('Missing recipe id');
+      await _repository.deleteRecipe(id);
+      if (!mounted) return;
+      Navigator.of(context).pop(true);
+    } catch (_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text('Nem sikerült törölni a receptet. Próbáld újra.'),
+      ));
+    } finally {
+      if (mounted) setState(() => _deleting = false);
+    }
+  }
 
   String _formatQuantity(double quantity) {
     if (quantity == quantity.roundToDouble()) {
@@ -69,9 +116,13 @@ class RecipeDetailsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return PopScope(
+      canPop: !_deleting,
+      child: AbsorbPointer(
+        absorbing: _deleting,
+        child: Scaffold(
 appBar: AppBar(
-title: Text(recipe.name),
+title: Text(_deleting ? 'Törlés folyamatban…' : recipe.name),
 actions: [
   IconButton(
     tooltip: 'Megosztás',
@@ -92,6 +143,7 @@ final updatedRecipe = await Navigator.of(context).push<Recipe>(
 MaterialPageRoute<Recipe>(
 builder: (context) => AddRecipeScreen(
 recipe: recipe,
+recipeRepository: _repository,
 ),
 ),
 );
@@ -106,45 +158,7 @@ Navigator.of(context).pop(true);
   IconButton(
     tooltip: 'Törlés',
     icon: const Icon(Icons.delete_outline),
-    onPressed: () async {
-      final shouldDelete = await showDialog<bool>(
-        context: context,
-        builder: (dialogContext) {
-          return AlertDialog(
-            title: const Text('Recept törlése'),
-            content: Text(
-              'Biztosan törölni szeretnéd ezt a receptet?\n\n${recipe.name}',
-            ),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  Navigator.of(dialogContext).pop(false);
-                },
-                child: const Text('Mégse'),
-              ),
-              FilledButton(
-                onPressed: () {
-                  Navigator.of(dialogContext).pop(true);
-                },
-                child: const Text('Törlés'),
-              ),
-            ],
-          );
-        },
-      );
-
-      if (shouldDelete != true) {
-        return;
-      }
-
-      await RecipeRepository().deleteRecipe(recipe.id!);
-
-      if (!context.mounted) {
-        return;
-      }
-
-      Navigator.of(context).pop(true);
-    },
+    onPressed: _deleting ? null : _deleteRecipe,
   ),
 ],
 ),
@@ -408,6 +422,8 @@ body: ListView(
           ),
         ],
       ),
+    ),
+    ),
     );
   }
 }

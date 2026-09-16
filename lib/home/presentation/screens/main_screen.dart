@@ -63,7 +63,7 @@ class _MainScreenState extends State<MainScreen> {
   }
 
   List<Widget> get _screens => widget.tabBodies ?? [
-    RecipesScreen(key: ValueKey(_recipesVersion)),
+    RecipesScreen(key: ValueKey(_recipesVersion), recipeRepository: widget.recipeRepository),
     const ShoppingListScreen(),
     const WhatToCookScreen(),
   ];

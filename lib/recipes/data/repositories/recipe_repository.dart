@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 import 'package:kuktam/recipes/domain/models/recipe.dart';
+import 'package:kuktam/recipes/domain/services/hungarian_recipe_name_comparator.dart';
 
 class RecipeRepository {
   RecipeRepository({
@@ -12,6 +13,11 @@ _firebaseAuth = firebaseAuth ?? FirebaseAuth.instance;
 
   final FirebaseFirestore _firestore;
 final FirebaseAuth _firebaseAuth;
+
+  static int _compareRecipes(Recipe a, Recipe b) {
+    final comparison = compareHungarianRecipeNames(a.name, b.name);
+    return comparison != 0 ? comparison : (a.id ?? '').compareTo(b.id ?? '');
+  }
 
 CollectionReference<Map<String, dynamic>> get _recipesCollection {
   final user = _firebaseAuth.currentUser;
@@ -79,11 +85,7 @@ Future<void> saveRecipe(Recipe recipe) async {
     )
         .toList();
 
-    recipes.sort(
-          (a, b) => a.name.toLowerCase().compareTo(
-        b.name.toLowerCase(),
-      ),
-    );
+    recipes.sort(_compareRecipes);
 
     return recipes;
   }
@@ -99,11 +101,7 @@ Future<void> saveRecipe(Recipe recipe) async {
         )
             .toList();
 
-        recipes.sort(
-              (a, b) => a.name.toLowerCase().compareTo(
-            b.name.toLowerCase(),
-          ),
-        );
+        recipes.sort(_compareRecipes);
 
         return recipes;
       },

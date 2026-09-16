@@ -5,19 +5,22 @@ import 'package:kuktam/recipes/domain/models/recipe.dart';
 import 'package:kuktam/recipes/presentation/screens/recipe_details_screen.dart';
 
 class RecipesScreen extends StatefulWidget {
-  const RecipesScreen({super.key});
+  const RecipesScreen({super.key, this.recipeRepository});
+  final RecipeRepository? recipeRepository;
 
   @override
   State<RecipesScreen> createState() => _RecipesScreenState();
 }
 class _RecipesScreenState extends State<RecipesScreen> {
-  final RecipeRepository _recipeRepository = RecipeRepository();
+  late final RecipeRepository _recipeRepository;
+  String _query = '';
 
   late Future<List<Recipe>> _recipesFuture;
 
   @override
   void initState() {
     super.initState();
+    _recipeRepository = widget.recipeRepository ?? RecipeRepository();
     _recipesFuture = _recipeRepository.getRecipes();
   }
 
@@ -27,9 +30,10 @@ class _RecipesScreenState extends State<RecipesScreen> {
       padding: const EdgeInsets.all(20),
       child: Column(
         children: [
-          const SearchBar(
+          SearchBar(
             hintText: 'Recept keresése...',
-            leading: Icon(Icons.search),
+            leading: const Icon(Icons.search),
+            onChanged: (value) => setState(() => _query = value.trim().toLowerCase()),
           ),
           const SizedBox(height: 32),
 Expanded(
@@ -44,11 +48,21 @@ child: CircularProgressIndicator(),
 
 if (snapshot.hasError) {
 return Center(
-child: Text('Hiba: ${snapshot.error}'),
+child: Column(mainAxisSize: MainAxisSize.min, children: [
+  const Text('Nem sikerült betölteni a recepteket.'),
+  TextButton(onPressed: () => setState(() {
+    _recipesFuture = _recipeRepository.getRecipes();
+  }), child: const Text('Újrapróbálás')),
+]),
 );
 }
 
-final recipes = snapshot.data ?? [];
+final allRecipes = snapshot.data ?? [];
+final recipes = allRecipes.where((recipe) => recipe.name.toLowerCase().contains(_query)).toList();
+
+if (allRecipes.isNotEmpty && recipes.isEmpty) {
+  return const Center(child: Text('Nincs találat.'));
+}
 
 if (recipes.isEmpty) {
 return Center(
@@ -91,11 +105,12 @@ await Navigator.of(context).push<bool>(
 MaterialPageRoute<bool>(
 builder: (context) => RecipeDetailsScreen(
 recipe: recipe,
+recipeRepository: _recipeRepository,
 ),
 ),
 );
 
-if (shouldRefresh == true) {
+if (mounted && shouldRefresh == true) {
 setState(() {
 _recipesFuture = _recipeRepository.getRecipes();
 });
