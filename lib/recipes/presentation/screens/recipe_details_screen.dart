@@ -34,6 +34,15 @@ class _RecipeDetailsScreenState extends State<RecipeDetailsScreen> {
   late final RecipeRepository _repository = widget.recipeRepository ?? RecipeRepository();
   bool _deleting = false;
   bool _confirmingDelete = false;
+  bool _multiplierFlowActive = false;
+  bool _addingMultiplier = false;
+  final _multiplierController = TextEditingController();
+
+  @override
+  void dispose() {
+    _multiplierController.dispose();
+    super.dispose();
+  }
 
   Future<void> _deleteRecipe() async {
     if (_deleting || _confirmingDelete) return;
@@ -117,9 +126,9 @@ class _RecipeDetailsScreenState extends State<RecipeDetailsScreen> {
   @override
   Widget build(BuildContext context) {
     return PopScope(
-      canPop: !_deleting,
+      canPop: !_deleting && !_addingMultiplier,
       child: AbsorbPointer(
-        absorbing: _deleting,
+        absorbing: _deleting || _addingMultiplier,
         child: Scaffold(
 appBar: AppBar(
 title: Text(_deleting ? 'Törlés folyamatban…' : recipe.name),
@@ -252,10 +261,15 @@ body: ListView(
           SizedBox(
             width: double.infinity,
             child: FilledButton.icon(
-              onPressed: () async {
-                final multiplierController = TextEditingController(text: '1.0');
+              onPressed: _addingMultiplier ? null : () async {
+                if (_multiplierFlowActive || _deleting) return;
+                _multiplierFlowActive = true;
+                try {
+                final multiplierController = _multiplierController;
+                multiplierController.text = '1.0';
                 double currentMultiplier = 1.0;
                 String? errorText;
+                bool submitted = false;
 
                 final multiplier = await showDialog<double>(
                   context: context,
@@ -263,7 +277,7 @@ body: ListView(
                     return StatefulBuilder(
                       builder: (context, setDialogState) {
                         void updateMultiplier(double newValue) {
-                          if (newValue < 0.1) {
+                          if (!newValue.isFinite || newValue < 0.1) {
                             return;
                           }
 
@@ -324,9 +338,7 @@ body: ListView(
                                         suffixText: '×',
                                       ),
                                       onChanged: (value) {
-                                        final parsedValue = double.tryParse(
-                                          value.replaceAll(',', '.'),
-                                        );
+                                        final parsedValue = const RecipeScaler().parseQuantity(value);
 
                                         if (parsedValue != null && parsedValue > 0) {
                                           currentMultiplier = parsedValue;
@@ -362,8 +374,9 @@ body: ListView(
                             ),
                             FilledButton(
                               onPressed: () {
-                                final parsedMultiplier = double.tryParse(
-                                  multiplierController.text.replaceAll(',', '.'),
+                                if (submitted) return;
+                                final parsedMultiplier = const RecipeScaler().parseQuantity(
+                                  multiplierController.text,
                                 );
 
                                 if (parsedMultiplier == null || parsedMultiplier <= 0) {
@@ -373,6 +386,7 @@ body: ListView(
                                   return;
                                 }
 
+                                submitted = true;
                                 Navigator.of(dialogContext).pop(parsedMultiplier);
                               },
                               child: const Text('Hozzáadás'),
@@ -384,21 +398,27 @@ body: ListView(
                   },
                 );
 
-                if (multiplier == null) {
+                if (!mounted || multiplier == null) {
                   return;
                 }
 
+                // Validate every scaled value before the first repository write.
+                final items = [
+                  for (final ingredient in recipe.ingredients)
+                    (name: ingredient.name, amount: const RecipeScaler().normalizeForShopping(
+                      quantity: ingredient.quantity * multiplier,
+                      unit: ingredient.unit,
+                    )),
+                ];
+                if (items.isEmpty) return;
+                setState(() => _addingMultiplier = true);
                 final add = addMultiplierShoppingItem ?? ShoppingRepository().addOrMergeItem;
 
-                for (final ingredient in recipe.ingredients) {
-                  final shopping = const RecipeScaler().normalizeForShopping(
-                    quantity: ingredient.quantity * multiplier,
-                    unit: ingredient.unit,
-                  );
+                for (final item in items) {
                   await add(
-                    name: ingredient.name,
-                    quantity: shopping.quantity,
-                    unit: shopping.unit,
+                    name: item.name,
+                    quantity: item.amount.quantity,
+                    unit: item.amount.unit,
                   );
                 }
 
@@ -409,15 +429,31 @@ body: ListView(
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text(
-                      'A hozzávalók ${multiplier.toStringAsFixed(1)}× mennyiséggel '
+                      'A hozzávalók ${multiplier.toString().replaceFirst(RegExp(r'\.0$'), '').replaceAll('.', ',')}× mennyiséggel '
                           'felkerültek a bevásárlólistára.',
                     ),
                   ),
                 );
                 Navigator.of(context).pop();
+                } on ArgumentError {
+                  if (!mounted) return;
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                    content: Text(_addingMultiplier
+                        ? 'Nem sikerült minden tételt hozzáadni a bevásárlólistához. Ellenőrizd a listát.'
+                        : 'A megadott mennyiséggel a recept nem számítható át.'),
+                  ));
+                } catch (_) {
+                  if (!mounted) return;
+                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                    content: Text('Nem sikerült minden tételt hozzáadni a bevásárlólistához. Ellenőrizd a listát.'),
+                  ));
+                } finally {
+                  _multiplierFlowActive = false;
+                  if (mounted) setState(() => _addingMultiplier = false);
+                }
               },
               icon: const Icon(Icons.shopping_cart_outlined),
-              label: const Text('Bevásárlólistához adás'),
+              label: Text(_addingMultiplier ? 'Hozzáadás folyamatban…' : 'Bevásárlólistához adás'),
             ),
           ),
         ],
