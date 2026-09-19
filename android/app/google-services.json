@@ -22,6 +22,14 @@
           }
         },
         {
+          "client_id": "44537266968-4qg5crqev0gp695reo6grbnkvd4ch33u.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.bronxii.kuktam",
+            "certificate_hash": "4740b62ad6edb72f10f52847e193973a7a0a7245"
+          }
+        },
+        {
           "client_id": "44537266968-55u1b9ekc1k5293af999qogt57i4mic6.apps.googleusercontent.com",
           "client_type": 3
         }
