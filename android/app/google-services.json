@@ -22,11 +22,35 @@
           }
         },
         {
+          "client_id": "44537266968-4735p52jmup42ikq8vhieua5rte0r7p7.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.bronxii.kuktam",
+            "certificate_hash": "e48f6213f6b9b497ecad163e7f8b41aede893c26"
+          }
+        },
+        {
           "client_id": "44537266968-4qg5crqev0gp695reo6grbnkvd4ch33u.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.bronxii.kuktam",
             "certificate_hash": "4740b62ad6edb72f10f52847e193973a7a0a7245"
+          }
+        },
+        {
+          "client_id": "44537266968-7e3hkqevgcm3ckkq95sfoup47kcdcojh.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.bronxii.kuktam",
+            "certificate_hash": "ca0536ccf4ca4cb137e0a80c9aaa5b336e26bd2d"
+          }
+        },
+        {
+          "client_id": "44537266968-hvi0rhbk4c1d2qbl4576mltoj1oppt0r.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.bronxii.kuktam",
+            "certificate_hash": "c9412b5b895fdd497e8f372ae043a28b48f25809"
           }
         },
         {
