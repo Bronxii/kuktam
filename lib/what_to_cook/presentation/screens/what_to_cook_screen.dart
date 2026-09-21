@@ -88,7 +88,7 @@ class _WhatToCookScreenState extends State<WhatToCookScreen> {
           const SizedBox(height: 8),
           Text(
             'Add meg az alapanyagokat, és megmutatjuk azokat a '
-            'recepteket, amelyek minden hozzávalója rendelkezésre áll.',
+            'recepteket, amelyekben minden kiválasztott alapanyag szerepel.',
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
               color: Theme.of(context).colorScheme.onSurfaceVariant,
             ),
@@ -176,7 +176,7 @@ class _WhatToCookScreenState extends State<WhatToCookScreen> {
         icon: Icons.search_off_rounded,
         title: 'Nincs megfelelő recept',
         message:
-            'Nincs olyan recept, amelyhez minden hozzávaló rendelkezésre áll.',
+            'Nincs olyan recept, amelyben minden kiválasztott alapanyag szerepel.',
       );
     }
 

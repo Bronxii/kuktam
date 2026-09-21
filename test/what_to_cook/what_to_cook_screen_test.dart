@@ -30,7 +30,7 @@ Future<void> add(WidgetTester tester, String name) async {
 
 void main() {
   testWidgets(
-    'empty input browse, exact subset, extra pantry, duplicate, remove, detail/back and live recipe edits',
+    'browse, selected subset, missing selection, duplicate, remove, detail/back and live edits',
     (tester) async {
       final repo = CookRepository()
         ..recipes.addAll([
@@ -45,31 +45,45 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.text('Összes recept (2)'), findsOneWidget);
       await add(tester, 'Tojás');
-      expect(find.text('Nincs megfelelő recept'), findsOneWidget);
+      expect(find.text('Találatok (2)'), findsOneWidget);
       await add(tester, ' LISZT ');
       expect(find.text('A étel'), findsOneWidget);
-      expect(find.text('B étel'), findsNothing);
+      expect(find.text('B étel'), findsOneWidget);
       await add(tester, 'alma');
-      expect(find.text('A étel'), findsOneWidget);
+      expect(find.text('Nincs megfelelő recept'), findsOneWidget);
       await add(tester, 'tojás');
       expect(find.byType(InputChip), findsNWidgets(3));
+      await tester.tap(find.byTooltip('alma eltávolítása'));
+      await tester.pumpAndSettle();
+      expect(find.text('Találatok (2)'), findsOneWidget);
       await tester.tap(find.text('A étel'));
       await tester.pumpAndSettle();
       expect(find.byType(RecipeDetailsScreen), findsOneWidget);
       await tester.pageBack();
       await tester.pumpAndSettle();
-      expect(find.byType(InputChip), findsNWidgets(3));
+      expect(find.byType(InputChip), findsNWidgets(2));
       await add(tester, 'tej');
-      expect(find.text('Találatok (2)'), findsOneWidget);
+      expect(find.text('Találatok (1)'), findsOneWidget);
+      expect(find.text('A étel'), findsNothing);
       repo.events.add([
-        recipe('B új', ['tej']),
+        recipe('B új', ['tojás', 'liszt', 'tej', 'vaj']),
       ]);
       await tester.pumpAndSettle();
       expect(find.text('A étel'), findsNothing);
       expect(find.text('B új'), findsOneWidget);
-      await tester.tap(find.byTooltip('tej eltávolítása'));
+      repo.events.add([
+        recipe('B új', ['tej']),
+      ]);
       await tester.pumpAndSettle();
       expect(find.text('Nincs megfelelő recept'), findsOneWidget);
+      await tester.tap(find.byTooltip('Tojás eltávolítása'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byTooltip('LISZT eltávolítása'));
+      await tester.pumpAndSettle();
+      expect(find.text('B új'), findsOneWidget);
+      await tester.tap(find.byTooltip('tej eltávolítása'));
+      await tester.pumpAndSettle();
+      expect(find.text('Összes recept (1)'), findsOneWidget);
       repo.events.add([]);
       await tester.pumpAndSettle();
       expect(find.text('Még nincsenek receptjeid'), findsOneWidget);

@@ -13,62 +13,125 @@ Recipe recipe(String name, List<String> names) => Recipe(
 
 void main() {
   const matcher = RecipeMatcher();
-  final a = recipe('A', ['tojás', 'liszt']);
-  final b = recipe('B', ['tojás', 'liszt', 'tej']);
-  test('pantry must contain every recipe ingredient, not the reverse', () {
-    expect(
-      matcher.findMatchingRecipes(
-        recipes: [a, b],
-        selectedIngredients: ['tojás', 'liszt'],
-      ),
-      [a],
-    );
-    expect(
-      matcher.findMatchingRecipes(
-        recipes: [a, b],
-        selectedIngredients: ['tojás', 'liszt', 'tej', 'alma'],
-      ),
-      [a, b],
-    );
-  });
-  test(
-    'case trim accents duplicates; quantities units and spices do not affect matching',
-    () {
-      final r = recipe('Étel', [' Tojás ', 'LISZT', 'tojás']);
+  final chicken = recipe('Csirkés étel', ['csirkemell', 'krémsajt']);
+
+  final cases =
+      <
+        ({
+          String label,
+          List<String> names,
+          List<String> selected,
+          bool matches,
+        })
+      >[
+        (
+          label:
+              'one selected ingredient matches a recipe with additional ingredients',
+          names: ['csirkemell', 'krémsajt'],
+          selected: ['csirkemell'],
+          matches: true,
+        ),
+        (
+          label: 'all selected ingredients match',
+          names: ['csirkemell', 'krémsajt'],
+          selected: ['csirkemell', 'krémsajt'],
+          matches: true,
+        ),
+        (
+          label: 'one missing selected ingredient excludes the recipe',
+          names: ['csirkemell', 'krémsajt'],
+          selected: ['csirkemell', 'burgonya'],
+          matches: false,
+        ),
+        (
+          label: 'matching ignores case',
+          names: ['Csirkemell'],
+          selected: ['csirkemell'],
+          matches: true,
+        ),
+        (
+          label: 'matching trims both recipe and selected names',
+          names: ['  Csirkemell  '],
+          selected: [' csirkemell '],
+          matches: true,
+        ),
+        (
+          label: 'multiple additional recipe ingredients are allowed',
+          names: ['csirkemell', 'krémsajt', 'tortilla', 'főzőtejszín'],
+          selected: ['csirkemell'],
+          matches: true,
+        ),
+        (
+          label: 'duplicate selections and recipe ingredients are harmless',
+          names: ['csirkemell', 'csirkemell', 'krémsajt'],
+          selected: ['csirkemell', ' CSIRKEMELL '],
+          matches: true,
+        ),
+        (
+          label: 'accents remain significant',
+          names: ['krémsajt'],
+          selected: ['kremsajt'],
+          matches: false,
+        ),
+        (
+          label: 'an empty recipe cannot satisfy a selection',
+          names: [],
+          selected: ['csirkemell'],
+          matches: false,
+        ),
+      ];
+  for (final c in cases) {
+    test(c.label, () {
+      final r = recipe('Étel', c.names);
       expect(
         matcher.findMatchingRecipes(
           recipes: [r],
-          selectedIngredients: [' TOJÁS ', 'liszt', 'víz'],
+          selectedIngredients: c.selected,
         ),
-        [r],
+        c.matches ? [r] : isEmpty,
       );
-      expect(
-        matcher.findMatchingRecipes(
-          recipes: [r],
-          selectedIngredients: ['tojas', 'liszt'],
-        ),
-        isEmpty,
-      );
-    },
-  );
+    });
+  }
+
   test(
-    'empty selection retains all-recipes browsing; empty recipe excluded from matches',
+    'empty selection keeps sorted all-recipes browsing including empty recipes',
     () {
       final empty = recipe('Üres', []);
       expect(
         matcher.findMatchingRecipes(
-          recipes: [a, empty],
+          recipes: [empty, chicken],
           selectedIngredients: [],
         ),
-        [a, empty],
-      );
-      expect(
-        matcher.findMatchingRecipes(
-          recipes: [empty],
-          selectedIngredients: ['tojás'],
-        ),
-        isEmpty,
+        [chicken, empty],
       );
     },
   );
+
+  test('spices do not satisfy a selected ingredient', () {
+    expect(
+      matcher.findMatchingRecipes(
+        recipes: [chicken],
+        selectedIngredients: ['csirkemell', 'só'],
+      ),
+      isEmpty,
+    );
+  });
+
+  test('quantity and unit do not affect ingredient-name matching', () {
+    final otherQuantity = Recipe(
+      name: 'Más mennyiség',
+      ingredients: const [
+        RecipeIngredient(name: 'csirkemell', quantity: 0.125, unit: 'kg'),
+      ],
+      spices: const [],
+      preparation: '',
+    );
+    expect(
+      matcher.findMatchingRecipes(
+        recipes: [otherQuantity, chicken],
+        selectedIngredients: ['csirkemell'],
+      ),
+      [chicken, otherQuantity],
+    );
+  });
 }

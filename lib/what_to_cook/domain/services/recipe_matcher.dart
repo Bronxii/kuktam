@@ -24,8 +24,7 @@ class RecipeMatcher {
           .map((ingredient) => _normalize(ingredient.name))
           .toSet();
 
-      return recipeIngredients.isNotEmpty &&
-          recipeIngredients.every(normalizedIngredients.contains);
+      return normalizedIngredients.every(recipeIngredients.contains);
     }).toList();
 
     matchingRecipes.sort(
