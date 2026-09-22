@@ -6,6 +6,7 @@ import '../../../shopping/data/repositories/shopping_repository.dart';
 
 import '../../domain/models/recipe.dart';
 import '../../domain/services/recipe_scaler.dart';
+import 'scaling_perf.dart';
 
 typedef AddScalingShoppingItems = Future<void> Function(List<ShoppingItemInput> items);
 
@@ -34,6 +35,7 @@ class _RecipeScalingDialogState extends State<RecipeScalingDialog> {
   bool _isConfirmingClose = false;
   bool _isAdding = false;
   String? _shoppingError;
+  ScalingPerf? _perf;
 
   Future<void> _addToShopping() async {
     if (_isAdding || _isConfirmingClose || _rows.isEmpty) return;
@@ -82,6 +84,7 @@ class _RecipeScalingDialogState extends State<RecipeScalingDialog> {
   @override
   void initState() {
     super.initState();
+    if (scalingPerfEnabled) _perf = ScalingPerf(widget.ingredients.length);
     _originalIngredients = List.unmodifiable(widget.ingredients);
     _scaledIngredients = _originalIngredients;
     _rows = List.unmodifiable([
@@ -90,6 +93,7 @@ class _RecipeScalingDialogState extends State<RecipeScalingDialog> {
     ]);
     for (final row in _rows) {
       row.focusListener = () {
+        _perf?.event('focus', {'row': row.index, 'focused': row.focusNode.hasFocus});
         if (!row.focusNode.hasFocus) _finishEditing(row);
       };
       row.focusNode.addListener(row.focusListener);
@@ -97,7 +101,14 @@ class _RecipeScalingDialogState extends State<RecipeScalingDialog> {
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _perf?.view = View.of(context);
+  }
+
+  @override
   void dispose() {
+    _perf?.close();
     _cancelPending();
     for (final row in _rows) {
       row.dispose();
@@ -124,6 +135,7 @@ class _RecipeScalingDialogState extends State<RecipeScalingDialog> {
   }
 
   void _onChanged(_ScalingRowState row, String text) {
+    _perf?.event('input', {'row': row.index});
     _cancelPending();
     final revision = _revision;
     setState(() {
@@ -144,6 +156,7 @@ class _RecipeScalingDialogState extends State<RecipeScalingDialog> {
   void _processPending() {
     final pending = _pending;
     if (pending == null || !mounted) return;
+    _perf?.event('scaleAndValidate', {'row': pending.index});
     // Consume before processing: Done followed by blur cannot scale twice.
     _cancelPending();
     final basis = _rows[pending.index];
@@ -196,6 +209,7 @@ class _RecipeScalingDialogState extends State<RecipeScalingDialog> {
     if (!mounted) return;
     if (_pending?.index == row.index) _processPending();
     if (!row.hasUserDraft || row.error != null) return;
+    _perf?.event('formatOnBlur', {'row': row.index});
     // A debounce may already have calculated this draft. Only format it here.
     final ingredient = _scaledIngredients[row.index];
     setState(() {
@@ -239,91 +253,113 @@ class _RecipeScalingDialogState extends State<RecipeScalingDialog> {
 
   @override
   Widget build(BuildContext context) {
-    return PopScope(
+    _perf?.event('dialog.build');
+    // Keep the lazy delegate stable across height-only LayoutBuilder updates.
+    // Actual state changes rebuild this list so row data and actions stay fresh.
+    final content = ListView.builder(
+      padding: const EdgeInsets.all(16),
+      itemCount: _rows.length + 2,
+      itemBuilder: (context, index) {
+        if (index == 0) {
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      'Átszámítás',
+                      style: Theme.of(
+                        context,
+                      ).textTheme.headlineSmall,
+                    ),
+                  ),
+                  IconButton(
+                    tooltip: 'Bezárás',
+                    onPressed: _isAdding ? null : _requestClose,
+                    icon: const Icon(Icons.close),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              const Text(
+                'Az átszámítás ideiglenes, az eredeti recept nem változik.',
+              ),
+              const SizedBox(height: 20),
+              if (_rows.isEmpty)
+                const Text('A recept nem tartalmaz hozzávalókat.'),
+            ],
+          );
+        }
+        if (index <= _rows.length) {
+          final row = _rows[index - 1];
+          return Padding(
+            key: ValueKey('scaling-row-${row.index}'),
+            padding: const EdgeInsets.only(bottom: 16),
+            child: _buildRow(row),
+          );
+        }
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            const SizedBox(height: 8),
+            OverflowBar(
+              alignment: MainAxisAlignment.end,
+              overflowAlignment: OverflowBarAlignment.end,
+              spacing: 8,
+              overflowSpacing: 8,
+              children: [
+                TextButton(
+                  onPressed: _isAdding ? null : _reset,
+                  child: const Text('Visszaállítás'),
+                ),
+                FilledButton(
+                  onPressed: _isAdding || _rows.isEmpty
+                      ? null
+                      : _addToShopping,
+                  child: const Text('Bevásárlólistához adás'),
+                ),
+              ],
+            ),
+            if (_shoppingError != null)
+              Text(
+                _shoppingError!,
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.error,
+                ),
+              ),
+          ],
+        );
+      },
+    );
+    final dialog = PopScope(
       canPop: false,
       onPopInvokedWithResult: (didPop, result) {
         if (!didPop) _requestClose();
       },
       child: Dialog(
+        insetAnimationDuration: Duration.zero,
         insetPadding: const EdgeInsets.all(16),
         constraints: const BoxConstraints(minWidth: 0, maxWidth: 640),
         clipBehavior: Clip.antiAlias,
         child: LayoutBuilder(
           builder: (context, constraints) {
+            _perf?.event('dialog.constraints', {'maxHeight': constraints.maxHeight, 'height': math.min(720, constraints.maxHeight * 0.9)});
             // Dialog already subtracts keyboard viewInsets and safe margins.
             return SizedBox(
               width: constraints.maxWidth,
               height: math.min(720, constraints.maxHeight * 0.9),
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            'Átszámítás',
-                            style: Theme.of(context).textTheme.headlineSmall,
-                          ),
-                        ),
-                        IconButton(
-                          tooltip: 'Bezárás',
-                          onPressed: _isAdding ? null : _requestClose,
-                          icon: const Icon(Icons.close),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 8),
-                    const Text(
-                      'Az átszámítás ideiglenes, az eredeti recept nem változik.',
-                    ),
-                    const SizedBox(height: 20),
-                    if (_rows.isEmpty)
-                      const Text('A recept nem tartalmaz hozzávalókat.'),
-                    for (final row in _rows)
-                      Padding(
-                        key: ValueKey('scaling-row-${row.index}'),
-                        padding: const EdgeInsets.only(bottom: 16),
-                        child: _buildRow(row),
-                      ),
-                    const SizedBox(height: 8),
-                    OverflowBar(
-                      alignment: MainAxisAlignment.end,
-                      overflowAlignment: OverflowBarAlignment.end,
-                      spacing: 8,
-                      overflowSpacing: 8,
-                      children: [
-                        TextButton(
-                          onPressed: _isAdding ? null : _reset,
-                          child: const Text('Visszaállítás'),
-                        ),
-                        FilledButton(
-                          onPressed: _isAdding || _rows.isEmpty
-                              ? null
-                              : _addToShopping,
-                          child: const Text('Bevásárlólistához adás'),
-                        ),
-                      ],
-                    ),
-                    if (_shoppingError != null)
-                      Text(
-                        _shoppingError!,
-                        style: TextStyle(
-                          color: Theme.of(context).colorScheme.error,
-                        ),
-                      ),
-                  ],
-                ),
-              ),
+              child: content,
             );
           },
         ),
       ),
     );
+    return _perf?.observe(dialog) ?? dialog;
   }
 
   Widget _buildRow(_ScalingRowState row) {
+    _perf?.event('row.build', {'row': row.index});
     final amount = TextField(
       key: ValueKey('scaling-quantity-${row.index}'),
       controller: row.controller,
@@ -346,6 +382,7 @@ class _RecipeScalingDialogState extends State<RecipeScalingDialog> {
     final unit = Text(row.displayUnit);
     return LayoutBuilder(
       builder: (context, constraints) {
+        _perf?.event('row.layoutBuilder', {'row': row.index, 'maxWidth': constraints.maxWidth});
         final compact =
             constraints.maxWidth < 400 ||
             MediaQuery.textScalerOf(context).scale(16) > 20;

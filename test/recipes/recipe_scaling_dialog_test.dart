@@ -1,11 +1,66 @@
 import 'dart:async';
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:kuktam/recipes/domain/models/recipe.dart';
 import 'package:kuktam/recipes/presentation/screens/recipe_details_screen.dart';
 import 'package:kuktam/recipes/presentation/widgets/recipe_scaling_dialog.dart';
+import 'package:kuktam/recipes/presentation/widgets/scaling_perf.dart';
 
 void main() {
+  testWidgets('perf: focus and inset sweep do not scale or format', (tester) async {
+    final messages = <Map<String, dynamic>>[];
+    final previousPrint = debugPrint;
+    debugPrint = (String? message, {int? wrapWidth}) {
+      if (message != null && message.startsWith('[SCALING_PERF] ')) {
+        messages.add(jsonDecode(message.substring('[SCALING_PERF] '.length)) as Map<String, dynamic>);
+      }
+    };
+    addTearDown(() => debugPrint = previousPrint);
+    tester.view.physicalSize = const Size(400, 850);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    addTearDown(tester.view.resetViewInsets);
+    final oldBuild = debugProfileBuildsEnabled;
+    for (final count in [3, 60]) {
+      messages.clear();
+      await tester.pumpWidget(MaterialApp(home: Scaffold(body: RecipeScalingDialog(
+        ingredients: List.generate(count, (i) => RecipeIngredient(name: 'Hozzávaló $i', quantity: 100, unit: 'g')),
+      ))));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const ValueKey('scaling-quantity-0')));
+      await tester.pump();
+      for (var step = 1; step <= 15; step++) {
+        tester.view.viewInsets = FakeViewPadding(bottom: step * 20);
+        await tester.pump(const Duration(milliseconds: 16));
+      }
+      await tester.pumpAndSettle();
+      expect(tester.takeException(), isNull);
+      await tester.pumpWidget(const SizedBox());
+      expect(messages.where((e) => ['input', 'scaleAndValidate', 'formatOnBlur'].contains(e['event'])), isEmpty);
+      expect(messages.where((e) => e['event'] == 'focus' && e['focused'] == true), isNotEmpty);
+      expect(messages.where((e) => e['event'] == 'metrics'), isNotEmpty);
+      final builtRows = messages.where((e) => e['event'] == 'row.build').map((e) => e['row']).toSet();
+      if (count == 60) expect(builtRows.length, lessThan(count));
+      // A shrinking viewport must not rebuild existing rows on each inset tick.
+      for (final row in builtRows) {
+        expect(messages.where((e) => e['event'] == 'row.build' && e['row'] == row).length, 1);
+        expect(messages.where((e) => e['event'] == 'row.layoutBuilder' && e['row'] == row).length, 1);
+      }
+      expect(messages.where((e) => e['event'] == 'dialog.constraints').length, greaterThan(1));
+      final counts = <String, int>{};
+      for (final event in messages) {
+        final name = event['event'] as String;
+        counts[name] = (counts[name] ?? 0) + 1;
+      }
+      previousPrint('[SCALING_PERF_TEST] rows=$count events=$counts builtRows=${builtRows.length}');
+      expect(debugProfileBuildsEnabled, oldBuild);
+      tester.view.resetViewInsets();
+    }
+    debugPrint = previousPrint;
+  }, skip: !scalingPerfEnabled);
+
   const ingredients = [
     RecipeIngredient(name: 'Liszt', quantity: 1250, unit: 'g'),
     RecipeIngredient(name: 'Vaj', quantity: 0.125, unit: 'kg'),
@@ -32,6 +87,26 @@ void main() {
     of: find.byType(RecipeScalingDialog),
     matching: find.widgetWithText(FilledButton, 'Bevásárlólistához adás'),
   );
+
+  Future<void> scrollTo(
+    WidgetTester tester,
+    Finder target, {
+    double delta = 200,
+  }) async {
+    final list = find.descendant(
+      of: find.byType(RecipeScalingDialog),
+      matching: find.byType(ListView),
+    );
+    await tester.scrollUntilVisible(
+      target,
+      delta,
+      scrollable: find
+          .descendant(of: list, matching: find.byType(Scrollable))
+          .first,
+      maxScrolls: 150,
+    );
+    await tester.pumpAndSettle();
+  }
 
   testWidgets(
     'details entry opens normalized ingredients only without autofocus',
@@ -421,7 +496,7 @@ void main() {
 
   Future<void> submitShopping(WidgetTester tester) async {
     final button = shoppingButton();
-    await tester.ensureVisible(button);
+    await scrollTo(tester, button);
     await tester.tap(button);
     await tester.pump();
   }
@@ -645,51 +720,154 @@ void main() {
     expect(find.byType(RecipeDetailsScreen), findsOneWidget);
   });
 
-  testWidgets('small viewport, keyboard and long list stay scrollable', (
-    tester,
-  ) async {
-    tester.view.physicalSize = const Size(320, 568);
-    tester.view.devicePixelRatio = 1;
-    addTearDown(tester.view.resetPhysicalSize);
-    addTearDown(tester.view.resetDevicePixelRatio);
-    addTearDown(tester.view.resetViewInsets);
-    final many = List.generate(
-      30,
-      (i) => RecipeIngredient(
-        name:
-            'Nagyon hosszú hozzávalónév több szóval és részletes megnevezéssel $i',
-        quantity: 2.5,
-        unit: 'konzerv',
-      ),
-    );
-    await tester.pumpWidget(
-      MaterialApp(
-        home: Scaffold(
-          body: Builder(
-            builder: (context) => TextButton(
-              onPressed: () => showDialog<void>(
-                context: context,
-                barrierDismissible: false,
-                builder: (_) => RecipeScalingDialog(ingredients: many),
+  for (final scenario in [
+    (
+      name: 'narrow phone',
+      size: const Size(320, 568),
+      inset: 280.0,
+      scale: 1.0,
+    ),
+    (name: 'large text', size: const Size(800, 600), inset: 280.0, scale: 1.8),
+    (name: 'landscape', size: const Size(700, 360), inset: 120.0, scale: 1.3),
+  ]) {
+    testWidgets('lazy rows preserve state with keyboard: ${scenario.name}', (
+      tester,
+    ) async {
+      tester.view.physicalSize = scenario.size;
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      addTearDown(tester.view.resetViewInsets);
+      final many = List.generate(
+        30,
+        (i) => RecipeIngredient(
+          name:
+              'Nagyon hosszú hozzávalónév több szóval és részletes megnevezéssel $i',
+          quantity: 2.5,
+          unit: 'konzerv',
+        ),
+      );
+      await tester.pumpWidget(
+        MaterialApp(
+          builder: (context, child) => MediaQuery(
+            data: MediaQuery.of(
+              context,
+            ).copyWith(textScaler: TextScaler.linear(scenario.scale)),
+            child: child!,
+          ),
+          home: Scaffold(
+            body: Builder(
+              builder: (context) => TextButton(
+                onPressed: () => showDialog<void>(
+                  context: context,
+                  barrierDismissible: false,
+                  builder: (_) => RecipeScalingDialog(ingredients: many),
+                ),
+                child: const Text('Nyitás'),
               ),
-              child: const Text('Nyitás'),
             ),
           ),
         ),
-      ),
-    );
-    await tester.tap(find.text('Nyitás'));
-    await tester.pumpAndSettle();
-    tester.view.viewInsets = const FakeViewPadding(bottom: 280);
-    await tester.pumpAndSettle();
-    await tester.ensureVisible(quantity(29));
-    await tester.enterText(quantity(29), '3');
-    await tester.pumpAndSettle();
-    expect(tester.takeException(), isNull);
-    await tester.ensureVisible(find.text('Visszaállítás'));
-    await tester.tap(find.text('Visszaállítás'));
-    await tester.pumpAndSettle();
-    expect(tester.widget<TextField>(quantity(29)).controller!.text, '2,5');
-    expect(tester.takeException(), isNull);
-  });
+      );
+      await tester.tap(find.text('Nyitás'));
+      await tester.pumpAndSettle();
+      expect(find.byType(Dialog), findsOneWidget);
+      expect(
+        tester.widget<Dialog>(find.byType(Dialog)).insetAnimationDuration,
+        Duration.zero,
+      );
+      expect(find.byType(TextField).evaluate().length, lessThan(many.length));
+      expect(quantity(29), findsNothing);
+      final list = tester.widget<ListView>(
+        find.descendant(
+          of: find.byType(RecipeScalingDialog),
+          matching: find.byType(ListView),
+        ),
+      );
+      expect(list.shrinkWrap, isFalse);
+      expect(list.itemExtent, isNull);
+      expect(
+        find.descendant(
+          of: find.byType(RecipeScalingDialog),
+          matching: find.byType(SingleChildScrollView),
+        ),
+        findsNothing,
+      );
+
+      await scrollTo(tester, quantity(0));
+      final first = tester.widget<TextField>(quantity(0));
+      final controller = first.controller!;
+      final focus = first.focusNode!;
+      await tester.enterText(quantity(0), '3,00');
+      await tester.pump(const Duration(milliseconds: 500));
+      controller.selection = const TextSelection.collapsed(offset: 2);
+      tester.view.viewInsets = FakeViewPadding(bottom: scenario.inset);
+      await tester.pumpAndSettle();
+      expect(focus.hasFocus, isTrue);
+      expect(controller.text, '3,00');
+      expect(controller.selection.baseOffset, 2);
+      expect(tester.takeException(), isNull);
+
+      await scrollTo(tester, quantity(29));
+      expect(focus.hasFocus, isTrue);
+      expect(controller.text, '3,00');
+      expect(tester.widget<TextField>(quantity(29)).controller!.text, '3');
+      await tester.enterText(quantity(29), '4');
+      await tester.pump(const Duration(milliseconds: 500));
+      final last = tester.widget<TextField>(quantity(29));
+      expect(last.focusNode!.hasFocus, isTrue);
+      expect(controller.text, '4');
+      expect(quantity(0), findsNothing);
+      last.focusNode!.unfocus();
+      await tester.pumpAndSettle();
+
+      await scrollTo(tester, quantity(0), delta: -200);
+      final rebuilt = tester.widget<TextField>(quantity(0));
+      expect(rebuilt.controller, same(controller));
+      expect(rebuilt.focusNode, same(focus));
+      expect(controller.text, '4');
+      await tester.enterText(quantity(0), 'abc');
+      await tester.pump(const Duration(milliseconds: 500));
+      expect(
+        tester.widget<TextField>(quantity(0)).decoration!.errorText,
+        isNotNull,
+      );
+      focus.unfocus();
+      await tester.pumpAndSettle();
+      await scrollTo(tester, quantity(29));
+      expect(quantity(0), findsNothing);
+      await scrollTo(tester, quantity(0), delta: -200);
+      expect(
+        tester.widget<TextField>(quantity(0)).controller,
+        same(controller),
+      );
+      expect(controller.text, 'abc');
+      expect(
+        tester.widget<TextField>(quantity(0)).decoration!.errorText,
+        isNotNull,
+      );
+
+      await scrollTo(tester, shoppingButton());
+      expect(shoppingButton().hitTestable(), findsOneWidget);
+      await scrollTo(tester, find.text('Visszaállítás'), delta: -200);
+      expect(quantity(0), findsNothing);
+      await tester.tap(find.text('Visszaállítás'));
+      await tester.pumpAndSettle();
+      expect(controller.text, '2,5');
+      await scrollTo(tester, quantity(29), delta: -200);
+      expect(tester.widget<TextField>(quantity(29)).controller!.text, '2,5');
+      await scrollTo(tester, quantity(0), delta: -200);
+      expect(
+        tester.widget<TextField>(quantity(0)).controller,
+        same(controller),
+      );
+      expect(tester.widget<TextField>(quantity(0)).focusNode, same(focus));
+      expect(
+        tester.widget<TextField>(quantity(0)).decoration!.errorText,
+        isNull,
+      );
+      expect(controller.text, '2,5');
+      expect(tester.takeException(), isNull);
+    });
+  }
 }
