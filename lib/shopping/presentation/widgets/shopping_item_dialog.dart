@@ -165,7 +165,8 @@ class _ShoppingItemDialogState extends State<_ShoppingItemDialog> {
               const SizedBox(height: 16),
               DropdownButtonFormField<String>(
                 initialValue: _selectedUnit,
-                menuMaxHeight: 240,
+                // 8px top padding + five 48px rows + half of the next row.
+                menuMaxHeight: 8 + 5.5 * kMinInteractiveDimension,
                 decoration: const InputDecoration(
                   labelText: 'Mértékegység',
                   border: OutlineInputBorder(),

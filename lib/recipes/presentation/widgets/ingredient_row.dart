@@ -105,7 +105,8 @@ class _IngredientRowState extends State<IngredientRow> {
           child: DropdownButtonFormField<String>(
             initialValue: widget.data.selectedUnit,
             isExpanded: true,
-            menuMaxHeight: 240,
+            // 8px top padding + five 48px rows + half of the next row.
+            menuMaxHeight: 8 + 5.5 * kMinInteractiveDimension,
             decoration: const InputDecoration(
               labelText: 'Egység',
               border: OutlineInputBorder(),

@@ -311,7 +311,8 @@ class _ShoppingImportDialogState extends State<ShoppingImportDialog> {
             child: DropdownButtonFormField<String>(
               initialValue: row.unit,
               isExpanded: true,
-              menuMaxHeight: 240,
+              // 8px top padding + five 48px rows + half of the next row.
+              menuMaxHeight: 8 + 5.5 * kMinInteractiveDimension,
               iconSize: 18,
               decoration: const InputDecoration(
                 labelText: 'Egység',

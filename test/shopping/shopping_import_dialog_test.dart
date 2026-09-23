@@ -335,7 +335,7 @@ void main() {
           )
           .first;
       expect(dropdown.items!.map((i) => i.value), shoppingUnits);
-      expect(dropdown.menuMaxHeight, 240);
+      expect(dropdown.menuMaxHeight, 8 + 5.5 * kMinInteractiveDimension);
       expect(dropdown.isExpanded, true);
       expect(
         tester
