@@ -138,7 +138,9 @@ class _RecipeImportDialogState extends State<RecipeImportDialog> {
                   key: const ValueKey('recipe-import-text'),
                   controller: _text,
                   minLines: 5,
-                  maxLines: 10,
+                  // Let the dialog scroll the text and actions together. A
+                  // capped field consumes vertical drags in its own viewport.
+                  maxLines: null,
                   keyboardType: TextInputType.multiline,
                   decoration: InputDecoration(
                     labelText: 'Recept szövege',

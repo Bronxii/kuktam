@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:kuktam/recipes/data/repositories/recipe_repository.dart';
 import 'package:kuktam/recipes/domain/models/recipe.dart';
@@ -43,9 +44,16 @@ void main() {
     _Repository repo, {
     Recipe? recipe,
     RecipeImportDraft? initialImport,
+    double textScale = 1,
   }) async {
     await tester.pumpWidget(
       MaterialApp(
+        builder: (context, child) => MediaQuery(
+          data: MediaQuery.of(context).copyWith(
+            textScaler: TextScaler.linear(textScale),
+          ),
+          child: child!,
+        ),
         home: Builder(
           builder: (context) => Scaffold(
             body: TextButton(
@@ -523,6 +531,56 @@ void main() {
       expect(tester.takeException(), isNull);
     },
   );
+
+  for (final config in [
+    (const Size(320, 640), 300.0, 1.0),
+    (const Size(740, 360), 170.0, 1.0),
+    (const Size(360, 740), 300.0, 1.6),
+  ]) {
+    testWidgets('import editor bottom field and save with keyboard $config', (
+      tester,
+    ) async {
+      tester.view.physicalSize = config.$1;
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      addTearDown(tester.view.resetViewInsets);
+      final repo = _Repository();
+      await open(tester, repo, initialImport: imported(), textScale: config.$3);
+      final preparation = field('Elkészítés menete');
+      final outer = find.descendant(
+        of: find.byType(ListView),
+        matching: find.byType(Scrollable),
+      ).first;
+      await tester.scrollUntilVisible(preparation, 150, scrollable: outer);
+      await tester.enterText(preparation, 'Keverd össze.\n' * 20);
+      tester.view.viewInsets = FakeViewPadding(bottom: config.$2);
+      await tester.pumpAndSettle();
+      final editable = tester.state<EditableTextState>(find.descendant(
+        of: preparation,
+        matching: find.byType(EditableText),
+      ));
+      expect(editable.widget.focusNode.hasFocus, isTrue);
+      final RenderEditable render = editable.renderEditable;
+      final caret = render.getLocalRectForCaret(
+        editable.widget.controller.selection.extent,
+      );
+      final caretBottom = render.localToGlobal(caret.bottomLeft).dy;
+      expect(caretBottom, lessThanOrEqualTo(config.$1.height - config.$2));
+      expect(caretBottom, greaterThan(tester.getRect(find.byType(AppBar)).bottom));
+      expect(repo.saved, isNull);
+
+      await tester.drag(outer, const Offset(0, -300));
+      await tester.pumpAndSettle();
+      expect(find.text('Mentés').hitTestable(), findsOneWidget);
+      expect(tester.takeException(), isNull);
+      await tester.tap(find.text('Mentés'));
+      await tester.pumpAndSettle();
+      expect(repo.saved!.preparation, ('Keverd össze.\n' * 20).trim());
+      expect(repo.saved!.ingredients.single.name, 'Liszt');
+      expect(find.byType(AddRecipeScreen), findsNothing);
+    });
+  }
 
   for (final entry in {'1,5': 1.5, '1.5': 1.5, '1/2': 0.5, '½': 0.5}.entries) {
     testWidgets('new recipe saves ${entry.key} as numeric quantity', (

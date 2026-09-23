@@ -61,9 +61,16 @@ void main() {
     WidgetTester tester, {
     RecipeImportDraft Function(String)? parse,
     ValueChanged<RecipeImportDraft?>? onResult,
+    double textScale = 1,
   }) async {
     await tester.pumpWidget(
       MaterialApp(
+        builder: (context, child) => MediaQuery(
+          data: MediaQuery.of(context).copyWith(
+            textScaler: TextScaler.linear(textScale),
+          ),
+          child: child!,
+        ),
         home: Builder(
           builder: (context) => Scaffold(
             body: TextButton(
@@ -223,6 +230,55 @@ void main() {
     await tester.ensureVisible(process);
     expect(tester.takeException(), isNull);
   });
+
+  for (final config in [
+    (const Size(320, 640), 300.0, 1.0),
+    (const Size(740, 360), 170.0, 1.0),
+    (const Size(360, 740), 300.0, 1.6),
+  ]) {
+    testWidgets('paste field drag scrolls dialog with keyboard $config', (
+      tester,
+    ) async {
+      tester.view.physicalSize = config.$1;
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      addTearDown(tester.view.resetViewInsets);
+      RecipeImportDraft? result;
+      await dialog(tester, textScale: config.$3, onResult: (d) => result = d);
+      final text = 'Hosszú hozzávalósor\n' * 80;
+      await enter(tester, text);
+      final controller = tester.widget<TextField>(input).controller!;
+      controller.selection = const TextSelection.collapsed(offset: 0);
+      tester.view.viewInsets = FakeViewPadding(bottom: config.$2);
+      await tester.pumpAndSettle();
+
+      final outer = find.descendant(
+        of: find.byType(RecipeImportDialog),
+        matching: find.byType(Scrollable),
+      ).first;
+      final position = tester.state<ScrollableState>(outer).position;
+      final viewport = tester.getRect(find.byType(SingleChildScrollView).first);
+      final visibleField = tester.getRect(input).intersect(viewport);
+      expect(visibleField.height, greaterThan(30));
+      final before = position.pixels;
+      await tester.dragFrom(visibleField.center, const Offset(0, -60));
+      await tester.pumpAndSettle();
+      expect(position.pixels, greaterThan(before));
+
+      // A real drag can reach the footer without dismissing the keyboard.
+      await tester.drag(outer, Offset(0, -position.maxScrollExtent));
+      await tester.pumpAndSettle();
+      expect(process.hitTestable(), findsOneWidget);
+      expect(tester.getRect(process).bottom,
+          lessThanOrEqualTo(config.$1.height - config.$2));
+      expect(controller.text, text);
+      expect(tester.takeException(), isNull);
+      await tester.tap(process);
+      await tester.pumpAndSettle();
+      expect(result!.originalText, text);
+    });
+  }
 
   testWidgets('recipe action tab scope and ordinary FAB', (tester) async {
     final repo = _Recipes();
