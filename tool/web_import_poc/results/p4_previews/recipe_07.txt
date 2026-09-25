@@ -1,0 +1,26 @@
+RECEPT: Palacsinta alaprecept
+
+HOZZÁVALÓK:
+3.0 db Tojás
+2.0 ek Cukor
+1.0 csomag Vaníliás cukor
+240.0 g Finomliszt
+400.0 ml Tej
+300.0 ml Szódavíz
+[JAVÍTANDÓ] ml Napraforgó olaj
+
+WARNING (POC auditjelölések, nem általános automatikus felismerés):
+7. sor: invalidQuantity, SOURCE_WARNING
+
+ELKÉSZÍTÉS:
+Egy tálba ütjük a tojásokat, majd a cukrokkal együtt kikeverjük.
+
+Folyamatos keverés mellett hozzáadjuk a tojásos keverékhez a lisztet, majd a tejet és a szódát, végül az olajat, és csomómentesre keverjük.
+
+Egy serpenyőt vagy palacsintasütőt egy ecsettel vékonyan megkenünk olajjal, majd megsütjük a palacsintákat.
+
+FŰSZEREK: üres
+
+VERDICT: REVIEW
+A draft teljes, de parser/source/unsupported figyelmeztetés miatt ellenőrzés szükséges.
+Bizonyított mezőjavítás minimum: 1. Az unsupported egységek átváltása nincs találgatva; további user-döntést igényelhet.

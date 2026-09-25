@@ -1,0 +1,32 @@
+RECEPT: Eredeti tiramisu
+
+HOZZÁVALÓK:
+4.0 db Tojás
+200.0 g Porcukor
+100.0 ml Rum
+500.0 g Mascarpone
+300.0 ml kávé
+1.0 doboz Babapiskóta
+1.0 db Kakaópor
+
+WARNING (POC auditjelölések, nem általános automatikus felismerés):
+7. sor: missingQuantity
+
+ELKÉSZÍTÉS:
+1. lépés: Az eredeti tiramisu receptje szerint első lépésként a tojásokat kettéválasztjuk.
+
+2. lépés: A tojássárgáját habosra kikeverjük a cukorral, hozzáadjuk a rumot, végül pedig a mascarponét, és addig keverjük, míg sima és kissé habos krémet kapunk.
+
+3. lépés: A tojásfehérjéből robotgéppel kemény habot verünk, majd óvatosan belekeverjük a mascarponés krémbe .
+
+4. lépés: Lefőzzük a kávét. Amikor langyosra hűlt, belemártjuk a babapiskótákat úgy, hogy félig átázzanak.
+
+5. lépés: Belehelyezzük a babapiskótákat egy sorban egy kisebb tepsibe, vagy üvegtálba. Rásimítjuk a krém felét, erre teszünk még egy réteg kávéba áztatott babapiskótát, és végül a maradék krémmel befedjük.
+
+6. lépés: Minimum 2 órát hűtőszekrényben állni hagyjuk. Közvetlenül a tálalás előtt a tiramisu tetejére kakaóport szórunk.
+
+FŰSZEREK: üres
+
+VERDICT: REVIEW
+A draft teljes, de parser/source/unsupported figyelmeztetés miatt ellenőrzés szükséges.
+Bizonyított mezőjavítás minimum: 0. Az unsupported egységek átváltása nincs találgatva; további user-döntést igényelhet.

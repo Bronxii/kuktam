@@ -1,0 +1,564 @@
+{
+  "summary": {
+    "primary_audit_decisions": {
+      "FORMAT_DIFFERENCE": 10,
+      "SOURCE_JSONLD_ERROR": 17,
+      "GROUND_TRUTH_ERROR": 6
+    },
+    "incidental_source_errors": 5,
+    "counting_unit": "One ingredient row, one complete instruction-reference correction per recipe, one title per recipe, one markup-bearing step.",
+    "corrected_files": [
+      "recipe_03.txt",
+      "recipe_06.txt",
+      "recipe_08.txt",
+      "recipe_09.txt",
+      "recipe_10.txt"
+    ],
+    "extractor": {
+      "ingredients_preserved": 100,
+      "ingredients_total": 100,
+      "steps_preserved": 56,
+      "steps_total": 56,
+      "rows_lost": 0,
+      "rows_added": 0,
+      "order_errors": 0,
+      "instruction_loss": 0,
+      "fidelity_percent": 100
+    },
+    "source_quality": {
+      "ingredient_mismatches": 22,
+      "ingredient_rows_total": 100,
+      "ingredient_content_agreement_percent": 78,
+      "quantity_mismatches": 15,
+      "truncated_fraction_rows": 8,
+      "spurious_zero_rows": 7,
+      "instruction_omissions": 0,
+      "title_decoration_only": 5
+    },
+    "verdicts": {
+      "PERFECT": 0,
+      "ACCEPTABLE": 3,
+      "PARTIAL": 7,
+      "FAILED": 0
+    },
+    "scope_note": "Primary 21 ingredients + 06/08 instructions + titles/markup. Five incidental ingredient-note omissions are separately disclosed and included in source-quality verdict. Other GT instructions remain paraphrased; no literal instruction accuracy is claimed."
+  },
+  "results": [
+    {
+      "id": "01",
+      "url": "https://www.mindmegette.hu/recept/rakott-krumpli",
+      "title": "Rakott krumpli | Mindmegette.hu",
+      "expected_ingredients": [
+        "1 kg burgonya",
+        "6 db tojás",
+        "só",
+        "10 dkg kolbász",
+        "5 dl tejföl",
+        "2 db tojássárgája",
+        "2 tk vaj",
+        "10 dkg bacon"
+      ],
+      "extracted_ingredients": [
+        "1 kg Burgonya",
+        "6 db Tojás",
+        "Só",
+        "10 dkg Kolbász",
+        "5 dl Tejföl",
+        "2 db Tojássárgája",
+        "2 tk Vaj",
+        "10 dkg Bacon"
+      ],
+      "normalized_match_count": 8,
+      "source_ingredient_mismatches": 0,
+      "source_quantity_mismatches": 0,
+      "source_instruction_omissions": 0,
+      "raw_instruction_entries": 22,
+      "actual_steps": 11,
+      "step_headings": 11,
+      "extractor": {
+        "rows_lost": 0,
+        "rows_added": 0,
+        "order_errors": 0,
+        "instruction_loss": 0
+      },
+      "visible_instructions": [
+        "A rakott krumpli elkészítését azzal kezdjük, hogy a krumplikat 10-15 percre beáztatjuk hideg vízbe, majd alaposan megsikáljuk és leöblítjük. A tojásokat megmossuk.",
+        "A krumplit felöntjük annyi hideg vízzel, hogy bőven ellepje.",
+        "Hozzáadjuk a sót, és a forrástól számított 20 percig, fedő alatt puhára főzzük.",
+        "A tojásokat sós, hideg vízben feltesszük főni, és a forrástól számított 8 percig főzzük, majd hideg vízbe merítve azonnal lehűtjük.",
+        "A krumpliról leöntjük a vizet, még melegen lehúzzuk a héját, és hűlni hagyjuk. A kihűlt tojásokat is meghámozzuk, elnegyedeljük vagy felkarikázzuk.",
+        "A kolbászt meleg vízzel leöblítjük, így könnyen lehúzhatjuk a héját, aztán vékonyan felkarikázzuk.",
+        "A tejfölt egy kis tálba tesszük és elkeverjük benne a tojássárgákat.",
+        "A sütőt 180 fokra (gázsütő 3. fokozat) előmelegítjük.",
+        "A vajjal kikenünk egy lapos, tűzálló tálat, és hozzálátunk a hagyományos rakott krumpli rétegezéséhez.",
+        "Az aljára karikázzuk a krumpli felét, kissé megsózzuk, lazán összekeverjük, és elsimítjuk. Arányosan elosztva a tetejére rendezzük a tojást és a kolbászkarikákat, majd megkenjük a tejföl felével. A maradék krumplit felkarikázzuk, és kissé egymásra csúsztatva a tetejére rendezzük. Egyenletesen bevonjuk a maradék tejföllel, végül a tetejére göndörítjük a szalonnaszeleteket.",
+        "A sütőben addig sütjük, amíg a tejföl és a szalonna aranybarnára pirul (35-40 perc). Az elkészült rakott krumplit vegyes idénysalátával vagy ecetes savanyúsággal, kovászos uborkával tálaljuk."
+      ],
+      "verdict": "ACCEPTABLE",
+      "verdict_basis": "Visible snapshot vs JSON-LD, including explicitly listed incidental omissions. Strict GT string equality is NOT the verdict."
+    },
+    {
+      "id": "02",
+      "url": "https://www.mindmegette.hu/recept/fasirt",
+      "title": "Fasírt | Mindmegette.hu",
+      "expected_ingredients": [
+        "50 dkg darált sertéshús",
+        "2 db zsemle",
+        "1 fej vöröshagyma",
+        "olaj",
+        "3 gerezd fokhagyma",
+        "2 db tojás",
+        "1 kis kanál majoránna",
+        "1 tk őrölt fűszerpaprika",
+        "só",
+        "bors",
+        "10 dkg zsemlemorzsa",
+        "5 dl olaj"
+      ],
+      "extracted_ingredients": [
+        "50 dkg sertéshús",
+        "2 db zsemle",
+        "1 fej Vöröshagyma",
+        "Olaj",
+        "3 gerezd Fokhagyma",
+        "2 db Tojás",
+        "1 kis kanál Majoránna",
+        "1 tk fűszerpaprika",
+        "Só",
+        "Bors",
+        "10 dkg Zsemlemorzsa",
+        "5 dl Olaj"
+      ],
+      "normalized_match_count": 10,
+      "source_ingredient_mismatches": 3,
+      "source_quantity_mismatches": 0,
+      "source_instruction_omissions": 0,
+      "raw_instruction_entries": 8,
+      "actual_steps": 4,
+      "step_headings": 4,
+      "extractor": {
+        "rows_lost": 0,
+        "rows_added": 0,
+        "order_errors": 0,
+        "instruction_loss": 0
+      },
+      "visible_instructions": [
+        "A fasírt elkészítéséhez a zsemlét vízbe áztatjuk, majd alaposan kinyomkodjuk. Az apróra vágott hagymát olajon megdinszteljük. A fokhagymát összenyomjuk.",
+        "Minden hozzávalót alaposan összedolgozunk, majd ízlés szerint fűszerezzük a masszát.",
+        "Vizes kézzel gombócokat formázunk (van, aki lapos pogácsákat készít), és zsemlemorzsában megforgatjuk.",
+        "Végül nem túl forró olajban, oldalanként 5-5 perc alatt kisütjük a fasírtokat."
+      ],
+      "verdict": "PARTIAL",
+      "verdict_basis": "Visible snapshot vs JSON-LD, including explicitly listed incidental omissions. Strict GT string equality is NOT the verdict."
+    },
+    {
+      "id": "03",
+      "url": "https://www.mindmegette.hu/recept/husleves",
+      "title": "Húsleves | Mindmegette.hu",
+      "expected_ingredients": [
+        "1 kg színhús",
+        "50 dkg csont",
+        "50 dkg vegyes zöldség",
+        "1 fej hagyma",
+        "2 gerezd fokhagyma",
+        "10 szem bors",
+        "cseresznyepaprika",
+        "1 csapott mokkáskanál szeklice",
+        "1 csokor petrezselyem",
+        "15 dkg kelkáposzta",
+        "1 db zöldpaprika",
+        "1 db paradicsom",
+        "só",
+        "10 dkg levelestészta"
+      ],
+      "extracted_ingredients": [
+        "1 kg színhús",
+        "50 dkg csont",
+        "50 dkg vegyes zöldség",
+        "1 fej Hagyma",
+        "2 gerezd Fokhagyma",
+        "10 szem Bors",
+        "cseresznyepaprika",
+        "1 csapott mokkáskanál szeklice",
+        "1 csokor Petrezselyem",
+        "15 dkg Kelkáposzta",
+        "1 db Zöldpaprika",
+        "1 db Paradicsom",
+        "Só",
+        "10 dkg levelestészta"
+      ],
+      "normalized_match_count": 14,
+      "source_ingredient_mismatches": 4,
+      "source_quantity_mismatches": 0,
+      "source_instruction_omissions": 0,
+      "raw_instruction_entries": 14,
+      "actual_steps": 7,
+      "step_headings": 7,
+      "extractor": {
+        "rows_lost": 0,
+        "rows_added": 0,
+        "order_errors": 0,
+        "instruction_loss": 0
+      },
+      "visible_instructions": [
+        "A húsleves elkészítéséhez elsőként a húst és a zöldségeket alaposan megmosunk, megtisztítjuk.",
+        "Egy nagyobb fazék aljára fektetjük a szétütött csontokat, arra a 3-4 darabba vágott húst, és felöntjük annyi hideg vízzel, hogy bőven (4-5 ujjnyira) ellepje. Forrásig hevítjük - a régi hagyománnyal szemben nem habozzuk le, mert oda az értékes fehérje, leülepszik szépen az a hab magától, nem lesz zavaros tőle a leves.",
+        "Hozzáadjuk (teatojásba zárva) a szemes borsot, a fokhagymát, a sáfrányos szeklicét - gyönyörű színt ad a levesnek -, a cseresznyepaprikát, a hagymát egészben és egy kevés sót. Fedő nélkül, lassú forralással, gyöngyöztetve fél óráig főzzük.",
+        "Ezután beletesszük a hasábokra vágott zöldségeket, a kelkáposztát, a zöldpaprikát és a paradicsomot egészben, a csokorban hagyott petrezselymet, és további lassú gyöngyöztető forralással, fedő nélkül az egészet puhára főzzük.",
+        "Közben enyhén sós vízben megfőzzük a levestésztát, leszűrjuk. Kevés húslevest merünk rá, hogy melegen tartsuk.",
+        "Ezután következik a művészet: a húsleves felszínéről kanállal eltávolítjuk a fölösleges zsiradékot, majd sűrű szövésű szitakanálon keresztül, merőkanállal - éppen csak szelíden megbillentve a fazekat, hogy fel ne zavarosítsuk a levest - előmelegített levesestálba szűrjuk.",
+        "A tésztát a forró leveshez adjuk, külön tálon kínáljuk a zöldséget és a húst, amelyet fogyaszthatunk a leveshez, vagy második fogásként is különféle mártásokkal."
+      ],
+      "verdict": "PARTIAL",
+      "verdict_basis": "Visible snapshot vs JSON-LD, including explicitly listed incidental omissions. Strict GT string equality is NOT the verdict."
+    },
+    {
+      "id": "04",
+      "url": "https://www.mindmegette.hu/recept/eredeti-tiramisu",
+      "title": "Eredeti tiramisu | Mindmegette.hu",
+      "expected_ingredients": [
+        "4 db tojás",
+        "20 dkg porcukor",
+        "1 dl rum",
+        "50 dkg mascarpone",
+        "3 dl kávé",
+        "1 doboz babapiskóta",
+        "kakaópor"
+      ],
+      "extracted_ingredients": [
+        "4 db Tojás",
+        "20 dkg Porcukor",
+        "1 dl Rum",
+        "50 dkg Mascarpone",
+        "3 dl kávé",
+        "1 doboz Babapiskóta",
+        "Kakaópor"
+      ],
+      "normalized_match_count": 7,
+      "source_ingredient_mismatches": 0,
+      "source_quantity_mismatches": 0,
+      "source_instruction_omissions": 0,
+      "raw_instruction_entries": 12,
+      "actual_steps": 6,
+      "step_headings": 6,
+      "extractor": {
+        "rows_lost": 0,
+        "rows_added": 0,
+        "order_errors": 0,
+        "instruction_loss": 0
+      },
+      "visible_instructions": [
+        "Az eredeti tiramisu receptje szerint első lépésként a tojásokat kettéválasztjuk.",
+        "A tojássárgáját habosra kikeverjük a cukorral, hozzáadjuk a rumot, végül pedig a mascarponét, és addig keverjük, míg sima és kissé habos krémet kapunk.",
+        "A tojásfehérjéből robotgéppel kemény habot verünk, majd óvatosan belekeverjük a mascarponés krémbe.",
+        "Lefőzzük a kávét. Amikor langyosra hűlt, belemártjuk a babapiskótákat úgy, hogy félig átázzanak.",
+        "Belehelyezzük a babapiskótákat egy sorban egy kisebb tepsibe, vagy üvegtálba. Rásimítjuk a krém felét, erre teszünk még egy réteg kávéba áztatott babapiskótát, és végül a maradék krémmel befedjük.",
+        "Minimum 2 órát hűtőszekrényben állni hagyjuk. Közvetlenül a tálalás előtt a tiramisu tetejére kakaóport szórunk."
+      ],
+      "verdict": "ACCEPTABLE",
+      "verdict_basis": "Visible snapshot vs JSON-LD, including explicitly listed incidental omissions. Strict GT string equality is NOT the verdict."
+    },
+    {
+      "id": "05",
+      "url": "https://www.mindmegette.hu/recept/zserbo-alaprecept",
+      "title": "Zserbó alaprecept | Mindmegette.hu",
+      "expected_ingredients": [
+        "25 dkg darált dió",
+        "20 dkg porcukor",
+        "1 db citrom",
+        "1 csomag vaníliás cukor",
+        "40 dkg baracklekvár",
+        "2 ek rum",
+        "1 dkg élesztő",
+        "0.5 dl tej",
+        "50 dkg liszt",
+        "25 dkg margarin",
+        "1 mokkáskanál szódabikarbóna",
+        "10 dkg porcukor",
+        "1 db tojássárgája",
+        "1 csomag vaníliás cukor",
+        "2 ek tejföl",
+        "15 dkg étcsokoládé",
+        "1 tk étolaj"
+      ],
+      "extracted_ingredients": [
+        "25 dkg Darált dió",
+        "20 dkg Porcukor",
+        "1 db Citrom",
+        "1 csomag Vaníliás cukor",
+        "40 dkg Baracklekvár",
+        "2 ek Rum",
+        "1 dkg Élesztő",
+        "0.5 dl Tej",
+        "50 dkg Liszt",
+        "25 dkg Margarin",
+        "1 mokkáskanál Szódabikarbóna",
+        "10 dkg Porcukor",
+        "1 db Tojássárgája",
+        "1 csomag Vaníliás cukor",
+        "2 ek Tejföl",
+        "15 dkg Étcsokoládé",
+        "1 tk Étolaj"
+      ],
+      "normalized_match_count": 17,
+      "source_ingredient_mismatches": 0,
+      "source_quantity_mismatches": 0,
+      "source_instruction_omissions": 0,
+      "raw_instruction_entries": 8,
+      "actual_steps": 4,
+      "step_headings": 4,
+      "extractor": {
+        "rows_lost": 0,
+        "rows_added": 0,
+        "order_errors": 0,
+        "instruction_loss": 0
+      },
+      "visible_instructions": [
+        "A zserbó elkészítéséhez a diót összekeverjük a porcukorral, a citrom lereszelt héjával és a vaníliás cukorral.",
+        "Az élesztőt langyos tejben felfuttatjuk. A lisztet elmorzsoljuk a margarinnal. Hozzáadjuk az élesztős tejet, a szódabikarbónát, a porcukrot, a tojássárgáját, a vaníliás cukrot és a tejfölt, és jól összedolgozzuk.",
+        "Az összegyúrt tésztát három részre osztjuk. Az első részt kinyújtjuk, és kibéleljük vele a 24×38 cm-es tepsit. Megkenjük a baracklekvár felével, meglocsoljuk 1 ek rummal, majd rászórjuk a cukros dió felét. Beborítjuk a másik kinyújtott tésztalappal, amit ismét megkenünk lekvárral, megöntözünk rummal, és rászórjuk a dió másik felét. Ráhelyezzük a harmadik kinyújtott tésztát, kissé rányomkodjuk, és villával megszurkáljuk.",
+        "Előmelegített sütőben 200 fokon kb. 30 perc alatt világosbarnára sütjük, majd a tepsiben hagyjuk kihűlni. Amíg hűl a tészta, elkészítjük a mázat. Az étcsokoládét vízgőz felett felolvasztjuk az olajjal, és a süteményre kenjük. Megvárjuk, amíg megszárad, majd felszeleteljük."
+      ],
+      "verdict": "ACCEPTABLE",
+      "verdict_basis": "Visible snapshot vs JSON-LD, including explicitly listed incidental omissions. Strict GT string equality is NOT the verdict."
+    },
+    {
+      "id": "06",
+      "url": "https://www.nosalty.hu/recept/csirkepaprikas",
+      "title": "Csirkepaprikás",
+      "expected_ingredients": [
+        "6 db csirke alsócomb",
+        "0.5 ek sertészsír",
+        "0.5 közepes db vöröshagyma",
+        "0.5 tk fűszerpaprika",
+        "1 közepes db zöldpaprika",
+        "1 közepes db paradicsom",
+        "200 g tejföl",
+        "1 ek finomliszt",
+        "só ízlés szerint",
+        "bors ízlés szerint"
+      ],
+      "extracted_ingredients": [
+        "6 db Csirke alsócomb",
+        "0 ek Sertészsír",
+        "0 közepes db Vöröshagyma",
+        "0 teáskanál Fűszerpaprika",
+        "1 közepes db Zöldpaprika",
+        "1 közepes db Paradicsom",
+        "200 g Tejföl",
+        "1 ek Finomliszt",
+        "0 ízlés szerint Só",
+        "0 ízlés szerint Bors"
+      ],
+      "normalized_match_count": 5,
+      "source_ingredient_mismatches": 5,
+      "source_quantity_mismatches": 5,
+      "source_instruction_omissions": 0,
+      "raw_instruction_entries": 3,
+      "actual_steps": 3,
+      "step_headings": 0,
+      "extractor": {
+        "rows_lost": 0,
+        "rows_added": 0,
+        "order_errors": 0,
+        "instruction_loss": 0
+      },
+      "visible_instructions": [
+        "A combokat megmossuk, szárazra itatjuk. A hagymát meghámozzuk, apróra vágjuk. A paprikát mossuk, kockára vágjuk. A paradicsomot mossuk, kockákra vágjuk.",
+        "A zsírt egy serpenyőben felhevítjük, rászórjuk a hagymát, és megpirítjuk. A tűzről levesszük, hozzákeverjük az édesnemes paprikát és kb. 100 ml vizet öntünk hozzá. Hozzáadjuk a csirkecombokat, a zöldpaprikát és a paradicsomot. Sóval, borssal ízesítjük.",
+        "Fedő alatt mérsékelt tűzőn, puhára pároljuk (ha szükséges öntsünk hozzá kevés vizet). A húst kiszedjük. A párolólét botmixerrel pürésítjük, hozzáadjuk a liszttel elkevert tejfölt, és 2-3 perc alatt mártássá forraljuk. A combokkal együtt még egyszer felforraljuk."
+      ],
+      "verdict": "PARTIAL",
+      "verdict_basis": "Visible snapshot vs JSON-LD, including explicitly listed incidental omissions. Strict GT string equality is NOT the verdict."
+    },
+    {
+      "id": "07",
+      "url": "https://www.nosalty.hu/recept/palacsinta-alaprecept",
+      "title": "Palacsinta alaprecept",
+      "expected_ingredients": [
+        "3 db tojás",
+        "2 ek cukor",
+        "1 csomag vaníliás cukor",
+        "240 g finomliszt",
+        "4 dl tej",
+        "3 dl szódavíz",
+        "0.5 dl napraforgó olaj"
+      ],
+      "extracted_ingredients": [
+        "3 db Tojás",
+        "2 ek Cukor",
+        "1 csomag Vaníliás cukor",
+        "240 g Finomliszt",
+        "4 dl Tej",
+        "3 dl Szódavíz",
+        "0 dl Napraforgó olaj"
+      ],
+      "normalized_match_count": 6,
+      "source_ingredient_mismatches": 1,
+      "source_quantity_mismatches": 1,
+      "source_instruction_omissions": 0,
+      "raw_instruction_entries": 3,
+      "actual_steps": 3,
+      "step_headings": 0,
+      "extractor": {
+        "rows_lost": 0,
+        "rows_added": 0,
+        "order_errors": 0,
+        "instruction_loss": 0
+      },
+      "visible_instructions": [
+        "Egy tálba ütjük a tojásokat, majd a cukrokkal együtt kikeverjük.",
+        "Folyamatos keverés mellett hozzáadjuk a tojásos keverékhez a lisztet, majd a tejet és a szódát, végül az olajat, és csomómentesre keverjük.",
+        "Egy serpenyőt vagy palacsintasütőt egy ecsettel vékonyan megkenünk olajjal, majd megsütjük a palacsintákat."
+      ],
+      "verdict": "PARTIAL",
+      "verdict_basis": "Visible snapshot vs JSON-LD, including explicitly listed incidental omissions. Strict GT string equality is NOT the verdict."
+    },
+    {
+      "id": "08",
+      "url": "https://www.nosalty.hu/recept/turos-csusza",
+      "title": "Túrós csusza",
+      "expected_ingredients": [
+        "40 dkg csuszatészta",
+        "só ízlés szerint",
+        "350 g füstölt szalonna",
+        "2.5 dl víz",
+        "2.5 dl tejföl",
+        "450 g tehéntúró"
+      ],
+      "extracted_ingredients": [
+        "40 dkg Csuszatészta",
+        "0 ízlés szerint Só",
+        "350 g Füstölt szalonna",
+        "2 dl Víz",
+        "2 dl Tejföl",
+        "450 g Tehéntúró"
+      ],
+      "normalized_match_count": 3,
+      "source_ingredient_mismatches": 3,
+      "source_quantity_mismatches": 3,
+      "source_instruction_omissions": 0,
+      "raw_instruction_entries": 6,
+      "actual_steps": 6,
+      "step_headings": 0,
+      "extractor": {
+        "rows_lost": 0,
+        "rows_added": 0,
+        "order_errors": 0,
+        "instruction_loss": 0
+      },
+      "visible_instructions": [
+        "A tésztát lobogó, enyhén sós vízben fogkeményre kifőzzük.",
+        "A szalonnát egy centis darabokra felkockázzuk, serpenyőbe tesszük. Felöntjük annyi vízzel, ami éppen ellepi, és közepes lángon melegíteni kezdjük. Egészen addig folytatjuk, amíg minden csepp víz el nem párolog, sőt utána szép barnára, zsírjára sütjük. (A vízre azért van szükség, mert így kívül ropogós, de belül puha marad.) Ha elkészült, akkor szűrőlapáttal kivesszük a szalonnát, és félretesszük.",
+        "A zsírt is kiöntjük, csak három evőkanállal hagyunk benne, ehhez hozzáadjuk a tejfölt, és alaposan elkeverjük.",
+        "A kifőtt tésztát összeforgatjuk a tejfölös keverék és a túró egyharmadával, majd a sütőt grill fokozatra és maximum hőfokra állítjuk, és 10-12 percre betesszük, amíg meg nem pirul a tészta széle.",
+        "Kivesszük a tésztát a sütőből, átforgatjuk, majd hozzáadjuk a túró és tejföl második harmadát, és újra visszatesszük a sütőbe 10 percre.",
+        "Ha kész, azonnal tálaljuk. A tetejét a maradék tejföllel és túróval meglocsoljuk."
+      ],
+      "verdict": "PARTIAL",
+      "verdict_basis": "Visible snapshot vs JSON-LD, including explicitly listed incidental omissions. Strict GT string equality is NOT the verdict."
+    },
+    {
+      "id": "09",
+      "url": "https://www.nosalty.hu/recept/eredeti-brassoi-apropecsenye",
+      "title": "Eredeti brassói aprópecsenye",
+      "expected_ingredients": [
+        "1 kg sertéshús (az eredeti recept bélszínt ír)",
+        "15 dkg füstölt szalonna (ízlés szerint)",
+        "1.5 kg burgonya",
+        "2 db vöröshagyma",
+        "8 gerezd fokhagyma",
+        "só ízlés szerint",
+        "bors ízlés szerint",
+        "majoranna ízlés szerint",
+        "kakukkfű ízlés szerint"
+      ],
+      "extracted_ingredients": [
+        "1 kg Sertéshús az eredeti recept bélszínt ír",
+        "15 dkg Füstölt szalonna ízlés szerint",
+        "1 kg Burgonya",
+        "2 db Vöröshagyma",
+        "8 gerezd Fokhagyma",
+        "0 ízlés szerint Só",
+        "0 ízlés szerint Bors",
+        "0 ízlés szerint Majoranna",
+        "0 ízlés szerint Kakukkfű"
+      ],
+      "normalized_match_count": 2,
+      "source_ingredient_mismatches": 5,
+      "source_quantity_mismatches": 5,
+      "source_instruction_omissions": 0,
+      "raw_instruction_entries": 5,
+      "actual_steps": 5,
+      "step_headings": 0,
+      "extractor": {
+        "rows_lost": 0,
+        "rows_added": 0,
+        "order_errors": 0,
+        "instruction_loss": 0
+      },
+      "visible_instructions": [
+        "A megmosott, meghámozott burgonyát apró kockákra vágjuk, zsírban megsütjük.",
+        "A sertéshúst is kockákra vágjuk, majd nagyon kevés zsíron pirítani kezdjük.",
+        "A meghámozott vöröshagymát felaprítjuk, vagy lereszeljük. A fokhagymát szintén felaprítjuk.",
+        "Hozzáadjuk a húshoz, majd fűszerezzük.",
+        "A burgonyát és a húst az eredeti recept szerint összekeverjük, de ez a lépés elhagyható."
+      ],
+      "verdict": "PARTIAL",
+      "verdict_basis": "Visible snapshot vs JSON-LD, including explicitly listed incidental omissions. Strict GT string equality is NOT the verdict."
+    },
+    {
+      "id": "10",
+      "url": "https://www.nosalty.hu/recept/sajtos-pogacsa",
+      "title": "Sajtos pogácsa",
+      "expected_ingredients": [
+        "20 dkg vaj",
+        "40 dkg finomliszt",
+        "2 db tojás",
+        "2 dl tejföl",
+        "2.5 dkg friss élesztő",
+        "1 dl tej (langyos)",
+        "1 csipet cukor",
+        "1 kávéskanál só",
+        "15 dkg sajt",
+        "1 db tojás a kenéshez"
+      ],
+      "extracted_ingredients": [
+        "20 dkg Vaj",
+        "40 dkg Finomliszt",
+        "2 db Tojás",
+        "2 dl Tejföl",
+        "2 dkg Friss élesztő",
+        "1 dl Tej langyos",
+        "1 csipet Cukor",
+        "1 kávéskanál Só",
+        "15 dkg Sajt",
+        "1 db Tojás a kenéshez"
+      ],
+      "normalized_match_count": 8,
+      "source_ingredient_mismatches": 1,
+      "source_quantity_mismatches": 1,
+      "source_instruction_omissions": 0,
+      "raw_instruction_entries": 7,
+      "actual_steps": 7,
+      "step_headings": 0,
+      "extractor": {
+        "rows_lost": 0,
+        "rows_added": 0,
+        "order_errors": 0,
+        "instruction_loss": 0
+      },
+      "visible_instructions": [
+        "Készítsük el a kovászt. Ehhez az élesztőt a langyos tejbe morzsoljuk el. Szórjuk meg egy csipet cukorral és egy kis liszttel, majd tegyük félre meleg helyre kb. 10 percre. Akkor jó, ha az élesztő szépen felhólyagosodik.",
+        "A lisztet a vajjal és egy csipet sóval morzsoljuk el. A tejfölt keverjük el a tojással.",
+        "A lisztbe beletesszük a felfuttatott élesztőt és a tejfölös tojást, majd jól összedolgozzuk. Könnyű tésztát kell kapjunk.",
+        "Takarjuk le, és hagyjuk kelni meleg helyen. Körülbelül 30 perc után nyújtsuk ki nagyjából 1,5 centire, összehajtogatjuk. Tíz perc múlva megint kinyújtjuk és összehajtogatjuk. Ezt háromszor ismételjük meg.",
+        "Megint kinyújtjuk kb 1,5 centi vastagra. Megkenjük tojással, sózzuk, majd megszórjuk reszelt sajttal.",
+        "Pogácsaszaggatóval szaggassuk ki, és kezünkkel kicsit formázzuk, sodorjuk meg. Így a sütőben felfele fog nőni a pogácsánk, nem fog elfolyni, és nem lesz lapos.",
+        "Lehetőség szerint magas falú tepsibe pakoljuk őket egymástól kb. 2 centire, hogy ne nőjenek össze. 180 fokos sütőben 25 perc alatt készre sütjük."
+      ],
+      "verdict": "PARTIAL",
+      "verdict_basis": "Visible snapshot vs JSON-LD, including explicitly listed incidental omissions. Strict GT string equality is NOT the verdict."
+    }
+  ]
+}

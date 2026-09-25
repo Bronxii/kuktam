@@ -1,0 +1,29 @@
+CÍM:
+Ultimate spaghetti carbonara recipe
+
+HOZZÁVALÓK:
+100g pancetta
+50g pecorino cheese
+50g parmesan
+3 large eggs
+350g spaghetti
+2 plump garlic cloves peeled and left whole
+50g unsalted butter
+sea salt and freshly ground black pepper
+
+ELKÉSZÍTÉS:
+# VISIBLE_SOURCE_REFERENCE_V1: teljes szöveg a mentett HTML-ben, nem összefoglaló.
+# Snapshot: tool/web_import_poc/results/b2_0_sources/source_16.html
+# SHA256: 7C66ECCDFCFA8F93FF3DE2FB58AD6A117C32854780D1EC65F6B7DEE210E18BF4
+1. @VISIBLE .method-steps__list-item | index=0 | content=.editor-content | heading=step 1
+2. @VISIBLE .method-steps__list-item | index=1 | content=.editor-content | heading=step 2
+3. @VISIBLE .method-steps__list-item | index=2 | content=.editor-content | heading=step 3
+4. @VISIBLE .method-steps__list-item | index=3 | content=.editor-content | heading=step 4
+5. @VISIBLE .method-steps__list-item | index=4 | content=.editor-content | heading=step 5
+6. @VISIBLE .method-steps__list-item | index=5 | content=.editor-content | heading=step 6
+7. @VISIBLE .method-steps__list-item | index=6 | content=.editor-content | heading=step 7
+8. @VISIBLE .method-steps__list-item | index=7 | content=.editor-content | heading=step 8
+9. @VISIBLE .method-steps__list-item | index=8 | content=.editor-content | heading=step 9
+10. @VISIBLE .method-steps__list-item | index=9 | content=.editor-content | heading=step 10
+11. @VISIBLE .method-steps__list-item | index=10 | content=.editor-content | heading=step 11
+12. @VISIBLE .method-steps__list-item | index=11 | content=.editor-content | heading=step 12

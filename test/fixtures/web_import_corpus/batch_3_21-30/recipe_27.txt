@@ -1,0 +1,19 @@
+CÍM:
+Real tomato soup
+
+HOZZÁVALÓK:
+2 tbsp olive oil
+1 onion chopped
+1 garlic clove finely chopped
+1 tbsp tomato purée
+400g can chopped tomato
+handful basil leaf
+pinch bicarbonate of soda
+600ml milk
+
+ELKÉSZÍTÉS:
+# VISIBLE_SOURCE_REFERENCE_V1: teljes szöveg a mentett HTML-ben, nem összefoglaló.
+# Snapshot: tool/web_import_poc/results/b3_0_sources/source_27.html
+# SHA256: 89199BA080737CBBD4ECC2287655C577427E1EE4E40B542826B0C18697A63E57
+1. @VISIBLE .method-steps__list-item | index=0 | content=.editor-content | heading=step 1
+2. @VISIBLE .method-steps__list-item | index=1 | content=.editor-content | heading=step 2

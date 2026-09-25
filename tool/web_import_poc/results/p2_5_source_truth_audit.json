@@ -1,0 +1,637 @@
+{
+  "method": "Offline saved visible HTML nodes vs JSON-LD vs frozen original P2 GT; no HTTP, AI service, parser or extractor modification. DOM selectors are audit evidence only, not a fallback pipeline.",
+  "summary": {
+    "primary_audit_decisions": {
+      "FORMAT_DIFFERENCE": 10,
+      "SOURCE_JSONLD_ERROR": 17,
+      "GROUND_TRUTH_ERROR": 6
+    },
+    "incidental_source_errors": 5,
+    "counting_unit": "One ingredient row, one complete instruction-reference correction per recipe, one title per recipe, one markup-bearing step.",
+    "corrected_files": [
+      "recipe_03.txt",
+      "recipe_06.txt",
+      "recipe_08.txt",
+      "recipe_09.txt",
+      "recipe_10.txt"
+    ],
+    "extractor": {
+      "ingredients_preserved": 100,
+      "ingredients_total": 100,
+      "steps_preserved": 56,
+      "steps_total": 56,
+      "rows_lost": 0,
+      "rows_added": 0,
+      "order_errors": 0,
+      "instruction_loss": 0,
+      "fidelity_percent": 100
+    },
+    "source_quality": {
+      "ingredient_mismatches": 22,
+      "ingredient_rows_total": 100,
+      "ingredient_content_agreement_percent": 78,
+      "quantity_mismatches": 15,
+      "truncated_fraction_rows": 8,
+      "spurious_zero_rows": 7,
+      "instruction_omissions": 0,
+      "title_decoration_only": 5
+    },
+    "verdicts": {
+      "PERFECT": 0,
+      "ACCEPTABLE": 3,
+      "PARTIAL": 7,
+      "FAILED": 0
+    },
+    "scope_note": "Primary 21 ingredients + 06/08 instructions + titles/markup. Five incidental ingredient-note omissions are separately disclosed and included in source-quality verdict. Other GT instructions remain paraphrased; no literal instruction accuracy is claimed."
+  },
+  "decisions": [
+    {
+      "id": "01",
+      "url": "https://www.mindmegette.hu/recept/rakott-krumpli",
+      "snapshot": "html/p1_01.html",
+      "location": "title",
+      "category": "FORMAT_DIFFERENCE",
+      "visible_page_value": "Rakott krumpli",
+      "json_ld_value": "Rakott krumpli | Mindmegette.hu",
+      "ground_truth_value": "Rakott krumpli",
+      "evidence": "A látható h1 receptcímhez a JSON-LD webhely-utótagot ad.",
+      "incidental": false
+    },
+    {
+      "id": "01",
+      "url": "https://www.mindmegette.hu/recept/rakott-krumpli",
+      "snapshot": "html/p1_01.html",
+      "location": "instruction 2 markup",
+      "category": "FORMAT_DIFFERENCE",
+      "visible_page_value": "A krumplit felöntjük annyi hideg vízzel, hogy bőven ellepje.",
+      "json_ld_value": "A krumplit felöntjük annyi hideg vízzel, hogy bőven ellepje.&nbsp;",
+      "ground_truth_value": [
+        "1. A burgonyát héjában sós vízben főzd puhára, majd hűtsd le, hámozd meg és karikázd fel.",
+        "2. A tojásokat főzd keményre, hűtsd le, hámozd meg és szeleteld fel.",
+        "3. A kolbászt karikázd fel, a tejfölt keverd össze a tojássárgájával.",
+        "4. Vajazz ki egy sütőtálat, majd rétegezd a burgonyát, tojást, kolbászt és tejfölt.",
+        "5. A tetejére kerüljön a maradék tejföl és a bacon.",
+        "6. 180 °C-on süsd aranybarnára, nagyjából 35–40 perc alatt."
+      ],
+      "evidence": "A látható HTML whitespace-ként jeleníti meg az &nbsp; entitást; a JSON-LD-ben entitásszöveg marad. Nincs tartalomveszteség.",
+      "incidental": false
+    },
+    {
+      "id": "01",
+      "url": "https://www.mindmegette.hu/recept/rakott-krumpli",
+      "snapshot": "html/p1_01.html",
+      "location": "instruction 4 markup",
+      "category": "FORMAT_DIFFERENCE",
+      "visible_page_value": "A tojásokat sós, hideg vízben feltesszük főni, és a forrástól számított 8 percig főzzük, majd hideg vízbe merítve azonnal lehűtjük.",
+      "json_ld_value": "A tojásokat sós, hideg vízben feltesszük főni, és a forrástól számított 8 percig főzzük, majd hideg vízbe merítve azonnal lehűtjük.&nbsp;",
+      "ground_truth_value": [
+        "1. A burgonyát héjában sós vízben főzd puhára, majd hűtsd le, hámozd meg és karikázd fel.",
+        "2. A tojásokat főzd keményre, hűtsd le, hámozd meg és szeleteld fel.",
+        "3. A kolbászt karikázd fel, a tejfölt keverd össze a tojássárgájával.",
+        "4. Vajazz ki egy sütőtálat, majd rétegezd a burgonyát, tojást, kolbászt és tejfölt.",
+        "5. A tetejére kerüljön a maradék tejföl és a bacon.",
+        "6. 180 °C-on süsd aranybarnára, nagyjából 35–40 perc alatt."
+      ],
+      "evidence": "A látható HTML whitespace-ként jeleníti meg az &nbsp; entitást; a JSON-LD-ben entitásszöveg marad. Nincs tartalomveszteség.",
+      "incidental": false
+    },
+    {
+      "id": "01",
+      "url": "https://www.mindmegette.hu/recept/rakott-krumpli",
+      "snapshot": "html/p1_01.html",
+      "location": "instruction 6 markup",
+      "category": "FORMAT_DIFFERENCE",
+      "visible_page_value": "A kolbászt meleg vízzel leöblítjük, így könnyen lehúzhatjuk a héját, aztán vékonyan felkarikázzuk.",
+      "json_ld_value": "A kolbászt meleg vízzel leöblítjük, így könnyen lehúzhatjuk a héját, aztán vékonyan felkarikázzuk.&nbsp;",
+      "ground_truth_value": [
+        "1. A burgonyát héjában sós vízben főzd puhára, majd hűtsd le, hámozd meg és karikázd fel.",
+        "2. A tojásokat főzd keményre, hűtsd le, hámozd meg és szeleteld fel.",
+        "3. A kolbászt karikázd fel, a tejfölt keverd össze a tojássárgájával.",
+        "4. Vajazz ki egy sütőtálat, majd rétegezd a burgonyát, tojást, kolbászt és tejfölt.",
+        "5. A tetejére kerüljön a maradék tejföl és a bacon.",
+        "6. 180 °C-on süsd aranybarnára, nagyjából 35–40 perc alatt."
+      ],
+      "evidence": "A látható HTML whitespace-ként jeleníti meg az &nbsp; entitást; a JSON-LD-ben entitásszöveg marad. Nincs tartalomveszteség.",
+      "incidental": false
+    },
+    {
+      "id": "01",
+      "url": "https://www.mindmegette.hu/recept/rakott-krumpli",
+      "snapshot": "html/p1_01.html",
+      "location": "instruction 7 markup",
+      "category": "FORMAT_DIFFERENCE",
+      "visible_page_value": "A tejfölt egy kis tálba tesszük és elkeverjük benne a tojássárgákat.",
+      "json_ld_value": "A tejfölt egy kis tálba tesszük és elkeverjük benne a tojássárgákat.&nbsp;",
+      "ground_truth_value": [
+        "1. A burgonyát héjában sós vízben főzd puhára, majd hűtsd le, hámozd meg és karikázd fel.",
+        "2. A tojásokat főzd keményre, hűtsd le, hámozd meg és szeleteld fel.",
+        "3. A kolbászt karikázd fel, a tejfölt keverd össze a tojássárgájával.",
+        "4. Vajazz ki egy sütőtálat, majd rétegezd a burgonyát, tojást, kolbászt és tejfölt.",
+        "5. A tetejére kerüljön a maradék tejföl és a bacon.",
+        "6. 180 °C-on süsd aranybarnára, nagyjából 35–40 perc alatt."
+      ],
+      "evidence": "A látható HTML whitespace-ként jeleníti meg az &nbsp; entitást; a JSON-LD-ben entitásszöveg marad. Nincs tartalomveszteség.",
+      "incidental": false
+    },
+    {
+      "id": "02",
+      "url": "https://www.mindmegette.hu/recept/fasirt",
+      "snapshot": "html/p1_02.html",
+      "location": "ingredient 1",
+      "category": "SOURCE_JSONLD_ERROR",
+      "visible_page_value": "50 dkg sertéshús (darált, lapocka vagy comb)",
+      "json_ld_value": "50 dkg sertéshús",
+      "ground_truth_value": "50 dkg darált sertéshús",
+      "evidence": "A .ingredients-meta small elemben a jelző látható, de a JSON-LD kihagyja.",
+      "incidental": false
+    },
+    {
+      "id": "02",
+      "url": "https://www.mindmegette.hu/recept/fasirt",
+      "snapshot": "html/p1_02.html",
+      "location": "ingredient 8",
+      "category": "SOURCE_JSONLD_ERROR",
+      "visible_page_value": "1 tk fűszerpaprika (őrölt)",
+      "json_ld_value": "1 tk fűszerpaprika",
+      "ground_truth_value": "1 tk őrölt fűszerpaprika",
+      "evidence": "A .ingredients-meta small elemben a jelző látható, de a JSON-LD kihagyja.",
+      "incidental": false
+    },
+    {
+      "id": "02",
+      "url": "https://www.mindmegette.hu/recept/fasirt",
+      "snapshot": "html/p1_02.html",
+      "location": "ingredient 3",
+      "category": "SOURCE_JSONLD_ERROR",
+      "visible_page_value": "1 fej vöröshagyma (kicsi)",
+      "json_ld_value": "1 fej Vöröshagyma",
+      "ground_truth_value": "1 fej vöröshagyma",
+      "evidence": "További látható zárójeles megjegyzés hiányzik a JSON-LD-ből és a régi GT-ből is. Külön, járulékos találat; GT itt nem módosult.",
+      "incidental": true
+    },
+    {
+      "id": "02",
+      "url": "https://www.mindmegette.hu/recept/fasirt",
+      "snapshot": "html/p1_02.html",
+      "location": "title",
+      "category": "FORMAT_DIFFERENCE",
+      "visible_page_value": "Fasírt",
+      "json_ld_value": "Fasírt | Mindmegette.hu",
+      "ground_truth_value": "Fasírt",
+      "evidence": "A látható h1 receptcímhez a JSON-LD webhely-utótagot ad.",
+      "incidental": false
+    },
+    {
+      "id": "03",
+      "url": "https://www.mindmegette.hu/recept/husleves",
+      "snapshot": "html/p1_03.html",
+      "location": "ingredient 14",
+      "category": "GROUND_TRUTH_ERROR",
+      "visible_page_value": "10 dkg levelestészta",
+      "json_ld_value": "10 dkg levelestészta",
+      "ground_truth_value": "10 dkg levesbetét tészta",
+      "evidence": "A látható recept és a JSON-LD azonos információt ad; a referencia átírta a nevet vagy kihagyta a megjegyzést.",
+      "incidental": false
+    },
+    {
+      "id": "03",
+      "url": "https://www.mindmegette.hu/recept/husleves",
+      "snapshot": "html/p1_03.html",
+      "location": "ingredient 3",
+      "category": "SOURCE_JSONLD_ERROR",
+      "visible_page_value": "50 dkg vegyes zöldség (sárgarépa, fehérrépa, zeller, karalábé)",
+      "json_ld_value": "50 dkg vegyes zöldség",
+      "ground_truth_value": "50 dkg vegyes zöldség",
+      "evidence": "További látható zárójeles megjegyzés hiányzik a JSON-LD-ből és a régi GT-ből is. Külön, járulékos találat; GT itt nem módosult.",
+      "incidental": true
+    },
+    {
+      "id": "03",
+      "url": "https://www.mindmegette.hu/recept/husleves",
+      "snapshot": "html/p1_03.html",
+      "location": "ingredient 4",
+      "category": "SOURCE_JSONLD_ERROR",
+      "visible_page_value": "1 fej hagyma (közepes)",
+      "json_ld_value": "1 fej Hagyma",
+      "ground_truth_value": "1 fej hagyma",
+      "evidence": "További látható zárójeles megjegyzés hiányzik a JSON-LD-ből és a régi GT-ből is. Külön, járulékos találat; GT itt nem módosult.",
+      "incidental": true
+    },
+    {
+      "id": "03",
+      "url": "https://www.mindmegette.hu/recept/husleves",
+      "snapshot": "html/p1_03.html",
+      "location": "ingredient 7",
+      "category": "SOURCE_JSONLD_ERROR",
+      "visible_page_value": "cseresznyepaprika (körömnyi )",
+      "json_ld_value": "cseresznyepaprika",
+      "ground_truth_value": "cseresznyepaprika",
+      "evidence": "További látható zárójeles megjegyzés hiányzik a JSON-LD-ből és a régi GT-ből is. Külön, járulékos találat; GT itt nem módosult.",
+      "incidental": true
+    },
+    {
+      "id": "03",
+      "url": "https://www.mindmegette.hu/recept/husleves",
+      "snapshot": "html/p1_03.html",
+      "location": "ingredient 8",
+      "category": "SOURCE_JSONLD_ERROR",
+      "visible_page_value": "1 csapott mokkáskanál szeklice (sáfrányos )",
+      "json_ld_value": "1 csapott mokkáskanál szeklice",
+      "ground_truth_value": "1 csapott mokkáskanál szeklice",
+      "evidence": "További látható zárójeles megjegyzés hiányzik a JSON-LD-ből és a régi GT-ből is. Külön, járulékos találat; GT itt nem módosult.",
+      "incidental": true
+    },
+    {
+      "id": "03",
+      "url": "https://www.mindmegette.hu/recept/husleves",
+      "snapshot": "html/p1_03.html",
+      "location": "title",
+      "category": "FORMAT_DIFFERENCE",
+      "visible_page_value": "Húsleves",
+      "json_ld_value": "Húsleves | Mindmegette.hu",
+      "ground_truth_value": "Húsleves",
+      "evidence": "A látható h1 receptcímhez a JSON-LD webhely-utótagot ad.",
+      "incidental": false
+    },
+    {
+      "id": "04",
+      "url": "https://www.mindmegette.hu/recept/eredeti-tiramisu",
+      "snapshot": "html/p1_04.html",
+      "location": "title",
+      "category": "FORMAT_DIFFERENCE",
+      "visible_page_value": "Eredeti tiramisu",
+      "json_ld_value": "Eredeti tiramisu | Mindmegette.hu",
+      "ground_truth_value": "Eredeti tiramisu",
+      "evidence": "A látható h1 receptcímhez a JSON-LD webhely-utótagot ad.",
+      "incidental": false
+    },
+    {
+      "id": "05",
+      "url": "https://www.mindmegette.hu/recept/zserbo-alaprecept",
+      "snapshot": "html/p1_05.html",
+      "location": "title",
+      "category": "FORMAT_DIFFERENCE",
+      "visible_page_value": "Zserbó alaprecept",
+      "json_ld_value": "Zserbó alaprecept | Mindmegette.hu",
+      "ground_truth_value": "Zserbó alaprecept",
+      "evidence": "A látható h1 receptcímhez a JSON-LD webhely-utótagot ad.",
+      "incidental": false
+    },
+    {
+      "id": "06",
+      "url": "https://www.nosalty.hu/recept/csirkepaprikas",
+      "snapshot": "html/p1_06.html",
+      "location": "ingredient 2",
+      "category": "SOURCE_JSONLD_ERROR",
+      "visible_page_value": "0.5 ek sertészsír",
+      "json_ld_value": "0 ek Sertészsír",
+      "ground_truth_value": "0.5 ek sertészsír",
+      "evidence": "A #ingredients listában a tört mennyiség / mennyiség nélküli ízlés szerint helyes; a JSON-LD csonkol vagy 0 előtagot illeszt be.",
+      "incidental": false
+    },
+    {
+      "id": "06",
+      "url": "https://www.nosalty.hu/recept/csirkepaprikas",
+      "snapshot": "html/p1_06.html",
+      "location": "ingredient 3",
+      "category": "SOURCE_JSONLD_ERROR",
+      "visible_page_value": "0.5 közepes db vöröshagyma",
+      "json_ld_value": "0 közepes db Vöröshagyma",
+      "ground_truth_value": "0.5 közepes db vöröshagyma",
+      "evidence": "A #ingredients listában a tört mennyiség / mennyiség nélküli ízlés szerint helyes; a JSON-LD csonkol vagy 0 előtagot illeszt be.",
+      "incidental": false
+    },
+    {
+      "id": "06",
+      "url": "https://www.nosalty.hu/recept/csirkepaprikas",
+      "snapshot": "html/p1_06.html",
+      "location": "ingredient 4",
+      "category": "SOURCE_JSONLD_ERROR",
+      "visible_page_value": "0.5 teáskanál fűszerpaprika",
+      "json_ld_value": "0 teáskanál Fűszerpaprika",
+      "ground_truth_value": "0.5 tk fűszerpaprika",
+      "evidence": "A #ingredients listában a tört mennyiség / mennyiség nélküli ízlés szerint helyes; a JSON-LD csonkol vagy 0 előtagot illeszt be.",
+      "incidental": false
+    },
+    {
+      "id": "06",
+      "url": "https://www.nosalty.hu/recept/csirkepaprikas",
+      "snapshot": "html/p1_06.html",
+      "location": "ingredient 9",
+      "category": "SOURCE_JSONLD_ERROR",
+      "visible_page_value": "só ízlés szerint",
+      "json_ld_value": "0 ízlés szerint Só",
+      "ground_truth_value": "só ízlés szerint",
+      "evidence": "A #ingredients listában a tört mennyiség / mennyiség nélküli ízlés szerint helyes; a JSON-LD csonkol vagy 0 előtagot illeszt be.",
+      "incidental": false
+    },
+    {
+      "id": "06",
+      "url": "https://www.nosalty.hu/recept/csirkepaprikas",
+      "snapshot": "html/p1_06.html",
+      "location": "ingredient 10",
+      "category": "SOURCE_JSONLD_ERROR",
+      "visible_page_value": "bors ízlés szerint",
+      "json_ld_value": "0 ízlés szerint Bors",
+      "ground_truth_value": "bors ízlés szerint",
+      "evidence": "A #ingredients listában a tört mennyiség / mennyiség nélküli ízlés szerint helyes; a JSON-LD csonkol vagy 0 előtagot illeszt be.",
+      "incidental": false
+    },
+    {
+      "id": "06",
+      "url": "https://www.nosalty.hu/recept/csirkepaprikas",
+      "snapshot": "html/p1_06.html",
+      "location": "instructions",
+      "category": "GROUND_TRUTH_ERROR",
+      "visible_page_value": [
+        "A combokat megmossuk, szárazra itatjuk. A hagymát meghámozzuk, apróra vágjuk. A paprikát mossuk, kockára vágjuk. A paradicsomot mossuk, kockákra vágjuk.",
+        "A zsírt egy serpenyőben felhevítjük, rászórjuk a hagymát, és megpirítjuk. A tűzről levesszük, hozzákeverjük az édesnemes paprikát és kb. 100 ml vizet öntünk hozzá. Hozzáadjuk a csirkecombokat, a zöldpaprikát és a paradicsomot. Sóval, borssal ízesítjük.",
+        "Fedő alatt mérsékelt tűzőn, puhára pároljuk (ha szükséges öntsünk hozzá kevés vizet). A húst kiszedjük. A párolólét botmixerrel pürésítjük, hozzáadjuk a liszttel elkevert tejfölt, és 2-3 perc alatt mártássá forraljuk. A combokkal együtt még egyszer felforraljuk."
+      ],
+      "json_ld_value": [
+        "A combokat megmossuk, szárazra itatjuk. A hagymát meghámozzuk, apróra vágjuk. A paprikát mossuk, kockára vágjuk. A paradicsomot mossuk, kockákra vágjuk.",
+        "A zsírt egy serpenyőben felhevítjük, rászórjuk a hagymát, és megpirítjuk. A tűzről levesszük, hozzákeverjük az édesnemes paprikát és kb. 100 ml vizet öntünk hozzá. Hozzáadjuk a csirkecombokat, a zöldpaprikát és a paradicsomot. Sóval, borssal ízesítjük.",
+        "Fedő alatt mérsékelt tűzőn, puhára pároljuk (ha szükséges öntsünk hozzá kevés vizet). A húst kiszedjük. A párolólét botmixerrel pürésítjük, hozzáadjuk a liszttel elkevert tejfölt, és 2-3 perc alatt mártássá forraljuk. A combokkal együtt még egyszer felforraljuk."
+      ],
+      "ground_truth_value": [
+        "1. A hagymát zsíron párold üvegesre, majd húzd le a tűzről és keverd hozzá a pirospaprikát.",
+        "2. Add hozzá a csirkét, a paprikát és paradicsomot, sózd, borsozd, majd kevés vízzel párold puhára.",
+        "3. A tejfölt keverd simára a liszttel.",
+        "4. Hőkiegyenlítés után keverd a tejfölös habarást a szaftba, és röviden forrald össze.",
+        "5. Nokedlivel vagy más körettel tálald."
+      ],
+      "evidence": "A látható 3 lépés egyezik a JSON-LD-vel; nincs hőkiegyenlítés/köret-tálalás, van botmixerezés. A referencia hozzáírt és elhagyott részleteket.",
+      "incidental": false
+    },
+    {
+      "id": "07",
+      "url": "https://www.nosalty.hu/recept/palacsinta-alaprecept",
+      "snapshot": "html/p1_07.html",
+      "location": "ingredient 7",
+      "category": "SOURCE_JSONLD_ERROR",
+      "visible_page_value": "0.5 dl napraforgó olaj",
+      "json_ld_value": "0 dl Napraforgó olaj",
+      "ground_truth_value": "0.5 dl napraforgó olaj",
+      "evidence": "A #ingredients listában a tört mennyiség / mennyiség nélküli ízlés szerint helyes; a JSON-LD csonkol vagy 0 előtagot illeszt be.",
+      "incidental": false
+    },
+    {
+      "id": "08",
+      "url": "https://www.nosalty.hu/recept/turos-csusza",
+      "snapshot": "html/p1_08.html",
+      "location": "ingredient 2",
+      "category": "SOURCE_JSONLD_ERROR",
+      "visible_page_value": "só ízlés szerint",
+      "json_ld_value": "0 ízlés szerint Só",
+      "ground_truth_value": "só ízlés szerint",
+      "evidence": "A #ingredients listában a tört mennyiség / mennyiség nélküli ízlés szerint helyes; a JSON-LD csonkol vagy 0 előtagot illeszt be.",
+      "incidental": false
+    },
+    {
+      "id": "08",
+      "url": "https://www.nosalty.hu/recept/turos-csusza",
+      "snapshot": "html/p1_08.html",
+      "location": "ingredient 4",
+      "category": "SOURCE_JSONLD_ERROR",
+      "visible_page_value": "2.5 dl víz",
+      "json_ld_value": "2 dl Víz",
+      "ground_truth_value": "2.5 dl víz",
+      "evidence": "A #ingredients listában a tört mennyiség / mennyiség nélküli ízlés szerint helyes; a JSON-LD csonkol vagy 0 előtagot illeszt be.",
+      "incidental": false
+    },
+    {
+      "id": "08",
+      "url": "https://www.nosalty.hu/recept/turos-csusza",
+      "snapshot": "html/p1_08.html",
+      "location": "ingredient 5",
+      "category": "SOURCE_JSONLD_ERROR",
+      "visible_page_value": "2.5 dl tejföl",
+      "json_ld_value": "2 dl Tejföl",
+      "ground_truth_value": "2.5 dl tejföl",
+      "evidence": "A #ingredients listában a tört mennyiség / mennyiség nélküli ízlés szerint helyes; a JSON-LD csonkol vagy 0 előtagot illeszt be.",
+      "incidental": false
+    },
+    {
+      "id": "08",
+      "url": "https://www.nosalty.hu/recept/turos-csusza",
+      "snapshot": "html/p1_08.html",
+      "location": "instructions",
+      "category": "GROUND_TRUTH_ERROR",
+      "visible_page_value": [
+        "A tésztát lobogó, enyhén sós vízben fogkeményre kifőzzük.",
+        "A szalonnát egy centis darabokra felkockázzuk, serpenyőbe tesszük. Felöntjük annyi vízzel, ami éppen ellepi, és közepes lángon melegíteni kezdjük. Egészen addig folytatjuk, amíg minden csepp víz el nem párolog, sőt utána szép barnára, zsírjára sütjük. (A vízre azért van szükség, mert így kívül ropogós, de belül puha marad.) Ha elkészült, akkor szűrőlapáttal kivesszük a szalonnát, és félretesszük.",
+        "A zsírt is kiöntjük, csak három evőkanállal hagyunk benne, ehhez hozzáadjuk a tejfölt, és alaposan elkeverjük.",
+        "A kifőtt tésztát összeforgatjuk a tejfölös keverék és a túró egyharmadával, majd a sütőt grill fokozatra és maximum hőfokra állítjuk, és 10-12 percre betesszük, amíg meg nem pirul a tészta széle.",
+        "Kivesszük a tésztát a sütőből, átforgatjuk, majd hozzáadjuk a túró és tejföl második harmadát, és újra visszatesszük a sütőbe 10 percre.",
+        "Ha kész, azonnal tálaljuk. A tetejét a maradék tejföllel és túróval meglocsoljuk."
+      ],
+      "json_ld_value": [
+        "A tésztát lobogó, enyhén sós vízben fogkeményre kifőzzük.",
+        "A szalonnát egy centis darabokra felkockázzuk, serpenyőbe tesszük. Felöntjük annyi vízzel, ami éppen ellepi, és közepes lángon melegíteni kezdjük. Egészen addig folytatjuk, amíg minden csepp víz el nem párolog, sőt utána szép barnára, zsírjára sütjük. (A vízre azért van szükség, mert így kívül ropogós, de belül puha marad.) Ha elkészült, akkor szűrőlapáttal kivesszük a szalonnát, és félretesszük.",
+        "A zsírt is kiöntjük, csak három evőkanállal hagyunk benne, ehhez hozzáadjuk a tejfölt, és alaposan elkeverjük.",
+        "A kifőtt tésztát összeforgatjuk a tejfölös keverék és a túró egyharmadával, majd a sütőt grill fokozatra és maximum hőfokra állítjuk, és 10-12 percre betesszük, amíg meg nem pirul a tészta széle.",
+        "Kivesszük a tésztát a sütőből, átforgatjuk, majd hozzáadjuk a túró és tejföl második harmadát, és újra visszatesszük a sütőbe 10 percre.",
+        "Ha kész, azonnal tálaljuk. A tetejét a maradék tejföllel és túróval meglocsoljuk."
+      ],
+      "ground_truth_value": [
+        "1. A tésztát sós vízben főzd fogkeményre.",
+        "2. A szalonnát kockázd fel, kevés vízzel kezdd sütni, majd pirítsd zsírjára.",
+        "3. A visszamaradt zsír egy részét keverd össze tejföllel.",
+        "4. A tésztát forgasd össze a tejfölös keverékkel és a túró egy részével.",
+        "5. Grill alatt pirítsd meg, majd add hozzá a maradék túrót és tejfölt, és röviden süsd tovább.",
+        "6. A ropogós szalonnával tálald."
+      ],
+      "evidence": "A látható 6 lépés egyezik a JSON-LD-vel; a tálalás tejfölt/túrót említ, nem szalonnát. A weboldalt nem javítjuk főzési tudásból.",
+      "incidental": false
+    },
+    {
+      "id": "09",
+      "url": "https://www.nosalty.hu/recept/eredeti-brassoi-apropecsenye",
+      "snapshot": "html/p1_09.html",
+      "location": "ingredient 1",
+      "category": "GROUND_TRUTH_ERROR",
+      "visible_page_value": "1 kg sertéshús (az eredeti recept bélszínt ír)",
+      "json_ld_value": "1 kg Sertéshús az eredeti recept bélszínt ír",
+      "ground_truth_value": "1 kg sertéshús",
+      "evidence": "A látható recept és a JSON-LD azonos információt ad; a referencia átírta a nevet vagy kihagyta a megjegyzést.",
+      "incidental": false
+    },
+    {
+      "id": "09",
+      "url": "https://www.nosalty.hu/recept/eredeti-brassoi-apropecsenye",
+      "snapshot": "html/p1_09.html",
+      "location": "ingredient 2",
+      "category": "GROUND_TRUTH_ERROR",
+      "visible_page_value": "15 dkg füstölt szalonna (ízlés szerint)",
+      "json_ld_value": "15 dkg Füstölt szalonna ízlés szerint",
+      "ground_truth_value": "15 dkg füstölt szalonna",
+      "evidence": "A látható recept és a JSON-LD azonos információt ad; a referencia átírta a nevet vagy kihagyta a megjegyzést.",
+      "incidental": false
+    },
+    {
+      "id": "09",
+      "url": "https://www.nosalty.hu/recept/eredeti-brassoi-apropecsenye",
+      "snapshot": "html/p1_09.html",
+      "location": "ingredient 3",
+      "category": "SOURCE_JSONLD_ERROR",
+      "visible_page_value": "1.5 kg burgonya",
+      "json_ld_value": "1 kg Burgonya",
+      "ground_truth_value": "1.5 kg burgonya",
+      "evidence": "A #ingredients listában a tört mennyiség / mennyiség nélküli ízlés szerint helyes; a JSON-LD csonkol vagy 0 előtagot illeszt be.",
+      "incidental": false
+    },
+    {
+      "id": "09",
+      "url": "https://www.nosalty.hu/recept/eredeti-brassoi-apropecsenye",
+      "snapshot": "html/p1_09.html",
+      "location": "ingredient 6",
+      "category": "SOURCE_JSONLD_ERROR",
+      "visible_page_value": "só ízlés szerint",
+      "json_ld_value": "0 ízlés szerint Só",
+      "ground_truth_value": "só ízlés szerint",
+      "evidence": "A #ingredients listában a tört mennyiség / mennyiség nélküli ízlés szerint helyes; a JSON-LD csonkol vagy 0 előtagot illeszt be.",
+      "incidental": false
+    },
+    {
+      "id": "09",
+      "url": "https://www.nosalty.hu/recept/eredeti-brassoi-apropecsenye",
+      "snapshot": "html/p1_09.html",
+      "location": "ingredient 7",
+      "category": "SOURCE_JSONLD_ERROR",
+      "visible_page_value": "bors ízlés szerint",
+      "json_ld_value": "0 ízlés szerint Bors",
+      "ground_truth_value": "bors ízlés szerint",
+      "evidence": "A #ingredients listában a tört mennyiség / mennyiség nélküli ízlés szerint helyes; a JSON-LD csonkol vagy 0 előtagot illeszt be.",
+      "incidental": false
+    },
+    {
+      "id": "09",
+      "url": "https://www.nosalty.hu/recept/eredeti-brassoi-apropecsenye",
+      "snapshot": "html/p1_09.html",
+      "location": "ingredient 8",
+      "category": "SOURCE_JSONLD_ERROR",
+      "visible_page_value": "majoranna ízlés szerint",
+      "json_ld_value": "0 ízlés szerint Majoranna",
+      "ground_truth_value": "majoranna ízlés szerint",
+      "evidence": "A #ingredients listában a tört mennyiség / mennyiség nélküli ízlés szerint helyes; a JSON-LD csonkol vagy 0 előtagot illeszt be.",
+      "incidental": false
+    },
+    {
+      "id": "09",
+      "url": "https://www.nosalty.hu/recept/eredeti-brassoi-apropecsenye",
+      "snapshot": "html/p1_09.html",
+      "location": "ingredient 9",
+      "category": "SOURCE_JSONLD_ERROR",
+      "visible_page_value": "kakukkfű ízlés szerint",
+      "json_ld_value": "0 ízlés szerint Kakukkfű",
+      "ground_truth_value": "kakukkfű ízlés szerint",
+      "evidence": "A #ingredients listában a tört mennyiség / mennyiség nélküli ízlés szerint helyes; a JSON-LD csonkol vagy 0 előtagot illeszt be.",
+      "incidental": false
+    },
+    {
+      "id": "10",
+      "url": "https://www.nosalty.hu/recept/sajtos-pogacsa",
+      "snapshot": "html/p1_10.html",
+      "location": "ingredient 5",
+      "category": "SOURCE_JSONLD_ERROR",
+      "visible_page_value": "2.5 dkg friss élesztő",
+      "json_ld_value": "2 dkg Friss élesztő",
+      "ground_truth_value": "2.5 dkg friss élesztő",
+      "evidence": "A #ingredients listában a tört mennyiség / mennyiség nélküli ízlés szerint helyes; a JSON-LD csonkol vagy 0 előtagot illeszt be.",
+      "incidental": false
+    },
+    {
+      "id": "10",
+      "url": "https://www.nosalty.hu/recept/sajtos-pogacsa",
+      "snapshot": "html/p1_10.html",
+      "location": "ingredient 6",
+      "category": "GROUND_TRUTH_ERROR",
+      "visible_page_value": "1 dl tej (langyos)",
+      "json_ld_value": "1 dl Tej langyos",
+      "ground_truth_value": "1 dl tej",
+      "evidence": "A látható recept és a JSON-LD azonos információt ad; a referencia átírta a nevet vagy kihagyta a megjegyzést.",
+      "incidental": false
+    },
+    {
+      "id": "10",
+      "url": "https://www.nosalty.hu/recept/sajtos-pogacsa",
+      "snapshot": "html/p1_10.html",
+      "location": "instruction 7 markup",
+      "category": "FORMAT_DIFFERENCE",
+      "visible_page_value": "Lehetőség szerint magas falú tepsibe pakoljuk őket egymástól kb. 2 centire, hogy ne nőjenek össze. 180 fokos sütőben 25 perc alatt készre sütjük.",
+      "json_ld_value": "Lehetőség szerint magas falú tepsibe pakoljuk őket egymástól kb. 2 centire, hogy ne nőjenek össze.\r\n\r\n180 fokos sütőben 25 perc alatt készre sütjük.",
+      "ground_truth_value": [
+        "1. Az élesztőt langyos, enyhén cukros tejben futtasd fel.",
+        "2. A lisztet morzsold össze a vajjal és sóval, majd add hozzá a tejfölös tojást és az élesztőt.",
+        "3. Gyúrd össze és keleszd körülbelül fél órát.",
+        "4. Nyújtsd és hajtogasd többször rövid pihentetésekkel.",
+        "5. Nyújtsd kb. 1,5 cm vastagra, kend meg tojással és szórd meg sajttal.",
+        "6. Szaggasd ki, majd 180 °C-on süsd nagyjából 25 percig."
+      ],
+      "evidence": "A dekódolt JSON-LD valódi CR/LF sortörést tartalmaz, nem literális backslash-r/backslash-n karaktereket. A P2 korábbi megfogalmazása pontatlan volt. Nincs tartalomveszteség.",
+      "incidental": false
+    }
+  ],
+  "ground_truth_changes": [
+    {
+      "id": "03",
+      "location": "ingredient 14",
+      "before": "10 dkg levesbetét tészta",
+      "after": "10 dkg levelestészta"
+    },
+    {
+      "id": "06",
+      "location": "instructions",
+      "before": [
+        "1. A hagymát zsíron párold üvegesre, majd húzd le a tűzről és keverd hozzá a pirospaprikát.",
+        "2. Add hozzá a csirkét, a paprikát és paradicsomot, sózd, borsozd, majd kevés vízzel párold puhára.",
+        "3. A tejfölt keverd simára a liszttel.",
+        "4. Hőkiegyenlítés után keverd a tejfölös habarást a szaftba, és röviden forrald össze.",
+        "5. Nokedlivel vagy más körettel tálald."
+      ],
+      "after": [
+        "1. A combokat megmossuk, szárazra itatjuk. A hagymát meghámozzuk, apróra vágjuk. A paprikát mossuk, kockára vágjuk. A paradicsomot mossuk, kockákra vágjuk.",
+        "2. A zsírt egy serpenyőben felhevítjük, rászórjuk a hagymát, és megpirítjuk. A tűzről levesszük, hozzákeverjük az édesnemes paprikát és kb. 100 ml vizet öntünk hozzá. Hozzáadjuk a csirkecombokat, a zöldpaprikát és a paradicsomot. Sóval, borssal ízesítjük.",
+        "3. Fedő alatt mérsékelt tűzőn, puhára pároljuk (ha szükséges öntsünk hozzá kevés vizet). A húst kiszedjük. A párolólét botmixerrel pürésítjük, hozzáadjuk a liszttel elkevert tejfölt, és 2-3 perc alatt mártássá forraljuk. A combokkal együtt még egyszer felforraljuk."
+      ]
+    },
+    {
+      "id": "08",
+      "location": "instructions",
+      "before": [
+        "1. A tésztát sós vízben főzd fogkeményre.",
+        "2. A szalonnát kockázd fel, kevés vízzel kezdd sütni, majd pirítsd zsírjára.",
+        "3. A visszamaradt zsír egy részét keverd össze tejföllel.",
+        "4. A tésztát forgasd össze a tejfölös keverékkel és a túró egy részével.",
+        "5. Grill alatt pirítsd meg, majd add hozzá a maradék túrót és tejfölt, és röviden süsd tovább.",
+        "6. A ropogós szalonnával tálald."
+      ],
+      "after": [
+        "1. A tésztát lobogó, enyhén sós vízben fogkeményre kifőzzük.",
+        "2. A szalonnát egy centis darabokra felkockázzuk, serpenyőbe tesszük. Felöntjük annyi vízzel, ami éppen ellepi, és közepes lángon melegíteni kezdjük. Egészen addig folytatjuk, amíg minden csepp víz el nem párolog, sőt utána szép barnára, zsírjára sütjük. (A vízre azért van szükség, mert így kívül ropogós, de belül puha marad.) Ha elkészült, akkor szűrőlapáttal kivesszük a szalonnát, és félretesszük.",
+        "3. A zsírt is kiöntjük, csak három evőkanállal hagyunk benne, ehhez hozzáadjuk a tejfölt, és alaposan elkeverjük.",
+        "4. A kifőtt tésztát összeforgatjuk a tejfölös keverék és a túró egyharmadával, majd a sütőt grill fokozatra és maximum hőfokra állítjuk, és 10-12 percre betesszük, amíg meg nem pirul a tészta széle.",
+        "5. Kivesszük a tésztát a sütőből, átforgatjuk, majd hozzáadjuk a túró és tejföl második harmadát, és újra visszatesszük a sütőbe 10 percre.",
+        "6. Ha kész, azonnal tálaljuk. A tetejét a maradék tejföllel és túróval meglocsoljuk."
+      ]
+    },
+    {
+      "id": "09",
+      "location": "ingredient 1",
+      "before": "1 kg sertéshús",
+      "after": "1 kg sertéshús (az eredeti recept bélszínt ír)"
+    },
+    {
+      "id": "09",
+      "location": "ingredient 2",
+      "before": "15 dkg füstölt szalonna",
+      "after": "15 dkg füstölt szalonna (ízlés szerint)"
+    },
+    {
+      "id": "10",
+      "location": "ingredient 6",
+      "before": "1 dl tej",
+      "after": "1 dl tej (langyos)"
+    }
+  ]
+}

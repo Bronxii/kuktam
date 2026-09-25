@@ -1,0 +1,40 @@
+RECEPT: Fasírt
+
+HOZZÁVALÓK:
+500.0 g sertéshús
+2.0 db zsemle
+1.0 db fej Vöröshagyma
+1.0 db Olaj
+3.0 db gerezd Fokhagyma
+2.0 db Tojás
+1.0 db kis kanál Majoránna
+1.0 tk fűszerpaprika
+1.0 db Só
+1.0 db Bors
+100.0 g Zsemlemorzsa
+500.0 ml Olaj
+
+WARNING (POC auditjelölések, nem általános automatikus felismerés):
+1. sor: SOURCE_WARNING
+3. sor: SOURCE_WARNING, UNSUPPORTED_UNIT
+4. sor: missingQuantity
+5. sor: UNSUPPORTED_UNIT
+7. sor: UNSUPPORTED_UNIT
+8. sor: SOURCE_WARNING
+9. sor: missingQuantity
+10. sor: missingQuantity
+
+ELKÉSZÍTÉS:
+1. lépés: A fasírt elkészítéséhez a zsemlét vízbe áztatjuk, majd alaposan kinyomkodjuk. Az apróra vágott hagymát olajon megdinszteljük. A fokhagymát összenyomjuk.
+
+2. lépés: Minden hozzávalót alaposan összedolgozunk, majd ízlés szerint fűszerezzük a masszát.
+
+3. lépés: Vizes kézzel gombócokat formázunk (van, aki lapos pogácsákat készít), és zsemlemorzsában megforgatjuk.
+
+4. lépés: Végül nem túl forró olajban, oldalanként 5-5 perc alatt kisütjük a fasírtokat.
+
+FŰSZEREK: üres
+
+VERDICT: REVIEW
+A draft teljes, de parser/source/unsupported figyelmeztetés miatt ellenőrzés szükséges.
+Bizonyított mezőjavítás minimum: 3. Az unsupported egységek átváltása nincs találgatva; további user-döntést igényelhet.

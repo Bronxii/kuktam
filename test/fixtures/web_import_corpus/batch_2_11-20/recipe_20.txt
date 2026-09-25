@@ -1,0 +1,29 @@
+CÍM:
+Easy classic lasagne
+
+HOZZÁVALÓK:
+1 tbsp olive oil
+2 rashers smoked streaky bacon
+1 onion finely chopped
+1 celery stick, finely chopped
+1 medium carrot grated
+2 garlic cloves finely chopped
+500g beef mince
+1 tbsp tomato purée
+2 x 400g cans chopped tomatoes
+1 tbsp clear honey
+500g pack fresh egg lasagne sheets
+400ml crème fraîche
+125g ball mozzarella roughly torn
+50g freshly grated parmesan
+large handful basil leaves torn (optional)
+
+ELKÉSZÍTÉS:
+# VISIBLE_SOURCE_REFERENCE_V1: teljes szöveg a mentett HTML-ben, nem összefoglaló.
+# Snapshot: tool/web_import_poc/results/b2_0_sources/source_20.html
+# SHA256: FA75490B2DBEB81B556A0264C64F09995561A359CBE631D9344AE47B5B98A449
+1. @VISIBLE .method-steps__list-item | index=0 | content=.editor-content | heading=step 1
+2. @VISIBLE .method-steps__list-item | index=1 | content=.editor-content | heading=step 2
+3. @VISIBLE .method-steps__list-item | index=2 | content=.editor-content | heading=step 3
+4. @VISIBLE .method-steps__list-item | index=3 | content=.editor-content | heading=step 4
+5. @VISIBLE .method-steps__list-item | index=4 | content=.editor-content | heading=step 5

@@ -1,0 +1,737 @@
+{
+  "phase": "B2.5",
+  "scope": "Frozen Batch 2 IDs 11–20; no new fetch or benchmark. Summary calculations only.",
+  "evidence_files": [
+    "b2_0_source_truth_audit.json",
+    "b2_1_batch_11-20.json",
+    "b2_2_content_source_quality.json",
+    "b2_2_snapshot_reconciliation.json",
+    "b2_3_parser_batch_11-20.json",
+    "b2_4_e2e_batch_11-20.json"
+  ],
+  "consistency_checks": {
+    "ids": true,
+    "snapshot_sha256_10_of_10": true,
+    "ingredient_counts": true,
+    "instruction_counts": true,
+    "source_parser_denominators": true,
+    "b2_3_vs_b2_4_draft_fields": true,
+    "overlap_reconciliation": true
+  },
+  "technical": {
+    "batch": {
+      "urls": 10,
+      "success": 10,
+      "failure": 0,
+      "retry": 0,
+      "http_errors": 0,
+      "multiple_candidates": 0,
+      "fallback": 0,
+      "anti_bot_observed": 0,
+      "js_rendering_required": false,
+      "success_rate_percent": 100.0,
+      "timing_ms": {
+        "fetch_ms": {
+          "average": 584.6168,
+          "median": 168.4525,
+          "min": 84.752,
+          "max": 1636.703
+        },
+        "extract_ms": {
+          "average": 27.8195,
+          "median": 19.564,
+          "min": 13.232,
+          "max": 96.153
+        },
+        "total_ms": {
+          "average": 612.4397,
+          "median": 223.6865,
+          "min": 101.275,
+          "max": 1656.137
+        }
+      }
+    },
+    "domains": {
+      "www.bbcgoodfood.com": {
+        "urls": 5,
+        "success": 5,
+        "failure": 0,
+        "retry": 0,
+        "http_errors": 0,
+        "multiple_candidates": 0,
+        "fallback": 0,
+        "anti_bot_observed": 0,
+        "js_rendering_required": false,
+        "success_rate_percent": 100.0,
+        "timing_ms": {
+          "fetch_ms": {
+            "average": 142.2412,
+            "median": 90.535,
+            "min": 84.752,
+            "max": 321.045
+          },
+          "extract_ms": {
+            "average": 16.0704,
+            "median": 14.448,
+            "min": 13.232,
+            "max": 19.696
+          },
+          "total_ms": {
+            "average": 158.31400000000002,
+            "median": 103.769,
+            "min": 101.275,
+            "max": 340.744
+          }
+        }
+      },
+      "www.mindmegette.hu": {
+        "urls": 5,
+        "success": 5,
+        "failure": 0,
+        "retry": 0,
+        "http_errors": 0,
+        "multiple_candidates": 0,
+        "fallback": 0,
+        "anti_bot_observed": 0,
+        "js_rendering_required": false,
+        "success_rate_percent": 100.0,
+        "timing_ms": {
+          "fetch_ms": {
+            "average": 1026.9923999999999,
+            "median": 1582.6,
+            "min": 105.485,
+            "max": 1636.703
+          },
+          "extract_ms": {
+            "average": 39.5686,
+            "median": 24.838,
+            "min": 19.432,
+            "max": 96.153
+          },
+          "total_ms": {
+            "average": 1066.5654,
+            "median": 1607.442,
+            "min": 139.466,
+            "max": 1656.137
+          }
+        }
+      }
+    }
+  },
+  "extractor": {
+    "verdict": "STRONG",
+    "scope_limit": "Only this 10-page, 2-domain sample; not a universal reliability estimate.",
+    "ingredient_rows_input": 110,
+    "ingredient_rows_output": 110,
+    "instruction_entries_input": 70,
+    "instruction_entries_output": 70,
+    "lossless_recipes": 10,
+    "ingredient_rows": 110,
+    "instruction_entries": 70,
+    "lost_ingredient_rows": 0,
+    "added_ingredient_rows": 0,
+    "modified_ingredient_rows": 0,
+    "order_errors": 0,
+    "lost_instruction_entries": 0,
+    "added_instruction_entries": 0,
+    "title_mutations": 0,
+    "candidate_selection_problems": 0
+  },
+  "snapshot_stability": {
+    "unchanged_recipe_content": 10,
+    "technical_html_changes_only": 8,
+    "identical_html": 2,
+    "changed_recipe_content": 0,
+    "format_only_change": 0,
+    "unresolved": 0
+  },
+  "source_quality": {
+    "www.bbcgoodfood.com": {
+      "verdict": "USABLE_WITH_ISSUES",
+      "ingredient_rows": 62,
+      "matching_rows": 62,
+      "missing_notes": 0,
+      "main_quantity_differences": 0,
+      "supplementary_quantity_note_omissions": 0,
+      "unit_differences": 0,
+      "missing_ingredients": 0,
+      "extra_ingredients": 0,
+      "instruction_content_loss": 0,
+      "structure_only_instruction_difference_recipes": 0,
+      "title_decoration": 0,
+      "group_heading_omissions": 1
+    },
+    "www.mindmegette.hu": {
+      "verdict": "USABLE_WITH_ISSUES",
+      "ingredient_rows": 48,
+      "matching_rows": 46,
+      "missing_notes": 2,
+      "main_quantity_differences": 0,
+      "supplementary_quantity_note_omissions": 1,
+      "unit_differences": 0,
+      "missing_ingredients": 0,
+      "extra_ingredients": 0,
+      "instruction_content_loss": 0,
+      "structure_only_instruction_difference_recipes": 1,
+      "title_decoration": 5,
+      "group_heading_omissions": 0
+    }
+  },
+  "parser_quality": {
+    "total": 110,
+    "source_errors": 2,
+    "valid_source": 108,
+    "correct": 73,
+    "parser_errors": 0,
+    "unsupported": 35,
+    "overall_accuracy_percent": 67.5925925925926,
+    "supported_input_accuracy": {
+      "correct": 73,
+      "denominator": 73,
+      "percent": 100.0
+    },
+    "quantity_accuracy": {
+      "correct": 101,
+      "denominator": 102,
+      "percent": 99.01960784313725,
+      "not_applicable": 6
+    },
+    "explicit_quantity_accuracy": {
+      "correct": 85,
+      "denominator": 86,
+      "percent": 98.83720930232558,
+      "not_applicable": 6
+    },
+    "supported_unit_accuracy": {
+      "correct": 73,
+      "denominator": 73,
+      "percent": 100.0,
+      "not_applicable": 0
+    },
+    "explicit_supported_unit_accuracy": {
+      "correct": 47,
+      "denominator": 47,
+      "percent": 100.0,
+      "not_applicable": 0
+    },
+    "name_accuracy": {
+      "correct": 74,
+      "denominator": 108,
+      "percent": 68.51851851851852,
+      "not_applicable": 0
+    },
+    "supported_name_accuracy": {
+      "correct": 73,
+      "denominator": 73,
+      "percent": 100.0,
+      "not_applicable": 0
+    },
+    "warning_rows": 24,
+    "unknown_unit_warning_rows": 1,
+    "unit_phrase_in_name_rows": 35,
+    "supported_normalization_rows": 18,
+    "quantity_forms": {
+      "integer": {
+        "count": 87,
+        "valid_source_accuracy": {
+          "correct": 84,
+          "denominator": 85,
+          "percent": 98.82352941176471,
+          "not_applicable": 0
+        }
+      },
+      "decimal": {
+        "count": 0,
+        "valid_source_accuracy": {
+          "correct": 0,
+          "denominator": 0,
+          "percent": null,
+          "not_applicable": 0
+        }
+      },
+      "comma_decimal": {
+        "count": 0,
+        "valid_source_accuracy": {
+          "correct": 0,
+          "denominator": 0,
+          "percent": null,
+          "not_applicable": 0
+        }
+      },
+      "slash_fraction": {
+        "count": 0,
+        "valid_source_accuracy": {
+          "correct": 0,
+          "denominator": 0,
+          "percent": null,
+          "not_applicable": 0
+        }
+      },
+      "unicode_fraction": {
+        "count": 1,
+        "valid_source_accuracy": {
+          "correct": 1,
+          "denominator": 1,
+          "percent": 100.0,
+          "not_applicable": 0
+        }
+      },
+      "mixed_fraction": {
+        "count": 0,
+        "valid_source_accuracy": {
+          "correct": 0,
+          "denominator": 0,
+          "percent": null,
+          "not_applicable": 0
+        }
+      },
+      "range": {
+        "count": 1,
+        "valid_source_accuracy": {
+          "correct": 0,
+          "denominator": 0,
+          "percent": null,
+          "not_applicable": 1
+        }
+      },
+      "multiplier": {
+        "count": 2,
+        "valid_source_accuracy": {
+          "correct": 0,
+          "denominator": 0,
+          "percent": null,
+          "not_applicable": 2
+        }
+      },
+      "missing": {
+        "count": 16,
+        "valid_source_accuracy": {
+          "correct": 16,
+          "denominator": 16,
+          "percent": 100.0,
+          "not_applicable": 0
+        }
+      },
+      "textual": {
+        "count": 3,
+        "valid_source_accuracy": {
+          "correct": 0,
+          "denominator": 0,
+          "percent": null,
+          "not_applicable": 3
+        }
+      }
+    },
+    "domains": {
+      "www.bbcgoodfood.com": {
+        "total": 62,
+        "source_errors": 0,
+        "valid_source": 62,
+        "correct": 36,
+        "parser_errors": 0,
+        "unsupported": 26,
+        "overall_accuracy_percent": 58.064516129032256,
+        "supported_input_accuracy": {
+          "correct": 36,
+          "denominator": 36,
+          "percent": 100.0
+        },
+        "quantity_accuracy": {
+          "correct": 55,
+          "denominator": 56,
+          "percent": 98.21428571428571,
+          "not_applicable": 6
+        },
+        "explicit_quantity_accuracy": {
+          "correct": 50,
+          "denominator": 51,
+          "percent": 98.03921568627452,
+          "not_applicable": 6
+        },
+        "supported_unit_accuracy": {
+          "correct": 36,
+          "denominator": 36,
+          "percent": 100.0,
+          "not_applicable": 0
+        },
+        "explicit_supported_unit_accuracy": {
+          "correct": 21,
+          "denominator": 21,
+          "percent": 100.0,
+          "not_applicable": 0
+        },
+        "name_accuracy": {
+          "correct": 36,
+          "denominator": 62,
+          "percent": 58.064516129032256,
+          "not_applicable": 0
+        },
+        "supported_name_accuracy": {
+          "correct": 36,
+          "denominator": 36,
+          "percent": 100.0,
+          "not_applicable": 0
+        }
+      },
+      "www.mindmegette.hu": {
+        "total": 48,
+        "source_errors": 2,
+        "valid_source": 46,
+        "correct": 37,
+        "parser_errors": 0,
+        "unsupported": 9,
+        "overall_accuracy_percent": 80.43478260869566,
+        "supported_input_accuracy": {
+          "correct": 37,
+          "denominator": 37,
+          "percent": 100.0
+        },
+        "quantity_accuracy": {
+          "correct": 46,
+          "denominator": 46,
+          "percent": 100.0,
+          "not_applicable": 0
+        },
+        "explicit_quantity_accuracy": {
+          "correct": 35,
+          "denominator": 35,
+          "percent": 100.0,
+          "not_applicable": 0
+        },
+        "supported_unit_accuracy": {
+          "correct": 37,
+          "denominator": 37,
+          "percent": 100.0,
+          "not_applicable": 0
+        },
+        "explicit_supported_unit_accuracy": {
+          "correct": 26,
+          "denominator": 26,
+          "percent": 100.0,
+          "not_applicable": 0
+        },
+        "name_accuracy": {
+          "correct": 38,
+          "denominator": 46,
+          "percent": 82.6086956521739,
+          "not_applicable": 0
+        },
+        "supported_name_accuracy": {
+          "correct": 37,
+          "denominator": 37,
+          "percent": 100.0,
+          "not_applicable": 0
+        }
+      }
+    },
+    "timing": {
+      "avg_parser_ms_per_ingredient": 0.04194545454545454,
+      "avg_parser_ms_per_recipe": 1.08,
+      "batch_recipe_parser_ms": 10.8,
+      "row_pass_parser_ms": 4.614,
+      "all_calls_parser_ms": 15.414,
+      "method": "One desktop Dart JIT pass; recipe pass then separate row calls. First recipe includes cold/JIT cost; IO excluded. Recipe and row times are separate measurements."
+    }
+  },
+  "unsupported": {
+    "valid_source_rows": 35,
+    "all_source_rows": 36,
+    "source_error_overlap": 1,
+    "phrases": [
+      {
+        "phrase": "2 x 400g cans",
+        "count_all": 2,
+        "count_valid_source": 2,
+        "warning_rows": 2,
+        "db_fallback_rows": 2,
+        "name_leak_rows": 2
+      },
+      {
+        "phrase": "cloves",
+        "count_all": 3,
+        "count_valid_source": 3,
+        "warning_rows": 0,
+        "db_fallback_rows": 3,
+        "name_leak_rows": 3
+      },
+      {
+        "phrase": "csipet",
+        "count_all": 1,
+        "count_valid_source": 1,
+        "warning_rows": 1,
+        "db_fallback_rows": 1,
+        "name_leak_rows": 0
+      },
+      {
+        "phrase": "drop",
+        "count_all": 1,
+        "count_valid_source": 1,
+        "warning_rows": 1,
+        "db_fallback_rows": 1,
+        "name_leak_rows": 1
+      },
+      {
+        "phrase": "fej",
+        "count_all": 4,
+        "count_valid_source": 3,
+        "warning_rows": 0,
+        "db_fallback_rows": 4,
+        "name_leak_rows": 4
+      },
+      {
+        "phrase": "gerezd",
+        "count_all": 2,
+        "count_valid_source": 2,
+        "warning_rows": 0,
+        "db_fallback_rows": 2,
+        "name_leak_rows": 2
+      },
+      {
+        "phrase": "half a … jar",
+        "count_all": 1,
+        "count_valid_source": 1,
+        "warning_rows": 1,
+        "db_fallback_rows": 1,
+        "name_leak_rows": 1
+      },
+      {
+        "phrase": "heaped tsp; alternative level tbsp",
+        "count_all": 1,
+        "count_valid_source": 1,
+        "warning_rows": 1,
+        "db_fallback_rows": 1,
+        "name_leak_rows": 1
+      },
+      {
+        "phrase": "kis fej",
+        "count_all": 1,
+        "count_valid_source": 1,
+        "warning_rows": 0,
+        "db_fallback_rows": 1,
+        "name_leak_rows": 1
+      },
+      {
+        "phrase": "kávéskanál",
+        "count_all": 1,
+        "count_valid_source": 1,
+        "warning_rows": 0,
+        "db_fallback_rows": 1,
+        "name_leak_rows": 1
+      },
+      {
+        "phrase": "large handful",
+        "count_all": 1,
+        "count_valid_source": 1,
+        "warning_rows": 1,
+        "db_fallback_rows": 1,
+        "name_leak_rows": 1
+      },
+      {
+        "phrase": "mokkáskanál",
+        "count_all": 1,
+        "count_valid_source": 1,
+        "warning_rows": 0,
+        "db_fallback_rows": 1,
+        "name_leak_rows": 1
+      },
+      {
+        "phrase": "range tbsp",
+        "count_all": 1,
+        "count_valid_source": 1,
+        "warning_rows": 1,
+        "db_fallback_rows": 1,
+        "name_leak_rows": 1
+      },
+      {
+        "phrase": "rashers",
+        "count_all": 1,
+        "count_valid_source": 1,
+        "warning_rows": 0,
+        "db_fallback_rows": 1,
+        "name_leak_rows": 1
+      },
+      {
+        "phrase": "stick",
+        "count_all": 1,
+        "count_valid_source": 1,
+        "warning_rows": 0,
+        "db_fallback_rows": 1,
+        "name_leak_rows": 1
+      },
+      {
+        "phrase": "tbsp",
+        "count_all": 9,
+        "count_valid_source": 9,
+        "warning_rows": 0,
+        "db_fallback_rows": 9,
+        "name_leak_rows": 9
+      },
+      {
+        "phrase": "tsp",
+        "count_all": 5,
+        "count_valid_source": 5,
+        "warning_rows": 0,
+        "db_fallback_rows": 5,
+        "name_leak_rows": 5
+      }
+    ],
+    "categories": {
+      "A_alias_or_lexical_rule_candidates": [
+        "tsp",
+        "tbsp",
+        "cloves recognition (warning/lexical recognition only; semantic mapping is category C)"
+      ],
+      "B_quantity_grammar": [
+        "2 x 400g cans",
+        "2-3 tbsp",
+        "half a 340g jar",
+        "alternative quantities in one row"
+      ],
+      "C_semantic_product_decisions": [
+        "cloves",
+        "rashers",
+        "stick",
+        "handful",
+        "drop",
+        "heaped/level spoon quantities",
+        "fej/gerezd/csipet/kávéskanál/mokkáskanál"
+      ]
+    }
+  },
+  "e2e": {
+    "batch": {
+      "recipes": 10,
+      "verdicts": {
+        "READY": 0,
+        "REVIEW": 5,
+        "POOR": 5,
+        "BROKEN": 0
+      },
+      "total_rows": 110,
+      "clean_rows": 57,
+      "source_error_rows": 2,
+      "unsupported_rows": 36,
+      "parser_error_rows": 0,
+      "warning_rows": 53,
+      "production_warning_rows": 24,
+      "silent_fallback_risk_rows": 27,
+      "silent_fallback_affected_recipes": 10,
+      "required_correction_rows": 37,
+      "required_correction_actions": 38,
+      "avg_required_corrections": 3.8,
+      "avg_review_only": 1.6
+    },
+    "domains": {
+      "www.mindmegette.hu": {
+        "recipes": 5,
+        "verdicts": {
+          "READY": 0,
+          "REVIEW": 4,
+          "POOR": 1,
+          "BROKEN": 0
+        },
+        "total_rows": 48,
+        "clean_rows": 26,
+        "source_error_rows": 2,
+        "unsupported_rows": 10,
+        "parser_error_rows": 0,
+        "warning_rows": 22,
+        "production_warning_rows": 12,
+        "silent_fallback_risk_rows": 8,
+        "silent_fallback_affected_recipes": 5,
+        "required_correction_rows": 11,
+        "required_correction_actions": 11,
+        "avg_required_corrections": 2.2,
+        "avg_review_only": 2.2
+      },
+      "www.bbcgoodfood.com": {
+        "recipes": 5,
+        "verdicts": {
+          "READY": 0,
+          "REVIEW": 1,
+          "POOR": 4,
+          "BROKEN": 0
+        },
+        "total_rows": 62,
+        "clean_rows": 31,
+        "source_error_rows": 0,
+        "unsupported_rows": 26,
+        "parser_error_rows": 0,
+        "warning_rows": 31,
+        "production_warning_rows": 12,
+        "silent_fallback_risk_rows": 19,
+        "silent_fallback_affected_recipes": 5,
+        "required_correction_rows": 26,
+        "required_correction_actions": 27,
+        "avg_required_corrections": 5.4,
+        "avg_review_only": 1.0
+      }
+    },
+    "thresholds": "BROKEN if title/preparation empty or no ingredient rows. READY if 0 required actions. POOR if >=4 required actions OR required actions / ingredient rows >=40%. Otherwise REVIEW. Group loss counts one structural action and cannot necessarily be restored in existing editor without notes; no new editor support assumed.",
+    "counting_policy": "Required: one action per objectively misleading/unsupported ingredient row, overlapping reasons counted once; plus one action per missing source ingredient group. Review-only: non-required rows with accepted missing-quantity fallback. Clean means no production OR POC warning. Source/unsupported/warning/risk categories overlap. Source-error rows excluded from silent risk, not excluded from user correction needs.",
+    "timing": {
+      "normalization_ms": {
+        "total": 23.004,
+        "average": 2.3004000000000002,
+        "max": 19.575
+      },
+      "parser_ms": {
+        "total": 10.751000000000001,
+        "average": 1.0751000000000002,
+        "max": 5.12
+      },
+      "draft_build_ms": {
+        "total": 0.3890000000000001,
+        "average": 0.03890000000000001,
+        "max": 0.183
+      },
+      "total_local_ms": {
+        "total": 34.177,
+        "average": 3.4177,
+        "max": 24.886
+      }
+    }
+  },
+  "decisions": {
+    "TECHNICAL_FEASIBILITY": "PASS",
+    "HUNGARIAN_MARKET_FEASIBILITY": "CONDITIONAL",
+    "CURRENT_INTERNATIONAL_FEASIBILITY": "CONDITIONAL",
+    "extractor_change_before_batch3": false,
+    "parser_change_before_batch3": false,
+    "benchmark_logic_change_before_batch3": false,
+    "ground_truth_method_change_before_batch3": false,
+    "batch3_can_start_with_separate_authorization": true,
+    "reason": "Continue measurement with unchanged baseline; this is not production release approval. Hungarian manual load lower, English unsupported load high. Both need explicit user review; POC warnings are not production detection."
+  },
+  "ux_documentation": {
+    "entry": "Recept importálása",
+    "input": "Recipe text OR URL",
+    "detection": "Exactly one valid http/https URL → web import; everything else → text import.",
+    "destination": "Same editable preview/editor; explicit save only.",
+    "warnings": "Visible suspect/invalid row marking patterned on current text import. POC audit labels cannot be assumed available at runtime.",
+    "reserved_future_action": "Fénykép csatolása; not implemented"
+  },
+  "batch3_method": [
+    "Visible page is ground truth; preserve snapshot/SHA256/@VISIBLE evidence.",
+    "JSON-LD, extractor, parser remain separate layers.",
+    "Exclude source-error rows from parser accuracy denominators.",
+    "Reconcile snapshot changes before content scoring.",
+    "Measure silent fallback separately; distinguish audit vs production warnings.",
+    "Report Hungarian/English usability separately.",
+    "Keep unsupported grammar out of supported-input denominator; disclose unmeasured forms.",
+    "Reuse correction thresholds and overlap counting; no automatic source repair."
+  ],
+  "next_step": "Separately authorize Batch 3 source-truth audit for IDs 21–30; verify visible-page references before fetching/extraction timing and accuracy phases. Batch 3 not started.",
+  "verification": {
+    "cross_report_consistency": "PASS",
+    "poc_tests": "52/52 PASS",
+    "poc_dart_analyze": "No issues found",
+    "production_flutter_analyze_no_pub": "No issues found",
+    "git_diff_check": "PASS (verified after report write)",
+    "production_modified": false,
+    "new_files": [
+      "b2_5_batch_2_summary.md",
+      "b2_5_batch_2_summary.json"
+    ]
+  }
+}

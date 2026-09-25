@@ -1,0 +1,24 @@
+CÍM:
+Tomato soup
+
+HOZZÁVALÓK:
+1-1.25kg/2lb 4oz-2lb 12oz ripe tomatoes
+1 medium onion
+1 small carrot
+1 celery stick
+2 tbsp olive oil
+2 squirts of tomato purée (about 2 tsp)
+a good pinch of sugar
+2 bay leaves
+1.2 litres/2 pints hot vegetable stock (made with boiling water and 4 rounded tsp bouillon powder or 2 stock cubes)
+
+ELKÉSZÍTÉS:
+# VISIBLE_SOURCE_REFERENCE_V1: teljes szöveg a mentett HTML-ben, nem összefoglaló.
+# Snapshot: tool/web_import_poc/results/b3_0_sources/source_26.html
+# SHA256: EB24C9CD530FFD2C7EA35B515E3FAE0970608CEC29C56B0204D51290B6E7B014
+1. @VISIBLE .method-steps__list-item | index=0 | content=.editor-content | heading=step 1
+2. @VISIBLE .method-steps__list-item | index=1 | content=.editor-content | heading=step 2
+3. @VISIBLE .method-steps__list-item | index=2 | content=.editor-content | heading=step 3
+4. @VISIBLE .method-steps__list-item | index=3 | content=.editor-content | heading=step 4
+5. @VISIBLE .method-steps__list-item | index=4 | content=.editor-content | heading=step 5
+6. @VISIBLE .method-steps__list-item | index=5 | content=.editor-content | heading=step 6

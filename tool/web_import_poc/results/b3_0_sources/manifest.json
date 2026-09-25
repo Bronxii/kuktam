@@ -1,0 +1,110 @@
+[
+  {
+    "status": 200,
+    "url": "https://www.bbcgoodfood.com/recipes/easy-chicken-curry",
+    "retrieved_at": "2026-09-25T12:32:36.6252507Z",
+    "final_url": "https://www.bbcgoodfood.com/recipes/easy-chicken-curry",
+    "id": "21",
+    "sha256": "B4D6F70B796D381AADB6E0C1F8D0481FC48041E5A8B31436627539FF0CF57003",
+    "path": "tool/web_import_poc/results/b3_0_sources/source_21.html"
+  },
+  {
+    "status": 200,
+    "url": "https://www.bbcgoodfood.com/recipes/easy-pancakes",
+    "retrieved_at": "2026-09-25T12:32:36.7662761Z",
+    "final_url": "https://www.bbcgoodfood.com/recipes/easy-pancakes",
+    "id": "22",
+    "sha256": "3CBEE9866978FF1C042286BFFD9D7D6A820FB684C693C68D54F064D358CA59C1",
+    "path": "tool/web_import_poc/results/b3_0_sources/source_22.html"
+  },
+  {
+    "status": 200,
+    "url": "https://www.bbcgoodfood.com/recipes/fish-pie-four-steps",
+    "retrieved_at": "2026-09-25T12:32:36.9186172Z",
+    "final_url": "https://www.bbcgoodfood.com/recipes/fish-pie-four-steps",
+    "id": "23",
+    "sha256": "699410C301850CF0C5CE870B42F8FDA04E39B5A351CB34AFA199B82975EAE6CB",
+    "path": "tool/web_import_poc/results/b3_0_sources/source_23.html"
+  },
+  {
+    "status": 200,
+    "url": "https://www.bbcgoodfood.com/recipes/best-ever-chocolate-brownies-recipe",
+    "retrieved_at": "2026-09-25T12:32:37.0354717Z",
+    "final_url": "https://www.bbcgoodfood.com/recipes/best-ever-chocolate-brownies-recipe",
+    "id": "24",
+    "sha256": "34761FBBFCAA228A5327C1AD96E3D9E5ED33AEB00B6A7D37F887BF43821F6905",
+    "path": "tool/web_import_poc/results/b3_0_sources/source_24.html"
+  },
+  {
+    "status": 200,
+    "url": "https://www.bbcgoodfood.com/recipes/best-apple-crumble",
+    "retrieved_at": "2026-09-25T12:32:37.1591012Z",
+    "final_url": "https://www.bbcgoodfood.com/recipes/best-apple-crumble",
+    "id": "25",
+    "sha256": "92681788A6D6DB71430738D4181295FA2844AF9833114C4A54EB988B7798CDE8",
+    "path": "tool/web_import_poc/results/b3_0_sources/source_25.html"
+  },
+  {
+    "status": 200,
+    "url": "https://www.bbcgoodfood.com/recipes/tomato-soup",
+    "retrieved_at": "2026-09-25T12:32:37.3239628Z",
+    "final_url": "https://www.bbcgoodfood.com/recipes/tomato-soup",
+    "id": "26",
+    "sha256": "EB24C9CD530FFD2C7EA35B515E3FAE0970608CEC29C56B0204D51290B6E7B014",
+    "path": "tool/web_import_poc/results/b3_0_sources/source_26.html"
+  },
+  {
+    "status": 200,
+    "url": "https://www.bbcgoodfood.com/recipes/real-tomato-soup",
+    "retrieved_at": "2026-09-25T12:32:37.4822046Z",
+    "final_url": "https://www.bbcgoodfood.com/recipes/real-tomato-soup",
+    "id": "27",
+    "sha256": "89199BA080737CBBD4ECC2287655C577427E1EE4E40B542826B0C18697A63E57",
+    "path": "tool/web_import_poc/results/b3_0_sources/source_27.html"
+  },
+  {
+    "status": 200,
+    "url": "https://www.bbcgoodfood.com/recipes/chicken-chilli-con-carne",
+    "retrieved_at": "2026-09-25T12:32:37.6411306Z",
+    "final_url": "https://www.bbcgoodfood.com/recipes/chicken-chilli-con-carne",
+    "id": "28",
+    "sha256": "8EC49DF4E37E0990867181D0388A22FD85E987DC45EC9EE4321A0F5A012D586A",
+    "path": "tool/web_import_poc/results/b3_0_sources/source_28.html"
+  },
+  {
+    "id": "29",
+    "error": "Response status code does not indicate success: 403 (Forbidden).",
+    "url": "https://www.foodnetwork.com/recipes/food-network-kitchen/classic-meatloaf-5484735",
+    "attempts": [
+      {
+        "client": "PowerShell Invoke-WebRequest",
+        "status": 403
+      },
+      {
+        "client": "curl Mozilla/5.0",
+        "status": 403,
+        "error_body_snapshot": "tool\\web_import_poc\\results\\b3_0_sources\\attempt2_29.html",
+        "sha256": "0240a2c0ed568e990c5352c9836d56fcfe2b67b4fe62b95dbe9648c5515a426d",
+        "captured_at_utc": "2026-09-25T12:33:04.566095+00:00"
+      }
+    ]
+  },
+  {
+    "id": "30",
+    "error": "Response status code does not indicate success: 403 (Forbidden).",
+    "url": "https://www.foodnetwork.com/recipes/guacamole-recipe2-1956046",
+    "attempts": [
+      {
+        "client": "PowerShell Invoke-WebRequest",
+        "status": 403
+      },
+      {
+        "client": "curl Mozilla/5.0",
+        "status": 403,
+        "error_body_snapshot": "tool\\web_import_poc\\results\\b3_0_sources\\attempt2_30.html",
+        "sha256": "57646df34644342ba313c40bf533680dd6dcdb2f493cfb53a76a3d076740888a",
+        "captured_at_utc": "2026-09-25T12:33:04.729066+00:00"
+      }
+    ]
+  }
+]

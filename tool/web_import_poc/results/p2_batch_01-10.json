@@ -1,0 +1,1840 @@
+{
+  "phase": "P2",
+  "method": "Offline frozen P1 and HTML JSON-LD audit + GT. Exact/normalized matching is automated. Semantic correspondences and process coverage explicitly reviewed; no similarity percentage for paraphrased instructions. No network, parser or unit parsing/conversion.",
+  "dataset_path": "C:\\Users\\gabor\\kuktam/test/fixtures/web_import_corpus/batch_1_01-10",
+  "inputs": "p1_batch_01-10.json, html/p1_01.html..p1_10.html, recipe_01.txt..recipe_10.txt",
+  "summary": {
+    "verdicts": {
+      "PERFECT": 0,
+      "ACCEPTABLE": 3,
+      "PARTIAL": 7,
+      "FAILED": 0
+    },
+    "content_success_rate_percent": 30.0,
+    "title": {
+      "clean": 5,
+      "decorated": 5,
+      "wrong": 0
+    },
+    "ingredients": {
+      "expected": 100,
+      "extracted": 100,
+      "exact_matches": 7,
+      "normalized_matches_including_exact": 79,
+      "reviewed_correspondences_not_accuracy": 100,
+      "content_difference_pairs": 21,
+      "missing_whole_lines": 0,
+      "extra_whole_lines": 0,
+      "duplicate_occurrences": 1,
+      "introduced_duplicates": 0,
+      "order_preserved_percent": 100
+    },
+    "instructions": {
+      "raw_entries": 88,
+      "actual_steps": 56,
+      "step_headings": 32,
+      "how_to_sections": 0,
+      "complete": 3,
+      "complete_with_section_headings": 5,
+      "missing_step_or_detail_relative_gt": 2,
+      "extra_content": 0,
+      "order_error": 0,
+      "lost_steps_by_extractor": 0,
+      "duplicated_steps": 0
+    },
+    "source_json_ld_fidelity_cases": 10
+  },
+  "results": [
+    {
+      "id": "01",
+      "url": "https://www.mindmegette.hu/recept/rakott-krumpli",
+      "expected_title": "Rakott krumpli",
+      "extracted_title": "Rakott krumpli | Mindmegette.hu",
+      "title_result": "TITLE_DECORATION",
+      "title_exact": false,
+      "title_normalized_match": false,
+      "expected_ingredient_count": 8,
+      "extracted_ingredient_count": 8,
+      "ingredient_exact_match_count": 0,
+      "ingredient_match_count": 8,
+      "ingredient_reviewed_correspondences": 8,
+      "ingredient_comparison": [
+        {
+          "expected_index": 1,
+          "extracted_index": 1,
+          "expected": "1 kg burgonya",
+          "extracted": "1 kg Burgonya",
+          "category": "FORMAT_DIFFERENCE",
+          "note": "Csak engedélyezett összehasonlítási normalizálás."
+        },
+        {
+          "expected_index": 2,
+          "extracted_index": 2,
+          "expected": "6 db tojás",
+          "extracted": "6 db Tojás",
+          "category": "FORMAT_DIFFERENCE",
+          "note": "Csak engedélyezett összehasonlítási normalizálás."
+        },
+        {
+          "expected_index": 3,
+          "extracted_index": 3,
+          "expected": "só",
+          "extracted": "Só",
+          "category": "FORMAT_DIFFERENCE",
+          "note": "Csak engedélyezett összehasonlítási normalizálás."
+        },
+        {
+          "expected_index": 4,
+          "extracted_index": 4,
+          "expected": "10 dkg kolbász",
+          "extracted": "10 dkg Kolbász",
+          "category": "FORMAT_DIFFERENCE",
+          "note": "Csak engedélyezett összehasonlítási normalizálás."
+        },
+        {
+          "expected_index": 5,
+          "extracted_index": 5,
+          "expected": "5 dl tejföl",
+          "extracted": "5 dl Tejföl",
+          "category": "FORMAT_DIFFERENCE",
+          "note": "Csak engedélyezett összehasonlítási normalizálás."
+        },
+        {
+          "expected_index": 6,
+          "extracted_index": 6,
+          "expected": "2 db tojássárgája",
+          "extracted": "2 db Tojássárgája",
+          "category": "FORMAT_DIFFERENCE",
+          "note": "Csak engedélyezett összehasonlítási normalizálás."
+        },
+        {
+          "expected_index": 7,
+          "extracted_index": 7,
+          "expected": "2 tk vaj",
+          "extracted": "2 tk Vaj",
+          "category": "FORMAT_DIFFERENCE",
+          "note": "Csak engedélyezett összehasonlítási normalizálás."
+        },
+        {
+          "expected_index": 8,
+          "extracted_index": 8,
+          "expected": "10 dkg bacon",
+          "extracted": "10 dkg Bacon",
+          "category": "FORMAT_DIFFERENCE",
+          "note": "Csak engedélyezett összehasonlítási normalizálás."
+        }
+      ],
+      "missing_ingredients": [],
+      "extra_ingredients": [],
+      "duplicates": {},
+      "introduced_duplicate_count": 0,
+      "order_status": "PRESERVED",
+      "raw_instruction_count": 22,
+      "actual_step_count": 11,
+      "section_heading_count": 11,
+      "heading_kind": "HowToStep.name (nem HowToSection)",
+      "how_to_section_count": 0,
+      "instruction_completeness_result": "COMPLETE_WITH_SECTION_HEADINGS",
+      "instruction_result_basis": "GT-folyamatlefedettség; a MISSING_STEP lehet hiányzó részlet is, nem feltétlen teljes művelet.",
+      "instruction_coverage": [
+        {
+          "gt_step": 1,
+          "gt_text": "1. A burgonyát héjában sós vízben főzd puhára, majd hűtsd le, hámozd meg és karikázd fel.",
+          "source_steps": [
+            1,
+            2,
+            3,
+            5,
+            10
+          ],
+          "coverage": "COVERED"
+        },
+        {
+          "gt_step": 2,
+          "gt_text": "2. A tojásokat főzd keményre, hűtsd le, hámozd meg és szeleteld fel.",
+          "source_steps": [
+            4,
+            5
+          ],
+          "coverage": "COVERED"
+        },
+        {
+          "gt_step": 3,
+          "gt_text": "3. A kolbászt karikázd fel, a tejfölt keverd össze a tojássárgájával.",
+          "source_steps": [
+            6,
+            7
+          ],
+          "coverage": "COVERED"
+        },
+        {
+          "gt_step": 4,
+          "gt_text": "4. Vajazz ki egy sütőtálat, majd rétegezd a burgonyát, tojást, kolbászt és tejfölt.",
+          "source_steps": [
+            9,
+            10
+          ],
+          "coverage": "COVERED"
+        },
+        {
+          "gt_step": 5,
+          "gt_text": "5. A tetejére kerüljön a maradék tejföl és a bacon.",
+          "source_steps": [
+            10
+          ],
+          "coverage": "COVERED"
+        },
+        {
+          "gt_step": 6,
+          "gt_text": "6. 180 °C-on süsd aranybarnára, nagyjából 35–40 perc alatt.",
+          "source_steps": [
+            8,
+            11
+          ],
+          "coverage": "COVERED"
+        }
+      ],
+      "instruction_notes": [
+        "Négy forráslépés szó szerinti &nbsp; entitást tartalmaz; extractor változatlanul megőrizte."
+      ],
+      "source_actual_steps": [
+        "A rakott krumpli elkészítését azzal kezdjük, hogy a krumplikat 10-15 percre beáztatjuk hideg vízbe, majd alaposan megsikáljuk és leöblítjük. A tojásokat megmossuk.",
+        "A krumplit felöntjük annyi hideg vízzel, hogy bőven ellepje.&nbsp;",
+        "Hozzáadjuk a sót, és a forrástól számított 20 percig, fedő alatt puhára főzzük.",
+        "A tojásokat sós, hideg vízben feltesszük főni, és a forrástól számított 8 percig főzzük, majd hideg vízbe merítve azonnal lehűtjük.&nbsp;",
+        "A krumpliról leöntjük a vizet, még melegen lehúzzuk a héját, és hűlni hagyjuk. A kihűlt tojásokat is meghámozzuk, elnegyedeljük vagy felkarikázzuk.",
+        "A kolbászt meleg vízzel leöblítjük, így könnyen lehúzhatjuk a héját, aztán vékonyan felkarikázzuk.&nbsp;",
+        "A tejfölt egy kis tálba tesszük és elkeverjük benne a tojássárgákat.&nbsp;",
+        "A sütőt 180 fokra (gázsütő 3. fokozat) előmelegítjük.",
+        "A vajjal kikenünk egy lapos, tűzálló tálat, és hozzálátunk a hagyományos rakott krumpli rétegezéséhez.",
+        "Az aljára karikázzuk a krumpli felét, kissé megsózzuk, lazán összekeverjük, és elsimítjuk. Arányosan elosztva a tetejére rendezzük a tojást és a kolbászkarikákat, majd megkenjük a tejföl felével. A maradék krumplit felkarikázzuk, és kissé egymásra csúsztatva a tetejére rendezzük. Egyenletesen bevonjuk a maradék tejföllel, végül a tetejére göndörítjük a szalonnaszeleteket.",
+        "A sütőben addig sütjük, amíg a tejföl és a szalonna aranybarnára pirul (35-40 perc). Az elkészült rakott krumplit vegyes idénysalátával vagy ecetes savanyúsággal, kovászos uborkával tálaljuk."
+      ],
+      "lost_steps_by_extractor": 0,
+      "duplicated_steps": 0,
+      "unexpected_content": [],
+      "instruction_order": "PRESERVED",
+      "source_fidelity": {
+        "name_equal": true,
+        "ingredients_equal": true,
+        "raw_instructions_equal": true,
+        "step_text_and_order_equal": true,
+        "step_headings_and_order_equal": true
+      },
+      "warnings": [
+        "Négy forráslépés szó szerinti &nbsp; entitást tartalmaz; extractor változatlanul megőrizte."
+      ],
+      "overall_content_verdict": "ACCEPTABLE"
+    },
+    {
+      "id": "02",
+      "url": "https://www.mindmegette.hu/recept/fasirt",
+      "expected_title": "Fasírt",
+      "extracted_title": "Fasírt | Mindmegette.hu",
+      "title_result": "TITLE_DECORATION",
+      "title_exact": false,
+      "title_normalized_match": false,
+      "expected_ingredient_count": 12,
+      "extracted_ingredient_count": 12,
+      "ingredient_exact_match_count": 1,
+      "ingredient_match_count": 10,
+      "ingredient_reviewed_correspondences": 12,
+      "ingredient_comparison": [
+        {
+          "expected_index": 1,
+          "extracted_index": 1,
+          "expected": "50 dkg darált sertéshús",
+          "extracted": "50 dkg sertéshús",
+          "category": "CONTENT_DIFFERENCE",
+          "note": "Hiányzó darált jelző; kevésbé specifikus alapanyag a forrás JSON-LD-ben."
+        },
+        {
+          "expected_index": 2,
+          "extracted_index": 2,
+          "expected": "2 db zsemle",
+          "extracted": "2 db zsemle",
+          "category": "MATCH",
+          "note": "Csak engedélyezett összehasonlítási normalizálás."
+        },
+        {
+          "expected_index": 3,
+          "extracted_index": 3,
+          "expected": "1 fej vöröshagyma",
+          "extracted": "1 fej Vöröshagyma",
+          "category": "FORMAT_DIFFERENCE",
+          "note": "Csak engedélyezett összehasonlítási normalizálás."
+        },
+        {
+          "expected_index": 4,
+          "extracted_index": 4,
+          "expected": "olaj",
+          "extracted": "Olaj",
+          "category": "FORMAT_DIFFERENCE",
+          "note": "Csak engedélyezett összehasonlítási normalizálás."
+        },
+        {
+          "expected_index": 5,
+          "extracted_index": 5,
+          "expected": "3 gerezd fokhagyma",
+          "extracted": "3 gerezd Fokhagyma",
+          "category": "FORMAT_DIFFERENCE",
+          "note": "Csak engedélyezett összehasonlítási normalizálás."
+        },
+        {
+          "expected_index": 6,
+          "extracted_index": 6,
+          "expected": "2 db tojás",
+          "extracted": "2 db Tojás",
+          "category": "FORMAT_DIFFERENCE",
+          "note": "Csak engedélyezett összehasonlítási normalizálás."
+        },
+        {
+          "expected_index": 7,
+          "extracted_index": 7,
+          "expected": "1 kis kanál majoránna",
+          "extracted": "1 kis kanál Majoránna",
+          "category": "FORMAT_DIFFERENCE",
+          "note": "Csak engedélyezett összehasonlítási normalizálás."
+        },
+        {
+          "expected_index": 8,
+          "extracted_index": 8,
+          "expected": "1 tk őrölt fűszerpaprika",
+          "extracted": "1 tk fűszerpaprika",
+          "category": "CONTENT_DIFFERENCE",
+          "note": "Hiányzó őrölt jelző; kevésbé specifikus alapanyag a forrás JSON-LD-ben."
+        },
+        {
+          "expected_index": 9,
+          "extracted_index": 9,
+          "expected": "só",
+          "extracted": "Só",
+          "category": "FORMAT_DIFFERENCE",
+          "note": "Csak engedélyezett összehasonlítási normalizálás."
+        },
+        {
+          "expected_index": 10,
+          "extracted_index": 10,
+          "expected": "bors",
+          "extracted": "Bors",
+          "category": "FORMAT_DIFFERENCE",
+          "note": "Csak engedélyezett összehasonlítási normalizálás."
+        },
+        {
+          "expected_index": 11,
+          "extracted_index": 11,
+          "expected": "10 dkg zsemlemorzsa",
+          "extracted": "10 dkg Zsemlemorzsa",
+          "category": "FORMAT_DIFFERENCE",
+          "note": "Csak engedélyezett összehasonlítási normalizálás."
+        },
+        {
+          "expected_index": 12,
+          "extracted_index": 12,
+          "expected": "5 dl olaj",
+          "extracted": "5 dl Olaj",
+          "category": "FORMAT_DIFFERENCE",
+          "note": "Csak engedélyezett összehasonlítási normalizálás."
+        }
+      ],
+      "missing_ingredients": [],
+      "extra_ingredients": [],
+      "duplicates": {},
+      "introduced_duplicate_count": 0,
+      "order_status": "PRESERVED",
+      "raw_instruction_count": 8,
+      "actual_step_count": 4,
+      "section_heading_count": 4,
+      "heading_kind": "HowToStep.name (nem HowToSection)",
+      "how_to_section_count": 0,
+      "instruction_completeness_result": "COMPLETE_WITH_SECTION_HEADINGS",
+      "instruction_result_basis": "GT-folyamatlefedettség; a MISSING_STEP lehet hiányzó részlet is, nem feltétlen teljes művelet.",
+      "instruction_coverage": [
+        {
+          "gt_step": 1,
+          "gt_text": "1. A zsemlét áztasd vízbe, majd alaposan nyomkodd ki.",
+          "source_steps": [
+            1
+          ],
+          "coverage": "COVERED"
+        },
+        {
+          "gt_step": 2,
+          "gt_text": "2. Az aprított hagymát kevés olajon dinszteld meg, a fokhagymát törd össze.",
+          "source_steps": [
+            1
+          ],
+          "coverage": "COVERED"
+        },
+        {
+          "gt_step": 3,
+          "gt_text": "3. Dolgozd össze a húsos massza hozzávalóit és fűszerezd.",
+          "source_steps": [
+            2
+          ],
+          "coverage": "COVERED"
+        },
+        {
+          "gt_step": 4,
+          "gt_text": "4. Formázz gombócokat vagy pogácsákat, majd forgasd zsemlemorzsába.",
+          "source_steps": [
+            3
+          ],
+          "coverage": "COVERED"
+        },
+        {
+          "gt_step": 5,
+          "gt_text": "5. Közepesen forró olajban süsd készre mindkét oldalukat.",
+          "source_steps": [
+            4
+          ],
+          "coverage": "COVERED"
+        }
+      ],
+      "instruction_notes": [],
+      "source_actual_steps": [
+        "A fasírt elkészítéséhez a zsemlét vízbe áztatjuk, majd alaposan kinyomkodjuk. Az apróra vágott hagymát olajon megdinszteljük. A fokhagymát összenyomjuk.",
+        "Minden hozzávalót alaposan összedolgozunk, majd ízlés szerint fűszerezzük a masszát.",
+        "Vizes kézzel gombócokat formázunk (van, aki lapos pogácsákat készít), és zsemlemorzsában megforgatjuk.",
+        "Végül nem túl forró olajban, oldalanként 5-5 perc alatt kisütjük a fasírtokat."
+      ],
+      "lost_steps_by_extractor": 0,
+      "duplicated_steps": 0,
+      "unexpected_content": [],
+      "instruction_order": "PRESERVED",
+      "source_fidelity": {
+        "name_equal": true,
+        "ingredients_equal": true,
+        "raw_instructions_equal": true,
+        "step_text_and_order_equal": true,
+        "step_headings_and_order_equal": true
+      },
+      "warnings": [
+        "Forrás JSON-LD és GT tartalmi eltérés; nincs automatikus korrekció."
+      ],
+      "overall_content_verdict": "PARTIAL"
+    },
+    {
+      "id": "03",
+      "url": "https://www.mindmegette.hu/recept/husleves",
+      "expected_title": "Húsleves",
+      "extracted_title": "Húsleves | Mindmegette.hu",
+      "title_result": "TITLE_DECORATION",
+      "title_exact": false,
+      "title_normalized_match": false,
+      "expected_ingredient_count": 14,
+      "extracted_ingredient_count": 14,
+      "ingredient_exact_match_count": 5,
+      "ingredient_match_count": 13,
+      "ingredient_reviewed_correspondences": 14,
+      "ingredient_comparison": [
+        {
+          "expected_index": 1,
+          "extracted_index": 1,
+          "expected": "1 kg színhús",
+          "extracted": "1 kg színhús",
+          "category": "MATCH",
+          "note": "Csak engedélyezett összehasonlítási normalizálás."
+        },
+        {
+          "expected_index": 2,
+          "extracted_index": 2,
+          "expected": "50 dkg csont",
+          "extracted": "50 dkg csont",
+          "category": "MATCH",
+          "note": "Csak engedélyezett összehasonlítási normalizálás."
+        },
+        {
+          "expected_index": 3,
+          "extracted_index": 3,
+          "expected": "50 dkg vegyes zöldség",
+          "extracted": "50 dkg vegyes zöldség",
+          "category": "MATCH",
+          "note": "Csak engedélyezett összehasonlítási normalizálás."
+        },
+        {
+          "expected_index": 4,
+          "extracted_index": 4,
+          "expected": "1 fej hagyma",
+          "extracted": "1 fej Hagyma",
+          "category": "FORMAT_DIFFERENCE",
+          "note": "Csak engedélyezett összehasonlítási normalizálás."
+        },
+        {
+          "expected_index": 5,
+          "extracted_index": 5,
+          "expected": "2 gerezd fokhagyma",
+          "extracted": "2 gerezd Fokhagyma",
+          "category": "FORMAT_DIFFERENCE",
+          "note": "Csak engedélyezett összehasonlítási normalizálás."
+        },
+        {
+          "expected_index": 6,
+          "extracted_index": 6,
+          "expected": "10 szem bors",
+          "extracted": "10 szem Bors",
+          "category": "FORMAT_DIFFERENCE",
+          "note": "Csak engedélyezett összehasonlítási normalizálás."
+        },
+        {
+          "expected_index": 7,
+          "extracted_index": 7,
+          "expected": "cseresznyepaprika",
+          "extracted": "cseresznyepaprika",
+          "category": "MATCH",
+          "note": "Csak engedélyezett összehasonlítási normalizálás."
+        },
+        {
+          "expected_index": 8,
+          "extracted_index": 8,
+          "expected": "1 csapott mokkáskanál szeklice",
+          "extracted": "1 csapott mokkáskanál szeklice",
+          "category": "MATCH",
+          "note": "Csak engedélyezett összehasonlítási normalizálás."
+        },
+        {
+          "expected_index": 9,
+          "extracted_index": 9,
+          "expected": "1 csokor petrezselyem",
+          "extracted": "1 csokor Petrezselyem",
+          "category": "FORMAT_DIFFERENCE",
+          "note": "Csak engedélyezett összehasonlítási normalizálás."
+        },
+        {
+          "expected_index": 10,
+          "extracted_index": 10,
+          "expected": "15 dkg kelkáposzta",
+          "extracted": "15 dkg Kelkáposzta",
+          "category": "FORMAT_DIFFERENCE",
+          "note": "Csak engedélyezett összehasonlítási normalizálás."
+        },
+        {
+          "expected_index": 11,
+          "extracted_index": 11,
+          "expected": "1 db zöldpaprika",
+          "extracted": "1 db Zöldpaprika",
+          "category": "FORMAT_DIFFERENCE",
+          "note": "Csak engedélyezett összehasonlítási normalizálás."
+        },
+        {
+          "expected_index": 12,
+          "extracted_index": 12,
+          "expected": "1 db paradicsom",
+          "extracted": "1 db Paradicsom",
+          "category": "FORMAT_DIFFERENCE",
+          "note": "Csak engedélyezett összehasonlítási normalizálás."
+        },
+        {
+          "expected_index": 13,
+          "extracted_index": 13,
+          "expected": "só",
+          "extracted": "Só",
+          "category": "FORMAT_DIFFERENCE",
+          "note": "Csak engedélyezett összehasonlítási normalizálás."
+        },
+        {
+          "expected_index": 14,
+          "extracted_index": 14,
+          "expected": "10 dkg levesbetét tészta",
+          "extracted": "10 dkg levelestészta",
+          "category": "CONTENT_DIFFERENCE",
+          "note": "levesbetét tészta ↔ levelestészta: nem puszta formázás. Forrás/referencia eltérés; automatikus javítás nem indokolt."
+        }
+      ],
+      "missing_ingredients": [],
+      "extra_ingredients": [],
+      "duplicates": {},
+      "introduced_duplicate_count": 0,
+      "order_status": "PRESERVED",
+      "raw_instruction_count": 14,
+      "actual_step_count": 7,
+      "section_heading_count": 7,
+      "heading_kind": "HowToStep.name (nem HowToSection)",
+      "how_to_section_count": 0,
+      "instruction_completeness_result": "COMPLETE_WITH_SECTION_HEADINGS",
+      "instruction_result_basis": "GT-folyamatlefedettség; a MISSING_STEP lehet hiányzó részlet is, nem feltétlen teljes művelet.",
+      "instruction_coverage": [
+        {
+          "gt_step": 1,
+          "gt_text": "1. A húst, csontot és zöldségeket tisztítsd meg.",
+          "source_steps": [
+            1
+          ],
+          "coverage": "COVERED"
+        },
+        {
+          "gt_step": 2,
+          "gt_text": "2. A csontot és húst tedd fazékba, öntsd fel bőven hideg vízzel és lassan forrald fel.",
+          "source_steps": [
+            2
+          ],
+          "coverage": "COVERED"
+        },
+        {
+          "gt_step": 3,
+          "gt_text": "3. Add hozzá a fűszereket és a zöldségeket, majd kis lángon főzd hosszan.",
+          "source_steps": [
+            3,
+            4
+          ],
+          "coverage": "COVERED"
+        },
+        {
+          "gt_step": 4,
+          "gt_text": "4. A kész levest szűrd le, a húst és zöldségeket külön tálald.",
+          "source_steps": [
+            6,
+            7
+          ],
+          "coverage": "COVERED"
+        },
+        {
+          "gt_step": 5,
+          "gt_text": "5. A levesbetétet külön főzd meg, és tálaláskor add a leveshez.",
+          "source_steps": [
+            5,
+            7
+          ],
+          "coverage": "COVERED"
+        }
+      ],
+      "instruction_notes": [],
+      "source_actual_steps": [
+        "A húsleves elkészítéséhez elsőként a húst és a zöldségeket alaposan megmosunk, megtisztítjuk.",
+        "Egy nagyobb fazék aljára fektetjük a szétütött csontokat, arra a 3-4 darabba vágott húst, és felöntjük annyi hideg vízzel, hogy bőven (4-5 ujjnyira) ellepje. Forrásig hevítjük - a régi hagyománnyal szemben nem habozzuk le, mert oda az értékes fehérje, leülepszik szépen az a hab magától, nem lesz zavaros tőle a leves.",
+        "Hozzáadjuk (teatojásba zárva) a szemes borsot, a fokhagymát, a sáfrányos szeklicét - gyönyörű színt ad a levesnek -, a cseresznyepaprikát, a hagymát egészben és egy kevés sót. Fedő nélkül, lassú forralással, gyöngyöztetve fél óráig főzzük.",
+        "Ezután beletesszük a hasábokra vágott zöldségeket, a kelkáposztát, a zöldpaprikát és a paradicsomot egészben, a csokorban hagyott petrezselymet, és további lassú gyöngyöztető forralással, fedő nélkül az egészet puhára főzzük.",
+        "Közben enyhén sós vízben megfőzzük a levestésztát, leszűrjuk. Kevés húslevest merünk rá, hogy melegen tartsuk.",
+        "Ezután következik a művészet: a húsleves felszínéről kanállal eltávolítjuk a fölösleges zsiradékot, majd sűrű szövésű szitakanálon keresztül, merőkanállal - éppen csak szelíden megbillentve a fazekat, hogy fel ne zavarosítsuk a levest - előmelegített levesestálba szűrjuk.",
+        "A tésztát a forró leveshez adjuk, külön tálon kínáljuk a zöldséget és a húst, amelyet fogyaszthatunk a leveshez, vagy második fogásként is különféle mártásokkal."
+      ],
+      "lost_steps_by_extractor": 0,
+      "duplicated_steps": 0,
+      "unexpected_content": [],
+      "instruction_order": "PRESERVED",
+      "source_fidelity": {
+        "name_equal": true,
+        "ingredients_equal": true,
+        "raw_instructions_equal": true,
+        "step_text_and_order_equal": true,
+        "step_headings_and_order_equal": true
+      },
+      "warnings": [
+        "Forrás JSON-LD és GT tartalmi eltérés; nincs automatikus korrekció."
+      ],
+      "overall_content_verdict": "PARTIAL"
+    },
+    {
+      "id": "04",
+      "url": "https://www.mindmegette.hu/recept/eredeti-tiramisu",
+      "expected_title": "Eredeti tiramisu",
+      "extracted_title": "Eredeti tiramisu | Mindmegette.hu",
+      "title_result": "TITLE_DECORATION",
+      "title_exact": false,
+      "title_normalized_match": false,
+      "expected_ingredient_count": 7,
+      "extracted_ingredient_count": 7,
+      "ingredient_exact_match_count": 1,
+      "ingredient_match_count": 7,
+      "ingredient_reviewed_correspondences": 7,
+      "ingredient_comparison": [
+        {
+          "expected_index": 1,
+          "extracted_index": 1,
+          "expected": "4 db tojás",
+          "extracted": "4 db Tojás",
+          "category": "FORMAT_DIFFERENCE",
+          "note": "Csak engedélyezett összehasonlítási normalizálás."
+        },
+        {
+          "expected_index": 2,
+          "extracted_index": 2,
+          "expected": "20 dkg porcukor",
+          "extracted": "20 dkg Porcukor",
+          "category": "FORMAT_DIFFERENCE",
+          "note": "Csak engedélyezett összehasonlítási normalizálás."
+        },
+        {
+          "expected_index": 3,
+          "extracted_index": 3,
+          "expected": "1 dl rum",
+          "extracted": "1 dl Rum",
+          "category": "FORMAT_DIFFERENCE",
+          "note": "Csak engedélyezett összehasonlítási normalizálás."
+        },
+        {
+          "expected_index": 4,
+          "extracted_index": 4,
+          "expected": "50 dkg mascarpone",
+          "extracted": "50 dkg Mascarpone",
+          "category": "FORMAT_DIFFERENCE",
+          "note": "Csak engedélyezett összehasonlítási normalizálás."
+        },
+        {
+          "expected_index": 5,
+          "extracted_index": 5,
+          "expected": "3 dl kávé",
+          "extracted": "3 dl kávé",
+          "category": "MATCH",
+          "note": "Csak engedélyezett összehasonlítási normalizálás."
+        },
+        {
+          "expected_index": 6,
+          "extracted_index": 6,
+          "expected": "1 doboz babapiskóta",
+          "extracted": "1 doboz Babapiskóta",
+          "category": "FORMAT_DIFFERENCE",
+          "note": "Csak engedélyezett összehasonlítási normalizálás."
+        },
+        {
+          "expected_index": 7,
+          "extracted_index": 7,
+          "expected": "kakaópor",
+          "extracted": "Kakaópor",
+          "category": "FORMAT_DIFFERENCE",
+          "note": "Csak engedélyezett összehasonlítási normalizálás."
+        }
+      ],
+      "missing_ingredients": [],
+      "extra_ingredients": [],
+      "duplicates": {},
+      "introduced_duplicate_count": 0,
+      "order_status": "PRESERVED",
+      "raw_instruction_count": 12,
+      "actual_step_count": 6,
+      "section_heading_count": 6,
+      "heading_kind": "HowToStep.name (nem HowToSection)",
+      "how_to_section_count": 0,
+      "instruction_completeness_result": "COMPLETE_WITH_SECTION_HEADINGS",
+      "instruction_result_basis": "GT-folyamatlefedettség; a MISSING_STEP lehet hiányzó részlet is, nem feltétlen teljes művelet.",
+      "instruction_coverage": [
+        {
+          "gt_step": 1,
+          "gt_text": "1. Válaszd szét a tojásokat.",
+          "source_steps": [
+            1
+          ],
+          "coverage": "COVERED"
+        },
+        {
+          "gt_step": 2,
+          "gt_text": "2. A sárgáját keverd habosra a cukorral, rummal és mascarponéval.",
+          "source_steps": [
+            2
+          ],
+          "coverage": "COVERED"
+        },
+        {
+          "gt_step": 3,
+          "gt_text": "3. A fehérjéből verj kemény habot, majd óvatosan forgasd a krémbe.",
+          "source_steps": [
+            3
+          ],
+          "coverage": "COVERED"
+        },
+        {
+          "gt_step": 4,
+          "gt_text": "4. A langyos kávéba röviden mártsd bele a babapiskótákat.",
+          "source_steps": [
+            4
+          ],
+          "coverage": "COVERED"
+        },
+        {
+          "gt_step": 5,
+          "gt_text": "5. Rétegezd a piskótát és a krémet egy tálban.",
+          "source_steps": [
+            5
+          ],
+          "coverage": "COVERED"
+        },
+        {
+          "gt_step": 6,
+          "gt_text": "6. Legalább 2 órára hűtsd le, tálalás előtt szórd meg kakaóporral.",
+          "source_steps": [
+            6
+          ],
+          "coverage": "COVERED"
+        }
+      ],
+      "instruction_notes": [],
+      "source_actual_steps": [
+        "Az eredeti tiramisu receptje szerint első lépésként a tojásokat kettéválasztjuk.",
+        "A tojássárgáját habosra kikeverjük a cukorral, hozzáadjuk a rumot, végül pedig a mascarponét, és addig keverjük, míg sima és kissé habos krémet kapunk.",
+        "A tojásfehérjéből robotgéppel kemény habot verünk, majd óvatosan belekeverjük a mascarponés krémbe .",
+        "Lefőzzük a kávét. Amikor langyosra hűlt, belemártjuk a babapiskótákat úgy, hogy félig átázzanak.",
+        "Belehelyezzük a babapiskótákat egy sorban egy kisebb tepsibe, vagy üvegtálba. Rásimítjuk a krém felét, erre teszünk még egy réteg kávéba áztatott babapiskótát, és végül a maradék krémmel befedjük.",
+        "Minimum 2 órát hűtőszekrényben állni hagyjuk. Közvetlenül a tálalás előtt a tiramisu tetejére kakaóport szórunk."
+      ],
+      "lost_steps_by_extractor": 0,
+      "duplicated_steps": 0,
+      "unexpected_content": [],
+      "instruction_order": "PRESERVED",
+      "source_fidelity": {
+        "name_equal": true,
+        "ingredients_equal": true,
+        "raw_instructions_equal": true,
+        "step_text_and_order_equal": true,
+        "step_headings_and_order_equal": true
+      },
+      "warnings": [],
+      "overall_content_verdict": "ACCEPTABLE"
+    },
+    {
+      "id": "05",
+      "url": "https://www.mindmegette.hu/recept/zserbo-alaprecept",
+      "expected_title": "Zserbó alaprecept",
+      "extracted_title": "Zserbó alaprecept | Mindmegette.hu",
+      "title_result": "TITLE_DECORATION",
+      "title_exact": false,
+      "title_normalized_match": false,
+      "expected_ingredient_count": 17,
+      "extracted_ingredient_count": 17,
+      "ingredient_exact_match_count": 0,
+      "ingredient_match_count": 17,
+      "ingredient_reviewed_correspondences": 17,
+      "ingredient_comparison": [
+        {
+          "expected_index": 1,
+          "extracted_index": 1,
+          "expected": "25 dkg darált dió",
+          "extracted": "25 dkg Darált dió",
+          "category": "FORMAT_DIFFERENCE",
+          "note": "Csak engedélyezett összehasonlítási normalizálás."
+        },
+        {
+          "expected_index": 2,
+          "extracted_index": 2,
+          "expected": "20 dkg porcukor",
+          "extracted": "20 dkg Porcukor",
+          "category": "FORMAT_DIFFERENCE",
+          "note": "Csak engedélyezett összehasonlítási normalizálás."
+        },
+        {
+          "expected_index": 3,
+          "extracted_index": 3,
+          "expected": "1 db citrom",
+          "extracted": "1 db Citrom",
+          "category": "FORMAT_DIFFERENCE",
+          "note": "Csak engedélyezett összehasonlítási normalizálás."
+        },
+        {
+          "expected_index": 4,
+          "extracted_index": 4,
+          "expected": "1 csomag vaníliás cukor",
+          "extracted": "1 csomag Vaníliás cukor",
+          "category": "FORMAT_DIFFERENCE",
+          "note": "Csak engedélyezett összehasonlítási normalizálás."
+        },
+        {
+          "expected_index": 5,
+          "extracted_index": 5,
+          "expected": "40 dkg baracklekvár",
+          "extracted": "40 dkg Baracklekvár",
+          "category": "FORMAT_DIFFERENCE",
+          "note": "Csak engedélyezett összehasonlítási normalizálás."
+        },
+        {
+          "expected_index": 6,
+          "extracted_index": 6,
+          "expected": "2 ek rum",
+          "extracted": "2 ek Rum",
+          "category": "FORMAT_DIFFERENCE",
+          "note": "Csak engedélyezett összehasonlítási normalizálás."
+        },
+        {
+          "expected_index": 7,
+          "extracted_index": 7,
+          "expected": "1 dkg élesztő",
+          "extracted": "1 dkg Élesztő",
+          "category": "FORMAT_DIFFERENCE",
+          "note": "Csak engedélyezett összehasonlítási normalizálás."
+        },
+        {
+          "expected_index": 8,
+          "extracted_index": 8,
+          "expected": "0.5 dl tej",
+          "extracted": "0.5 dl Tej",
+          "category": "FORMAT_DIFFERENCE",
+          "note": "Csak engedélyezett összehasonlítási normalizálás."
+        },
+        {
+          "expected_index": 9,
+          "extracted_index": 9,
+          "expected": "50 dkg liszt",
+          "extracted": "50 dkg Liszt",
+          "category": "FORMAT_DIFFERENCE",
+          "note": "Csak engedélyezett összehasonlítási normalizálás."
+        },
+        {
+          "expected_index": 10,
+          "extracted_index": 10,
+          "expected": "25 dkg margarin",
+          "extracted": "25 dkg Margarin",
+          "category": "FORMAT_DIFFERENCE",
+          "note": "Csak engedélyezett összehasonlítási normalizálás."
+        },
+        {
+          "expected_index": 11,
+          "extracted_index": 11,
+          "expected": "1 mokkáskanál szódabikarbóna",
+          "extracted": "1 mokkáskanál Szódabikarbóna",
+          "category": "FORMAT_DIFFERENCE",
+          "note": "Csak engedélyezett összehasonlítási normalizálás."
+        },
+        {
+          "expected_index": 12,
+          "extracted_index": 12,
+          "expected": "10 dkg porcukor",
+          "extracted": "10 dkg Porcukor",
+          "category": "FORMAT_DIFFERENCE",
+          "note": "Csak engedélyezett összehasonlítási normalizálás."
+        },
+        {
+          "expected_index": 13,
+          "extracted_index": 13,
+          "expected": "1 db tojássárgája",
+          "extracted": "1 db Tojássárgája",
+          "category": "FORMAT_DIFFERENCE",
+          "note": "Csak engedélyezett összehasonlítási normalizálás."
+        },
+        {
+          "expected_index": 14,
+          "extracted_index": 14,
+          "expected": "1 csomag vaníliás cukor",
+          "extracted": "1 csomag Vaníliás cukor",
+          "category": "FORMAT_DIFFERENCE",
+          "note": "Csak engedélyezett összehasonlítási normalizálás."
+        },
+        {
+          "expected_index": 15,
+          "extracted_index": 15,
+          "expected": "2 ek tejföl",
+          "extracted": "2 ek Tejföl",
+          "category": "FORMAT_DIFFERENCE",
+          "note": "Csak engedélyezett összehasonlítási normalizálás."
+        },
+        {
+          "expected_index": 16,
+          "extracted_index": 16,
+          "expected": "15 dkg étcsokoládé",
+          "extracted": "15 dkg Étcsokoládé",
+          "category": "FORMAT_DIFFERENCE",
+          "note": "Csak engedélyezett összehasonlítási normalizálás."
+        },
+        {
+          "expected_index": 17,
+          "extracted_index": 17,
+          "expected": "1 tk étolaj",
+          "extracted": "1 tk Étolaj",
+          "category": "FORMAT_DIFFERENCE",
+          "note": "Csak engedélyezett összehasonlítási normalizálás."
+        }
+      ],
+      "missing_ingredients": [],
+      "extra_ingredients": [],
+      "duplicates": {
+        "1 csomag vaníliás cukor": [
+          4,
+          14
+        ]
+      },
+      "introduced_duplicate_count": 0,
+      "order_status": "PRESERVED",
+      "raw_instruction_count": 8,
+      "actual_step_count": 4,
+      "section_heading_count": 4,
+      "heading_kind": "HowToStep.name (nem HowToSection)",
+      "how_to_section_count": 0,
+      "instruction_completeness_result": "COMPLETE_WITH_SECTION_HEADINGS",
+      "instruction_result_basis": "GT-folyamatlefedettség; a MISSING_STEP lehet hiányzó részlet is, nem feltétlen teljes művelet.",
+      "instruction_coverage": [
+        {
+          "gt_step": 1,
+          "gt_text": "1. A diós tölteléket keverd össze a cukorral, citromhéjjal és vaníliás cukorral.",
+          "source_steps": [
+            1
+          ],
+          "coverage": "COVERED"
+        },
+        {
+          "gt_step": 2,
+          "gt_text": "2. Futtasd fel az élesztőt langyos tejben, majd gyúrd össze a tészta hozzávalóival.",
+          "source_steps": [
+            2
+          ],
+          "coverage": "COVERED"
+        },
+        {
+          "gt_step": 3,
+          "gt_text": "3. Oszd a tésztát három részre és nyújts három lapot.",
+          "source_steps": [
+            3
+          ],
+          "coverage": "COVERED"
+        },
+        {
+          "gt_step": 4,
+          "gt_text": "4. Rétegezd a lapokat lekvárral, rummal és cukros dióval.",
+          "source_steps": [
+            3
+          ],
+          "coverage": "COVERED"
+        },
+        {
+          "gt_step": 5,
+          "gt_text": "5. A felső lapot szurkáld meg, majd kb. 200 °C-on süsd világosbarnára.",
+          "source_steps": [
+            3,
+            4
+          ],
+          "coverage": "COVERED"
+        },
+        {
+          "gt_step": 6,
+          "gt_text": "6. Hűlés után vond be olajjal felolvasztott étcsokoládéval.",
+          "source_steps": [
+            4
+          ],
+          "coverage": "COVERED"
+        }
+      ],
+      "instruction_notes": [],
+      "source_actual_steps": [
+        "A zserbó elkészítéséhez a diót összekeverjük a porcukorral, a citrom lereszelt héjával és a vaníliás cukorral.",
+        "Az élesztőt langyos tejben felfuttatjuk. A lisztet elmorzsoljuk a margarinnal. Hozzáadjuk az élesztős tejet, a szódabikarbónát, a porcukrot, a tojássárgáját, a vaníliás cukrot és a tejfölt, és jól összedolgozzuk.",
+        "Az összegyúrt tésztát három részre osztjuk. Az első részt kinyújtjuk, és kibéleljük vele a 24×38 cm-es tepsit. Megkenjük a baracklekvár felével, meglocsoljuk 1 ek rummal, majd rászórjuk a cukros dió felét. Beborítjuk a másik kinyújtott tésztalappal, amit ismét megkenünk lekvárral, megöntözünk rummal, és rászórjuk a dió másik felét. Ráhelyezzük a harmadik kinyújtott tésztát, kissé rányomkodjuk, és villával megszurkáljuk.",
+        "Előmelegített sütőben 200 fokon kb. 30 perc alatt világosbarnára sütjük, majd a tepsiben hagyjuk kihűlni. Amíg hűl a tészta, elkészítjük a mázat. Az étcsokoládét vízgőz felett felolvasztjuk az olajjal, és a süteményre kenjük. Megvárjuk, amíg megszárad, majd felszeleteljük."
+      ],
+      "lost_steps_by_extractor": 0,
+      "duplicated_steps": 0,
+      "unexpected_content": [],
+      "instruction_order": "PRESERVED",
+      "source_fidelity": {
+        "name_equal": true,
+        "ingredients_equal": true,
+        "raw_instructions_equal": true,
+        "step_text_and_order_equal": true,
+        "step_headings_and_order_equal": true
+      },
+      "warnings": [],
+      "overall_content_verdict": "ACCEPTABLE"
+    },
+    {
+      "id": "06",
+      "url": "https://www.nosalty.hu/recept/csirkepaprikas",
+      "expected_title": "Csirkepaprikás",
+      "extracted_title": "Csirkepaprikás",
+      "title_result": "MATCH",
+      "title_exact": true,
+      "title_normalized_match": true,
+      "expected_ingredient_count": 10,
+      "extracted_ingredient_count": 10,
+      "ingredient_exact_match_count": 0,
+      "ingredient_match_count": 5,
+      "ingredient_reviewed_correspondences": 10,
+      "ingredient_comparison": [
+        {
+          "expected_index": 1,
+          "extracted_index": 1,
+          "expected": "6 db csirke alsócomb",
+          "extracted": "6 db Csirke alsócomb",
+          "category": "FORMAT_DIFFERENCE",
+          "note": "Csak engedélyezett összehasonlítási normalizálás."
+        },
+        {
+          "expected_index": 2,
+          "extracted_index": 2,
+          "expected": "0.5 ek sertészsír",
+          "extracted": "0 ek Sertészsír",
+          "category": "CONTENT_DIFFERENCE",
+          "note": "0.5 ↔ 0: valódi mennyiségi eltérés."
+        },
+        {
+          "expected_index": 3,
+          "extracted_index": 3,
+          "expected": "0.5 közepes db vöröshagyma",
+          "extracted": "0 közepes db Vöröshagyma",
+          "category": "CONTENT_DIFFERENCE",
+          "note": "0.5 ↔ 0: valódi mennyiségi eltérés."
+        },
+        {
+          "expected_index": 4,
+          "extracted_index": 4,
+          "expected": "0.5 tk fűszerpaprika",
+          "extracted": "0 teáskanál Fűszerpaprika",
+          "category": "CONTENT_DIFFERENCE",
+          "note": "0.5 tk ↔ 0 teáskanál: mennyiségi eltérés ÉS eltérő egységmegfogalmazás; nincs unit-konverzió."
+        },
+        {
+          "expected_index": 5,
+          "extracted_index": 5,
+          "expected": "1 közepes db zöldpaprika",
+          "extracted": "1 közepes db Zöldpaprika",
+          "category": "FORMAT_DIFFERENCE",
+          "note": "Csak engedélyezett összehasonlítási normalizálás."
+        },
+        {
+          "expected_index": 6,
+          "extracted_index": 6,
+          "expected": "1 közepes db paradicsom",
+          "extracted": "1 közepes db Paradicsom",
+          "category": "FORMAT_DIFFERENCE",
+          "note": "Csak engedélyezett összehasonlítási normalizálás."
+        },
+        {
+          "expected_index": 7,
+          "extracted_index": 7,
+          "expected": "200 g tejföl",
+          "extracted": "200 g Tejföl",
+          "category": "FORMAT_DIFFERENCE",
+          "note": "Csak engedélyezett összehasonlítási normalizálás."
+        },
+        {
+          "expected_index": 8,
+          "extracted_index": 8,
+          "expected": "1 ek finomliszt",
+          "extracted": "1 ek Finomliszt",
+          "category": "FORMAT_DIFFERENCE",
+          "note": "Csak engedélyezett összehasonlítási normalizálás."
+        },
+        {
+          "expected_index": 9,
+          "extracted_index": 9,
+          "expected": "só ízlés szerint",
+          "extracted": "0 ízlés szerint Só",
+          "category": "CONTENT_DIFFERENCE",
+          "note": "A forrás 0 ízlés szerint előtagot ad. A 0 nem tekinthető helyes mennyiségnek."
+        },
+        {
+          "expected_index": 10,
+          "extracted_index": 10,
+          "expected": "bors ízlés szerint",
+          "extracted": "0 ízlés szerint Bors",
+          "category": "CONTENT_DIFFERENCE",
+          "note": "A forrás 0 ízlés szerint előtagot ad. A 0 nem tekinthető helyes mennyiségnek."
+        }
+      ],
+      "missing_ingredients": [],
+      "extra_ingredients": [],
+      "duplicates": {},
+      "introduced_duplicate_count": 0,
+      "order_status": "PRESERVED",
+      "raw_instruction_count": 3,
+      "actual_step_count": 3,
+      "section_heading_count": 0,
+      "heading_kind": "HowToStep.name (nem HowToSection)",
+      "how_to_section_count": 0,
+      "instruction_completeness_result": "MISSING_STEP",
+      "instruction_result_basis": "GT-folyamatlefedettség; a MISSING_STEP lehet hiányzó részlet is, nem feltétlen teljes művelet.",
+      "instruction_coverage": [
+        {
+          "gt_step": 1,
+          "gt_text": "1. A hagymát zsíron párold üvegesre, majd húzd le a tűzről és keverd hozzá a pirospaprikát.",
+          "source_steps": [
+            2
+          ],
+          "coverage": "COVERED"
+        },
+        {
+          "gt_step": 2,
+          "gt_text": "2. Add hozzá a csirkét, a paprikát és paradicsomot, sózd, borsozd, majd kevés vízzel párold puhára.",
+          "source_steps": [
+            2,
+            3
+          ],
+          "coverage": "COVERED"
+        },
+        {
+          "gt_step": 3,
+          "gt_text": "3. A tejfölt keverd simára a liszttel.",
+          "source_steps": [
+            3
+          ],
+          "coverage": "COVERED"
+        },
+        {
+          "gt_step": 4,
+          "gt_text": "4. Hőkiegyenlítés után keverd a tejfölös habarást a szaftba, és röviden forrald össze.",
+          "source_steps": [
+            3
+          ],
+          "coverage": "PARTIAL_OR_MISSING_DETAIL"
+        },
+        {
+          "gt_step": 5,
+          "gt_text": "5. Nokedlivel vagy más körettel tálald.",
+          "source_steps": [],
+          "coverage": "PARTIAL_OR_MISSING_DETAIL"
+        }
+      ],
+      "instruction_notes": [
+        "GT 4: hőkiegyenlítés nincs kifejtve a forrásban; GT 5: nokedli/köret tálalás nincs a JSON-LD-ben. Forrás 3: botmixeres pürésítés szerepel, a tömör GT ezt nem említi. Nem extractorveszteség."
+      ],
+      "source_actual_steps": [
+        "A combokat megmossuk, szárazra itatjuk. A hagymát meghámozzuk, apróra vágjuk. A paprikát mossuk, kockára vágjuk. A paradicsomot mossuk, kockákra vágjuk.",
+        "A zsírt egy serpenyőben felhevítjük, rászórjuk a hagymát, és megpirítjuk. A tűzről levesszük, hozzákeverjük az édesnemes paprikát és kb. 100 ml vizet öntünk hozzá. Hozzáadjuk a csirkecombokat, a zöldpaprikát és a paradicsomot. Sóval, borssal ízesítjük.",
+        "Fedő alatt mérsékelt tűzőn, puhára pároljuk (ha szükséges öntsünk hozzá kevés vizet). A húst kiszedjük. A párolólét botmixerrel pürésítjük, hozzáadjuk a liszttel elkevert tejfölt, és 2-3 perc alatt mártássá forraljuk. A combokkal együtt még egyszer felforraljuk."
+      ],
+      "lost_steps_by_extractor": 0,
+      "duplicated_steps": 0,
+      "unexpected_content": [],
+      "instruction_order": "PRESERVED",
+      "source_fidelity": {
+        "name_equal": true,
+        "ingredients_equal": true,
+        "raw_instructions_equal": true,
+        "step_text_and_order_equal": true,
+        "step_headings_and_order_equal": true
+      },
+      "warnings": [
+        "GT 4: hőkiegyenlítés nincs kifejtve a forrásban; GT 5: nokedli/köret tálalás nincs a JSON-LD-ben. Forrás 3: botmixeres pürésítés szerepel, a tömör GT ezt nem említi. Nem extractorveszteség.",
+        "Forrás JSON-LD és GT tartalmi eltérés; nincs automatikus korrekció."
+      ],
+      "overall_content_verdict": "PARTIAL"
+    },
+    {
+      "id": "07",
+      "url": "https://www.nosalty.hu/recept/palacsinta-alaprecept",
+      "expected_title": "Palacsinta alaprecept",
+      "extracted_title": "Palacsinta alaprecept",
+      "title_result": "MATCH",
+      "title_exact": true,
+      "title_normalized_match": true,
+      "expected_ingredient_count": 7,
+      "extracted_ingredient_count": 7,
+      "ingredient_exact_match_count": 0,
+      "ingredient_match_count": 6,
+      "ingredient_reviewed_correspondences": 7,
+      "ingredient_comparison": [
+        {
+          "expected_index": 1,
+          "extracted_index": 1,
+          "expected": "3 db tojás",
+          "extracted": "3 db Tojás",
+          "category": "FORMAT_DIFFERENCE",
+          "note": "Csak engedélyezett összehasonlítási normalizálás."
+        },
+        {
+          "expected_index": 2,
+          "extracted_index": 2,
+          "expected": "2 ek cukor",
+          "extracted": "2 ek Cukor",
+          "category": "FORMAT_DIFFERENCE",
+          "note": "Csak engedélyezett összehasonlítási normalizálás."
+        },
+        {
+          "expected_index": 3,
+          "extracted_index": 3,
+          "expected": "1 csomag vaníliás cukor",
+          "extracted": "1 csomag Vaníliás cukor",
+          "category": "FORMAT_DIFFERENCE",
+          "note": "Csak engedélyezett összehasonlítási normalizálás."
+        },
+        {
+          "expected_index": 4,
+          "extracted_index": 4,
+          "expected": "240 g finomliszt",
+          "extracted": "240 g Finomliszt",
+          "category": "FORMAT_DIFFERENCE",
+          "note": "Csak engedélyezett összehasonlítási normalizálás."
+        },
+        {
+          "expected_index": 5,
+          "extracted_index": 5,
+          "expected": "4 dl tej",
+          "extracted": "4 dl Tej",
+          "category": "FORMAT_DIFFERENCE",
+          "note": "Csak engedélyezett összehasonlítási normalizálás."
+        },
+        {
+          "expected_index": 6,
+          "extracted_index": 6,
+          "expected": "3 dl szódavíz",
+          "extracted": "3 dl Szódavíz",
+          "category": "FORMAT_DIFFERENCE",
+          "note": "Csak engedélyezett összehasonlítási normalizálás."
+        },
+        {
+          "expected_index": 7,
+          "extracted_index": 7,
+          "expected": "0.5 dl napraforgó olaj",
+          "extracted": "0 dl Napraforgó olaj",
+          "category": "CONTENT_DIFFERENCE",
+          "note": "0.5 ↔ 0: valódi mennyiségi eltérés."
+        }
+      ],
+      "missing_ingredients": [],
+      "extra_ingredients": [],
+      "duplicates": {},
+      "introduced_duplicate_count": 0,
+      "order_status": "PRESERVED",
+      "raw_instruction_count": 3,
+      "actual_step_count": 3,
+      "section_heading_count": 0,
+      "heading_kind": "HowToStep.name (nem HowToSection)",
+      "how_to_section_count": 0,
+      "instruction_completeness_result": "COMPLETE",
+      "instruction_result_basis": "GT-folyamatlefedettség; a MISSING_STEP lehet hiányzó részlet is, nem feltétlen teljes művelet.",
+      "instruction_coverage": [
+        {
+          "gt_step": 1,
+          "gt_text": "1. A tojásokat keverd ki a cukorral és a vaníliás cukorral.",
+          "source_steps": [
+            1
+          ],
+          "coverage": "COVERED"
+        },
+        {
+          "gt_step": 2,
+          "gt_text": "2. Fokozatosan add hozzá a lisztet, majd a tejet és a szódavizet.",
+          "source_steps": [
+            2
+          ],
+          "coverage": "COVERED"
+        },
+        {
+          "gt_step": 3,
+          "gt_text": "3. Keverd bele az olajat, és dolgozd csomómentesre a tésztát.",
+          "source_steps": [
+            2
+          ],
+          "coverage": "COVERED"
+        },
+        {
+          "gt_step": 4,
+          "gt_text": "4. Vékonyan olajozott serpenyőben süsd ki a palacsintákat.",
+          "source_steps": [
+            3
+          ],
+          "coverage": "COVERED"
+        }
+      ],
+      "instruction_notes": [],
+      "source_actual_steps": [
+        "Egy tálba ütjük a tojásokat, majd a cukrokkal együtt kikeverjük.",
+        "Folyamatos keverés mellett hozzáadjuk a tojásos keverékhez a lisztet, majd a tejet és a szódát, végül az olajat, és csomómentesre keverjük.",
+        "Egy serpenyőt vagy palacsintasütőt egy ecsettel vékonyan megkenünk olajjal, majd megsütjük a palacsintákat."
+      ],
+      "lost_steps_by_extractor": 0,
+      "duplicated_steps": 0,
+      "unexpected_content": [],
+      "instruction_order": "PRESERVED",
+      "source_fidelity": {
+        "name_equal": true,
+        "ingredients_equal": true,
+        "raw_instructions_equal": true,
+        "step_text_and_order_equal": true,
+        "step_headings_and_order_equal": true
+      },
+      "warnings": [
+        "Forrás JSON-LD és GT tartalmi eltérés; nincs automatikus korrekció."
+      ],
+      "overall_content_verdict": "PARTIAL"
+    },
+    {
+      "id": "08",
+      "url": "https://www.nosalty.hu/recept/turos-csusza",
+      "expected_title": "Túrós csusza",
+      "extracted_title": "Túrós csusza",
+      "title_result": "MATCH",
+      "title_exact": true,
+      "title_normalized_match": true,
+      "expected_ingredient_count": 6,
+      "extracted_ingredient_count": 6,
+      "ingredient_exact_match_count": 0,
+      "ingredient_match_count": 3,
+      "ingredient_reviewed_correspondences": 6,
+      "ingredient_comparison": [
+        {
+          "expected_index": 1,
+          "extracted_index": 1,
+          "expected": "40 dkg csuszatészta",
+          "extracted": "40 dkg Csuszatészta",
+          "category": "FORMAT_DIFFERENCE",
+          "note": "Csak engedélyezett összehasonlítási normalizálás."
+        },
+        {
+          "expected_index": 2,
+          "extracted_index": 2,
+          "expected": "só ízlés szerint",
+          "extracted": "0 ízlés szerint Só",
+          "category": "CONTENT_DIFFERENCE",
+          "note": "A forrás 0 ízlés szerint előtagot ad. A 0 nem puszta formázás."
+        },
+        {
+          "expected_index": 3,
+          "extracted_index": 3,
+          "expected": "350 g füstölt szalonna",
+          "extracted": "350 g Füstölt szalonna",
+          "category": "FORMAT_DIFFERENCE",
+          "note": "Csak engedélyezett összehasonlítási normalizálás."
+        },
+        {
+          "expected_index": 4,
+          "extracted_index": 4,
+          "expected": "2.5 dl víz",
+          "extracted": "2 dl Víz",
+          "category": "CONTENT_DIFFERENCE",
+          "note": "2.5 ↔ 2: valódi mennyiségi eltérés."
+        },
+        {
+          "expected_index": 5,
+          "extracted_index": 5,
+          "expected": "2.5 dl tejföl",
+          "extracted": "2 dl Tejföl",
+          "category": "CONTENT_DIFFERENCE",
+          "note": "2.5 ↔ 2: valódi mennyiségi eltérés."
+        },
+        {
+          "expected_index": 6,
+          "extracted_index": 6,
+          "expected": "450 g tehéntúró",
+          "extracted": "450 g Tehéntúró",
+          "category": "FORMAT_DIFFERENCE",
+          "note": "Csak engedélyezett összehasonlítási normalizálás."
+        }
+      ],
+      "missing_ingredients": [],
+      "extra_ingredients": [],
+      "duplicates": {},
+      "introduced_duplicate_count": 0,
+      "order_status": "PRESERVED",
+      "raw_instruction_count": 6,
+      "actual_step_count": 6,
+      "section_heading_count": 0,
+      "heading_kind": "HowToStep.name (nem HowToSection)",
+      "how_to_section_count": 0,
+      "instruction_completeness_result": "MISSING_STEP",
+      "instruction_result_basis": "GT-folyamatlefedettség; a MISSING_STEP lehet hiányzó részlet is, nem feltétlen teljes művelet.",
+      "instruction_coverage": [
+        {
+          "gt_step": 1,
+          "gt_text": "1. A tésztát sós vízben főzd fogkeményre.",
+          "source_steps": [
+            1
+          ],
+          "coverage": "COVERED"
+        },
+        {
+          "gt_step": 2,
+          "gt_text": "2. A szalonnát kockázd fel, kevés vízzel kezdd sütni, majd pirítsd zsírjára.",
+          "source_steps": [
+            2
+          ],
+          "coverage": "COVERED"
+        },
+        {
+          "gt_step": 3,
+          "gt_text": "3. A visszamaradt zsír egy részét keverd össze tejföllel.",
+          "source_steps": [
+            3
+          ],
+          "coverage": "COVERED"
+        },
+        {
+          "gt_step": 4,
+          "gt_text": "4. A tésztát forgasd össze a tejfölös keverékkel és a túró egy részével.",
+          "source_steps": [
+            4
+          ],
+          "coverage": "COVERED"
+        },
+        {
+          "gt_step": 5,
+          "gt_text": "5. Grill alatt pirítsd meg, majd add hozzá a maradék túrót és tejfölt, és röviden süsd tovább.",
+          "source_steps": [
+            4,
+            5
+          ],
+          "coverage": "COVERED"
+        },
+        {
+          "gt_step": 6,
+          "gt_text": "6. A ropogós szalonnával tálald.",
+          "source_steps": [
+            6
+          ],
+          "coverage": "PARTIAL_OR_MISSING_DETAIL"
+        }
+      ],
+      "instruction_notes": [
+        "GT 6 ropogós szalonnával tálalása nincs a forrás 6-ban; az csak maradék tejfölt/túrót említ. A szalonna kisütése és félretétele megvan a 2. lépésben. Nem extractorveszteség."
+      ],
+      "source_actual_steps": [
+        "A tésztát lobogó, enyhén sós vízben fogkeményre kifőzzük.",
+        "A szalonnát egy centis darabokra felkockázzuk, serpenyőbe tesszük. Felöntjük annyi vízzel, ami éppen ellepi, és közepes lángon melegíteni kezdjük. Egészen addig folytatjuk, amíg minden csepp víz el nem párolog, sőt utána szép barnára, zsírjára sütjük. (A vízre azért van szükség, mert így kívül ropogós, de belül puha marad.) Ha elkészült, akkor szűrőlapáttal kivesszük a szalonnát, és félretesszük.",
+        "A zsírt is kiöntjük, csak három evőkanállal hagyunk benne, ehhez hozzáadjuk a tejfölt, és alaposan elkeverjük.",
+        "A kifőtt tésztát összeforgatjuk a tejfölös keverék és a túró egyharmadával, majd a sütőt grill fokozatra és maximum hőfokra állítjuk, és 10-12 percre betesszük, amíg meg nem pirul a tészta széle.",
+        "Kivesszük a tésztát a sütőből, átforgatjuk, majd hozzáadjuk a túró és tejföl második harmadát, és újra visszatesszük a sütőbe 10 percre.",
+        "Ha kész, azonnal tálaljuk. A tetejét a maradék tejföllel és túróval meglocsoljuk."
+      ],
+      "lost_steps_by_extractor": 0,
+      "duplicated_steps": 0,
+      "unexpected_content": [],
+      "instruction_order": "PRESERVED",
+      "source_fidelity": {
+        "name_equal": true,
+        "ingredients_equal": true,
+        "raw_instructions_equal": true,
+        "step_text_and_order_equal": true,
+        "step_headings_and_order_equal": true
+      },
+      "warnings": [
+        "GT 6 ropogós szalonnával tálalása nincs a forrás 6-ban; az csak maradék tejfölt/túrót említ. A szalonna kisütése és félretétele megvan a 2. lépésben. Nem extractorveszteség.",
+        "Forrás JSON-LD és GT tartalmi eltérés; nincs automatikus korrekció."
+      ],
+      "overall_content_verdict": "PARTIAL"
+    },
+    {
+      "id": "09",
+      "url": "https://www.nosalty.hu/recept/eredeti-brassoi-apropecsenye",
+      "expected_title": "Eredeti brassói aprópecsenye",
+      "extracted_title": "Eredeti brassói aprópecsenye",
+      "title_result": "MATCH",
+      "title_exact": true,
+      "title_normalized_match": true,
+      "expected_ingredient_count": 9,
+      "extracted_ingredient_count": 9,
+      "ingredient_exact_match_count": 0,
+      "ingredient_match_count": 2,
+      "ingredient_reviewed_correspondences": 9,
+      "ingredient_comparison": [
+        {
+          "expected_index": 1,
+          "extracted_index": 1,
+          "expected": "1 kg sertéshús",
+          "extracted": "1 kg Sertéshús az eredeti recept bélszínt ír",
+          "category": "CONTENT_DIFFERENCE",
+          "note": "Kiegészítő forrásszöveg: az eredeti recept bélszínt ír. Nem külön hozzávaló."
+        },
+        {
+          "expected_index": 2,
+          "extracted_index": 2,
+          "expected": "15 dkg füstölt szalonna",
+          "extracted": "15 dkg Füstölt szalonna ízlés szerint",
+          "category": "CONTENT_DIFFERENCE",
+          "note": "Kiegészítő forrásszöveg: ízlés szerint. Nem külön hozzávaló."
+        },
+        {
+          "expected_index": 3,
+          "extracted_index": 3,
+          "expected": "1.5 kg burgonya",
+          "extracted": "1 kg Burgonya",
+          "category": "CONTENT_DIFFERENCE",
+          "note": "1.5 ↔ 1: valódi mennyiségi eltérés."
+        },
+        {
+          "expected_index": 4,
+          "extracted_index": 4,
+          "expected": "2 db vöröshagyma",
+          "extracted": "2 db Vöröshagyma",
+          "category": "FORMAT_DIFFERENCE",
+          "note": "Csak engedélyezett összehasonlítási normalizálás."
+        },
+        {
+          "expected_index": 5,
+          "extracted_index": 5,
+          "expected": "8 gerezd fokhagyma",
+          "extracted": "8 gerezd Fokhagyma",
+          "category": "FORMAT_DIFFERENCE",
+          "note": "Csak engedélyezett összehasonlítási normalizálás."
+        },
+        {
+          "expected_index": 6,
+          "extracted_index": 6,
+          "expected": "só ízlés szerint",
+          "extracted": "0 ízlés szerint Só",
+          "category": "CONTENT_DIFFERENCE",
+          "note": "A forrás 0 ízlés szerint előtagot ad."
+        },
+        {
+          "expected_index": 7,
+          "extracted_index": 7,
+          "expected": "bors ízlés szerint",
+          "extracted": "0 ízlés szerint Bors",
+          "category": "CONTENT_DIFFERENCE",
+          "note": "A forrás 0 ízlés szerint előtagot ad."
+        },
+        {
+          "expected_index": 8,
+          "extracted_index": 8,
+          "expected": "majoranna ízlés szerint",
+          "extracted": "0 ízlés szerint Majoranna",
+          "category": "CONTENT_DIFFERENCE",
+          "note": "A forrás 0 ízlés szerint előtagot ad."
+        },
+        {
+          "expected_index": 9,
+          "extracted_index": 9,
+          "expected": "kakukkfű ízlés szerint",
+          "extracted": "0 ízlés szerint Kakukkfű",
+          "category": "CONTENT_DIFFERENCE",
+          "note": "A forrás 0 ízlés szerint előtagot ad."
+        }
+      ],
+      "missing_ingredients": [],
+      "extra_ingredients": [],
+      "duplicates": {},
+      "introduced_duplicate_count": 0,
+      "order_status": "PRESERVED",
+      "raw_instruction_count": 5,
+      "actual_step_count": 5,
+      "section_heading_count": 0,
+      "heading_kind": "HowToStep.name (nem HowToSection)",
+      "how_to_section_count": 0,
+      "instruction_completeness_result": "COMPLETE",
+      "instruction_result_basis": "GT-folyamatlefedettség; a MISSING_STEP lehet hiányzó részlet is, nem feltétlen teljes művelet.",
+      "instruction_coverage": [
+        {
+          "gt_step": 1,
+          "gt_text": "1. A burgonyát kockázd fel és süsd meg zsírban.",
+          "source_steps": [
+            1
+          ],
+          "coverage": "COVERED"
+        },
+        {
+          "gt_step": 2,
+          "gt_text": "2. A sertéshúst kockázd fel és kevés zsiradékon pirítsd meg.",
+          "source_steps": [
+            2
+          ],
+          "coverage": "COVERED"
+        },
+        {
+          "gt_step": 3,
+          "gt_text": "3. Add hozzá az aprított hagymát és fokhagymát, majd fűszerezd.",
+          "source_steps": [
+            3,
+            4
+          ],
+          "coverage": "COVERED"
+        },
+        {
+          "gt_step": 4,
+          "gt_text": "4. A kész húst keverd össze a sült burgonyával, vagy tálald egymás mellett.",
+          "source_steps": [
+            5
+          ],
+          "coverage": "COVERED"
+        }
+      ],
+      "instruction_notes": [
+        "A szalonna felhasználása sem a GT, sem a JSON-LD elkészítésében nincs részletezve; nem extractor által elhagyott lépés."
+      ],
+      "source_actual_steps": [
+        "A megmosott, meghámozott burgonyát apró kockákra vágjuk, zsírban megsütjük.",
+        "A sertéshúst is kockákra vágjuk, majd nagyon kevés zsíron pirítani kezdjük.",
+        "A meghámozott vöröshagymát felaprítjuk, vagy lereszeljük. A fokhagymát szintén felaprítjuk.",
+        "Hozzáadjuk a húshoz, majd fűszerezzük.",
+        "A burgonyát és a húst az eredeti recept szerint összekeverjük, de ez a lépés elhagyható."
+      ],
+      "lost_steps_by_extractor": 0,
+      "duplicated_steps": 0,
+      "unexpected_content": [],
+      "instruction_order": "PRESERVED",
+      "source_fidelity": {
+        "name_equal": true,
+        "ingredients_equal": true,
+        "raw_instructions_equal": true,
+        "step_text_and_order_equal": true,
+        "step_headings_and_order_equal": true
+      },
+      "warnings": [
+        "A szalonna felhasználása sem a GT, sem a JSON-LD elkészítésében nincs részletezve; nem extractor által elhagyott lépés.",
+        "Forrás JSON-LD és GT tartalmi eltérés; nincs automatikus korrekció."
+      ],
+      "overall_content_verdict": "PARTIAL"
+    },
+    {
+      "id": "10",
+      "url": "https://www.nosalty.hu/recept/sajtos-pogacsa",
+      "expected_title": "Sajtos pogácsa",
+      "extracted_title": "Sajtos pogácsa",
+      "title_result": "MATCH",
+      "title_exact": true,
+      "title_normalized_match": true,
+      "expected_ingredient_count": 10,
+      "extracted_ingredient_count": 10,
+      "ingredient_exact_match_count": 0,
+      "ingredient_match_count": 8,
+      "ingredient_reviewed_correspondences": 10,
+      "ingredient_comparison": [
+        {
+          "expected_index": 1,
+          "extracted_index": 1,
+          "expected": "20 dkg vaj",
+          "extracted": "20 dkg Vaj",
+          "category": "FORMAT_DIFFERENCE",
+          "note": "Csak engedélyezett összehasonlítási normalizálás."
+        },
+        {
+          "expected_index": 2,
+          "extracted_index": 2,
+          "expected": "40 dkg finomliszt",
+          "extracted": "40 dkg Finomliszt",
+          "category": "FORMAT_DIFFERENCE",
+          "note": "Csak engedélyezett összehasonlítási normalizálás."
+        },
+        {
+          "expected_index": 3,
+          "extracted_index": 3,
+          "expected": "2 db tojás",
+          "extracted": "2 db Tojás",
+          "category": "FORMAT_DIFFERENCE",
+          "note": "Csak engedélyezett összehasonlítási normalizálás."
+        },
+        {
+          "expected_index": 4,
+          "extracted_index": 4,
+          "expected": "2 dl tejföl",
+          "extracted": "2 dl Tejföl",
+          "category": "FORMAT_DIFFERENCE",
+          "note": "Csak engedélyezett összehasonlítási normalizálás."
+        },
+        {
+          "expected_index": 5,
+          "extracted_index": 5,
+          "expected": "2.5 dkg friss élesztő",
+          "extracted": "2 dkg Friss élesztő",
+          "category": "CONTENT_DIFFERENCE",
+          "note": "2.5 ↔ 2: valódi mennyiségi eltérés."
+        },
+        {
+          "expected_index": 6,
+          "extracted_index": 6,
+          "expected": "1 dl tej",
+          "extracted": "1 dl Tej langyos",
+          "category": "CONTENT_DIFFERENCE",
+          "note": "Kiegészítő forrásszöveg: langyos. Nem külön hozzávaló."
+        },
+        {
+          "expected_index": 7,
+          "extracted_index": 7,
+          "expected": "1 csipet cukor",
+          "extracted": "1 csipet Cukor",
+          "category": "FORMAT_DIFFERENCE",
+          "note": "Csak engedélyezett összehasonlítási normalizálás."
+        },
+        {
+          "expected_index": 8,
+          "extracted_index": 8,
+          "expected": "1 kávéskanál só",
+          "extracted": "1 kávéskanál Só",
+          "category": "FORMAT_DIFFERENCE",
+          "note": "Csak engedélyezett összehasonlítási normalizálás."
+        },
+        {
+          "expected_index": 9,
+          "extracted_index": 9,
+          "expected": "15 dkg sajt",
+          "extracted": "15 dkg Sajt",
+          "category": "FORMAT_DIFFERENCE",
+          "note": "Csak engedélyezett összehasonlítási normalizálás."
+        },
+        {
+          "expected_index": 10,
+          "extracted_index": 10,
+          "expected": "1 db tojás a kenéshez",
+          "extracted": "1 db Tojás a kenéshez",
+          "category": "FORMAT_DIFFERENCE",
+          "note": "Csak engedélyezett összehasonlítási normalizálás."
+        }
+      ],
+      "missing_ingredients": [],
+      "extra_ingredients": [],
+      "duplicates": {},
+      "introduced_duplicate_count": 0,
+      "order_status": "PRESERVED",
+      "raw_instruction_count": 7,
+      "actual_step_count": 7,
+      "section_heading_count": 0,
+      "heading_kind": "HowToStep.name (nem HowToSection)",
+      "how_to_section_count": 0,
+      "instruction_completeness_result": "COMPLETE",
+      "instruction_result_basis": "GT-folyamatlefedettség; a MISSING_STEP lehet hiányzó részlet is, nem feltétlen teljes művelet.",
+      "instruction_coverage": [
+        {
+          "gt_step": 1,
+          "gt_text": "1. Az élesztőt langyos, enyhén cukros tejben futtasd fel.",
+          "source_steps": [
+            1
+          ],
+          "coverage": "COVERED"
+        },
+        {
+          "gt_step": 2,
+          "gt_text": "2. A lisztet morzsold össze a vajjal és sóval, majd add hozzá a tejfölös tojást és az élesztőt.",
+          "source_steps": [
+            2,
+            3
+          ],
+          "coverage": "COVERED"
+        },
+        {
+          "gt_step": 3,
+          "gt_text": "3. Gyúrd össze és keleszd körülbelül fél órát.",
+          "source_steps": [
+            3,
+            4
+          ],
+          "coverage": "COVERED"
+        },
+        {
+          "gt_step": 4,
+          "gt_text": "4. Nyújtsd és hajtogasd többször rövid pihentetésekkel.",
+          "source_steps": [
+            4
+          ],
+          "coverage": "COVERED"
+        },
+        {
+          "gt_step": 5,
+          "gt_text": "5. Nyújtsd kb. 1,5 cm vastagra, kend meg tojással és szórd meg sajttal.",
+          "source_steps": [
+            5
+          ],
+          "coverage": "COVERED"
+        },
+        {
+          "gt_step": 6,
+          "gt_text": "6. Szaggasd ki, majd 180 °C-on süsd nagyjából 25 percig.",
+          "source_steps": [
+            6,
+            7
+          ],
+          "coverage": "COVERED"
+        }
+      ],
+      "instruction_notes": [
+        "A 7. forráslépésben szó szerinti \\r\\n\\r\\n karakterlánc van; az output ezt változatlanul őrzi."
+      ],
+      "source_actual_steps": [
+        "Készítsük el a kovászt. Ehhez az élesztőt a langyos tejbe morzsoljuk el. Szórjuk meg egy csipet cukorral és egy kis liszttel, majd tegyük félre meleg helyre kb. 10 percre. Akkor jó, ha az élesztő szépen felhólyagosodik.",
+        "A lisztet a vajjal és egy csipet sóval morzsoljuk el. A tejfölt keverjük el a tojással.",
+        "A lisztbe beletesszük a felfuttatott élesztőt és a tejfölös tojást, majd jól összedolgozzuk. Könnyű tésztát kell kapjunk. ",
+        "Takarjuk le, és hagyjuk kelni meleg helyen. Körülbelül 30 perc után nyújtsuk ki nagyjából 1,5 centire, összehajtogatjuk. Tíz perc múlva megint kinyújtjuk és összehajtogatjuk. Ezt háromszor ismételjük meg.",
+        "Megint kinyújtjuk kb 1,5 centi vastagra. Megkenjük tojással, sózzuk, majd megszórjuk reszelt sajttal. ",
+        "Pogácsaszaggatóval szaggassuk ki, és kezünkkel kicsit formázzuk, sodorjuk meg. Így a sütőben felfele fog nőni a pogácsánk, nem fog elfolyni, és nem lesz lapos. ",
+        "Lehetőség szerint magas falú tepsibe pakoljuk őket egymástól kb. 2 centire, hogy ne nőjenek össze.\r\n\r\n180 fokos sütőben 25 perc alatt készre sütjük."
+      ],
+      "lost_steps_by_extractor": 0,
+      "duplicated_steps": 0,
+      "unexpected_content": [],
+      "instruction_order": "PRESERVED",
+      "source_fidelity": {
+        "name_equal": true,
+        "ingredients_equal": true,
+        "raw_instructions_equal": true,
+        "step_text_and_order_equal": true,
+        "step_headings_and_order_equal": true
+      },
+      "warnings": [
+        "A 7. forráslépésben szó szerinti \\r\\n\\r\\n karakterlánc van; az output ezt változatlanul őrzi.",
+        "Forrás JSON-LD és GT tartalmi eltérés; nincs automatikus korrekció."
+      ],
+      "overall_content_verdict": "PARTIAL"
+    }
+  ]
+}

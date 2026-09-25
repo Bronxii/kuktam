@@ -1,0 +1,18 @@
+CÍM:
+Rakott krumpli magyarosan
+
+HOZZÁVALÓK:
+50 dkg krumpli
+1 fej vöröshagyma
+6 db tojás
+kolbász
+tejföl
+szalonna
+só
+bors
+
+ELKÉSZÍTÉS:
+# VISIBLE_SOURCE_REFERENCE_V1: teljes szöveg a mentett HTML-ben, nem összefoglaló.
+# Snapshot: tool/web_import_poc/results/b2_0_sources/source_15.html
+# SHA256: CFEE4334CA8D2333679C9291735723B1A8A81E130F302983B8DE42309C339047
+1. @VISIBLE .block-content > p | index=0 | content=entire element

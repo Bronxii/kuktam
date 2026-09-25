@@ -1,0 +1,1219 @@
+{
+  "method": "B3.0 only. Audit snapshots; no POC extractor, RecipeTextParser, timing or accuracy benchmark. Visible DOM is authoritative. Ingredients retain source wording with layout whitespace collapsed. Full instructions remain in immutable HTML, referenced by selector/index/SHA256, not paraphrased. Future content benchmark must resolve references, not score them as prose. Scope: main recipe only; separate FAQs, comments and standalone notes outside Method/Elkészítés excluded.",
+  "summary": {
+    "already_correct_files": 0,
+    "corrected_files": 8,
+    "title_corrections": 0,
+    "ingredient_line_edit_operations": 38,
+    "instruction_references_corrected": 8,
+    "ingredient_group_headings_restored": 4,
+    "source_jsonld_difference_observations": 4,
+    "format_only_ingredient_edits": 1,
+    "content_ingredient_edits": 37,
+    "instruction_reference_entries": 47,
+    "unresolved": 2,
+    "total_recipes": 10,
+    "audited_recipes": 8
+  },
+  "recipes": [
+    {
+      "id": "21",
+      "domain": "www.bbcgoodfood.com",
+      "snapshot_id": "b3_0/source_21",
+      "url": "https://www.bbcgoodfood.com/recipes/easy-chicken-curry",
+      "visible_title": "Easy chicken curry",
+      "ground_truth_title_status": "GROUND_TRUTH_CORRECT",
+      "ingredient_count_visible": 11,
+      "ingredient_count_ground_truth_before": 11,
+      "ingredient_count_ground_truth_after": 11,
+      "corrected_ingredient_lines": [
+        {
+          "operation": "replace",
+          "before_row": 2,
+          "after_row": 2,
+          "before": "1 onion",
+          "after": "1 onion thinly sliced",
+          "category": "GROUND_TRUTH_FIXED",
+          "format_only": false
+        },
+        {
+          "operation": "replace",
+          "before_row": 3,
+          "after_row": 3,
+          "before": "2 garlic cloves",
+          "after": "2 garlic cloves crushed",
+          "category": "GROUND_TRUTH_FIXED",
+          "format_only": false
+        },
+        {
+          "operation": "replace",
+          "before_row": 4,
+          "after_row": 4,
+          "before": "thumb-sized piece of ginger",
+          "after": "thumb-sized piece of ginger grated",
+          "category": "GROUND_TRUTH_FIXED",
+          "format_only": false
+        },
+        {
+          "operation": "replace",
+          "before_row": 5,
+          "after_row": 5,
+          "before": "6 boneless skinless chicken thighs",
+          "after": "6 chicken thighs boneless and skinless",
+          "category": "GROUND_TRUTH_FIXED",
+          "format_only": false
+        },
+        {
+          "operation": "replace",
+          "before_row": 6,
+          "after_row": 6,
+          "before": "3 tbsp medium spice paste",
+          "after": "3 tbsp medium spice paste (tikka works well)",
+          "category": "GROUND_TRUTH_FIXED",
+          "format_only": false
+        },
+        {
+          "operation": "replace",
+          "before_row": 9,
+          "after_row": 9,
+          "before": "1 small bunch coriander",
+          "after": "1 small bunch of coriander leaves chopped",
+          "category": "GROUND_TRUTH_FIXED",
+          "format_only": false
+        },
+        {
+          "operation": "replace",
+          "before_row": 11,
+          "after_row": 11,
+          "before": "naan breads or basmati rice",
+          "after": "naan breads or cooked basmati rice, to serve",
+          "category": "GROUND_TRUTH_FIXED",
+          "format_only": false
+        }
+      ],
+      "ingredient_groups": [],
+      "ingredient_status": "GROUND_TRUTH_FIXED",
+      "instruction_structure_before": {
+        "entries": 6,
+        "kind": "paraphrased numbered reference"
+      },
+      "instruction_structure_after": {
+        "entries": 4,
+        "kind": "ordered steps",
+        "references": [
+          {
+            "index": 1,
+            "snapshot": "results/b3_0_sources/source_21.html",
+            "snapshot_sha256": "B4D6F70B796D381AADB6E0C1F8D0481FC48041E5A8B31436627539FF0CF57003",
+            "selector": ".method-steps__list-item",
+            "selector_index_zero_based": 0,
+            "heading": "step 1",
+            "content_scope": ".editor-content",
+            "text_length": 204
+          },
+          {
+            "index": 2,
+            "snapshot": "results/b3_0_sources/source_21.html",
+            "snapshot_sha256": "B4D6F70B796D381AADB6E0C1F8D0481FC48041E5A8B31436627539FF0CF57003",
+            "selector": ".method-steps__list-item",
+            "selector_index_zero_based": 1,
+            "heading": "step 2",
+            "content_scope": ".editor-content",
+            "text_length": 56
+          },
+          {
+            "index": 3,
+            "snapshot": "results/b3_0_sources/source_21.html",
+            "snapshot_sha256": "B4D6F70B796D381AADB6E0C1F8D0481FC48041E5A8B31436627539FF0CF57003",
+            "selector": ".method-steps__list-item",
+            "selector_index_zero_based": 2,
+            "heading": "step 3",
+            "content_scope": ".editor-content",
+            "text_length": 276
+          },
+          {
+            "index": 4,
+            "snapshot": "results/b3_0_sources/source_21.html",
+            "snapshot_sha256": "B4D6F70B796D381AADB6E0C1F8D0481FC48041E5A8B31436627539FF0CF57003",
+            "selector": ".method-steps__list-item",
+            "selector_index_zero_based": 3,
+            "heading": "step 4",
+            "content_scope": ".editor-content",
+            "text_length": 109
+          }
+        ],
+        "status": "GROUND_TRUTH_FIXED"
+      },
+      "source_jsonld_differences_observed": [],
+      "unresolved_issues": [],
+      "evidence": {
+        "snapshot": "results/b3_0_sources/source_21.html",
+        "sha256": "B4D6F70B796D381AADB6E0C1F8D0481FC48041E5A8B31436627539FF0CF57003",
+        "retrieved_at": "2026-09-25T12:32:36.6252507Z",
+        "title_selector": "h1",
+        "ingredient_selector": ".ingredients-list__item"
+      }
+    },
+    {
+      "id": "22",
+      "domain": "www.bbcgoodfood.com",
+      "snapshot_id": "b3_0/source_22",
+      "url": "https://www.bbcgoodfood.com/recipes/easy-pancakes",
+      "visible_title": "Easy pancakes",
+      "ground_truth_title_status": "GROUND_TRUTH_CORRECT",
+      "ingredient_count_visible": 6,
+      "ingredient_count_ground_truth_before": 7,
+      "ingredient_count_ground_truth_after": 6,
+      "corrected_ingredient_lines": [
+        {
+          "operation": "remove",
+          "before_row": 4,
+          "before": "1 tbsp sunflower or vegetable oil",
+          "category": "GROUND_TRUTH_FIXED"
+        },
+        {
+          "operation": "replace",
+          "before_row": 5,
+          "after_row": 4,
+          "before": "extra oil for frying",
+          "after": "1 tbsp sunflower or vegetable oil plus a little extra for frying",
+          "category": "GROUND_TRUTH_FIXED",
+          "format_only": false
+        },
+        {
+          "operation": "replace",
+          "before_row": 6,
+          "after_row": 5,
+          "before": "lemon wedges optional",
+          "after": "lemon wedges to serve (optional)",
+          "category": "GROUND_TRUTH_FIXED",
+          "format_only": false
+        },
+        {
+          "operation": "replace",
+          "before_row": 7,
+          "after_row": 6,
+          "before": "caster sugar optional",
+          "after": "caster sugar to serve (optional)",
+          "category": "GROUND_TRUTH_FIXED",
+          "format_only": false
+        }
+      ],
+      "ingredient_groups": [],
+      "ingredient_status": "GROUND_TRUTH_FIXED",
+      "instruction_structure_before": {
+        "entries": 5,
+        "kind": "paraphrased numbered reference"
+      },
+      "instruction_structure_after": {
+        "entries": 5,
+        "kind": "ordered steps",
+        "references": [
+          {
+            "index": 1,
+            "snapshot": "results/b3_0_sources/source_22.html",
+            "snapshot_sha256": "3CBEE9866978FF1C042286BFFD9D7D6A820FB684C693C68D54F064D358CA59C1",
+            "selector": ".method-steps__list-item",
+            "selector_index_zero_based": 0,
+            "heading": "step 1",
+            "content_scope": ".editor-content",
+            "text_length": 213
+          },
+          {
+            "index": 2,
+            "snapshot": "results/b3_0_sources/source_22.html",
+            "snapshot_sha256": "3CBEE9866978FF1C042286BFFD9D7D6A820FB684C693C68D54F064D358CA59C1",
+            "selector": ".method-steps__list-item",
+            "selector_index_zero_based": 1,
+            "heading": "step 2",
+            "content_scope": ".editor-content",
+            "text_length": 79
+          },
+          {
+            "index": 3,
+            "snapshot": "results/b3_0_sources/source_22.html",
+            "snapshot_sha256": "3CBEE9866978FF1C042286BFFD9D7D6A820FB684C693C68D54F064D358CA59C1",
+            "selector": ".method-steps__list-item",
+            "selector_index_zero_based": 2,
+            "heading": "step 3",
+            "content_scope": ".editor-content",
+            "text_length": 108
+          },
+          {
+            "index": 4,
+            "snapshot": "results/b3_0_sources/source_22.html",
+            "snapshot_sha256": "3CBEE9866978FF1C042286BFFD9D7D6A820FB684C693C68D54F064D358CA59C1",
+            "selector": ".method-steps__list-item",
+            "selector_index_zero_based": 3,
+            "heading": "step 4",
+            "content_scope": ".editor-content",
+            "text_length": 168
+          },
+          {
+            "index": 5,
+            "snapshot": "results/b3_0_sources/source_22.html",
+            "snapshot_sha256": "3CBEE9866978FF1C042286BFFD9D7D6A820FB684C693C68D54F064D358CA59C1",
+            "selector": ".method-steps__list-item",
+            "selector_index_zero_based": 4,
+            "heading": "step 5",
+            "content_scope": ".editor-content",
+            "text_length": 189
+          }
+        ],
+        "status": "GROUND_TRUTH_FIXED"
+      },
+      "source_jsonld_differences_observed": [],
+      "unresolved_issues": [],
+      "evidence": {
+        "snapshot": "results/b3_0_sources/source_22.html",
+        "sha256": "3CBEE9866978FF1C042286BFFD9D7D6A820FB684C693C68D54F064D358CA59C1",
+        "retrieved_at": "2026-09-25T12:32:36.7662761Z",
+        "title_selector": "h1",
+        "ingredient_selector": ".ingredients-list__item"
+      }
+    },
+    {
+      "id": "23",
+      "domain": "www.bbcgoodfood.com",
+      "snapshot_id": "b3_0/source_23",
+      "url": "https://www.bbcgoodfood.com/recipes/fish-pie-four-steps",
+      "visible_title": "Fish pie - in four steps",
+      "ground_truth_title_status": "GROUND_TRUTH_CORRECT",
+      "ingredient_count_visible": 13,
+      "ingredient_count_ground_truth_before": 13,
+      "ingredient_count_ground_truth_after": 13,
+      "corrected_ingredient_lines": [
+        {
+          "operation": "replace",
+          "before_row": 4,
+          "after_row": 4,
+          "before": "1 small onion",
+          "after": "1 small onion quartered",
+          "category": "GROUND_TRUTH_FIXED",
+          "format_only": false
+        },
+        {
+          "operation": "replace",
+          "before_row": 8,
+          "after_row": 8,
+          "before": "small bunch parsley",
+          "after": "small bunch parsley leaves only, chopped",
+          "category": "GROUND_TRUTH_FIXED",
+          "format_only": false
+        },
+        {
+          "operation": "replace",
+          "before_row": 11,
+          "after_row": 11,
+          "before": "pinch nutmeg",
+          "after": "pinch freshly grated nutmeg",
+          "category": "GROUND_TRUTH_FIXED",
+          "format_only": false
+        },
+        {
+          "operation": "replace",
+          "before_row": 12,
+          "after_row": 12,
+          "before": "1kg floury potatoes",
+          "after": "1kg floury potato peeled and cut into even-sized chunks",
+          "category": "GROUND_TRUTH_FIXED",
+          "format_only": false
+        },
+        {
+          "operation": "replace",
+          "before_row": 13,
+          "after_row": 13,
+          "before": "50g cheddar",
+          "after": "50g cheddar grated",
+          "category": "GROUND_TRUTH_FIXED",
+          "format_only": false
+        }
+      ],
+      "ingredient_groups": [],
+      "ingredient_status": "GROUND_TRUTH_FIXED",
+      "instruction_structure_before": {
+        "entries": 5,
+        "kind": "paraphrased numbered reference"
+      },
+      "instruction_structure_after": {
+        "entries": 4,
+        "kind": "ordered steps",
+        "references": [
+          {
+            "index": 1,
+            "snapshot": "results/b3_0_sources/source_23.html",
+            "snapshot_sha256": "699410C301850CF0C5CE870B42F8FDA04E39B5A351CB34AFA199B82975EAE6CB",
+            "selector": ".method-steps__list-item",
+            "selector_index_zero_based": 0,
+            "heading": "step 1",
+            "content_scope": ".editor-content",
+            "text_length": 483
+          },
+          {
+            "index": 2,
+            "snapshot": "results/b3_0_sources/source_23.html",
+            "snapshot_sha256": "699410C301850CF0C5CE870B42F8FDA04E39B5A351CB34AFA199B82975EAE6CB",
+            "selector": ".method-steps__list-item",
+            "selector_index_zero_based": 1,
+            "heading": "step 2",
+            "content_scope": ".editor-content",
+            "text_length": 410
+          },
+          {
+            "index": 3,
+            "snapshot": "results/b3_0_sources/source_23.html",
+            "snapshot_sha256": "699410C301850CF0C5CE870B42F8FDA04E39B5A351CB34AFA199B82975EAE6CB",
+            "selector": ".method-steps__list-item",
+            "selector_index_zero_based": 2,
+            "heading": "step 3",
+            "content_scope": ".editor-content",
+            "text_length": 498
+          },
+          {
+            "index": 4,
+            "snapshot": "results/b3_0_sources/source_23.html",
+            "snapshot_sha256": "699410C301850CF0C5CE870B42F8FDA04E39B5A351CB34AFA199B82975EAE6CB",
+            "selector": ".method-steps__list-item",
+            "selector_index_zero_based": 3,
+            "heading": "step 4",
+            "content_scope": ".editor-content",
+            "text_length": 447
+          }
+        ],
+        "status": "GROUND_TRUTH_FIXED"
+      },
+      "source_jsonld_differences_observed": [],
+      "unresolved_issues": [],
+      "evidence": {
+        "snapshot": "results/b3_0_sources/source_23.html",
+        "sha256": "699410C301850CF0C5CE870B42F8FDA04E39B5A351CB34AFA199B82975EAE6CB",
+        "retrieved_at": "2026-09-25T12:32:36.9186172Z",
+        "title_selector": "h1",
+        "ingredient_selector": ".ingredients-list__item"
+      }
+    },
+    {
+      "id": "24",
+      "domain": "www.bbcgoodfood.com",
+      "snapshot_id": "b3_0/source_24",
+      "url": "https://www.bbcgoodfood.com/recipes/best-ever-chocolate-brownies-recipe",
+      "visible_title": "Best ever chocolate brownies recipe",
+      "ground_truth_title_status": "GROUND_TRUTH_CORRECT",
+      "ingredient_count_visible": 8,
+      "ingredient_count_ground_truth_before": 8,
+      "ingredient_count_ground_truth_after": 8,
+      "corrected_ingredient_lines": [
+        {
+          "operation": "replace",
+          "before_row": 2,
+          "after_row": 2,
+          "before": "185g dark chocolate",
+          "after": "185g best dark chocolate",
+          "category": "GROUND_TRUTH_FIXED",
+          "format_only": false
+        }
+      ],
+      "ingredient_groups": [],
+      "ingredient_status": "GROUND_TRUTH_FIXED",
+      "instruction_structure_before": {
+        "entries": 6,
+        "kind": "paraphrased numbered reference"
+      },
+      "instruction_structure_after": {
+        "entries": 15,
+        "kind": "ordered steps",
+        "references": [
+          {
+            "index": 1,
+            "snapshot": "results/b3_0_sources/source_24.html",
+            "snapshot_sha256": "34761FBBFCAA228A5327C1AD96E3D9E5ED33AEB00B6A7D37F887BF43821F6905",
+            "selector": ".method-steps__list-item",
+            "selector_index_zero_based": 0,
+            "heading": "step 1",
+            "content_scope": ".editor-content",
+            "text_length": 137
+          },
+          {
+            "index": 2,
+            "snapshot": "results/b3_0_sources/source_24.html",
+            "snapshot_sha256": "34761FBBFCAA228A5327C1AD96E3D9E5ED33AEB00B6A7D37F887BF43821F6905",
+            "selector": ".method-steps__list-item",
+            "selector_index_zero_based": 1,
+            "heading": "step 2",
+            "content_scope": ".editor-content",
+            "text_length": 241
+          },
+          {
+            "index": 3,
+            "snapshot": "results/b3_0_sources/source_24.html",
+            "snapshot_sha256": "34761FBBFCAA228A5327C1AD96E3D9E5ED33AEB00B6A7D37F887BF43821F6905",
+            "selector": ".method-steps__list-item",
+            "selector_index_zero_based": 2,
+            "heading": "step 3",
+            "content_scope": ".editor-content",
+            "text_length": 185
+          },
+          {
+            "index": 4,
+            "snapshot": "results/b3_0_sources/source_24.html",
+            "snapshot_sha256": "34761FBBFCAA228A5327C1AD96E3D9E5ED33AEB00B6A7D37F887BF43821F6905",
+            "selector": ".method-steps__list-item",
+            "selector_index_zero_based": 3,
+            "heading": "step 4",
+            "content_scope": ".editor-content",
+            "text_length": 130
+          },
+          {
+            "index": 5,
+            "snapshot": "results/b3_0_sources/source_24.html",
+            "snapshot_sha256": "34761FBBFCAA228A5327C1AD96E3D9E5ED33AEB00B6A7D37F887BF43821F6905",
+            "selector": ".method-steps__list-item",
+            "selector_index_zero_based": 4,
+            "heading": "step 5",
+            "content_scope": ".editor-content",
+            "text_length": 277
+          },
+          {
+            "index": 6,
+            "snapshot": "results/b3_0_sources/source_24.html",
+            "snapshot_sha256": "34761FBBFCAA228A5327C1AD96E3D9E5ED33AEB00B6A7D37F887BF43821F6905",
+            "selector": ".method-steps__list-item",
+            "selector_index_zero_based": 5,
+            "heading": "step 6",
+            "content_scope": ".editor-content",
+            "text_length": 71
+          },
+          {
+            "index": 7,
+            "snapshot": "results/b3_0_sources/source_24.html",
+            "snapshot_sha256": "34761FBBFCAA228A5327C1AD96E3D9E5ED33AEB00B6A7D37F887BF43821F6905",
+            "selector": ".method-steps__list-item",
+            "selector_index_zero_based": 6,
+            "heading": "step 7",
+            "content_scope": ".editor-content",
+            "text_length": 587
+          },
+          {
+            "index": 8,
+            "snapshot": "results/b3_0_sources/source_24.html",
+            "snapshot_sha256": "34761FBBFCAA228A5327C1AD96E3D9E5ED33AEB00B6A7D37F887BF43821F6905",
+            "selector": ".method-steps__list-item",
+            "selector_index_zero_based": 7,
+            "heading": "step 8",
+            "content_scope": ".editor-content",
+            "text_length": 515
+          },
+          {
+            "index": 9,
+            "snapshot": "results/b3_0_sources/source_24.html",
+            "snapshot_sha256": "34761FBBFCAA228A5327C1AD96E3D9E5ED33AEB00B6A7D37F887BF43821F6905",
+            "selector": ".method-steps__list-item",
+            "selector_index_zero_based": 8,
+            "heading": "step 9",
+            "content_scope": ".editor-content",
+            "text_length": 156
+          },
+          {
+            "index": 10,
+            "snapshot": "results/b3_0_sources/source_24.html",
+            "snapshot_sha256": "34761FBBFCAA228A5327C1AD96E3D9E5ED33AEB00B6A7D37F887BF43821F6905",
+            "selector": ".method-steps__list-item",
+            "selector_index_zero_based": 9,
+            "heading": "step 10",
+            "content_scope": ".editor-content",
+            "text_length": 312
+          },
+          {
+            "index": 11,
+            "snapshot": "results/b3_0_sources/source_24.html",
+            "snapshot_sha256": "34761FBBFCAA228A5327C1AD96E3D9E5ED33AEB00B6A7D37F887BF43821F6905",
+            "selector": ".method-steps__list-item",
+            "selector_index_zero_based": 10,
+            "heading": "step 11",
+            "content_scope": ".editor-content",
+            "text_length": 85
+          },
+          {
+            "index": 12,
+            "snapshot": "results/b3_0_sources/source_24.html",
+            "snapshot_sha256": "34761FBBFCAA228A5327C1AD96E3D9E5ED33AEB00B6A7D37F887BF43821F6905",
+            "selector": ".method-steps__list-item",
+            "selector_index_zero_based": 11,
+            "heading": "step 12",
+            "content_scope": ".editor-content",
+            "text_length": 213
+          },
+          {
+            "index": 13,
+            "snapshot": "results/b3_0_sources/source_24.html",
+            "snapshot_sha256": "34761FBBFCAA228A5327C1AD96E3D9E5ED33AEB00B6A7D37F887BF43821F6905",
+            "selector": ".method-steps__list-item",
+            "selector_index_zero_based": 12,
+            "heading": "step 13",
+            "content_scope": ".editor-content",
+            "text_length": 367
+          },
+          {
+            "index": 14,
+            "snapshot": "results/b3_0_sources/source_24.html",
+            "snapshot_sha256": "34761FBBFCAA228A5327C1AD96E3D9E5ED33AEB00B6A7D37F887BF43821F6905",
+            "selector": ".method-steps__list-item",
+            "selector_index_zero_based": 13,
+            "heading": "step 14",
+            "content_scope": ".editor-content",
+            "text_length": 343
+          },
+          {
+            "index": 15,
+            "snapshot": "results/b3_0_sources/source_24.html",
+            "snapshot_sha256": "34761FBBFCAA228A5327C1AD96E3D9E5ED33AEB00B6A7D37F887BF43821F6905",
+            "selector": ".method-steps__list-item",
+            "selector_index_zero_based": 14,
+            "heading": "step 15",
+            "content_scope": ".editor-content",
+            "text_length": 96
+          }
+        ],
+        "status": "GROUND_TRUTH_FIXED"
+      },
+      "source_jsonld_differences_observed": [],
+      "unresolved_issues": [],
+      "evidence": {
+        "snapshot": "results/b3_0_sources/source_24.html",
+        "sha256": "34761FBBFCAA228A5327C1AD96E3D9E5ED33AEB00B6A7D37F887BF43821F6905",
+        "retrieved_at": "2026-09-25T12:32:37.0354717Z",
+        "title_selector": "h1",
+        "ingredient_selector": ".ingredients-list__item"
+      }
+    },
+    {
+      "id": "25",
+      "domain": "www.bbcgoodfood.com",
+      "snapshot_id": "b3_0/source_25",
+      "url": "https://www.bbcgoodfood.com/recipes/best-apple-crumble",
+      "visible_title": "Easy apple crumble recipe",
+      "ground_truth_title_status": "GROUND_TRUTH_CORRECT",
+      "ingredient_count_visible": 8,
+      "ingredient_count_ground_truth_before": 8,
+      "ingredient_count_ground_truth_after": 8,
+      "corrected_ingredient_lines": [
+        {
+          "operation": "replace",
+          "before_row": 1,
+          "after_row": 1,
+          "before": "575g Bramley apples",
+          "after": "575g Bramley apple (3 medium apples), peeled, cored and sliced to 1cm thick",
+          "category": "GROUND_TRUTH_FIXED",
+          "format_only": false
+        },
+        {
+          "operation": "replace",
+          "before_row": 6,
+          "after_row": 6,
+          "before": "1 tbsp rolled oats optional",
+          "after": "1 tbsp rolled oats",
+          "category": "GROUND_TRUTH_FIXED",
+          "format_only": false
+        },
+        {
+          "operation": "replace",
+          "before_row": 7,
+          "after_row": 7,
+          "before": "1 tbsp demerara sugar optional",
+          "after": "1 tbsp demerara sugar",
+          "category": "GROUND_TRUTH_FIXED",
+          "format_only": false
+        },
+        {
+          "operation": "replace",
+          "before_row": 8,
+          "after_row": 8,
+          "before": "cream or custard to serve",
+          "after": "double cream clotted cream or custard, to serve",
+          "category": "GROUND_TRUTH_FIXED",
+          "format_only": false
+        }
+      ],
+      "ingredient_groups": [
+        {
+          "before_row": 1,
+          "heading": "For the filling"
+        },
+        {
+          "before_row": 3,
+          "heading": "For the crumble"
+        },
+        {
+          "before_row": 6,
+          "heading": "For the topping (optional)"
+        }
+      ],
+      "ingredient_status": "GROUND_TRUTH_FIXED",
+      "instruction_structure_before": {
+        "entries": 6,
+        "kind": "paraphrased numbered reference"
+      },
+      "instruction_structure_after": {
+        "entries": 8,
+        "kind": "ordered steps",
+        "references": [
+          {
+            "index": 1,
+            "snapshot": "results/b3_0_sources/source_25.html",
+            "snapshot_sha256": "92681788A6D6DB71430738D4181295FA2844AF9833114C4A54EB988B7798CDE8",
+            "selector": ".method-steps__list-item",
+            "selector_index_zero_based": 0,
+            "heading": "step 1",
+            "content_scope": ".editor-content",
+            "text_length": 36
+          },
+          {
+            "index": 2,
+            "snapshot": "results/b3_0_sources/source_25.html",
+            "snapshot_sha256": "92681788A6D6DB71430738D4181295FA2844AF9833114C4A54EB988B7798CDE8",
+            "selector": ".method-steps__list-item",
+            "selector_index_zero_based": 1,
+            "heading": "step 2",
+            "content_scope": ".editor-content",
+            "text_length": 232
+          },
+          {
+            "index": 3,
+            "snapshot": "results/b3_0_sources/source_25.html",
+            "snapshot_sha256": "92681788A6D6DB71430738D4181295FA2844AF9833114C4A54EB988B7798CDE8",
+            "selector": ".method-steps__list-item",
+            "selector_index_zero_based": 2,
+            "heading": "step 3",
+            "content_scope": ".editor-content",
+            "text_length": 86
+          },
+          {
+            "index": 4,
+            "snapshot": "results/b3_0_sources/source_25.html",
+            "snapshot_sha256": "92681788A6D6DB71430738D4181295FA2844AF9833114C4A54EB988B7798CDE8",
+            "selector": ".method-steps__list-item",
+            "selector_index_zero_based": 3,
+            "heading": "step 4",
+            "content_scope": ".editor-content",
+            "text_length": 250
+          },
+          {
+            "index": 5,
+            "snapshot": "results/b3_0_sources/source_25.html",
+            "snapshot_sha256": "92681788A6D6DB71430738D4181295FA2844AF9833114C4A54EB988B7798CDE8",
+            "selector": ".method-steps__list-item",
+            "selector_index_zero_based": 4,
+            "heading": "step 5",
+            "content_scope": ".editor-content",
+            "text_length": 93
+          },
+          {
+            "index": 6,
+            "snapshot": "results/b3_0_sources/source_25.html",
+            "snapshot_sha256": "92681788A6D6DB71430738D4181295FA2844AF9833114C4A54EB988B7798CDE8",
+            "selector": ".method-steps__list-item",
+            "selector_index_zero_based": 5,
+            "heading": "step 6",
+            "content_scope": ".editor-content",
+            "text_length": 161
+          },
+          {
+            "index": 7,
+            "snapshot": "results/b3_0_sources/source_25.html",
+            "snapshot_sha256": "92681788A6D6DB71430738D4181295FA2844AF9833114C4A54EB988B7798CDE8",
+            "selector": ".method-steps__list-item",
+            "selector_index_zero_based": 6,
+            "heading": "step 7",
+            "content_scope": ".editor-content",
+            "text_length": 79
+          },
+          {
+            "index": 8,
+            "snapshot": "results/b3_0_sources/source_25.html",
+            "snapshot_sha256": "92681788A6D6DB71430738D4181295FA2844AF9833114C4A54EB988B7798CDE8",
+            "selector": ".method-steps__list-item",
+            "selector_index_zero_based": 7,
+            "heading": "step 8",
+            "content_scope": ".editor-content",
+            "text_length": 206
+          }
+        ],
+        "status": "GROUND_TRUTH_FIXED"
+      },
+      "source_jsonld_differences_observed": [
+        {
+          "field": "ingredient_group",
+          "category": "SOURCE_JSONLD_DIFFERENCE",
+          "visible": "For the filling",
+          "json_ld": null,
+          "note": "A lapos recipeIngredient listában nincs csoportcím."
+        },
+        {
+          "field": "ingredient_group",
+          "category": "SOURCE_JSONLD_DIFFERENCE",
+          "visible": "For the crumble",
+          "json_ld": null,
+          "note": "A lapos recipeIngredient listában nincs csoportcím."
+        },
+        {
+          "field": "ingredient_group",
+          "category": "SOURCE_JSONLD_DIFFERENCE",
+          "visible": "For the topping (optional)",
+          "json_ld": null,
+          "note": "A lapos recipeIngredient listában nincs csoportcím."
+        }
+      ],
+      "unresolved_issues": [],
+      "evidence": {
+        "snapshot": "results/b3_0_sources/source_25.html",
+        "sha256": "92681788A6D6DB71430738D4181295FA2844AF9833114C4A54EB988B7798CDE8",
+        "retrieved_at": "2026-09-25T12:32:37.1591012Z",
+        "title_selector": "h1",
+        "ingredient_selector": ".ingredients-list__item"
+      }
+    },
+    {
+      "id": "26",
+      "domain": "www.bbcgoodfood.com",
+      "snapshot_id": "b3_0/source_26",
+      "url": "https://www.bbcgoodfood.com/recipes/tomato-soup",
+      "visible_title": "Tomato soup",
+      "ground_truth_title_status": "GROUND_TRUTH_CORRECT",
+      "ingredient_count_visible": 9,
+      "ingredient_count_ground_truth_before": 9,
+      "ingredient_count_ground_truth_after": 9,
+      "corrected_ingredient_lines": [
+        {
+          "operation": "replace",
+          "before_row": 1,
+          "after_row": 1,
+          "before": "1-1.25kg ripe tomatoes",
+          "after": "1-1.25kg/2lb 4oz-2lb 12oz ripe tomatoes",
+          "category": "GROUND_TRUTH_FIXED",
+          "format_only": false
+        },
+        {
+          "operation": "replace",
+          "before_row": 6,
+          "after_row": 6,
+          "before": "2 tsp tomato purée",
+          "after": "2 squirts of tomato purée (about 2 tsp)",
+          "category": "GROUND_TRUTH_FIXED",
+          "format_only": false
+        },
+        {
+          "operation": "replace",
+          "before_row": 7,
+          "after_row": 7,
+          "before": "pinch of sugar",
+          "after": "a good pinch of sugar",
+          "category": "GROUND_TRUTH_FIXED",
+          "format_only": false
+        },
+        {
+          "operation": "replace",
+          "before_row": 9,
+          "after_row": 9,
+          "before": "1.2 litres hot vegetable stock",
+          "after": "1.2 litres/2 pints hot vegetable stock (made with boiling water and 4 rounded tsp bouillon powder or 2 stock cubes)",
+          "category": "GROUND_TRUTH_FIXED",
+          "format_only": false
+        }
+      ],
+      "ingredient_groups": [],
+      "ingredient_status": "GROUND_TRUTH_FIXED",
+      "instruction_structure_before": {
+        "entries": 6,
+        "kind": "paraphrased numbered reference"
+      },
+      "instruction_structure_after": {
+        "entries": 6,
+        "kind": "ordered steps",
+        "references": [
+          {
+            "index": 1,
+            "snapshot": "results/b3_0_sources/source_26.html",
+            "snapshot_sha256": "EB24C9CD530FFD2C7EA35B515E3FAE0970608CEC29C56B0204D51290B6E7B014",
+            "selector": ".method-steps__list-item",
+            "selector_index_zero_based": 0,
+            "heading": "step 1",
+            "content_scope": ".editor-content",
+            "text_length": 567
+          },
+          {
+            "index": 2,
+            "snapshot": "results/b3_0_sources/source_26.html",
+            "snapshot_sha256": "EB24C9CD530FFD2C7EA35B515E3FAE0970608CEC29C56B0204D51290B6E7B014",
+            "selector": ".method-steps__list-item",
+            "selector_index_zero_based": 1,
+            "heading": "step 2",
+            "content_scope": ".editor-content",
+            "text_length": 467
+          },
+          {
+            "index": 3,
+            "snapshot": "results/b3_0_sources/source_26.html",
+            "snapshot_sha256": "EB24C9CD530FFD2C7EA35B515E3FAE0970608CEC29C56B0204D51290B6E7B014",
+            "selector": ".method-steps__list-item",
+            "selector_index_zero_based": 2,
+            "heading": "step 3",
+            "content_scope": ".editor-content",
+            "text_length": 564
+          },
+          {
+            "index": 4,
+            "snapshot": "results/b3_0_sources/source_26.html",
+            "snapshot_sha256": "EB24C9CD530FFD2C7EA35B515E3FAE0970608CEC29C56B0204D51290B6E7B014",
+            "selector": ".method-steps__list-item",
+            "selector_index_zero_based": 3,
+            "heading": "step 4",
+            "content_scope": ".editor-content",
+            "text_length": 474
+          },
+          {
+            "index": 5,
+            "snapshot": "results/b3_0_sources/source_26.html",
+            "snapshot_sha256": "EB24C9CD530FFD2C7EA35B515E3FAE0970608CEC29C56B0204D51290B6E7B014",
+            "selector": ".method-steps__list-item",
+            "selector_index_zero_based": 4,
+            "heading": "step 5",
+            "content_scope": ".editor-content",
+            "text_length": 560
+          },
+          {
+            "index": 6,
+            "snapshot": "results/b3_0_sources/source_26.html",
+            "snapshot_sha256": "EB24C9CD530FFD2C7EA35B515E3FAE0970608CEC29C56B0204D51290B6E7B014",
+            "selector": ".method-steps__list-item",
+            "selector_index_zero_based": 5,
+            "heading": "step 6",
+            "content_scope": ".editor-content",
+            "text_length": 490
+          }
+        ],
+        "status": "GROUND_TRUTH_FIXED"
+      },
+      "source_jsonld_differences_observed": [],
+      "unresolved_issues": [],
+      "evidence": {
+        "snapshot": "results/b3_0_sources/source_26.html",
+        "sha256": "EB24C9CD530FFD2C7EA35B515E3FAE0970608CEC29C56B0204D51290B6E7B014",
+        "retrieved_at": "2026-09-25T12:32:37.3239628Z",
+        "title_selector": "h1",
+        "ingredient_selector": ".ingredients-list__item"
+      }
+    },
+    {
+      "id": "27",
+      "domain": "www.bbcgoodfood.com",
+      "snapshot_id": "b3_0/source_27",
+      "url": "https://www.bbcgoodfood.com/recipes/real-tomato-soup",
+      "visible_title": "Real tomato soup",
+      "ground_truth_title_status": "GROUND_TRUTH_CORRECT",
+      "ingredient_count_visible": 8,
+      "ingredient_count_ground_truth_before": 8,
+      "ingredient_count_ground_truth_after": 8,
+      "corrected_ingredient_lines": [
+        {
+          "operation": "replace",
+          "before_row": 2,
+          "after_row": 2,
+          "before": "1 onion",
+          "after": "1 onion chopped",
+          "category": "GROUND_TRUTH_FIXED",
+          "format_only": false
+        },
+        {
+          "operation": "replace",
+          "before_row": 3,
+          "after_row": 3,
+          "before": "1 garlic clove",
+          "after": "1 garlic clove finely chopped",
+          "category": "GROUND_TRUTH_FIXED",
+          "format_only": false
+        },
+        {
+          "operation": "replace",
+          "before_row": 6,
+          "after_row": 6,
+          "before": "handful basil leaves",
+          "after": "handful basil leaf",
+          "category": "GROUND_TRUTH_FIXED",
+          "format_only": false
+        }
+      ],
+      "ingredient_groups": [],
+      "ingredient_status": "GROUND_TRUTH_FIXED",
+      "instruction_structure_before": {
+        "entries": 6,
+        "kind": "paraphrased numbered reference"
+      },
+      "instruction_structure_after": {
+        "entries": 2,
+        "kind": "ordered steps",
+        "references": [
+          {
+            "index": 1,
+            "snapshot": "results/b3_0_sources/source_27.html",
+            "snapshot_sha256": "89199BA080737CBBD4ECC2287655C577427E1EE4E40B542826B0C18697A63E57",
+            "selector": ".method-steps__list-item",
+            "selector_index_zero_based": 0,
+            "heading": "step 1",
+            "content_scope": ".editor-content",
+            "text_length": 463
+          },
+          {
+            "index": 2,
+            "snapshot": "results/b3_0_sources/source_27.html",
+            "snapshot_sha256": "89199BA080737CBBD4ECC2287655C577427E1EE4E40B542826B0C18697A63E57",
+            "selector": ".method-steps__list-item",
+            "selector_index_zero_based": 1,
+            "heading": "step 2",
+            "content_scope": ".editor-content",
+            "text_length": 359
+          }
+        ],
+        "status": "GROUND_TRUTH_FIXED"
+      },
+      "source_jsonld_differences_observed": [],
+      "unresolved_issues": [],
+      "evidence": {
+        "snapshot": "results/b3_0_sources/source_27.html",
+        "sha256": "89199BA080737CBBD4ECC2287655C577427E1EE4E40B542826B0C18697A63E57",
+        "retrieved_at": "2026-09-25T12:32:37.4822046Z",
+        "title_selector": "h1",
+        "ingredient_selector": ".ingredients-list__item"
+      }
+    },
+    {
+      "id": "28",
+      "domain": "www.bbcgoodfood.com",
+      "snapshot_id": "b3_0/source_28",
+      "url": "https://www.bbcgoodfood.com/recipes/chicken-chilli-con-carne",
+      "visible_title": "Chicken chilli con carne",
+      "ground_truth_title_status": "GROUND_TRUTH_CORRECT",
+      "ingredient_count_visible": 19,
+      "ingredient_count_ground_truth_before": 17,
+      "ingredient_count_ground_truth_after": 19,
+      "corrected_ingredient_lines": [
+        {
+          "operation": "replace",
+          "before_row": 2,
+          "after_row": 2,
+          "before": "1 onion",
+          "after": "1 onion sliced",
+          "category": "GROUND_TRUTH_FIXED",
+          "format_only": false
+        },
+        {
+          "operation": "replace",
+          "before_row": 3,
+          "after_row": 3,
+          "before": "2 mixed peppers",
+          "after": "2 mixed peppers sliced (use red, yellow or orange peppers)",
+          "category": "GROUND_TRUTH_FIXED",
+          "format_only": false
+        },
+        {
+          "operation": "replace",
+          "before_row": 4,
+          "after_row": 4,
+          "before": "2 large garlic cloves",
+          "after": "2 large garlic cloves crushed",
+          "category": "GROUND_TRUTH_FIXED",
+          "format_only": false
+        },
+        {
+          "operation": "replace",
+          "before_row": 5,
+          "after_row": 5,
+          "before": "1 small bunch coriander",
+          "after": "1 small bunch of coriander stalks finely chopped and leaves roughly chopped",
+          "category": "GROUND_TRUTH_FIXED",
+          "format_only": false
+        },
+        {
+          "operation": "replace",
+          "before_row": 6,
+          "after_row": 6,
+          "before": "0.5 tbsp ground coriander",
+          "after": "½ tbsp ground coriander",
+          "category": "FORMAT_ONLY",
+          "format_only": true
+        },
+        {
+          "operation": "replace",
+          "before_row": 13,
+          "after_row": 13,
+          "before": "4 skinless chicken thighs",
+          "after": "4 skinless chicken thighs bone-in",
+          "category": "GROUND_TRUTH_FIXED",
+          "format_only": false
+        },
+        {
+          "operation": "replace",
+          "before_row": 15,
+          "after_row": 15,
+          "before": "400g can kidney beans",
+          "after": "400g can kidney beans drained",
+          "category": "GROUND_TRUTH_FIXED",
+          "format_only": false
+        },
+        {
+          "operation": "add",
+          "after_row": 17,
+          "after": "20g dark chocolate (at least 70% cocoa solids)",
+          "category": "GROUND_TRUTH_FIXED"
+        },
+        {
+          "operation": "add",
+          "after_row": 18,
+          "after": "cooked rice or tortilla chips",
+          "category": "GROUND_TRUTH_FIXED"
+        },
+        {
+          "operation": "replace",
+          "before_row": 17,
+          "after_row": 19,
+          "before": "20g dark chocolate",
+          "after": "guacamole and soured cream (optional)",
+          "category": "GROUND_TRUTH_FIXED",
+          "format_only": false
+        }
+      ],
+      "ingredient_groups": [
+        {
+          "before_row": 18,
+          "heading": "To serve"
+        }
+      ],
+      "ingredient_status": "GROUND_TRUTH_FIXED",
+      "instruction_structure_before": {
+        "entries": 6,
+        "kind": "paraphrased numbered reference"
+      },
+      "instruction_structure_after": {
+        "entries": 3,
+        "kind": "ordered steps",
+        "references": [
+          {
+            "index": 1,
+            "snapshot": "results/b3_0_sources/source_28.html",
+            "snapshot_sha256": "8EC49DF4E37E0990867181D0388A22FD85E987DC45EC9EE4321A0F5A012D586A",
+            "selector": ".method-steps__list-item",
+            "selector_index_zero_based": 0,
+            "heading": "step 1",
+            "content_scope": ".editor-content",
+            "text_length": 553
+          },
+          {
+            "index": 2,
+            "snapshot": "results/b3_0_sources/source_28.html",
+            "snapshot_sha256": "8EC49DF4E37E0990867181D0388A22FD85E987DC45EC9EE4321A0F5A012D586A",
+            "selector": ".method-steps__list-item",
+            "selector_index_zero_based": 1,
+            "heading": "step 2",
+            "content_scope": ".editor-content",
+            "text_length": 336
+          },
+          {
+            "index": 3,
+            "snapshot": "results/b3_0_sources/source_28.html",
+            "snapshot_sha256": "8EC49DF4E37E0990867181D0388A22FD85E987DC45EC9EE4321A0F5A012D586A",
+            "selector": ".method-steps__list-item",
+            "selector_index_zero_based": 2,
+            "heading": "step 3",
+            "content_scope": ".editor-content",
+            "text_length": 305
+          }
+        ],
+        "status": "GROUND_TRUTH_FIXED"
+      },
+      "source_jsonld_differences_observed": [
+        {
+          "field": "ingredient_group",
+          "category": "SOURCE_JSONLD_DIFFERENCE",
+          "visible": "To serve",
+          "json_ld": null,
+          "note": "A lapos recipeIngredient listában nincs csoportcím."
+        }
+      ],
+      "unresolved_issues": [],
+      "evidence": {
+        "snapshot": "results/b3_0_sources/source_28.html",
+        "sha256": "8EC49DF4E37E0990867181D0388A22FD85E987DC45EC9EE4321A0F5A012D586A",
+        "retrieved_at": "2026-09-25T12:32:37.6411306Z",
+        "title_selector": "h1",
+        "ingredient_selector": ".ingredients-list__item"
+      }
+    },
+    {
+      "id": "29",
+      "url": "https://www.foodnetwork.com/recipes/food-network-kitchen/classic-meatloaf-5484735",
+      "domain": "www.foodnetwork.com",
+      "visible_title": null,
+      "ground_truth_title_status": "UNRESOLVED",
+      "ingredient_count_visible": null,
+      "ingredient_count_ground_truth_before": 11,
+      "ingredient_count_ground_truth_after": 11,
+      "corrected_ingredient_lines": [],
+      "ingredient_groups": [],
+      "instruction_structure_before": {
+        "entries": 6
+      },
+      "instruction_structure_after": {
+        "entries": null,
+        "references": []
+      },
+      "source_jsonld_differences_observed": [],
+      "unresolved_issues": [
+        "Direct HTML fetch HTTP 403 twice (PowerShell and curl). No trustworthy local recipe HTML snapshot. Original ground truth unchanged, not approved for accuracy scoring."
+      ],
+      "snapshot_id": null,
+      "evidence": {
+        "blocked_response": "results/b3_0_sources/attempt2_29.html",
+        "snapshot_type": "HTTP 403 error body, NOT recipe snapshot"
+      }
+    },
+    {
+      "id": "30",
+      "url": "https://www.foodnetwork.com/recipes/guacamole-recipe2-1956046",
+      "domain": "www.foodnetwork.com",
+      "visible_title": null,
+      "ground_truth_title_status": "UNRESOLVED",
+      "ingredient_count_visible": null,
+      "ingredient_count_ground_truth_before": 7,
+      "ingredient_count_ground_truth_after": 7,
+      "corrected_ingredient_lines": [],
+      "ingredient_groups": [],
+      "instruction_structure_before": {
+        "entries": 5
+      },
+      "instruction_structure_after": {
+        "entries": null,
+        "references": []
+      },
+      "source_jsonld_differences_observed": [],
+      "unresolved_issues": [
+        "Direct HTML fetch HTTP 403 twice (PowerShell and curl). No trustworthy local recipe HTML snapshot. Original ground truth unchanged, not approved for accuracy scoring."
+      ],
+      "snapshot_id": null,
+      "evidence": {
+        "blocked_response": "results/b3_0_sources/attempt2_30.html",
+        "snapshot_type": "HTTP 403 error body, NOT recipe snapshot"
+      }
+    }
+  ],
+  "verification": {
+    "corpus_and_references": "PASS for 21–28; 29–30 unchanged and unresolved",
+    "snapshot_sha256": "8/8 valid recipe snapshots verified",
+    "poc_tests": "54/54 PASS",
+    "poc_dart_analyze": "clean",
+    "production_flutter_analyze_no_pub": "clean"
+  },
+  "readiness": {
+    "21-28": "Ground truth ready",
+    "29-30": "UNRESOLVED; no approved local recipe snapshot",
+    "B3.1": "Technical fetch can be separately authorized, but full ground-truth acceptance is blocked for two cases."
+  }
+}

@@ -1,0 +1,33 @@
+RECEPT: Túrós csusza
+
+HOZZÁVALÓK:
+400.0 g Csuszatészta
+[JAVÍTANDÓ] db ízlés szerint Só
+350.0 g Füstölt szalonna
+200.0 ml Víz
+200.0 ml Tejföl
+450.0 g Tehéntúró
+
+WARNING (POC auditjelölések, nem általános automatikus felismerés):
+2. sor: invalidQuantity, SOURCE_WARNING
+4. sor: SOURCE_WARNING
+5. sor: SOURCE_WARNING
+
+ELKÉSZÍTÉS:
+A tésztát lobogó, enyhén sós vízben fogkeményre kifőzzük.
+
+A szalonnát egy centis darabokra felkockázzuk, serpenyőbe tesszük. Felöntjük annyi vízzel, ami éppen ellepi, és közepes lángon melegíteni kezdjük. Egészen addig folytatjuk, amíg minden csepp víz el nem párolog, sőt utána szép barnára, zsírjára sütjük. (A vízre azért van szükség, mert így kívül ropogós, de belül puha marad.) Ha elkészült, akkor szűrőlapáttal kivesszük a szalonnát, és félretesszük.
+
+A zsírt is kiöntjük, csak három evőkanállal hagyunk benne, ehhez hozzáadjuk a tejfölt, és alaposan elkeverjük.
+
+A kifőtt tésztát összeforgatjuk a tejfölös keverék és a túró egyharmadával, majd a sütőt grill fokozatra és maximum hőfokra állítjuk, és 10-12 percre betesszük, amíg meg nem pirul a tészta széle.
+
+Kivesszük a tésztát a sütőből, átforgatjuk, majd hozzáadjuk a túró és tejföl második harmadát, és újra visszatesszük a sütőbe 10 percre.
+
+Ha kész, azonnal tálaljuk. A tetejét a maradék tejföllel és túróval meglocsoljuk.
+
+FŰSZEREK: üres
+
+VERDICT: POOR
+Legalább 3 sor és a sorok legalább fele bizonyított mezőjavítást igényel (előre rögzített POC-küszöb).
+Bizonyított mezőjavítás minimum: 3. Az unsupported egységek átváltása nincs találgatva; további user-döntést igényelhet.

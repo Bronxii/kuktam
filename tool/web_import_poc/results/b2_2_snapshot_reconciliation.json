@@ -1,0 +1,232 @@
+[
+  {
+    "id": "11",
+    "verdict": "UNCHANGED_RECIPE_CONTENT",
+    "html_changed": true,
+    "fields_equal": {
+      "title": true,
+      "ingredients": true,
+      "ingredient_groups": true,
+      "steps": true,
+      "instruction_selector": true,
+      "servings": true
+    },
+    "servings_before": [
+      "4 adag"
+    ],
+    "servings_after": [
+      "4 adag"
+    ],
+    "b2_0": "b2_0_sources/source_11.html",
+    "b2_1": "b2_1_html/source_11.html",
+    "quantity_unit_notes_check": "Full ingredient strings compared without conversions; unchanged.",
+    "reference": "Existing B2.0 reference valid; no replacement created."
+  },
+  {
+    "id": "12",
+    "verdict": "UNCHANGED_RECIPE_CONTENT",
+    "html_changed": true,
+    "fields_equal": {
+      "title": true,
+      "ingredients": true,
+      "ingredient_groups": true,
+      "steps": true,
+      "instruction_selector": true,
+      "servings": true
+    },
+    "servings_before": [
+      "0 adag"
+    ],
+    "servings_after": [
+      "0 adag"
+    ],
+    "b2_0": "b2_0_sources/source_12.html",
+    "b2_1": "b2_1_html/source_12.html",
+    "quantity_unit_notes_check": "Full ingredient strings compared without conversions; unchanged.",
+    "reference": "Existing B2.0 reference valid; no replacement created."
+  },
+  {
+    "id": "13",
+    "verdict": "UNCHANGED_RECIPE_CONTENT",
+    "html_changed": true,
+    "fields_equal": {
+      "title": true,
+      "ingredients": true,
+      "ingredient_groups": true,
+      "steps": true,
+      "instruction_selector": true,
+      "servings": true
+    },
+    "servings_before": [
+      "4 adag"
+    ],
+    "servings_after": [
+      "4 adag"
+    ],
+    "b2_0": "b2_0_sources/source_13.html",
+    "b2_1": "b2_1_html/source_13.html",
+    "quantity_unit_notes_check": "Full ingredient strings compared without conversions; unchanged.",
+    "reference": "Existing B2.0 reference valid; no replacement created."
+  },
+  {
+    "id": "14",
+    "verdict": "UNCHANGED_RECIPE_CONTENT",
+    "html_changed": true,
+    "fields_equal": {
+      "title": true,
+      "ingredients": true,
+      "ingredient_groups": true,
+      "steps": true,
+      "instruction_selector": true,
+      "servings": true
+    },
+    "servings_before": [
+      "4 adag"
+    ],
+    "servings_after": [
+      "4 adag"
+    ],
+    "b2_0": "b2_0_sources/source_14.html",
+    "b2_1": "b2_1_html/source_14.html",
+    "quantity_unit_notes_check": "Full ingredient strings compared without conversions; unchanged.",
+    "reference": "Existing B2.0 reference valid; no replacement created."
+  },
+  {
+    "id": "15",
+    "verdict": "UNCHANGED_RECIPE_CONTENT",
+    "html_changed": true,
+    "fields_equal": {
+      "title": true,
+      "ingredients": true,
+      "ingredient_groups": true,
+      "steps": true,
+      "instruction_selector": true,
+      "servings": true
+    },
+    "servings_before": [
+      "0 adag"
+    ],
+    "servings_after": [
+      "0 adag"
+    ],
+    "b2_0": "b2_0_sources/source_15.html",
+    "b2_1": "b2_1_html/source_15.html",
+    "quantity_unit_notes_check": "Full ingredient strings compared without conversions; unchanged.",
+    "reference": "Existing B2.0 reference valid; no replacement created."
+  },
+  {
+    "id": "16",
+    "verdict": "UNCHANGED_RECIPE_CONTENT",
+    "html_changed": false,
+    "fields_equal": {
+      "title": true,
+      "ingredients": true,
+      "ingredient_groups": true,
+      "steps": true,
+      "instruction_selector": true,
+      "servings": true
+    },
+    "servings_before": [
+      "Serves 4"
+    ],
+    "servings_after": [
+      "Serves 4"
+    ],
+    "b2_0": "b2_0_sources/source_16.html",
+    "b2_1": "b2_1_html/source_16.html",
+    "quantity_unit_notes_check": "Full ingredient strings compared without conversions; unchanged.",
+    "reference": "Existing B2.0 reference valid; no replacement created."
+  },
+  {
+    "id": "17",
+    "verdict": "UNCHANGED_RECIPE_CONTENT",
+    "html_changed": true,
+    "fields_equal": {
+      "title": true,
+      "ingredients": true,
+      "ingredient_groups": true,
+      "steps": true,
+      "instruction_selector": true,
+      "servings": true
+    },
+    "servings_before": [
+      "Cuts into 10 slices"
+    ],
+    "servings_after": [
+      "Cuts into 10 slices"
+    ],
+    "b2_0": "b2_0_sources/source_17.html",
+    "b2_1": "b2_1_html/source_17.html",
+    "quantity_unit_notes_check": "Full ingredient strings compared without conversions; unchanged.",
+    "reference": "Existing B2.0 reference valid; no replacement created."
+  },
+  {
+    "id": "18",
+    "verdict": "UNCHANGED_RECIPE_CONTENT",
+    "html_changed": true,
+    "fields_equal": {
+      "title": true,
+      "ingredients": true,
+      "ingredient_groups": true,
+      "steps": true,
+      "instruction_selector": true,
+      "servings": true
+    },
+    "servings_before": [
+      "Serves 4"
+    ],
+    "servings_after": [
+      "Serves 4"
+    ],
+    "b2_0": "b2_0_sources/source_18.html",
+    "b2_1": "b2_1_html/source_18.html",
+    "quantity_unit_notes_check": "Full ingredient strings compared without conversions; unchanged.",
+    "reference": "Existing B2.0 reference valid; no replacement created."
+  },
+  {
+    "id": "19",
+    "verdict": "UNCHANGED_RECIPE_CONTENT",
+    "html_changed": true,
+    "fields_equal": {
+      "title": true,
+      "ingredients": true,
+      "ingredient_groups": true,
+      "steps": true,
+      "instruction_selector": true,
+      "servings": true
+    },
+    "servings_before": [
+      "Serves 10"
+    ],
+    "servings_after": [
+      "Serves 10"
+    ],
+    "b2_0": "b2_0_sources/source_19.html",
+    "b2_1": "b2_1_html/source_19.html",
+    "quantity_unit_notes_check": "Full ingredient strings compared without conversions; unchanged.",
+    "reference": "Existing B2.0 reference valid; no replacement created."
+  },
+  {
+    "id": "20",
+    "verdict": "UNCHANGED_RECIPE_CONTENT",
+    "html_changed": false,
+    "fields_equal": {
+      "title": true,
+      "ingredients": true,
+      "ingredient_groups": true,
+      "steps": true,
+      "instruction_selector": true,
+      "servings": true
+    },
+    "servings_before": [
+      "Serves 4 - 6"
+    ],
+    "servings_after": [
+      "Serves 4 - 6"
+    ],
+    "b2_0": "b2_0_sources/source_20.html",
+    "b2_1": "b2_1_html/source_20.html",
+    "quantity_unit_notes_check": "Full ingredient strings compared without conversions; unchanged.",
+    "reference": "Existing B2.0 reference valid; no replacement created."
+  }
+]

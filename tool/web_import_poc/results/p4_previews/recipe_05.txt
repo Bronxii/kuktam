@@ -1,0 +1,38 @@
+RECEPT: Zserbó alaprecept
+
+HOZZÁVALÓK:
+250.0 g Darált dió
+200.0 g Porcukor
+1.0 db Citrom
+1.0 csomag Vaníliás cukor
+400.0 g Baracklekvár
+2.0 ek Rum
+10.0 g Élesztő
+50.0 ml Tej
+500.0 g Liszt
+250.0 g Margarin
+1.0 db mokkáskanál Szódabikarbóna
+100.0 g Porcukor
+1.0 db Tojássárgája
+1.0 csomag Vaníliás cukor
+2.0 ek Tejföl
+150.0 g Étcsokoládé
+1.0 tk Étolaj
+
+WARNING (POC auditjelölések, nem általános automatikus felismerés):
+11. sor: UNSUPPORTED_UNIT
+
+ELKÉSZÍTÉS:
+1. lépés: A zserbó elkészítéséhez a diót összekeverjük a porcukorral, a citrom lereszelt héjával és a vaníliás cukorral.
+
+2. lépés: Az élesztőt langyos tejben felfuttatjuk. A lisztet elmorzsoljuk a margarinnal. Hozzáadjuk az élesztős tejet, a szódabikarbónát, a porcukrot, a tojássárgáját, a vaníliás cukrot és a tejfölt, és jól összedolgozzuk.
+
+3. lépés: Az összegyúrt tésztát három részre osztjuk. Az első részt kinyújtjuk, és kibéleljük vele a 24×38 cm-es tepsit. Megkenjük a baracklekvár felével, meglocsoljuk 1 ek rummal, majd rászórjuk a cukros dió felét. Beborítjuk a másik kinyújtott tésztalappal, amit ismét megkenünk lekvárral, megöntözünk rummal, és rászórjuk a dió másik felét. Ráhelyezzük a harmadik kinyújtott tésztát, kissé rányomkodjuk, és villával megszurkáljuk.
+
+4. lépés: Előmelegített sütőben 200 fokon kb. 30 perc alatt világosbarnára sütjük, majd a tepsiben hagyjuk kihűlni. Amíg hűl a tészta, elkészítjük a mázat. Az étcsokoládét vízgőz felett felolvasztjuk az olajjal, és a süteményre kenjük. Megvárjuk, amíg megszárad, majd felszeleteljük.
+
+FŰSZEREK: üres
+
+VERDICT: REVIEW
+A draft teljes, de parser/source/unsupported figyelmeztetés miatt ellenőrzés szükséges.
+Bizonyított mezőjavítás minimum: 0. Az unsupported egységek átváltása nincs találgatva; további user-döntést igényelhet.

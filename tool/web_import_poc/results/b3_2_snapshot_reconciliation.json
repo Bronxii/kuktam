@@ -1,0 +1,218 @@
+[
+  {
+    "id": "21",
+    "b3_0_sha256": "b4d6f70b796d381aadb6e0c1f8d0481fc48041e5a8b31436627539ff0cf57003",
+    "b3_1_sha256": "79f76ba98713df7b503ba8db7e7787f9f62342d8578da7f602e255ce2363ca8f",
+    "b3_0_manifest_and_visible_references_verified": true,
+    "b3_1_bytes_verified": true,
+    "verdict": "UNCHANGED_RECIPE_CONTENT",
+    "html_changed": true,
+    "fields_equal": {
+      "title": true,
+      "ingredients": true,
+      "ingredient_groups": true,
+      "steps": true,
+      "instruction_selector": true,
+      "servings": true
+    },
+    "servings_before": [
+      "Serves 4"
+    ],
+    "servings_after": [
+      "Serves 4"
+    ],
+    "b3_0": "b3_0_sources/source_21.html",
+    "b3_1": "b3_1_html/source_21.html",
+    "quantity_unit_notes_check": "Full ingredient strings compared without conversions; unchanged.",
+    "reference": "Existing B3.0 reference valid; no replacement created."
+  },
+  {
+    "id": "22",
+    "b3_0_sha256": "3cbee9866978ff1c042286bffd9d7d6a820fb684c693c68d54f064d358ca59c1",
+    "b3_1_sha256": "3cbee9866978ff1c042286bffd9d7d6a820fb684c693c68d54f064d358ca59c1",
+    "b3_0_manifest_and_visible_references_verified": true,
+    "b3_1_bytes_verified": true,
+    "verdict": "UNCHANGED_RECIPE_CONTENT",
+    "html_changed": false,
+    "fields_equal": {
+      "title": true,
+      "ingredients": true,
+      "ingredient_groups": true,
+      "steps": true,
+      "instruction_selector": true,
+      "servings": true
+    },
+    "servings_before": [
+      "Makes 12"
+    ],
+    "servings_after": [
+      "Makes 12"
+    ],
+    "b3_0": "b3_0_sources/source_22.html",
+    "b3_1": "b3_1_html/source_22.html",
+    "quantity_unit_notes_check": "Full ingredient strings compared without conversions; unchanged.",
+    "reference": "Existing B3.0 reference valid; no replacement created."
+  },
+  {
+    "id": "23",
+    "b3_0_sha256": "699410c301850cf0c5ce870b42f8fda04e39b5a351cb34afa199b82975eae6cb",
+    "b3_1_sha256": "699410c301850cf0c5ce870b42f8fda04e39b5a351cb34afa199b82975eae6cb",
+    "b3_0_manifest_and_visible_references_verified": true,
+    "b3_1_bytes_verified": true,
+    "verdict": "UNCHANGED_RECIPE_CONTENT",
+    "html_changed": false,
+    "fields_equal": {
+      "title": true,
+      "ingredients": true,
+      "ingredient_groups": true,
+      "steps": true,
+      "instruction_selector": true,
+      "servings": true
+    },
+    "servings_before": [
+      "Serves 4"
+    ],
+    "servings_after": [
+      "Serves 4"
+    ],
+    "b3_0": "b3_0_sources/source_23.html",
+    "b3_1": "b3_1_html/source_23.html",
+    "quantity_unit_notes_check": "Full ingredient strings compared without conversions; unchanged.",
+    "reference": "Existing B3.0 reference valid; no replacement created."
+  },
+  {
+    "id": "24",
+    "b3_0_sha256": "34761fbbfcaa228a5327c1ad96e3d9e5ed33aeb00b6a7d37f887bf43821f6905",
+    "b3_1_sha256": "2a45389122ca8b2c0737f3c0e6adbbb4661eb136dac14fd3255e1c9670f921e5",
+    "b3_0_manifest_and_visible_references_verified": true,
+    "b3_1_bytes_verified": true,
+    "verdict": "UNCHANGED_RECIPE_CONTENT",
+    "html_changed": true,
+    "fields_equal": {
+      "title": true,
+      "ingredients": true,
+      "ingredient_groups": true,
+      "steps": true,
+      "instruction_selector": true,
+      "servings": true
+    },
+    "servings_before": [
+      "Cuts into 16 squares or 32 triangles"
+    ],
+    "servings_after": [
+      "Cuts into 16 squares or 32 triangles"
+    ],
+    "b3_0": "b3_0_sources/source_24.html",
+    "b3_1": "b3_1_html/source_24.html",
+    "quantity_unit_notes_check": "Full ingredient strings compared without conversions; unchanged.",
+    "reference": "Existing B3.0 reference valid; no replacement created."
+  },
+  {
+    "id": "25",
+    "b3_0_sha256": "92681788a6d6db71430738d4181295fa2844af9833114c4a54eb988b7798cde8",
+    "b3_1_sha256": "92681788a6d6db71430738d4181295fa2844af9833114c4a54eb988b7798cde8",
+    "b3_0_manifest_and_visible_references_verified": true,
+    "b3_1_bytes_verified": true,
+    "verdict": "UNCHANGED_RECIPE_CONTENT",
+    "html_changed": false,
+    "fields_equal": {
+      "title": true,
+      "ingredients": true,
+      "ingredient_groups": true,
+      "steps": true,
+      "instruction_selector": true,
+      "servings": true
+    },
+    "servings_before": [
+      "Serves 4"
+    ],
+    "servings_after": [
+      "Serves 4"
+    ],
+    "b3_0": "b3_0_sources/source_25.html",
+    "b3_1": "b3_1_html/source_25.html",
+    "quantity_unit_notes_check": "Full ingredient strings compared without conversions; unchanged.",
+    "reference": "Existing B3.0 reference valid; no replacement created."
+  },
+  {
+    "id": "26",
+    "b3_0_sha256": "eb24c9cd530ffd2c7ea35b515e3fae0970608cec29c56b0204d51290b6e7b014",
+    "b3_1_sha256": "eb24c9cd530ffd2c7ea35b515e3fae0970608cec29c56b0204d51290b6e7b014",
+    "b3_0_manifest_and_visible_references_verified": true,
+    "b3_1_bytes_verified": true,
+    "verdict": "UNCHANGED_RECIPE_CONTENT",
+    "html_changed": false,
+    "fields_equal": {
+      "title": true,
+      "ingredients": true,
+      "ingredient_groups": true,
+      "steps": true,
+      "instruction_selector": true,
+      "servings": true
+    },
+    "servings_before": [
+      "serves 4 for lunch or 6 as a starter"
+    ],
+    "servings_after": [
+      "serves 4 for lunch or 6 as a starter"
+    ],
+    "b3_0": "b3_0_sources/source_26.html",
+    "b3_1": "b3_1_html/source_26.html",
+    "quantity_unit_notes_check": "Full ingredient strings compared without conversions; unchanged.",
+    "reference": "Existing B3.0 reference valid; no replacement created."
+  },
+  {
+    "id": "27",
+    "b3_0_sha256": "89199ba080737cbbd4ecc2287655c577427e1ee4e40b542826b0c18697a63e57",
+    "b3_1_sha256": "89199ba080737cbbd4ecc2287655c577427e1ee4e40b542826b0c18697a63e57",
+    "b3_0_manifest_and_visible_references_verified": true,
+    "b3_1_bytes_verified": true,
+    "verdict": "UNCHANGED_RECIPE_CONTENT",
+    "html_changed": false,
+    "fields_equal": {
+      "title": true,
+      "ingredients": true,
+      "ingredient_groups": true,
+      "steps": true,
+      "instruction_selector": true,
+      "servings": true
+    },
+    "servings_before": [
+      "Serves 4"
+    ],
+    "servings_after": [
+      "Serves 4"
+    ],
+    "b3_0": "b3_0_sources/source_27.html",
+    "b3_1": "b3_1_html/source_27.html",
+    "quantity_unit_notes_check": "Full ingredient strings compared without conversions; unchanged.",
+    "reference": "Existing B3.0 reference valid; no replacement created."
+  },
+  {
+    "id": "28",
+    "b3_0_sha256": "8ec49df4e37e0990867181d0388a22fd85e987dc45ec9ee4321a0f5a012d586a",
+    "b3_1_sha256": "8ec49df4e37e0990867181d0388a22fd85e987dc45ec9ee4321a0f5a012d586a",
+    "b3_0_manifest_and_visible_references_verified": true,
+    "b3_1_bytes_verified": true,
+    "verdict": "UNCHANGED_RECIPE_CONTENT",
+    "html_changed": false,
+    "fields_equal": {
+      "title": true,
+      "ingredients": true,
+      "ingredient_groups": true,
+      "steps": true,
+      "instruction_selector": true,
+      "servings": true
+    },
+    "servings_before": [
+      "Serves 4 - 6"
+    ],
+    "servings_after": [
+      "Serves 4 - 6"
+    ],
+    "b3_0": "b3_0_sources/source_28.html",
+    "b3_1": "b3_1_html/source_28.html",
+    "quantity_unit_notes_check": "Full ingredient strings compared without conversions; unchanged.",
+    "reference": "Existing B3.0 reference valid; no replacement created."
+  }
+]

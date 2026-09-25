@@ -1,0 +1,92 @@
+[
+  {
+    "sha256": "652C8972F8919BB48C0CFA429148E7B9C01555626B4357C9CD93CD5D175A1CCB",
+    "url": "https://www.mindmegette.hu/recept/lecso",
+    "final_url": "https://www.mindmegette.hu/recept/lecso",
+    "path": "tool\\web_import_poc\\results\\b2_0_sources\\source_11.html",
+    "status": 200,
+    "id": "11",
+    "retrieved_at": "2026-09-24T20:03:50.3192076Z"
+  },
+  {
+    "sha256": "D059D2E5D7CCFF1D7812A35C05B9919F1365102AA1A374EF0A22E5FAEA0587F4",
+    "url": "https://www.mindmegette.hu/recept/toltott-kaposzta",
+    "final_url": "https://www.mindmegette.hu/recept/toltott-kaposzta",
+    "path": "tool\\web_import_poc\\results\\b2_0_sources\\source_12.html",
+    "status": 200,
+    "id": "12",
+    "retrieved_at": "2026-09-24T20:03:52.0896147Z"
+  },
+  {
+    "sha256": "8BDD89F45F6FE525E423E6C7BDE39834CB33FA03A8AD690F94330EE84D0645A4",
+    "url": "https://www.mindmegette.hu/recept/klasszikus-paprikas-krumpli",
+    "final_url": "https://www.mindmegette.hu/recept/klasszikus-paprikas-krumpli",
+    "path": "tool\\web_import_poc\\results\\b2_0_sources\\source_13.html",
+    "status": 200,
+    "id": "13",
+    "retrieved_at": "2026-09-24T20:03:53.8155939Z"
+  },
+  {
+    "sha256": "101CB422D31FC7AB661B0F2D6B30B89178D7A79CD6CE551BC9E4FEA278B39B7B",
+    "url": "https://www.mindmegette.hu/recept/hagyomanyos-szatmari-toltott-kaposzta",
+    "final_url": "https://www.mindmegette.hu/recept/hagyomanyos-szatmari-toltott-kaposzta",
+    "path": "tool\\web_import_poc\\results\\b2_0_sources\\source_14.html",
+    "status": 200,
+    "id": "14",
+    "retrieved_at": "2026-09-24T20:03:55.5551083Z"
+  },
+  {
+    "sha256": "CFEE4334CA8D2333679C9291735723B1A8A81E130F302983B8DE42309C339047",
+    "url": "https://www.mindmegette.hu/recept/rakott-krumpli-magyarosan",
+    "final_url": "https://www.mindmegette.hu/recept/rakott-krumpli-magyarosan",
+    "path": "tool\\web_import_poc\\results\\b2_0_sources\\source_15.html",
+    "status": 200,
+    "id": "15",
+    "retrieved_at": "2026-09-24T20:03:57.4673977Z"
+  },
+  {
+    "sha256": "7C66ECCDFCFA8F93FF3DE2FB58AD6A117C32854780D1EC65F6B7DEE210E18BF4",
+    "url": "https://www.bbcgoodfood.com/recipes/ultimate-spaghetti-carbonara-recipe",
+    "final_url": "https://www.bbcgoodfood.com/recipes/ultimate-spaghetti-carbonara-recipe",
+    "path": "tool\\web_import_poc\\results\\b2_0_sources\\source_16.html",
+    "status": 200,
+    "id": "16",
+    "retrieved_at": "2026-09-24T20:03:57.6416680Z"
+  },
+  {
+    "sha256": "222C023C2BF7A9CE20E21B6D70F296EFB2FC2F6B7007F4610298FE642EF78D58",
+    "url": "https://www.bbcgoodfood.com/recipes/classic-victoria-sandwich-recipe",
+    "final_url": "https://www.bbcgoodfood.com/recipes/classic-victoria-sandwich-recipe",
+    "path": "tool\\web_import_poc\\results\\b2_0_sources\\source_17.html",
+    "status": 200,
+    "id": "17",
+    "retrieved_at": "2026-09-24T20:03:57.7625238Z"
+  },
+  {
+    "sha256": "94355B2B6E2C9B0589400A7DCB2B3D768FD46DC4D8296B5E225FFAB766434A05",
+    "url": "https://www.bbcgoodfood.com/recipes/chilli-con-carne-recipe",
+    "final_url": "https://www.bbcgoodfood.com/recipes/chilli-con-carne-recipe",
+    "path": "tool\\web_import_poc\\results\\b2_0_sources\\source_18.html",
+    "status": 200,
+    "id": "18",
+    "retrieved_at": "2026-09-24T20:03:57.8825594Z"
+  },
+  {
+    "sha256": "B3F2250DD5AFC894882294F32280039C50E0BD14D5C18599CF456621250B554F",
+    "url": "https://www.bbcgoodfood.com/recipes/chicken-tikka-masala",
+    "final_url": "https://www.bbcgoodfood.com/recipes/chicken-tikka-masala",
+    "path": "tool\\web_import_poc\\results\\b2_0_sources\\source_19.html",
+    "status": 200,
+    "id": "19",
+    "retrieved_at": "2026-09-24T20:03:58.0326928Z"
+  },
+  {
+    "sha256": "FA75490B2DBEB81B556A0264C64F09995561A359CBE631D9344AE47B5B98A449",
+    "url": "https://www.bbcgoodfood.com/recipes/classic-lasagne",
+    "final_url": "https://www.bbcgoodfood.com/recipes/classic-lasagne",
+    "path": "tool\\web_import_poc\\results\\b2_0_sources\\source_20.html",
+    "status": 200,
+    "id": "20",
+    "retrieved_at": "2026-09-24T20:03:58.1839453Z"
+  }
+]

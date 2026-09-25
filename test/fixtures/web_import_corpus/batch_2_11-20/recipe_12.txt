@@ -1,0 +1,28 @@
+CÍM:
+Töltött káposzta
+
+HOZZÁVALÓK:
+80 dkg savanyú káposzta
+8 darab savanyított káposztalevél
+2 fej hagyma
+1 gerezd fokhagyma
+5 dkg füstölt szalonna
+40 dkg darált sertéshús
+2 kávéskanál édesnemes pirospaprika
+8 dkg rizs
+1 darab tojás
+1 csipet őrölt köménymag
+1 mokkáskanál majoránna
+2 evőkanál olaj
+2 evőkanál liszt
+2 dl tejföl
+
+ELKÉSZÍTÉS:
+# VISIBLE_SOURCE_REFERENCE_V1: teljes szöveg a mentett HTML-ben, nem összefoglaló.
+# Snapshot: tool/web_import_poc/results/b2_0_sources/source_12.html
+# SHA256: D059D2E5D7CCFF1D7812A35C05B9919F1365102AA1A374EF0A22E5FAEA0587F4
+1. @VISIBLE .block-content > p | index=0 | content=entire element
+2. @VISIBLE .block-content > p | index=1 | content=entire element
+3. @VISIBLE .block-content > p | index=2 | content=entire element
+4. @VISIBLE .block-content > p | index=3 | content=entire element
+5. @VISIBLE .block-content > p | index=4 | content=entire element

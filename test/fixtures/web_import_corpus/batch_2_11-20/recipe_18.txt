@@ -1,0 +1,41 @@
+CÍM:
+Chilli con carne recipe
+
+HOZZÁVALÓK:
+1 large onion
+1 red pepper
+2 garlic cloves
+1 tbsp oil
+1 heaped tsp hot chilli powder (or 1 level tbsp if you only have mild)
+1 tsp paprika
+1 tsp ground cumin
+500g lean minced beef
+1 beef stock cube
+400g can Mutti chopped tomatoes
+½ tsp dried marjoram
+1 tsp sugar (or add a thumbnail-sized piece of dark chocolate along with the beans instead, see tip)
+2 tbsp tomato purée
+410g can red kidney beans
+plain boiled long grain rice to serve
+soured cream to serve
+
+ELKÉSZÍTÉS:
+# VISIBLE_SOURCE_REFERENCE_V1: teljes szöveg a mentett HTML-ben, nem összefoglaló.
+# Snapshot: tool/web_import_poc/results/b2_0_sources/source_18.html
+# SHA256: 94355B2B6E2C9B0589400A7DCB2B3D768FD46DC4D8296B5E225FFAB766434A05
+1. @VISIBLE .method-steps__list-item | index=0 | content=.editor-content | heading=step 1
+2. @VISIBLE .method-steps__list-item | index=1 | content=.editor-content | heading=step 2
+3. @VISIBLE .method-steps__list-item | index=2 | content=.editor-content | heading=step 3
+4. @VISIBLE .method-steps__list-item | index=3 | content=.editor-content | heading=step 4
+5. @VISIBLE .method-steps__list-item | index=4 | content=.editor-content | heading=step 5
+6. @VISIBLE .method-steps__list-item | index=5 | content=.editor-content | heading=step 6
+7. @VISIBLE .method-steps__list-item | index=6 | content=.editor-content | heading=step 7
+8. @VISIBLE .method-steps__list-item | index=7 | content=.editor-content | heading=step 8
+9. @VISIBLE .method-steps__list-item | index=8 | content=.editor-content | heading=step 9
+10. @VISIBLE .method-steps__list-item | index=9 | content=.editor-content | heading=step 10
+11. @VISIBLE .method-steps__list-item | index=10 | content=.editor-content | heading=step 11
+12. @VISIBLE .method-steps__list-item | index=11 | content=.editor-content | heading=step 12
+13. @VISIBLE .method-steps__list-item | index=12 | content=.editor-content | heading=step 13
+14. @VISIBLE .method-steps__list-item | index=13 | content=.editor-content | heading=step 14
+15. @VISIBLE .method-steps__list-item | index=14 | content=.editor-content | heading=step 15
+16. @VISIBLE .method-steps__list-item | index=15 | content=.editor-content | heading=step 16

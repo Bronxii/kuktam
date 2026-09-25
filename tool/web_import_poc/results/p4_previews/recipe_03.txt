@@ -1,0 +1,48 @@
+RECEPT: Húsleves
+
+HOZZÁVALÓK:
+1.0 kg színhús
+500.0 g csont
+500.0 g vegyes zöldség
+1.0 db fej Hagyma
+2.0 db gerezd Fokhagyma
+10.0 db szem Bors
+1.0 db cseresznyepaprika
+1.0 db csapott mokkáskanál szeklice
+1.0 db csokor Petrezselyem
+150.0 g Kelkáposzta
+1.0 db Zöldpaprika
+1.0 db Paradicsom
+1.0 db Só
+100.0 g levelestészta
+
+WARNING (POC auditjelölések, nem általános automatikus felismerés):
+3. sor: SOURCE_WARNING
+4. sor: SOURCE_WARNING, UNSUPPORTED_UNIT
+5. sor: UNSUPPORTED_UNIT
+6. sor: UNSUPPORTED_UNIT
+7. sor: missingQuantity, SOURCE_WARNING
+8. sor: SOURCE_WARNING, UNSUPPORTED_UNIT
+9. sor: UNSUPPORTED_UNIT
+13. sor: missingQuantity
+
+ELKÉSZÍTÉS:
+1. lépés: A húsleves elkészítéséhez elsőként a húst és a zöldségeket alaposan megmosunk, megtisztítjuk.
+
+2. lépés: Egy nagyobb fazék aljára fektetjük a szétütött csontokat, arra a 3-4 darabba vágott húst, és felöntjük annyi hideg vízzel, hogy bőven (4-5 ujjnyira) ellepje. Forrásig hevítjük - a régi hagyománnyal szemben nem habozzuk le, mert oda az értékes fehérje, leülepszik szépen az a hab magától, nem lesz zavaros tőle a leves.
+
+3. lépés: Hozzáadjuk (teatojásba zárva) a szemes borsot, a fokhagymát, a sáfrányos szeklicét - gyönyörű színt ad a levesnek -, a cseresznyepaprikát, a hagymát egészben és egy kevés sót. Fedő nélkül, lassú forralással, gyöngyöztetve fél óráig főzzük.
+
+4. lépés: Ezután beletesszük a hasábokra vágott zöldségeket, a kelkáposztát, a zöldpaprikát és a paradicsomot egészben, a csokorban hagyott petrezselymet, és további lassú gyöngyöztető forralással, fedő nélkül az egészet puhára főzzük.
+
+5. lépés: Közben enyhén sós vízben megfőzzük a levestésztát, leszűrjuk. Kevés húslevest merünk rá, hogy melegen tartsuk.
+
+6. lépés: Ezután következik a művészet: a húsleves felszínéről kanállal eltávolítjuk a fölösleges zsiradékot, majd sűrű szövésű szitakanálon keresztül, merőkanállal - éppen csak szelíden megbillentve a fazekat, hogy fel ne zavarosítsuk a levest - előmelegített levesestálba szűrjuk.
+
+7. lépés: A tésztát a forró leveshez adjuk, külön tálon kínáljuk a zöldséget és a húst, amelyet fogyaszthatunk a leveshez, vagy második fogásként is különféle mártásokkal.
+
+FŰSZEREK: üres
+
+VERDICT: REVIEW
+A draft teljes, de parser/source/unsupported figyelmeztetés miatt ellenőrzés szükséges.
+Bizonyított mezőjavítás minimum: 4. Az unsupported egységek átváltása nincs találgatva; további user-döntést igényelhet.

@@ -1,0 +1,3260 @@
+{
+  "method": "Offline B3.4, 21–28 only. Existing POC simulate() invokes unchanged production RecipeTextParser on full title/ingredients/preparation. Raw ingredient input and production warnings untouched. All eight clean Good Food titles unchanged. POC warning metadata uses B3.2/B3.3 human-audited labels, NOT an implemented online detector. No correction applied.",
+  "counting_policy": "Required: one action per objectively misleading ingredient row. All 31 reviewed unsupported rows here contain a measure/expression represented as db or an ambiguous/null quantity, so they require resolution (not merely review); original words remain but do not make that numeric/unit representation reliable. Count overlapping reasons counted once; plus one action per missing source ingredient group. Review-only: non-required rows with accepted missing-quantity fallback. Clean means no production OR POC warning. Source/unsupported/warning/risk categories overlap. Source-error rows excluded from silent risk, not excluded from user correction needs.",
+  "thresholds": "BROKEN if title/preparation empty or no ingredient rows. READY if 0 required actions. POOR if >=4 required actions OR required actions / ingredient rows >=40%. Otherwise REVIEW. Group loss counts one structural action and cannot necessarily be restored in existing editor without notes; no new editor support assumed.",
+  "timing_note": "Desktop Dart JIT, one sequential pass, first recipe includes cold/JIT. Core normalization/parser/draft assembly only; file IO, metadata adjudication and preview/report formatting outside timers. No network.",
+  "excluded": {
+    "29": "NO_DRAFT_DUE_TO_ACCESS_BLOCK",
+    "30": "NO_DRAFT_DUE_TO_ACCESS_BLOCK"
+  },
+  "comparison_b2_4": {
+    "recipes": 10,
+    "verdicts": {
+      "READY": 0,
+      "REVIEW": 5,
+      "POOR": 5,
+      "BROKEN": 0
+    },
+    "total_rows": 110,
+    "clean_rows": 57,
+    "source_error_rows": 2,
+    "unsupported_rows": 36,
+    "parser_error_rows": 0,
+    "warning_rows": 53,
+    "production_warning_rows": 24,
+    "silent_fallback_risk_rows": 27,
+    "silent_fallback_affected_recipes": 10,
+    "required_correction_rows": 37,
+    "required_correction_actions": 38,
+    "avg_required_corrections": 3.8,
+    "avg_review_only": 1.6
+  },
+  "summary": {
+    "recipes": 8,
+    "verdicts": {
+      "READY": 1,
+      "REVIEW": 2,
+      "POOR": 5,
+      "BROKEN": 0
+    },
+    "total_rows": 82,
+    "clean_rows": 45,
+    "source_error_rows": 0,
+    "unsupported_rows": 31,
+    "parser_error_rows": 0,
+    "warning_rows": 37,
+    "production_warning_rows": 16,
+    "silent_fallback_risk_rows": 21,
+    "silent_fallback_affected_recipes": 6,
+    "required_correction_rows": 31,
+    "review_only_rows": 6,
+    "source_structure_warning_rows": 0,
+    "source_structure_warning_count": 4,
+    "source_structure_affected_recipes": 2,
+    "instruction_entries_preserved": 47,
+    "required_correction_actions": 35,
+    "avg_required_corrections": 4.375,
+    "avg_review_only": 0.75
+  },
+  "domains": {
+    "www.bbcgoodfood.com": {
+      "recipes": 8,
+      "verdicts": {
+        "READY": 1,
+        "REVIEW": 2,
+        "POOR": 5,
+        "BROKEN": 0
+      },
+      "total_rows": 82,
+      "clean_rows": 45,
+      "source_error_rows": 0,
+      "unsupported_rows": 31,
+      "parser_error_rows": 0,
+      "warning_rows": 37,
+      "production_warning_rows": 16,
+      "silent_fallback_risk_rows": 21,
+      "silent_fallback_affected_recipes": 6,
+      "required_correction_rows": 31,
+      "review_only_rows": 6,
+      "source_structure_warning_rows": 0,
+      "source_structure_warning_count": 4,
+      "source_structure_affected_recipes": 2,
+      "instruction_entries_preserved": 47,
+      "required_correction_actions": 35,
+      "avg_required_corrections": 4.375,
+      "avg_review_only": 0.75
+    }
+  },
+  "timing": {
+    "normalization_ms": {
+      "total": 11.404000000000002,
+      "average": 1.4255000000000002,
+      "max": 8.641
+    },
+    "parser_ms": {
+      "total": 9.700000000000001,
+      "average": 1.2125000000000001,
+      "max": 5.54
+    },
+    "draft_build_ms": {
+      "total": 0.30400000000000005,
+      "average": 0.038000000000000006,
+      "max": 0.169
+    },
+    "total_local_ms": {
+      "total": 21.435000000000002,
+      "average": 2.6793750000000003,
+      "max": 14.358
+    }
+  },
+  "recipes": [
+    {
+      "id": "21",
+      "url": "https://www.bbcgoodfood.com/recipes/easy-chicken-curry",
+      "domain": "www.bbcgoodfood.com",
+      "raw_title": "Easy chicken curry",
+      "normalized_title": "Easy chicken curry",
+      "parser_input": "Easy chicken curry\n\nHozzávalók:\n2 tbsp sunflower oil\n1 onion thinly sliced\n2 garlic cloves crushed\nthumb-sized piece of ginger grated\n6 chicken thighs boneless and skinless\n3 tbsp medium spice paste (tikka works well)\n400g can chopped tomatoes\n100g Greek yogurt\n1 small bunch of coriander leaves chopped\n50g ground almonds\nnaan breads or cooked basmati rice, to serve\n\nElkészítés:\nHeat the oil in a flameproof casserole dish or large frying pan over a medium heat. Add the onion and a generous pinch of salt and fry for 8-10 mins, or until the onion has turned golden brown and sticky.\n\nAdd the garlic and ginger, cooking for a further minute.\n\nChop the chicken into chunky 3cm pieces, add to the pan and fry for 5 mins before stirring through the spice paste and tomatoes, along with 250ml water. Bring to the boil, lower to a simmer and cook on a gentle heat uncovered for 25-30 mins or until rich and slightly reduced.\n\nStir though the yogurt, coriander and ground almonds, season and serve with warm naan or fluffy basmati rice.",
+      "draft": {
+        "title": "Easy chicken curry",
+        "ingredients": [
+          {
+            "sourceOrder": 3,
+            "rawText": "2 tbsp sunflower oil",
+            "name": "tbsp sunflower oil",
+            "quantity": 2.0,
+            "canonical_unit": "db",
+            "warnings": [],
+            "sourceIngredientIndex": 0,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "UNSUPPORTED_UNIT",
+            "sourceError": false,
+            "unsupported": true,
+            "parserError": false,
+            "silentFallbackRisk": true,
+            "requiredCorrection": true,
+            "pocWarnings": [
+              "UNSUPPORTED_INPUT",
+              "SILENT_BAD_FALLBACK_RISK"
+            ],
+            "source_evidence": {
+              "source_order": 1,
+              "visible_text": "2 tbsp sunflower oil",
+              "json_ld_text": "2 tbsp sunflower oil",
+              "source_verdict": "MATCH",
+              "note": null
+            },
+            "unsupported_phrase": "tbsp",
+            "misleading_fields": [
+              "canonical_unit",
+              "name contains unresolved measure/expression"
+            ]
+          },
+          {
+            "sourceOrder": 4,
+            "rawText": "1 onion thinly sliced",
+            "name": "onion thinly sliced",
+            "quantity": 1.0,
+            "canonical_unit": "db",
+            "warnings": [],
+            "sourceIngredientIndex": 1,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "CORRECT",
+            "sourceError": false,
+            "unsupported": false,
+            "parserError": false,
+            "silentFallbackRisk": false,
+            "requiredCorrection": false,
+            "pocWarnings": [],
+            "source_evidence": {
+              "source_order": 2,
+              "visible_text": "1 onion thinly sliced",
+              "json_ld_text": "1 onion thinly sliced",
+              "source_verdict": "MATCH",
+              "note": null
+            },
+            "unsupported_phrase": null,
+            "misleading_fields": []
+          },
+          {
+            "sourceOrder": 5,
+            "rawText": "2 garlic cloves crushed",
+            "name": "garlic cloves crushed",
+            "quantity": 2.0,
+            "canonical_unit": "db",
+            "warnings": [],
+            "sourceIngredientIndex": 2,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "UNSUPPORTED_UNIT",
+            "sourceError": false,
+            "unsupported": true,
+            "parserError": false,
+            "silentFallbackRisk": true,
+            "requiredCorrection": true,
+            "pocWarnings": [
+              "UNSUPPORTED_INPUT",
+              "SILENT_BAD_FALLBACK_RISK"
+            ],
+            "source_evidence": {
+              "source_order": 3,
+              "visible_text": "2 garlic cloves crushed",
+              "json_ld_text": "2 garlic cloves crushed",
+              "source_verdict": "MATCH",
+              "note": null
+            },
+            "unsupported_phrase": "cloves",
+            "misleading_fields": [
+              "canonical_unit",
+              "name contains unresolved measure/expression"
+            ]
+          },
+          {
+            "sourceOrder": 6,
+            "rawText": "thumb-sized piece of ginger grated",
+            "name": "thumb-sized piece of ginger grated",
+            "quantity": 1.0,
+            "canonical_unit": "db",
+            "warnings": [
+              "missingQuantity"
+            ],
+            "sourceIngredientIndex": 3,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "UNSUPPORTED_UNIT",
+            "sourceError": false,
+            "unsupported": true,
+            "parserError": false,
+            "silentFallbackRisk": false,
+            "requiredCorrection": true,
+            "pocWarnings": [
+              "UNSUPPORTED_INPUT"
+            ],
+            "source_evidence": {
+              "source_order": 4,
+              "visible_text": "thumb-sized piece of ginger grated",
+              "json_ld_text": "thumb-sized piece of ginger grated",
+              "source_verdict": "MATCH",
+              "note": null
+            },
+            "unsupported_phrase": "thumb-sized piece",
+            "misleading_fields": [
+              "canonical_unit",
+              "quantity interpretation",
+              "name contains unresolved measure/expression"
+            ]
+          },
+          {
+            "sourceOrder": 7,
+            "rawText": "6 chicken thighs boneless and skinless",
+            "name": "chicken thighs boneless and skinless",
+            "quantity": 6.0,
+            "canonical_unit": "db",
+            "warnings": [],
+            "sourceIngredientIndex": 4,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "CORRECT",
+            "sourceError": false,
+            "unsupported": false,
+            "parserError": false,
+            "silentFallbackRisk": false,
+            "requiredCorrection": false,
+            "pocWarnings": [],
+            "source_evidence": {
+              "source_order": 5,
+              "visible_text": "6 chicken thighs boneless and skinless",
+              "json_ld_text": "6 chicken thighs boneless and skinless",
+              "source_verdict": "MATCH",
+              "note": null
+            },
+            "unsupported_phrase": null,
+            "misleading_fields": []
+          },
+          {
+            "sourceOrder": 8,
+            "rawText": "3 tbsp medium spice paste (tikka works well)",
+            "name": "tbsp medium spice paste (tikka works well)",
+            "quantity": 3.0,
+            "canonical_unit": "db",
+            "warnings": [],
+            "sourceIngredientIndex": 5,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "UNSUPPORTED_UNIT",
+            "sourceError": false,
+            "unsupported": true,
+            "parserError": false,
+            "silentFallbackRisk": true,
+            "requiredCorrection": true,
+            "pocWarnings": [
+              "UNSUPPORTED_INPUT",
+              "SILENT_BAD_FALLBACK_RISK"
+            ],
+            "source_evidence": {
+              "source_order": 6,
+              "visible_text": "3 tbsp medium spice paste (tikka works well)",
+              "json_ld_text": "3 tbsp medium spice paste (tikka works well)",
+              "source_verdict": "MATCH",
+              "note": null
+            },
+            "unsupported_phrase": "tbsp",
+            "misleading_fields": [
+              "canonical_unit",
+              "name contains unresolved measure/expression"
+            ]
+          },
+          {
+            "sourceOrder": 9,
+            "rawText": "400g can chopped tomatoes",
+            "name": "can chopped tomatoes",
+            "quantity": 400.0,
+            "canonical_unit": "g",
+            "warnings": [],
+            "sourceIngredientIndex": 6,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "CORRECT",
+            "sourceError": false,
+            "unsupported": false,
+            "parserError": false,
+            "silentFallbackRisk": false,
+            "requiredCorrection": false,
+            "pocWarnings": [],
+            "source_evidence": {
+              "source_order": 7,
+              "visible_text": "400g can chopped tomatoes",
+              "json_ld_text": "400g can chopped tomatoes",
+              "source_verdict": "MATCH",
+              "note": null
+            },
+            "unsupported_phrase": null,
+            "misleading_fields": []
+          },
+          {
+            "sourceOrder": 10,
+            "rawText": "100g Greek yogurt",
+            "name": "Greek yogurt",
+            "quantity": 100.0,
+            "canonical_unit": "g",
+            "warnings": [],
+            "sourceIngredientIndex": 7,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "CORRECT",
+            "sourceError": false,
+            "unsupported": false,
+            "parserError": false,
+            "silentFallbackRisk": false,
+            "requiredCorrection": false,
+            "pocWarnings": [],
+            "source_evidence": {
+              "source_order": 8,
+              "visible_text": "100g Greek yogurt",
+              "json_ld_text": "100g Greek yogurt",
+              "source_verdict": "MATCH",
+              "note": null
+            },
+            "unsupported_phrase": null,
+            "misleading_fields": []
+          },
+          {
+            "sourceOrder": 11,
+            "rawText": "1 small bunch of coriander leaves chopped",
+            "name": "small bunch of coriander leaves chopped",
+            "quantity": 1.0,
+            "canonical_unit": "db",
+            "warnings": [],
+            "sourceIngredientIndex": 8,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "UNSUPPORTED_UNIT",
+            "sourceError": false,
+            "unsupported": true,
+            "parserError": false,
+            "silentFallbackRisk": true,
+            "requiredCorrection": true,
+            "pocWarnings": [
+              "UNSUPPORTED_INPUT",
+              "SILENT_BAD_FALLBACK_RISK"
+            ],
+            "source_evidence": {
+              "source_order": 9,
+              "visible_text": "1 small bunch of coriander leaves chopped",
+              "json_ld_text": "1 small bunch of coriander leaves chopped",
+              "source_verdict": "MATCH",
+              "note": null
+            },
+            "unsupported_phrase": "small bunch",
+            "misleading_fields": [
+              "canonical_unit",
+              "name contains unresolved measure/expression"
+            ]
+          },
+          {
+            "sourceOrder": 12,
+            "rawText": "50g ground almonds",
+            "name": "ground almonds",
+            "quantity": 50.0,
+            "canonical_unit": "g",
+            "warnings": [],
+            "sourceIngredientIndex": 9,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "CORRECT",
+            "sourceError": false,
+            "unsupported": false,
+            "parserError": false,
+            "silentFallbackRisk": false,
+            "requiredCorrection": false,
+            "pocWarnings": [],
+            "source_evidence": {
+              "source_order": 10,
+              "visible_text": "50g ground almonds",
+              "json_ld_text": "50g ground almonds",
+              "source_verdict": "MATCH",
+              "note": null
+            },
+            "unsupported_phrase": null,
+            "misleading_fields": []
+          },
+          {
+            "sourceOrder": 13,
+            "rawText": "naan breads or cooked basmati rice, to serve",
+            "name": "naan breads or cooked basmati rice, to serve",
+            "quantity": 1.0,
+            "canonical_unit": "db",
+            "warnings": [
+              "missingQuantity"
+            ],
+            "sourceIngredientIndex": 10,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "CORRECT",
+            "sourceError": false,
+            "unsupported": false,
+            "parserError": false,
+            "silentFallbackRisk": false,
+            "requiredCorrection": false,
+            "pocWarnings": [],
+            "source_evidence": {
+              "source_order": 11,
+              "visible_text": "naan breads or cooked basmati rice, to serve",
+              "json_ld_text": "naan breads or cooked basmati rice, to serve",
+              "source_verdict": "MATCH",
+              "note": null
+            },
+            "unsupported_phrase": null,
+            "misleading_fields": []
+          }
+        ],
+        "preparation": "Heat the oil in a flameproof casserole dish or large frying pan over a medium heat. Add the onion and a generous pinch of salt and fry for 8-10 mins, or until the onion has turned golden brown and sticky.\n\nAdd the garlic and ginger, cooking for a further minute.\n\nChop the chicken into chunky 3cm pieces, add to the pan and fry for 5 mins before stirring through the spice paste and tomatoes, along with 250ml water. Bring to the boil, lower to a simmer and cook on a gentle heat uncovered for 25-30 mins or until rich and slightly reduced.\n\nStir though the yogurt, coriander and ground almonds, season and serve with warm naan or fluffy basmati rice.",
+        "spices": [],
+        "unprocessedSegments": []
+      },
+      "normalized_preparation": "Heat the oil in a flameproof casserole dish or large frying pan over a medium heat. Add the onion and a generous pinch of salt and fry for 8-10 mins, or until the onion has turned golden brown and sticky.\n\nAdd the garlic and ginger, cooking for a further minute.\n\nChop the chicken into chunky 3cm pieces, add to the pan and fry for 5 mins before stirring through the spice paste and tomatoes, along with 250ml water. Bring to the boil, lower to a simmer and cook on a gentle heat uncovered for 25-30 mins or until rich and slightly reduced.\n\nStir though the yogurt, coriander and ground almonds, season and serve with warm naan or fluffy basmati rice.",
+      "timing": {
+        "normalization_ms": 8.641,
+        "parser_ms": 5.54,
+        "draft_build_ms": 0.169,
+        "total_local_ms": 14.358
+      },
+      "title_changed": false,
+      "ingredient_count": 11,
+      "clean_rows": 5,
+      "unsupported_rows": 5,
+      "structural_corrections": 0,
+      "source_structure_warnings": [],
+      "instruction_entries_preserved": 4,
+      "required_corrections": [
+        {
+          "row": 1,
+          "classification": "REQUIRED_CORRECTION",
+          "fields": [
+            "name/quantity/unit interpretation"
+          ],
+          "reasons": [
+            "Unsupported measure/expression cannot safely be represented by current db fallback."
+          ],
+          "counting": "One row-level correction action even if multiple fields/reasons overlap."
+        },
+        {
+          "row": 3,
+          "classification": "REQUIRED_CORRECTION",
+          "fields": [
+            "name/quantity/unit interpretation"
+          ],
+          "reasons": [
+            "Unsupported measure/expression cannot safely be represented by current db fallback."
+          ],
+          "counting": "One row-level correction action even if multiple fields/reasons overlap."
+        },
+        {
+          "row": 4,
+          "classification": "REQUIRED_CORRECTION",
+          "fields": [
+            "name/quantity/unit interpretation"
+          ],
+          "reasons": [
+            "Unsupported measure/expression cannot safely be represented by current db fallback."
+          ],
+          "counting": "One row-level correction action even if multiple fields/reasons overlap."
+        },
+        {
+          "row": 6,
+          "classification": "REQUIRED_CORRECTION",
+          "fields": [
+            "name/quantity/unit interpretation"
+          ],
+          "reasons": [
+            "Unsupported measure/expression cannot safely be represented by current db fallback."
+          ],
+          "counting": "One row-level correction action even if multiple fields/reasons overlap."
+        },
+        {
+          "row": 9,
+          "classification": "REQUIRED_CORRECTION",
+          "fields": [
+            "name/quantity/unit interpretation"
+          ],
+          "reasons": [
+            "Unsupported measure/expression cannot safely be represented by current db fallback."
+          ],
+          "counting": "One row-level correction action even if multiple fields/reasons overlap."
+        }
+      ],
+      "review_only": [
+        {
+          "row": 11,
+          "field": "quantity",
+          "classification": "REVIEW_ONLY",
+          "reason": "Source gives no quantity; accepted 1 db default requires confirmation, not a proven erroneous value."
+        }
+      ],
+      "silent_fallback_rows": 4,
+      "verdict": "POOR",
+      "verdict_reason": "5 correction actions / 11 ingredient rows; 1 review-only quantities. Usable=true.",
+      "consistency": {
+        "ingredient_fields_equal_b3_3": true,
+        "preparation_equals_normalized_input": true,
+        "b3_0_reference_verified_by_b3_2": true
+      }
+    },
+    {
+      "id": "22",
+      "url": "https://www.bbcgoodfood.com/recipes/easy-pancakes",
+      "domain": "www.bbcgoodfood.com",
+      "raw_title": "Easy pancakes",
+      "normalized_title": "Easy pancakes",
+      "parser_input": "Easy pancakes\n\nHozzávalók:\n100g plain flour\n2 large eggs\n300ml milk\n1 tbsp sunflower or vegetable oil plus a little extra for frying\nlemon wedges to serve (optional)\ncaster sugar to serve (optional)\n\nElkészítés:\nPut 100g plain flour, 2 large eggs, 300ml milk, 1 tbsp sunflower or vegetable oil and a pinch of salt into a bowl or large jug, then whisk to a smooth batter. This should be similar in consistency to single cream.\n\nSet aside for 30 mins to rest if you have time, or start cooking straight away.\n\nSet a medium frying pan or crêpe pan over a medium heat and carefully wipe it with some oiled kitchen paper.\n\nWhen hot, cook your pancakes for 1 min on each side until golden, using around half a ladleful of batter per pancake. Keep them warm in a low oven as you make the rest.\n\nServe with lemon wedges and caster sugar, or your favourite filling. Once cold, you can layer the pancakes between baking parchment, then wrap in cling film and freeze for up to two months.",
+      "draft": {
+        "title": "Easy pancakes",
+        "ingredients": [
+          {
+            "sourceOrder": 3,
+            "rawText": "100g plain flour",
+            "name": "plain flour",
+            "quantity": 100.0,
+            "canonical_unit": "g",
+            "warnings": [],
+            "sourceIngredientIndex": 0,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "CORRECT",
+            "sourceError": false,
+            "unsupported": false,
+            "parserError": false,
+            "silentFallbackRisk": false,
+            "requiredCorrection": false,
+            "pocWarnings": [],
+            "source_evidence": {
+              "source_order": 1,
+              "visible_text": "100g plain flour",
+              "json_ld_text": "100g plain flour",
+              "source_verdict": "MATCH",
+              "note": null
+            },
+            "unsupported_phrase": null,
+            "misleading_fields": []
+          },
+          {
+            "sourceOrder": 4,
+            "rawText": "2 large eggs",
+            "name": "large eggs",
+            "quantity": 2.0,
+            "canonical_unit": "db",
+            "warnings": [],
+            "sourceIngredientIndex": 1,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "CORRECT",
+            "sourceError": false,
+            "unsupported": false,
+            "parserError": false,
+            "silentFallbackRisk": false,
+            "requiredCorrection": false,
+            "pocWarnings": [],
+            "source_evidence": {
+              "source_order": 2,
+              "visible_text": "2 large eggs",
+              "json_ld_text": "2 large eggs",
+              "source_verdict": "MATCH",
+              "note": null
+            },
+            "unsupported_phrase": null,
+            "misleading_fields": []
+          },
+          {
+            "sourceOrder": 5,
+            "rawText": "300ml milk",
+            "name": "milk",
+            "quantity": 300.0,
+            "canonical_unit": "ml",
+            "warnings": [],
+            "sourceIngredientIndex": 2,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "CORRECT",
+            "sourceError": false,
+            "unsupported": false,
+            "parserError": false,
+            "silentFallbackRisk": false,
+            "requiredCorrection": false,
+            "pocWarnings": [],
+            "source_evidence": {
+              "source_order": 3,
+              "visible_text": "300ml milk",
+              "json_ld_text": "300ml milk",
+              "source_verdict": "MATCH",
+              "note": null
+            },
+            "unsupported_phrase": null,
+            "misleading_fields": []
+          },
+          {
+            "sourceOrder": 6,
+            "rawText": "1 tbsp sunflower or vegetable oil plus a little extra for frying",
+            "name": "tbsp sunflower or vegetable oil plus a little extra for frying",
+            "quantity": 1.0,
+            "canonical_unit": "db",
+            "warnings": [],
+            "sourceIngredientIndex": 3,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "UNSUPPORTED_UNIT",
+            "sourceError": false,
+            "unsupported": true,
+            "parserError": false,
+            "silentFallbackRisk": true,
+            "requiredCorrection": true,
+            "pocWarnings": [
+              "UNSUPPORTED_INPUT",
+              "SILENT_BAD_FALLBACK_RISK"
+            ],
+            "source_evidence": {
+              "source_order": 4,
+              "visible_text": "1 tbsp sunflower or vegetable oil plus a little extra for frying",
+              "json_ld_text": "1 tbsp sunflower or vegetable oil plus a little extra for frying",
+              "source_verdict": "MATCH",
+              "note": null
+            },
+            "unsupported_phrase": "tbsp",
+            "misleading_fields": [
+              "canonical_unit",
+              "name contains unresolved measure/expression"
+            ]
+          },
+          {
+            "sourceOrder": 7,
+            "rawText": "lemon wedges to serve (optional)",
+            "name": "lemon wedges to serve (optional)",
+            "quantity": 1.0,
+            "canonical_unit": "db",
+            "warnings": [
+              "missingQuantity"
+            ],
+            "sourceIngredientIndex": 4,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "CORRECT",
+            "sourceError": false,
+            "unsupported": false,
+            "parserError": false,
+            "silentFallbackRisk": false,
+            "requiredCorrection": false,
+            "pocWarnings": [],
+            "source_evidence": {
+              "source_order": 5,
+              "visible_text": "lemon wedges to serve (optional)",
+              "json_ld_text": "lemon wedges to serve (optional)",
+              "source_verdict": "MATCH",
+              "note": null
+            },
+            "unsupported_phrase": null,
+            "misleading_fields": []
+          },
+          {
+            "sourceOrder": 8,
+            "rawText": "caster sugar to serve (optional)",
+            "name": "caster sugar to serve (optional)",
+            "quantity": 1.0,
+            "canonical_unit": "db",
+            "warnings": [
+              "missingQuantity"
+            ],
+            "sourceIngredientIndex": 5,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "CORRECT",
+            "sourceError": false,
+            "unsupported": false,
+            "parserError": false,
+            "silentFallbackRisk": false,
+            "requiredCorrection": false,
+            "pocWarnings": [],
+            "source_evidence": {
+              "source_order": 6,
+              "visible_text": "caster sugar to serve (optional)",
+              "json_ld_text": "caster sugar to serve (optional)",
+              "source_verdict": "MATCH",
+              "note": null
+            },
+            "unsupported_phrase": null,
+            "misleading_fields": []
+          }
+        ],
+        "preparation": "Put 100g plain flour, 2 large eggs, 300ml milk, 1 tbsp sunflower or vegetable oil and a pinch of salt into a bowl or large jug, then whisk to a smooth batter. This should be similar in consistency to single cream.\n\nSet aside for 30 mins to rest if you have time, or start cooking straight away.\n\nSet a medium frying pan or crêpe pan over a medium heat and carefully wipe it with some oiled kitchen paper.\n\nWhen hot, cook your pancakes for 1 min on each side until golden, using around half a ladleful of batter per pancake. Keep them warm in a low oven as you make the rest.\n\nServe with lemon wedges and caster sugar, or your favourite filling. Once cold, you can layer the pancakes between baking parchment, then wrap in cling film and freeze for up to two months.",
+        "spices": [],
+        "unprocessedSegments": []
+      },
+      "normalized_preparation": "Put 100g plain flour, 2 large eggs, 300ml milk, 1 tbsp sunflower or vegetable oil and a pinch of salt into a bowl or large jug, then whisk to a smooth batter. This should be similar in consistency to single cream.\n\nSet aside for 30 mins to rest if you have time, or start cooking straight away.\n\nSet a medium frying pan or crêpe pan over a medium heat and carefully wipe it with some oiled kitchen paper.\n\nWhen hot, cook your pancakes for 1 min on each side until golden, using around half a ladleful of batter per pancake. Keep them warm in a low oven as you make the rest.\n\nServe with lemon wedges and caster sugar, or your favourite filling. Once cold, you can layer the pancakes between baking parchment, then wrap in cling film and freeze for up to two months.",
+      "timing": {
+        "normalization_ms": 0.356,
+        "parser_ms": 0.348,
+        "draft_build_ms": 0.016,
+        "total_local_ms": 0.723
+      },
+      "title_changed": false,
+      "ingredient_count": 6,
+      "clean_rows": 3,
+      "unsupported_rows": 1,
+      "structural_corrections": 0,
+      "source_structure_warnings": [],
+      "instruction_entries_preserved": 5,
+      "required_corrections": [
+        {
+          "row": 4,
+          "classification": "REQUIRED_CORRECTION",
+          "fields": [
+            "name/quantity/unit interpretation"
+          ],
+          "reasons": [
+            "Unsupported measure/expression cannot safely be represented by current db fallback."
+          ],
+          "counting": "One row-level correction action even if multiple fields/reasons overlap."
+        }
+      ],
+      "review_only": [
+        {
+          "row": 5,
+          "field": "quantity",
+          "classification": "REVIEW_ONLY",
+          "reason": "Source gives no quantity; accepted 1 db default requires confirmation, not a proven erroneous value."
+        },
+        {
+          "row": 6,
+          "field": "quantity",
+          "classification": "REVIEW_ONLY",
+          "reason": "Source gives no quantity; accepted 1 db default requires confirmation, not a proven erroneous value."
+        }
+      ],
+      "silent_fallback_rows": 1,
+      "verdict": "REVIEW",
+      "verdict_reason": "1 correction actions / 6 ingredient rows; 2 review-only quantities. Usable=true.",
+      "consistency": {
+        "ingredient_fields_equal_b3_3": true,
+        "preparation_equals_normalized_input": true,
+        "b3_0_reference_verified_by_b3_2": true
+      }
+    },
+    {
+      "id": "23",
+      "url": "https://www.bbcgoodfood.com/recipes/fish-pie-four-steps",
+      "domain": "www.bbcgoodfood.com",
+      "raw_title": "Fish pie - in four steps",
+      "normalized_title": "Fish pie - in four steps",
+      "parser_input": "Fish pie - in four steps\n\nHozzávalók:\n400g skinless white fish fillet\n400g skinless smoked haddock fillet\n600ml semi-skimmed milk\n1 small onion quartered\n4 cloves\n2 bay leaves\n4 eggs\nsmall bunch parsley leaves only, chopped\n100g butter\n50g plain flour\npinch freshly grated nutmeg\n1kg floury potato peeled and cut into even-sized chunks\n50g cheddar grated\n\nElkészítés:\nPoach 400g skinless white fish fillets and 400g skinless smoked haddock fillets. Put the fish in the frying pan and pour over 500ml of the semi-skimmed milk. Quarter 1 small onion and stud each quarter with a clove, then add to the milk, with 2 bay leaves. Bring the milk just to the boil – you will see a few small bubbles. Reduce the heat and simmer for 8 mins. Lift the fish onto a plate and strain the milk into a jug to cool. Flake the fish into large pieces in the baking dish.\n\nHard-boil 4 eggs. Bring a small pan of water to a gentle boil, then carefully lower the eggs in with a slotted spoon. Bring the water back to a gentle boil, with just a couple of bubbles rising to the surface. Set the timer for 8 mins, cook, then drain and cool in a bowl of cold water. Peel, slice into quarters and arrange on top of the fish, then scatter over the chopped leaves of a small bunch of parsley.\n\nMake the sauce. Melt 50g butter in a pan, stir in 50g plain flour and cook for 1 min over moderate heat. Take off the heat, pour in a little of the cold poaching milk, then stir until blended. Continue to add the milk gradually, mixing well until you have a smooth sauce. Return to the heat, bring to the boil and cook for 5 mins, stirring continually, until it coats the back of a spoon. Remove from the heat, season with salt, pepper and a pinch of freshly grated nutmeg, then pour over the fish.\n\nAssemble and bake. Heat oven to 200C/fan 180C/gas 6. Boil 1kg floury potatoes, cut into even-sized chunks, for 20 mins. Drain, season and mash with the remaining 50g butter and 100ml milk. Use to top the pie, starting at the edge of the dish and working your way in – push the mash right to the edges to seal. Fluff the top with a fork, sprinkle over 50g grated cheddar, then bake for 30 mins. Make up to a day ahead, chill, then bake for 40 mins.",
+      "draft": {
+        "title": "Fish pie - in four steps",
+        "ingredients": [
+          {
+            "sourceOrder": 3,
+            "rawText": "400g skinless white fish fillet",
+            "name": "skinless white fish fillet",
+            "quantity": 400.0,
+            "canonical_unit": "g",
+            "warnings": [],
+            "sourceIngredientIndex": 0,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "CORRECT",
+            "sourceError": false,
+            "unsupported": false,
+            "parserError": false,
+            "silentFallbackRisk": false,
+            "requiredCorrection": false,
+            "pocWarnings": [],
+            "source_evidence": {
+              "source_order": 1,
+              "visible_text": "400g skinless white fish fillet",
+              "json_ld_text": "400g skinless white fish fillet",
+              "source_verdict": "MATCH",
+              "note": null
+            },
+            "unsupported_phrase": null,
+            "misleading_fields": []
+          },
+          {
+            "sourceOrder": 4,
+            "rawText": "400g skinless smoked haddock fillet",
+            "name": "skinless smoked haddock fillet",
+            "quantity": 400.0,
+            "canonical_unit": "g",
+            "warnings": [],
+            "sourceIngredientIndex": 1,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "CORRECT",
+            "sourceError": false,
+            "unsupported": false,
+            "parserError": false,
+            "silentFallbackRisk": false,
+            "requiredCorrection": false,
+            "pocWarnings": [],
+            "source_evidence": {
+              "source_order": 2,
+              "visible_text": "400g skinless smoked haddock fillet",
+              "json_ld_text": "400g skinless smoked haddock fillet",
+              "source_verdict": "MATCH",
+              "note": null
+            },
+            "unsupported_phrase": null,
+            "misleading_fields": []
+          },
+          {
+            "sourceOrder": 5,
+            "rawText": "600ml semi-skimmed milk",
+            "name": "semi-skimmed milk",
+            "quantity": 600.0,
+            "canonical_unit": "ml",
+            "warnings": [],
+            "sourceIngredientIndex": 2,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "CORRECT",
+            "sourceError": false,
+            "unsupported": false,
+            "parserError": false,
+            "silentFallbackRisk": false,
+            "requiredCorrection": false,
+            "pocWarnings": [],
+            "source_evidence": {
+              "source_order": 3,
+              "visible_text": "600ml semi-skimmed milk",
+              "json_ld_text": "600ml semi-skimmed milk",
+              "source_verdict": "MATCH",
+              "note": null
+            },
+            "unsupported_phrase": null,
+            "misleading_fields": []
+          },
+          {
+            "sourceOrder": 6,
+            "rawText": "1 small onion quartered",
+            "name": "small onion quartered",
+            "quantity": 1.0,
+            "canonical_unit": "db",
+            "warnings": [],
+            "sourceIngredientIndex": 3,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "CORRECT",
+            "sourceError": false,
+            "unsupported": false,
+            "parserError": false,
+            "silentFallbackRisk": false,
+            "requiredCorrection": false,
+            "pocWarnings": [],
+            "source_evidence": {
+              "source_order": 4,
+              "visible_text": "1 small onion quartered",
+              "json_ld_text": "1 small onion quartered",
+              "source_verdict": "MATCH",
+              "note": null
+            },
+            "unsupported_phrase": null,
+            "misleading_fields": []
+          },
+          {
+            "sourceOrder": 7,
+            "rawText": "4 cloves",
+            "name": "cloves",
+            "quantity": 4.0,
+            "canonical_unit": "db",
+            "warnings": [],
+            "sourceIngredientIndex": 4,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "CORRECT",
+            "sourceError": false,
+            "unsupported": false,
+            "parserError": false,
+            "silentFallbackRisk": false,
+            "requiredCorrection": false,
+            "pocWarnings": [],
+            "source_evidence": {
+              "source_order": 5,
+              "visible_text": "4 cloves",
+              "json_ld_text": "4 cloves",
+              "source_verdict": "MATCH",
+              "note": null
+            },
+            "unsupported_phrase": null,
+            "misleading_fields": []
+          },
+          {
+            "sourceOrder": 8,
+            "rawText": "2 bay leaves",
+            "name": "bay leaves",
+            "quantity": 2.0,
+            "canonical_unit": "db",
+            "warnings": [],
+            "sourceIngredientIndex": 5,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "CORRECT",
+            "sourceError": false,
+            "unsupported": false,
+            "parserError": false,
+            "silentFallbackRisk": false,
+            "requiredCorrection": false,
+            "pocWarnings": [],
+            "source_evidence": {
+              "source_order": 6,
+              "visible_text": "2 bay leaves",
+              "json_ld_text": "2 bay leaves",
+              "source_verdict": "MATCH",
+              "note": null
+            },
+            "unsupported_phrase": null,
+            "misleading_fields": []
+          },
+          {
+            "sourceOrder": 9,
+            "rawText": "4 eggs",
+            "name": "eggs",
+            "quantity": 4.0,
+            "canonical_unit": "db",
+            "warnings": [],
+            "sourceIngredientIndex": 6,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "CORRECT",
+            "sourceError": false,
+            "unsupported": false,
+            "parserError": false,
+            "silentFallbackRisk": false,
+            "requiredCorrection": false,
+            "pocWarnings": [],
+            "source_evidence": {
+              "source_order": 7,
+              "visible_text": "4 eggs",
+              "json_ld_text": "4 eggs",
+              "source_verdict": "MATCH",
+              "note": null
+            },
+            "unsupported_phrase": null,
+            "misleading_fields": []
+          },
+          {
+            "sourceOrder": 10,
+            "rawText": "small bunch parsley leaves only, chopped",
+            "name": "small bunch parsley leaves only, chopped",
+            "quantity": 1.0,
+            "canonical_unit": "db",
+            "warnings": [
+              "missingQuantity"
+            ],
+            "sourceIngredientIndex": 7,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "UNSUPPORTED_UNIT",
+            "sourceError": false,
+            "unsupported": true,
+            "parserError": false,
+            "silentFallbackRisk": false,
+            "requiredCorrection": true,
+            "pocWarnings": [
+              "UNSUPPORTED_INPUT"
+            ],
+            "source_evidence": {
+              "source_order": 8,
+              "visible_text": "small bunch parsley leaves only, chopped",
+              "json_ld_text": "small bunch parsley leaves only, chopped",
+              "source_verdict": "MATCH",
+              "note": null
+            },
+            "unsupported_phrase": "small bunch",
+            "misleading_fields": [
+              "canonical_unit",
+              "quantity interpretation",
+              "name contains unresolved measure/expression"
+            ]
+          },
+          {
+            "sourceOrder": 11,
+            "rawText": "100g butter",
+            "name": "butter",
+            "quantity": 100.0,
+            "canonical_unit": "g",
+            "warnings": [],
+            "sourceIngredientIndex": 8,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "CORRECT",
+            "sourceError": false,
+            "unsupported": false,
+            "parserError": false,
+            "silentFallbackRisk": false,
+            "requiredCorrection": false,
+            "pocWarnings": [],
+            "source_evidence": {
+              "source_order": 9,
+              "visible_text": "100g butter",
+              "json_ld_text": "100g butter",
+              "source_verdict": "MATCH",
+              "note": null
+            },
+            "unsupported_phrase": null,
+            "misleading_fields": []
+          },
+          {
+            "sourceOrder": 12,
+            "rawText": "50g plain flour",
+            "name": "plain flour",
+            "quantity": 50.0,
+            "canonical_unit": "g",
+            "warnings": [],
+            "sourceIngredientIndex": 9,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "CORRECT",
+            "sourceError": false,
+            "unsupported": false,
+            "parserError": false,
+            "silentFallbackRisk": false,
+            "requiredCorrection": false,
+            "pocWarnings": [],
+            "source_evidence": {
+              "source_order": 10,
+              "visible_text": "50g plain flour",
+              "json_ld_text": "50g plain flour",
+              "source_verdict": "MATCH",
+              "note": null
+            },
+            "unsupported_phrase": null,
+            "misleading_fields": []
+          },
+          {
+            "sourceOrder": 13,
+            "rawText": "pinch freshly grated nutmeg",
+            "name": "pinch freshly grated nutmeg",
+            "quantity": 1.0,
+            "canonical_unit": "db",
+            "warnings": [
+              "missingQuantity"
+            ],
+            "sourceIngredientIndex": 10,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "UNSUPPORTED_UNIT",
+            "sourceError": false,
+            "unsupported": true,
+            "parserError": false,
+            "silentFallbackRisk": false,
+            "requiredCorrection": true,
+            "pocWarnings": [
+              "UNSUPPORTED_INPUT"
+            ],
+            "source_evidence": {
+              "source_order": 11,
+              "visible_text": "pinch freshly grated nutmeg",
+              "json_ld_text": "pinch freshly grated nutmeg",
+              "source_verdict": "MATCH",
+              "note": null
+            },
+            "unsupported_phrase": "pinch",
+            "misleading_fields": [
+              "canonical_unit",
+              "quantity interpretation",
+              "name contains unresolved measure/expression"
+            ]
+          },
+          {
+            "sourceOrder": 14,
+            "rawText": "1kg floury potato peeled and cut into even-sized chunks",
+            "name": "floury potato peeled and cut into even-sized chunks",
+            "quantity": 1.0,
+            "canonical_unit": "kg",
+            "warnings": [],
+            "sourceIngredientIndex": 11,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "CORRECT",
+            "sourceError": false,
+            "unsupported": false,
+            "parserError": false,
+            "silentFallbackRisk": false,
+            "requiredCorrection": false,
+            "pocWarnings": [],
+            "source_evidence": {
+              "source_order": 12,
+              "visible_text": "1kg floury potato peeled and cut into even-sized chunks",
+              "json_ld_text": "1kg floury potato peeled and cut into even-sized chunks",
+              "source_verdict": "MATCH",
+              "note": null
+            },
+            "unsupported_phrase": null,
+            "misleading_fields": []
+          },
+          {
+            "sourceOrder": 15,
+            "rawText": "50g cheddar grated",
+            "name": "cheddar grated",
+            "quantity": 50.0,
+            "canonical_unit": "g",
+            "warnings": [],
+            "sourceIngredientIndex": 12,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "CORRECT",
+            "sourceError": false,
+            "unsupported": false,
+            "parserError": false,
+            "silentFallbackRisk": false,
+            "requiredCorrection": false,
+            "pocWarnings": [],
+            "source_evidence": {
+              "source_order": 13,
+              "visible_text": "50g cheddar grated",
+              "json_ld_text": "50g cheddar grated",
+              "source_verdict": "MATCH",
+              "note": null
+            },
+            "unsupported_phrase": null,
+            "misleading_fields": []
+          }
+        ],
+        "preparation": "Poach 400g skinless white fish fillets and 400g skinless smoked haddock fillets. Put the fish in the frying pan and pour over 500ml of the semi-skimmed milk. Quarter 1 small onion and stud each quarter with a clove, then add to the milk, with 2 bay leaves. Bring the milk just to the boil – you will see a few small bubbles. Reduce the heat and simmer for 8 mins. Lift the fish onto a plate and strain the milk into a jug to cool. Flake the fish into large pieces in the baking dish.\n\nHard-boil 4 eggs. Bring a small pan of water to a gentle boil, then carefully lower the eggs in with a slotted spoon. Bring the water back to a gentle boil, with just a couple of bubbles rising to the surface. Set the timer for 8 mins, cook, then drain and cool in a bowl of cold water. Peel, slice into quarters and arrange on top of the fish, then scatter over the chopped leaves of a small bunch of parsley.\n\nMake the sauce. Melt 50g butter in a pan, stir in 50g plain flour and cook for 1 min over moderate heat. Take off the heat, pour in a little of the cold poaching milk, then stir until blended. Continue to add the milk gradually, mixing well until you have a smooth sauce. Return to the heat, bring to the boil and cook for 5 mins, stirring continually, until it coats the back of a spoon. Remove from the heat, season with salt, pepper and a pinch of freshly grated nutmeg, then pour over the fish.\n\nAssemble and bake. Heat oven to 200C/fan 180C/gas 6. Boil 1kg floury potatoes, cut into even-sized chunks, for 20 mins. Drain, season and mash with the remaining 50g butter and 100ml milk. Use to top the pie, starting at the edge of the dish and working your way in – push the mash right to the edges to seal. Fluff the top with a fork, sprinkle over 50g grated cheddar, then bake for 30 mins. Make up to a day ahead, chill, then bake for 40 mins.",
+        "spices": [],
+        "unprocessedSegments": []
+      },
+      "normalized_preparation": "Poach 400g skinless white fish fillets and 400g skinless smoked haddock fillets. Put the fish in the frying pan and pour over 500ml of the semi-skimmed milk. Quarter 1 small onion and stud each quarter with a clove, then add to the milk, with 2 bay leaves. Bring the milk just to the boil – you will see a few small bubbles. Reduce the heat and simmer for 8 mins. Lift the fish onto a plate and strain the milk into a jug to cool. Flake the fish into large pieces in the baking dish.\n\nHard-boil 4 eggs. Bring a small pan of water to a gentle boil, then carefully lower the eggs in with a slotted spoon. Bring the water back to a gentle boil, with just a couple of bubbles rising to the surface. Set the timer for 8 mins, cook, then drain and cool in a bowl of cold water. Peel, slice into quarters and arrange on top of the fish, then scatter over the chopped leaves of a small bunch of parsley.\n\nMake the sauce. Melt 50g butter in a pan, stir in 50g plain flour and cook for 1 min over moderate heat. Take off the heat, pour in a little of the cold poaching milk, then stir until blended. Continue to add the milk gradually, mixing well until you have a smooth sauce. Return to the heat, bring to the boil and cook for 5 mins, stirring continually, until it coats the back of a spoon. Remove from the heat, season with salt, pepper and a pinch of freshly grated nutmeg, then pour over the fish.\n\nAssemble and bake. Heat oven to 200C/fan 180C/gas 6. Boil 1kg floury potatoes, cut into even-sized chunks, for 20 mins. Drain, season and mash with the remaining 50g butter and 100ml milk. Use to top the pie, starting at the edge of the dish and working your way in – push the mash right to the edges to seal. Fluff the top with a fork, sprinkle over 50g grated cheddar, then bake for 30 mins. Make up to a day ahead, chill, then bake for 40 mins.",
+      "timing": {
+        "normalization_ms": 0.545,
+        "parser_ms": 1.232,
+        "draft_build_ms": 0.025,
+        "total_local_ms": 1.805
+      },
+      "title_changed": false,
+      "ingredient_count": 13,
+      "clean_rows": 11,
+      "unsupported_rows": 2,
+      "structural_corrections": 0,
+      "source_structure_warnings": [],
+      "instruction_entries_preserved": 4,
+      "required_corrections": [
+        {
+          "row": 8,
+          "classification": "REQUIRED_CORRECTION",
+          "fields": [
+            "name/quantity/unit interpretation"
+          ],
+          "reasons": [
+            "Unsupported measure/expression cannot safely be represented by current db fallback."
+          ],
+          "counting": "One row-level correction action even if multiple fields/reasons overlap."
+        },
+        {
+          "row": 11,
+          "classification": "REQUIRED_CORRECTION",
+          "fields": [
+            "name/quantity/unit interpretation"
+          ],
+          "reasons": [
+            "Unsupported measure/expression cannot safely be represented by current db fallback."
+          ],
+          "counting": "One row-level correction action even if multiple fields/reasons overlap."
+        }
+      ],
+      "review_only": [],
+      "silent_fallback_rows": 0,
+      "verdict": "REVIEW",
+      "verdict_reason": "2 correction actions / 13 ingredient rows; 0 review-only quantities. Usable=true.",
+      "consistency": {
+        "ingredient_fields_equal_b3_3": true,
+        "preparation_equals_normalized_input": true,
+        "b3_0_reference_verified_by_b3_2": true
+      }
+    },
+    {
+      "id": "24",
+      "url": "https://www.bbcgoodfood.com/recipes/best-ever-chocolate-brownies-recipe",
+      "domain": "www.bbcgoodfood.com",
+      "raw_title": "Best ever chocolate brownies recipe",
+      "normalized_title": "Best ever chocolate brownies recipe",
+      "parser_input": "Best ever chocolate brownies recipe\n\nHozzávalók:\n185g unsalted butter\n185g best dark chocolate\n85g plain flour\n40g cocoa powder\n50g white chocolate\n50g milk chocolate\n3 large eggs\n275g golden caster sugar\n\nElkészítés:\nCut 185g unsalted butter into small cubes and tip into a medium bowl. Break 185g dark chocolate into small pieces and drop into the bowl.\n\nFill a small saucepan about a quarter full with hot water, then sit the bowl on top so it rests on the rim of the pan, not touching the water. Put over a low heat until the butter and chocolate have melted, stirring occasionally to mix them.\n\nRemove the bowl from the pan. Alternatively, cover the bowl loosely with cling film and put in the microwave for 2 minutes on High. Leave the melted mixture to cool to room temperature.\n\nWhile you wait for the chocolate to cool, position a shelf in the middle of your oven and turn the oven on to 180C/160C fan/gas 4.\n\nUsing a shallow 20cm square tin, cut out a square of kitchen foil (or non-stick baking parchment) to line the base. Tip 85g plain flour and 40g cocoa powder into a sieve held over a medium bowl. Tap and shake the sieve so they run through together and you get rid of any lumps.\n\nChop 50g white chocolate and 50g milk chocolate into chunks on a board.\n\nBreak 3 large eggs into a large bowl and tip in 275g golden caster sugar. With an electric mixer on maximum speed, whisk the eggs and sugar. They will look thick and creamy, like a milk shake. This can take 3-8 minutes, depending on how powerful your mixer is. You’ll know it’s ready when the mixture becomes really pale and about double its original volume. Another check is to turn off the mixer, lift out the beaters and wiggle them from side to side. If the mixture that runs off the beaters leaves a trail on the surface of the mixture in the bowl for a second or two, you’re there.\n\nPour the cooled chocolate mixture over the eggy mousse, then gently fold together with a rubber spatula. Plunge the spatula in at one side, take it underneath and bring it up the opposite side and in again at the middle. Continue going under and over in a figure of eight, moving the bowl round after each folding so you can get at it from all sides, until the two mixtures are one and the colour is a mottled dark brown. The idea is to marry them without knocking out the air, so be as gentle and slow as you like.\n\nHold the sieve over the bowl of eggy chocolate mixture and resift the cocoa and flour mixture, shaking the sieve from side to side, to cover the top evenly.\n\nGently fold in this powder using the same figure of eight action as before. The mixture will look dry and dusty at first, and a bit unpromising, but if you keep going very gently and patiently, it will end up looking gungy and fudgy. Stop just before you feel you should, as you don’t want to overdo this mixing.\n\nFinally, stir in the white and milk chocolate chunks until they’re dotted throughout.\n\nPour the mixture into the prepared tin, scraping every bit out of the bowl with the spatula. Gently ease the mixture into the corners of the tin and paddle the spatula from side to side across the top to level it.\n\nPut in the oven and set your timer for 25 mins. When the buzzer goes, open the oven, pull the shelf out a bit and gently shake the tin. If the brownie wobbles in the middle, it’s not quite done, so slide it back in and bake for another 5 minutes until the top has a shiny, papery crust and the sides are just beginning to come away from the tin. Take out of the oven.\n\nLeave the whole thing in the tin until completely cold, then, if you’re using the brownie tin, lift up the protruding rim slightly and slide the uncut brownie out on its base. If you’re using a normal tin, lift out the brownie with the foil (or parchment). Cut into quarters, then cut each quarter into four squares and finally into triangles.\n\nThey’ll keep in an airtight container for a good two weeks and in the freezer for up to a month.",
+      "draft": {
+        "title": "Best ever chocolate brownies recipe",
+        "ingredients": [
+          {
+            "sourceOrder": 3,
+            "rawText": "185g unsalted butter",
+            "name": "unsalted butter",
+            "quantity": 185.0,
+            "canonical_unit": "g",
+            "warnings": [],
+            "sourceIngredientIndex": 0,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "CORRECT",
+            "sourceError": false,
+            "unsupported": false,
+            "parserError": false,
+            "silentFallbackRisk": false,
+            "requiredCorrection": false,
+            "pocWarnings": [],
+            "source_evidence": {
+              "source_order": 1,
+              "visible_text": "185g unsalted butter",
+              "json_ld_text": "185g unsalted butter",
+              "source_verdict": "MATCH",
+              "note": null
+            },
+            "unsupported_phrase": null,
+            "misleading_fields": []
+          },
+          {
+            "sourceOrder": 4,
+            "rawText": "185g best dark chocolate",
+            "name": "best dark chocolate",
+            "quantity": 185.0,
+            "canonical_unit": "g",
+            "warnings": [],
+            "sourceIngredientIndex": 1,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "CORRECT",
+            "sourceError": false,
+            "unsupported": false,
+            "parserError": false,
+            "silentFallbackRisk": false,
+            "requiredCorrection": false,
+            "pocWarnings": [],
+            "source_evidence": {
+              "source_order": 2,
+              "visible_text": "185g best dark chocolate",
+              "json_ld_text": "185g best dark chocolate",
+              "source_verdict": "MATCH",
+              "note": null
+            },
+            "unsupported_phrase": null,
+            "misleading_fields": []
+          },
+          {
+            "sourceOrder": 5,
+            "rawText": "85g plain flour",
+            "name": "plain flour",
+            "quantity": 85.0,
+            "canonical_unit": "g",
+            "warnings": [],
+            "sourceIngredientIndex": 2,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "CORRECT",
+            "sourceError": false,
+            "unsupported": false,
+            "parserError": false,
+            "silentFallbackRisk": false,
+            "requiredCorrection": false,
+            "pocWarnings": [],
+            "source_evidence": {
+              "source_order": 3,
+              "visible_text": "85g plain flour",
+              "json_ld_text": "85g plain flour",
+              "source_verdict": "MATCH",
+              "note": null
+            },
+            "unsupported_phrase": null,
+            "misleading_fields": []
+          },
+          {
+            "sourceOrder": 6,
+            "rawText": "40g cocoa powder",
+            "name": "cocoa powder",
+            "quantity": 40.0,
+            "canonical_unit": "g",
+            "warnings": [],
+            "sourceIngredientIndex": 3,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "CORRECT",
+            "sourceError": false,
+            "unsupported": false,
+            "parserError": false,
+            "silentFallbackRisk": false,
+            "requiredCorrection": false,
+            "pocWarnings": [],
+            "source_evidence": {
+              "source_order": 4,
+              "visible_text": "40g cocoa powder",
+              "json_ld_text": "40g cocoa powder",
+              "source_verdict": "MATCH",
+              "note": null
+            },
+            "unsupported_phrase": null,
+            "misleading_fields": []
+          },
+          {
+            "sourceOrder": 7,
+            "rawText": "50g white chocolate",
+            "name": "white chocolate",
+            "quantity": 50.0,
+            "canonical_unit": "g",
+            "warnings": [],
+            "sourceIngredientIndex": 4,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "CORRECT",
+            "sourceError": false,
+            "unsupported": false,
+            "parserError": false,
+            "silentFallbackRisk": false,
+            "requiredCorrection": false,
+            "pocWarnings": [],
+            "source_evidence": {
+              "source_order": 5,
+              "visible_text": "50g white chocolate",
+              "json_ld_text": "50g white chocolate",
+              "source_verdict": "MATCH",
+              "note": null
+            },
+            "unsupported_phrase": null,
+            "misleading_fields": []
+          },
+          {
+            "sourceOrder": 8,
+            "rawText": "50g milk chocolate",
+            "name": "milk chocolate",
+            "quantity": 50.0,
+            "canonical_unit": "g",
+            "warnings": [],
+            "sourceIngredientIndex": 5,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "CORRECT",
+            "sourceError": false,
+            "unsupported": false,
+            "parserError": false,
+            "silentFallbackRisk": false,
+            "requiredCorrection": false,
+            "pocWarnings": [],
+            "source_evidence": {
+              "source_order": 6,
+              "visible_text": "50g milk chocolate",
+              "json_ld_text": "50g milk chocolate",
+              "source_verdict": "MATCH",
+              "note": null
+            },
+            "unsupported_phrase": null,
+            "misleading_fields": []
+          },
+          {
+            "sourceOrder": 9,
+            "rawText": "3 large eggs",
+            "name": "large eggs",
+            "quantity": 3.0,
+            "canonical_unit": "db",
+            "warnings": [],
+            "sourceIngredientIndex": 6,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "CORRECT",
+            "sourceError": false,
+            "unsupported": false,
+            "parserError": false,
+            "silentFallbackRisk": false,
+            "requiredCorrection": false,
+            "pocWarnings": [],
+            "source_evidence": {
+              "source_order": 7,
+              "visible_text": "3 large eggs",
+              "json_ld_text": "3 large eggs",
+              "source_verdict": "MATCH",
+              "note": null
+            },
+            "unsupported_phrase": null,
+            "misleading_fields": []
+          },
+          {
+            "sourceOrder": 10,
+            "rawText": "275g golden caster sugar",
+            "name": "golden caster sugar",
+            "quantity": 275.0,
+            "canonical_unit": "g",
+            "warnings": [],
+            "sourceIngredientIndex": 7,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "CORRECT",
+            "sourceError": false,
+            "unsupported": false,
+            "parserError": false,
+            "silentFallbackRisk": false,
+            "requiredCorrection": false,
+            "pocWarnings": [],
+            "source_evidence": {
+              "source_order": 8,
+              "visible_text": "275g golden caster sugar",
+              "json_ld_text": "275g golden caster sugar",
+              "source_verdict": "MATCH",
+              "note": null
+            },
+            "unsupported_phrase": null,
+            "misleading_fields": []
+          }
+        ],
+        "preparation": "Cut 185g unsalted butter into small cubes and tip into a medium bowl. Break 185g dark chocolate into small pieces and drop into the bowl.\n\nFill a small saucepan about a quarter full with hot water, then sit the bowl on top so it rests on the rim of the pan, not touching the water. Put over a low heat until the butter and chocolate have melted, stirring occasionally to mix them.\n\nRemove the bowl from the pan. Alternatively, cover the bowl loosely with cling film and put in the microwave for 2 minutes on High. Leave the melted mixture to cool to room temperature.\n\nWhile you wait for the chocolate to cool, position a shelf in the middle of your oven and turn the oven on to 180C/160C fan/gas 4.\n\nUsing a shallow 20cm square tin, cut out a square of kitchen foil (or non-stick baking parchment) to line the base. Tip 85g plain flour and 40g cocoa powder into a sieve held over a medium bowl. Tap and shake the sieve so they run through together and you get rid of any lumps.\n\nChop 50g white chocolate and 50g milk chocolate into chunks on a board.\n\nBreak 3 large eggs into a large bowl and tip in 275g golden caster sugar. With an electric mixer on maximum speed, whisk the eggs and sugar. They will look thick and creamy, like a milk shake. This can take 3-8 minutes, depending on how powerful your mixer is. You’ll know it’s ready when the mixture becomes really pale and about double its original volume. Another check is to turn off the mixer, lift out the beaters and wiggle them from side to side. If the mixture that runs off the beaters leaves a trail on the surface of the mixture in the bowl for a second or two, you’re there.\n\nPour the cooled chocolate mixture over the eggy mousse, then gently fold together with a rubber spatula. Plunge the spatula in at one side, take it underneath and bring it up the opposite side and in again at the middle. Continue going under and over in a figure of eight, moving the bowl round after each folding so you can get at it from all sides, until the two mixtures are one and the colour is a mottled dark brown. The idea is to marry them without knocking out the air, so be as gentle and slow as you like.\n\nHold the sieve over the bowl of eggy chocolate mixture and resift the cocoa and flour mixture, shaking the sieve from side to side, to cover the top evenly.\n\nGently fold in this powder using the same figure of eight action as before. The mixture will look dry and dusty at first, and a bit unpromising, but if you keep going very gently and patiently, it will end up looking gungy and fudgy. Stop just before you feel you should, as you don’t want to overdo this mixing.\n\nFinally, stir in the white and milk chocolate chunks until they’re dotted throughout.\n\nPour the mixture into the prepared tin, scraping every bit out of the bowl with the spatula. Gently ease the mixture into the corners of the tin and paddle the spatula from side to side across the top to level it.\n\nPut in the oven and set your timer for 25 mins. When the buzzer goes, open the oven, pull the shelf out a bit and gently shake the tin. If the brownie wobbles in the middle, it’s not quite done, so slide it back in and bake for another 5 minutes until the top has a shiny, papery crust and the sides are just beginning to come away from the tin. Take out of the oven.\n\nLeave the whole thing in the tin until completely cold, then, if you’re using the brownie tin, lift up the protruding rim slightly and slide the uncut brownie out on its base. If you’re using a normal tin, lift out the brownie with the foil (or parchment). Cut into quarters, then cut each quarter into four squares and finally into triangles.\n\nThey’ll keep in an airtight container for a good two weeks and in the freezer for up to a month.",
+        "spices": [],
+        "unprocessedSegments": []
+      },
+      "normalized_preparation": "Cut 185g unsalted butter into small cubes and tip into a medium bowl. Break 185g dark chocolate into small pieces and drop into the bowl.\n\nFill a small saucepan about a quarter full with hot water, then sit the bowl on top so it rests on the rim of the pan, not touching the water. Put over a low heat until the butter and chocolate have melted, stirring occasionally to mix them.\n\nRemove the bowl from the pan. Alternatively, cover the bowl loosely with cling film and put in the microwave for 2 minutes on High. Leave the melted mixture to cool to room temperature.\n\nWhile you wait for the chocolate to cool, position a shelf in the middle of your oven and turn the oven on to 180C/160C fan/gas 4.\n\nUsing a shallow 20cm square tin, cut out a square of kitchen foil (or non-stick baking parchment) to line the base. Tip 85g plain flour and 40g cocoa powder into a sieve held over a medium bowl. Tap and shake the sieve so they run through together and you get rid of any lumps.\n\nChop 50g white chocolate and 50g milk chocolate into chunks on a board.\n\nBreak 3 large eggs into a large bowl and tip in 275g golden caster sugar. With an electric mixer on maximum speed, whisk the eggs and sugar. They will look thick and creamy, like a milk shake. This can take 3-8 minutes, depending on how powerful your mixer is. You’ll know it’s ready when the mixture becomes really pale and about double its original volume. Another check is to turn off the mixer, lift out the beaters and wiggle them from side to side. If the mixture that runs off the beaters leaves a trail on the surface of the mixture in the bowl for a second or two, you’re there.\n\nPour the cooled chocolate mixture over the eggy mousse, then gently fold together with a rubber spatula. Plunge the spatula in at one side, take it underneath and bring it up the opposite side and in again at the middle. Continue going under and over in a figure of eight, moving the bowl round after each folding so you can get at it from all sides, until the two mixtures are one and the colour is a mottled dark brown. The idea is to marry them without knocking out the air, so be as gentle and slow as you like.\n\nHold the sieve over the bowl of eggy chocolate mixture and resift the cocoa and flour mixture, shaking the sieve from side to side, to cover the top evenly.\n\nGently fold in this powder using the same figure of eight action as before. The mixture will look dry and dusty at first, and a bit unpromising, but if you keep going very gently and patiently, it will end up looking gungy and fudgy. Stop just before you feel you should, as you don’t want to overdo this mixing.\n\nFinally, stir in the white and milk chocolate chunks until they’re dotted throughout.\n\nPour the mixture into the prepared tin, scraping every bit out of the bowl with the spatula. Gently ease the mixture into the corners of the tin and paddle the spatula from side to side across the top to level it.\n\nPut in the oven and set your timer for 25 mins. When the buzzer goes, open the oven, pull the shelf out a bit and gently shake the tin. If the brownie wobbles in the middle, it’s not quite done, so slide it back in and bake for another 5 minutes until the top has a shiny, papery crust and the sides are just beginning to come away from the tin. Take out of the oven.\n\nLeave the whole thing in the tin until completely cold, then, if you’re using the brownie tin, lift up the protruding rim slightly and slide the uncut brownie out on its base. If you’re using a normal tin, lift out the brownie with the foil (or parchment). Cut into quarters, then cut each quarter into four squares and finally into triangles.\n\nThey’ll keep in an airtight container for a good two weeks and in the freezer for up to a month.",
+      "timing": {
+        "normalization_ms": 0.76,
+        "parser_ms": 0.795,
+        "draft_build_ms": 0.017,
+        "total_local_ms": 1.575
+      },
+      "title_changed": false,
+      "ingredient_count": 8,
+      "clean_rows": 8,
+      "unsupported_rows": 0,
+      "structural_corrections": 0,
+      "source_structure_warnings": [],
+      "instruction_entries_preserved": 15,
+      "required_corrections": [],
+      "review_only": [],
+      "silent_fallback_rows": 0,
+      "verdict": "READY",
+      "verdict_reason": "0 correction actions / 8 ingredient rows; 0 review-only quantities. Usable=true.",
+      "consistency": {
+        "ingredient_fields_equal_b3_3": true,
+        "preparation_equals_normalized_input": true,
+        "b3_0_reference_verified_by_b3_2": true
+      }
+    },
+    {
+      "id": "25",
+      "url": "https://www.bbcgoodfood.com/recipes/best-apple-crumble",
+      "domain": "www.bbcgoodfood.com",
+      "raw_title": "Easy apple crumble recipe",
+      "normalized_title": "Easy apple crumble recipe",
+      "parser_input": "Easy apple crumble recipe\n\nHozzávalók:\n575g Bramley apple (3 medium apples), peeled, cored and sliced to 1cm thick\n2 tbsp golden caster sugar\n175g plain flour\n110g golden caster sugar\n110g cold butter\n1 tbsp rolled oats\n1 tbsp demerara sugar\ndouble cream clotted cream or custard, to serve\n\nElkészítés:\nHeat the oven to 190C/170 fan/gas 5.\n\nToss 575g peeled, cored and sliced Bramley apples with 2 tbsp golden caster sugar and put in a 23cm round baking dish at least 5cm deep, or a 20cm square dish. Flatten down with your hand to prevent too much crumble falling through.\n\nPut 175g plain flour and 110g golden caster sugar in a bowl with a good pinch of salt.\n\nSlice in 110g cold butter and rub it in with your fingertips until the mixture looks like moist breadcrumbs. Shake the bowl and any big bits will come to the surface – rub them in. Alternatively, pulse in a processor until sandy (don’t over-process).\n\nPour the crumb mix over the apples to form a pile in the centre, then use a fork to even out.\n\nGently press the surface with the back of the fork so the crumble holds together and goes crisp, then lightly drag the fork over the top for a decorative finish.\n\nSprinkle 1 tbsp rolled oats and 1 tbsp demerara sugar over evenly, if you wish.\n\nSet on a baking tray and put in the preheated oven for 35-40 minutes, until the top is golden and the apples feel very soft when you insert a small, sharp knife. Leave to cool for 10 minutes before serving.",
+      "draft": {
+        "title": "Easy apple crumble recipe",
+        "ingredients": [
+          {
+            "sourceOrder": 3,
+            "rawText": "575g Bramley apple (3 medium apples), peeled, cored and sliced to 1cm thick",
+            "name": "Bramley apple (3 medium apples), peeled, cored and sliced to 1cm thick",
+            "quantity": 575.0,
+            "canonical_unit": "g",
+            "warnings": [],
+            "sourceIngredientIndex": 0,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "CORRECT",
+            "sourceError": false,
+            "unsupported": false,
+            "parserError": false,
+            "silentFallbackRisk": false,
+            "requiredCorrection": false,
+            "pocWarnings": [],
+            "source_evidence": {
+              "source_order": 1,
+              "visible_text": "575g Bramley apple (3 medium apples), peeled, cored and sliced to 1cm thick",
+              "json_ld_text": "575g Bramley apple (3 medium apples), peeled, cored and sliced to 1cm thick",
+              "source_verdict": "MATCH",
+              "note": null
+            },
+            "unsupported_phrase": null,
+            "misleading_fields": []
+          },
+          {
+            "sourceOrder": 4,
+            "rawText": "2 tbsp golden caster sugar",
+            "name": "tbsp golden caster sugar",
+            "quantity": 2.0,
+            "canonical_unit": "db",
+            "warnings": [],
+            "sourceIngredientIndex": 1,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "UNSUPPORTED_UNIT",
+            "sourceError": false,
+            "unsupported": true,
+            "parserError": false,
+            "silentFallbackRisk": true,
+            "requiredCorrection": true,
+            "pocWarnings": [
+              "UNSUPPORTED_INPUT",
+              "SILENT_BAD_FALLBACK_RISK"
+            ],
+            "source_evidence": {
+              "source_order": 2,
+              "visible_text": "2 tbsp golden caster sugar",
+              "json_ld_text": "2 tbsp golden caster sugar",
+              "source_verdict": "MATCH",
+              "note": null
+            },
+            "unsupported_phrase": "tbsp",
+            "misleading_fields": [
+              "canonical_unit",
+              "name contains unresolved measure/expression"
+            ]
+          },
+          {
+            "sourceOrder": 5,
+            "rawText": "175g plain flour",
+            "name": "plain flour",
+            "quantity": 175.0,
+            "canonical_unit": "g",
+            "warnings": [],
+            "sourceIngredientIndex": 2,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "CORRECT",
+            "sourceError": false,
+            "unsupported": false,
+            "parserError": false,
+            "silentFallbackRisk": false,
+            "requiredCorrection": false,
+            "pocWarnings": [],
+            "source_evidence": {
+              "source_order": 3,
+              "visible_text": "175g plain flour",
+              "json_ld_text": "175g plain flour",
+              "source_verdict": "MATCH",
+              "note": null
+            },
+            "unsupported_phrase": null,
+            "misleading_fields": []
+          },
+          {
+            "sourceOrder": 6,
+            "rawText": "110g golden caster sugar",
+            "name": "golden caster sugar",
+            "quantity": 110.0,
+            "canonical_unit": "g",
+            "warnings": [],
+            "sourceIngredientIndex": 3,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "CORRECT",
+            "sourceError": false,
+            "unsupported": false,
+            "parserError": false,
+            "silentFallbackRisk": false,
+            "requiredCorrection": false,
+            "pocWarnings": [],
+            "source_evidence": {
+              "source_order": 4,
+              "visible_text": "110g golden caster sugar",
+              "json_ld_text": "110g golden caster sugar",
+              "source_verdict": "MATCH",
+              "note": null
+            },
+            "unsupported_phrase": null,
+            "misleading_fields": []
+          },
+          {
+            "sourceOrder": 7,
+            "rawText": "110g cold butter",
+            "name": "cold butter",
+            "quantity": 110.0,
+            "canonical_unit": "g",
+            "warnings": [],
+            "sourceIngredientIndex": 4,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "CORRECT",
+            "sourceError": false,
+            "unsupported": false,
+            "parserError": false,
+            "silentFallbackRisk": false,
+            "requiredCorrection": false,
+            "pocWarnings": [],
+            "source_evidence": {
+              "source_order": 5,
+              "visible_text": "110g cold butter",
+              "json_ld_text": "110g cold butter",
+              "source_verdict": "MATCH",
+              "note": null
+            },
+            "unsupported_phrase": null,
+            "misleading_fields": []
+          },
+          {
+            "sourceOrder": 8,
+            "rawText": "1 tbsp rolled oats",
+            "name": "tbsp rolled oats",
+            "quantity": 1.0,
+            "canonical_unit": "db",
+            "warnings": [],
+            "sourceIngredientIndex": 5,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "UNSUPPORTED_UNIT",
+            "sourceError": false,
+            "unsupported": true,
+            "parserError": false,
+            "silentFallbackRisk": true,
+            "requiredCorrection": true,
+            "pocWarnings": [
+              "UNSUPPORTED_INPUT",
+              "SILENT_BAD_FALLBACK_RISK"
+            ],
+            "source_evidence": {
+              "source_order": 6,
+              "visible_text": "1 tbsp rolled oats",
+              "json_ld_text": "1 tbsp rolled oats",
+              "source_verdict": "MATCH",
+              "note": null
+            },
+            "unsupported_phrase": "tbsp",
+            "misleading_fields": [
+              "canonical_unit",
+              "name contains unresolved measure/expression"
+            ]
+          },
+          {
+            "sourceOrder": 9,
+            "rawText": "1 tbsp demerara sugar",
+            "name": "tbsp demerara sugar",
+            "quantity": 1.0,
+            "canonical_unit": "db",
+            "warnings": [],
+            "sourceIngredientIndex": 6,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "UNSUPPORTED_UNIT",
+            "sourceError": false,
+            "unsupported": true,
+            "parserError": false,
+            "silentFallbackRisk": true,
+            "requiredCorrection": true,
+            "pocWarnings": [
+              "UNSUPPORTED_INPUT",
+              "SILENT_BAD_FALLBACK_RISK"
+            ],
+            "source_evidence": {
+              "source_order": 7,
+              "visible_text": "1 tbsp demerara sugar",
+              "json_ld_text": "1 tbsp demerara sugar",
+              "source_verdict": "MATCH",
+              "note": null
+            },
+            "unsupported_phrase": "tbsp",
+            "misleading_fields": [
+              "canonical_unit",
+              "name contains unresolved measure/expression"
+            ]
+          },
+          {
+            "sourceOrder": 10,
+            "rawText": "double cream clotted cream or custard, to serve",
+            "name": "double cream clotted cream or custard, to serve",
+            "quantity": 1.0,
+            "canonical_unit": "db",
+            "warnings": [
+              "missingQuantity"
+            ],
+            "sourceIngredientIndex": 7,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "CORRECT",
+            "sourceError": false,
+            "unsupported": false,
+            "parserError": false,
+            "silentFallbackRisk": false,
+            "requiredCorrection": false,
+            "pocWarnings": [],
+            "source_evidence": {
+              "source_order": 8,
+              "visible_text": "double cream clotted cream or custard, to serve",
+              "json_ld_text": "double cream clotted cream or custard, to serve",
+              "source_verdict": "MATCH",
+              "note": null
+            },
+            "unsupported_phrase": null,
+            "misleading_fields": []
+          }
+        ],
+        "preparation": "Heat the oven to 190C/170 fan/gas 5.\n\nToss 575g peeled, cored and sliced Bramley apples with 2 tbsp golden caster sugar and put in a 23cm round baking dish at least 5cm deep, or a 20cm square dish. Flatten down with your hand to prevent too much crumble falling through.\n\nPut 175g plain flour and 110g golden caster sugar in a bowl with a good pinch of salt.\n\nSlice in 110g cold butter and rub it in with your fingertips until the mixture looks like moist breadcrumbs. Shake the bowl and any big bits will come to the surface – rub them in. Alternatively, pulse in a processor until sandy (don’t over-process).\n\nPour the crumb mix over the apples to form a pile in the centre, then use a fork to even out.\n\nGently press the surface with the back of the fork so the crumble holds together and goes crisp, then lightly drag the fork over the top for a decorative finish.\n\nSprinkle 1 tbsp rolled oats and 1 tbsp demerara sugar over evenly, if you wish.\n\nSet on a baking tray and put in the preheated oven for 35-40 minutes, until the top is golden and the apples feel very soft when you insert a small, sharp knife. Leave to cool for 10 minutes before serving.",
+        "spices": [],
+        "unprocessedSegments": []
+      },
+      "normalized_preparation": "Heat the oven to 190C/170 fan/gas 5.\n\nToss 575g peeled, cored and sliced Bramley apples with 2 tbsp golden caster sugar and put in a 23cm round baking dish at least 5cm deep, or a 20cm square dish. Flatten down with your hand to prevent too much crumble falling through.\n\nPut 175g plain flour and 110g golden caster sugar in a bowl with a good pinch of salt.\n\nSlice in 110g cold butter and rub it in with your fingertips until the mixture looks like moist breadcrumbs. Shake the bowl and any big bits will come to the surface – rub them in. Alternatively, pulse in a processor until sandy (don’t over-process).\n\nPour the crumb mix over the apples to form a pile in the centre, then use a fork to even out.\n\nGently press the surface with the back of the fork so the crumble holds together and goes crisp, then lightly drag the fork over the top for a decorative finish.\n\nSprinkle 1 tbsp rolled oats and 1 tbsp demerara sugar over evenly, if you wish.\n\nSet on a baking tray and put in the preheated oven for 35-40 minutes, until the top is golden and the apples feel very soft when you insert a small, sharp knife. Leave to cool for 10 minutes before serving.",
+      "timing": {
+        "normalization_ms": 0.24,
+        "parser_ms": 0.372,
+        "draft_build_ms": 0.015,
+        "total_local_ms": 0.629
+      },
+      "title_changed": false,
+      "ingredient_count": 8,
+      "clean_rows": 4,
+      "unsupported_rows": 3,
+      "structural_corrections": 3,
+      "source_structure_warnings": [
+        {
+          "type": "SOURCE_STRUCTURE_WARNING",
+          "evidence": {
+            "before_row": 1,
+            "heading": "For the filling",
+            "verdict": "GROUP_HEADING_DIFFERENCE",
+            "json_ld": null
+          }
+        },
+        {
+          "type": "SOURCE_STRUCTURE_WARNING",
+          "evidence": {
+            "before_row": 3,
+            "heading": "For the crumble",
+            "verdict": "GROUP_HEADING_DIFFERENCE",
+            "json_ld": null
+          }
+        },
+        {
+          "type": "SOURCE_STRUCTURE_WARNING",
+          "evidence": {
+            "before_row": 6,
+            "heading": "For the topping (optional)",
+            "verdict": "GROUP_HEADING_DIFFERENCE",
+            "json_ld": null
+          }
+        }
+      ],
+      "instruction_entries_preserved": 8,
+      "required_corrections": [
+        {
+          "row": 2,
+          "classification": "REQUIRED_CORRECTION",
+          "fields": [
+            "name/quantity/unit interpretation"
+          ],
+          "reasons": [
+            "Unsupported measure/expression cannot safely be represented by current db fallback."
+          ],
+          "counting": "One row-level correction action even if multiple fields/reasons overlap."
+        },
+        {
+          "row": 6,
+          "classification": "REQUIRED_CORRECTION",
+          "fields": [
+            "name/quantity/unit interpretation"
+          ],
+          "reasons": [
+            "Unsupported measure/expression cannot safely be represented by current db fallback."
+          ],
+          "counting": "One row-level correction action even if multiple fields/reasons overlap."
+        },
+        {
+          "row": 7,
+          "classification": "REQUIRED_CORRECTION",
+          "fields": [
+            "name/quantity/unit interpretation"
+          ],
+          "reasons": [
+            "Unsupported measure/expression cannot safely be represented by current db fallback."
+          ],
+          "counting": "One row-level correction action even if multiple fields/reasons overlap."
+        },
+        {
+          "field": "ingredient grouping",
+          "classification": "REQUIRED_CORRECTION",
+          "reason": "Ingredient group heading lost upstream; logical grouping/to-serve/optional scope needs manual representation. No automatic restoration or ingredient insertion.",
+          "evidence": {
+            "before_row": 1,
+            "heading": "For the filling",
+            "verdict": "GROUP_HEADING_DIFFERENCE",
+            "json_ld": null
+          },
+          "counting": "One recipe-level structural correction; may need a note/workaround because current draft has no group field."
+        },
+        {
+          "field": "ingredient grouping",
+          "classification": "REQUIRED_CORRECTION",
+          "reason": "Ingredient group heading lost upstream; logical grouping/to-serve/optional scope needs manual representation. No automatic restoration or ingredient insertion.",
+          "evidence": {
+            "before_row": 3,
+            "heading": "For the crumble",
+            "verdict": "GROUP_HEADING_DIFFERENCE",
+            "json_ld": null
+          },
+          "counting": "One recipe-level structural correction; may need a note/workaround because current draft has no group field."
+        },
+        {
+          "field": "ingredient grouping",
+          "classification": "REQUIRED_CORRECTION",
+          "reason": "Ingredient group heading lost upstream; logical grouping/to-serve/optional scope needs manual representation. No automatic restoration or ingredient insertion.",
+          "evidence": {
+            "before_row": 6,
+            "heading": "For the topping (optional)",
+            "verdict": "GROUP_HEADING_DIFFERENCE",
+            "json_ld": null
+          },
+          "counting": "One recipe-level structural correction; may need a note/workaround because current draft has no group field."
+        }
+      ],
+      "review_only": [
+        {
+          "row": 8,
+          "field": "quantity",
+          "classification": "REVIEW_ONLY",
+          "reason": "Source gives no quantity; accepted 1 db default requires confirmation, not a proven erroneous value."
+        }
+      ],
+      "silent_fallback_rows": 3,
+      "verdict": "POOR",
+      "verdict_reason": "6 correction actions / 8 ingredient rows; 1 review-only quantities. Usable=true.",
+      "consistency": {
+        "ingredient_fields_equal_b3_3": true,
+        "preparation_equals_normalized_input": true,
+        "b3_0_reference_verified_by_b3_2": true
+      }
+    },
+    {
+      "id": "26",
+      "url": "https://www.bbcgoodfood.com/recipes/tomato-soup",
+      "domain": "www.bbcgoodfood.com",
+      "raw_title": "Tomato soup",
+      "normalized_title": "Tomato soup",
+      "parser_input": "Tomato soup\n\nHozzávalók:\n1-1.25kg/2lb 4oz-2lb 12oz ripe  tomatoes\n1 medium onion\n1 small carrot\n1 celery stick\n2 tbsp olive oil\n2 squirts of tomato purée (about 2 tsp)\na good pinch of sugar\n2 bay leaves\n1.2 litres/2 pints hot vegetable stock (made with boiling water and 4 rounded tsp bouillon powder or 2 stock cubes)\n\nElkészítés:\nFirst, prepare your vegetables. You need 1-1.25kg/2lb 4oz-2lb 12oz ripe tomatoes. If the tomatoes are on their vines, pull them off. The green stalky bits should come off at the same time, but if they don't, just pull or twist them off afterwards. Throw the vines and green bits away and wash the tomatoes. Now cut each tomato into quarters and slice off any hard cores (they don't soften during cooking and you'd get hard bits in the soup at the end). Peel 1 medium onion and 1 small carrot and chop them into small pieces. Chop 1 celery stick roughly the same size.\n\nSpoon 2 tbsp olive oil into a large heavy-based pan and heat it over a low heat. Hold your hand over the pan until you can feel the heat rising from the oil, then tip in the onion, carrot and celery and mix them together with a wooden spoon. Still with the heat low, cook the vegetables until they're soft and faintly coloured. This should take about 10 minutes and you should stir them two or three times so they cook evenly and don’t stick to the bottom of the pan.\n\nHolding the tube over the pan, squirt in about 2 tsp of tomato purée, then stir it around so it turns the vegetables red. Shoot the tomatoes in off the chopping board, sprinkle in a good pinch of sugar and grind in a little black pepper. Tear 2 bay leaves into a few pieces and throw them into the pan. Stir to mix everything together, put the lid on the pan and let the tomatoes stew over a low heat for 10 minutes until they shrink down in the pan and their juices flow nicely. From time to time, give the pan a good shake – this will keep everything well mixed.\n\nSlowly pour in the 1.2 litres/2 pints of hot stock (made with boiling water and 4 rounded tsp bouillon powder or 2 stock cubes), stirring at the same time to mix it with the vegetables. Turn up the heat as high as it will go and wait until everything is bubbling, then turn the heat down to low again and put the lid back on the pan. Cook gently for 25 minutes, stirring a couple of times. At the end of cooking the tomatoes will have broken down and be very slushy-looking.\n\nRemove the pan from the heat, take the lid off and stand back for a few seconds or so while the steam escapes, then fish out the pieces of bay leaf and throw them away. Ladle the soup into your blender until it’s about three-quarters full, fit the lid on tightly and turn the machine on full. Blitz until the soup’s smooth (stop the machine and lift the lid to check after about 30 seconds), then pour the puréed soup into a large bowl. Repeat with the soup that’s left in the pan. (The soup may now be frozen for up to three months. Defrost before reheating.)\n\nPour the puréed soup back into the pan and reheat it over a medium heat for a few minutes, stirring occasionally until you can see bubbles breaking gently on the surface. Taste a spoonful and add a pinch or two of salt if you think the soup needs it, plus more pepper and sugar if you like. If the colour’s not a deep enough red for you, plop in another teaspoon of tomato purée and stir until it dissolves. Ladle into bowls and serve. Or sieve and serve chilled with some cream swirled in.",
+      "draft": {
+        "title": "Tomato soup",
+        "ingredients": [
+          {
+            "sourceOrder": 3,
+            "rawText": "1-1.25kg/2lb 4oz-2lb 12oz ripe  tomatoes",
+            "name": "1-1.25kg/2lb 4oz-2lb 12oz ripe  tomatoes",
+            "quantity": 1.0,
+            "canonical_unit": "db",
+            "warnings": [
+              "missingQuantity"
+            ],
+            "sourceIngredientIndex": 0,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "PARSER_LIMITATION",
+            "sourceError": false,
+            "unsupported": true,
+            "parserError": false,
+            "silentFallbackRisk": false,
+            "requiredCorrection": true,
+            "pocWarnings": [
+              "UNSUPPORTED_INPUT",
+              "PARSER_LIMITATION"
+            ],
+            "source_evidence": {
+              "source_order": 1,
+              "visible_text": "1-1.25kg/2lb 4oz-2lb 12oz ripe tomatoes",
+              "json_ld_text": "1-1.25kg/2lb 4oz-2lb 12oz ripe  tomatoes",
+              "source_verdict": "FORMAT_DIFFERENCE",
+              "note": null
+            },
+            "unsupported_phrase": "range + kg/lb/oz compound quantity",
+            "misleading_fields": [
+              "canonical_unit",
+              "quantity interpretation",
+              "name contains unresolved measure/expression"
+            ]
+          },
+          {
+            "sourceOrder": 4,
+            "rawText": "1 medium onion",
+            "name": "medium onion",
+            "quantity": 1.0,
+            "canonical_unit": "db",
+            "warnings": [],
+            "sourceIngredientIndex": 1,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "CORRECT",
+            "sourceError": false,
+            "unsupported": false,
+            "parserError": false,
+            "silentFallbackRisk": false,
+            "requiredCorrection": false,
+            "pocWarnings": [],
+            "source_evidence": {
+              "source_order": 2,
+              "visible_text": "1 medium onion",
+              "json_ld_text": "1 medium onion",
+              "source_verdict": "MATCH",
+              "note": null
+            },
+            "unsupported_phrase": null,
+            "misleading_fields": []
+          },
+          {
+            "sourceOrder": 5,
+            "rawText": "1 small carrot",
+            "name": "small carrot",
+            "quantity": 1.0,
+            "canonical_unit": "db",
+            "warnings": [],
+            "sourceIngredientIndex": 2,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "CORRECT",
+            "sourceError": false,
+            "unsupported": false,
+            "parserError": false,
+            "silentFallbackRisk": false,
+            "requiredCorrection": false,
+            "pocWarnings": [],
+            "source_evidence": {
+              "source_order": 3,
+              "visible_text": "1 small carrot",
+              "json_ld_text": "1 small carrot",
+              "source_verdict": "MATCH",
+              "note": null
+            },
+            "unsupported_phrase": null,
+            "misleading_fields": []
+          },
+          {
+            "sourceOrder": 6,
+            "rawText": "1 celery stick",
+            "name": "celery stick",
+            "quantity": 1.0,
+            "canonical_unit": "db",
+            "warnings": [],
+            "sourceIngredientIndex": 3,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "UNSUPPORTED_UNIT",
+            "sourceError": false,
+            "unsupported": true,
+            "parserError": false,
+            "silentFallbackRisk": true,
+            "requiredCorrection": true,
+            "pocWarnings": [
+              "UNSUPPORTED_INPUT",
+              "SILENT_BAD_FALLBACK_RISK"
+            ],
+            "source_evidence": {
+              "source_order": 4,
+              "visible_text": "1 celery stick",
+              "json_ld_text": "1 celery stick",
+              "source_verdict": "MATCH",
+              "note": null
+            },
+            "unsupported_phrase": "stick",
+            "misleading_fields": [
+              "canonical_unit",
+              "name contains unresolved measure/expression"
+            ]
+          },
+          {
+            "sourceOrder": 7,
+            "rawText": "2 tbsp olive oil",
+            "name": "tbsp olive oil",
+            "quantity": 2.0,
+            "canonical_unit": "db",
+            "warnings": [],
+            "sourceIngredientIndex": 4,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "UNSUPPORTED_UNIT",
+            "sourceError": false,
+            "unsupported": true,
+            "parserError": false,
+            "silentFallbackRisk": true,
+            "requiredCorrection": true,
+            "pocWarnings": [
+              "UNSUPPORTED_INPUT",
+              "SILENT_BAD_FALLBACK_RISK"
+            ],
+            "source_evidence": {
+              "source_order": 5,
+              "visible_text": "2 tbsp olive oil",
+              "json_ld_text": "2 tbsp olive oil",
+              "source_verdict": "MATCH",
+              "note": null
+            },
+            "unsupported_phrase": "tbsp",
+            "misleading_fields": [
+              "canonical_unit",
+              "name contains unresolved measure/expression"
+            ]
+          },
+          {
+            "sourceOrder": 8,
+            "rawText": "2 squirts of tomato purée (about 2 tsp)",
+            "name": "2 squirts of tomato purée (about 2 tsp)",
+            "quantity": null,
+            "canonical_unit": "db",
+            "warnings": [
+              "ambiguousIngredient"
+            ],
+            "sourceIngredientIndex": 5,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "PARSER_LIMITATION",
+            "sourceError": false,
+            "unsupported": true,
+            "parserError": false,
+            "silentFallbackRisk": false,
+            "requiredCorrection": true,
+            "pocWarnings": [
+              "UNSUPPORTED_INPUT",
+              "PARSER_LIMITATION"
+            ],
+            "source_evidence": {
+              "source_order": 6,
+              "visible_text": "2 squirts of tomato purée (about 2 tsp)",
+              "json_ld_text": "2 squirts of tomato purée (about 2 tsp)",
+              "source_verdict": "MATCH",
+              "note": null
+            },
+            "unsupported_phrase": "squirts + alternative tsp",
+            "misleading_fields": [
+              "canonical_unit",
+              "quantity interpretation",
+              "name contains unresolved measure/expression"
+            ]
+          },
+          {
+            "sourceOrder": 9,
+            "rawText": "a good pinch of sugar",
+            "name": "a good pinch of sugar",
+            "quantity": 1.0,
+            "canonical_unit": "db",
+            "warnings": [
+              "missingQuantity"
+            ],
+            "sourceIngredientIndex": 6,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "UNSUPPORTED_UNIT",
+            "sourceError": false,
+            "unsupported": true,
+            "parserError": false,
+            "silentFallbackRisk": false,
+            "requiredCorrection": true,
+            "pocWarnings": [
+              "UNSUPPORTED_INPUT"
+            ],
+            "source_evidence": {
+              "source_order": 7,
+              "visible_text": "a good pinch of sugar",
+              "json_ld_text": "a good pinch of sugar",
+              "source_verdict": "MATCH",
+              "note": null
+            },
+            "unsupported_phrase": "good pinch",
+            "misleading_fields": [
+              "canonical_unit",
+              "quantity interpretation",
+              "name contains unresolved measure/expression"
+            ]
+          },
+          {
+            "sourceOrder": 10,
+            "rawText": "2 bay leaves",
+            "name": "bay leaves",
+            "quantity": 2.0,
+            "canonical_unit": "db",
+            "warnings": [],
+            "sourceIngredientIndex": 7,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "CORRECT",
+            "sourceError": false,
+            "unsupported": false,
+            "parserError": false,
+            "silentFallbackRisk": false,
+            "requiredCorrection": false,
+            "pocWarnings": [],
+            "source_evidence": {
+              "source_order": 8,
+              "visible_text": "2 bay leaves",
+              "json_ld_text": "2 bay leaves",
+              "source_verdict": "MATCH",
+              "note": null
+            },
+            "unsupported_phrase": null,
+            "misleading_fields": []
+          },
+          {
+            "sourceOrder": 11,
+            "rawText": "1.2 litres/2 pints hot vegetable stock (made with boiling water and 4 rounded tsp bouillon powder or 2 stock cubes)",
+            "name": "1.2 litres/2 pints hot vegetable stock (made with boiling water and 4 rounded tsp bouillon powder or 2 stock cubes)",
+            "quantity": null,
+            "canonical_unit": "db",
+            "warnings": [
+              "ambiguousIngredient"
+            ],
+            "sourceIngredientIndex": 8,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "PARSER_LIMITATION",
+            "sourceError": false,
+            "unsupported": true,
+            "parserError": false,
+            "silentFallbackRisk": false,
+            "requiredCorrection": true,
+            "pocWarnings": [
+              "UNSUPPORTED_INPUT",
+              "PARSER_LIMITATION"
+            ],
+            "source_evidence": {
+              "source_order": 9,
+              "visible_text": "1.2 litres/2 pints hot vegetable stock (made with boiling water and 4 rounded tsp bouillon powder or 2 stock cubes)",
+              "json_ld_text": "1.2 litres/2 pints hot vegetable stock (made with boiling water and 4 rounded tsp bouillon powder or 2 stock cubes)",
+              "source_verdict": "MATCH",
+              "note": null
+            },
+            "unsupported_phrase": "litres/pints + alternative stock quantities",
+            "misleading_fields": [
+              "canonical_unit",
+              "quantity interpretation",
+              "name contains unresolved measure/expression"
+            ]
+          }
+        ],
+        "preparation": "First, prepare your vegetables. You need 1-1.25kg/2lb 4oz-2lb 12oz ripe tomatoes. If the tomatoes are on their vines, pull them off. The green stalky bits should come off at the same time, but if they don't, just pull or twist them off afterwards. Throw the vines and green bits away and wash the tomatoes. Now cut each tomato into quarters and slice off any hard cores (they don't soften during cooking and you'd get hard bits in the soup at the end). Peel 1 medium onion and 1 small carrot and chop them into small pieces. Chop 1 celery stick roughly the same size.\n\nSpoon 2 tbsp olive oil into a large heavy-based pan and heat it over a low heat. Hold your hand over the pan until you can feel the heat rising from the oil, then tip in the onion, carrot and celery and mix them together with a wooden spoon. Still with the heat low, cook the vegetables until they're soft and faintly coloured. This should take about 10 minutes and you should stir them two or three times so they cook evenly and don’t stick to the bottom of the pan.\n\nHolding the tube over the pan, squirt in about 2 tsp of tomato purée, then stir it around so it turns the vegetables red. Shoot the tomatoes in off the chopping board, sprinkle in a good pinch of sugar and grind in a little black pepper. Tear 2 bay leaves into a few pieces and throw them into the pan. Stir to mix everything together, put the lid on the pan and let the tomatoes stew over a low heat for 10 minutes until they shrink down in the pan and their juices flow nicely. From time to time, give the pan a good shake – this will keep everything well mixed.\n\nSlowly pour in the 1.2 litres/2 pints of hot stock (made with boiling water and 4 rounded tsp bouillon powder or 2 stock cubes), stirring at the same time to mix it with the vegetables. Turn up the heat as high as it will go and wait until everything is bubbling, then turn the heat down to low again and put the lid back on the pan. Cook gently for 25 minutes, stirring a couple of times. At the end of cooking the tomatoes will have broken down and be very slushy-looking.\n\nRemove the pan from the heat, take the lid off and stand back for a few seconds or so while the steam escapes, then fish out the pieces of bay leaf and throw them away. Ladle the soup into your blender until it’s about three-quarters full, fit the lid on tightly and turn the machine on full. Blitz until the soup’s smooth (stop the machine and lift the lid to check after about 30 seconds), then pour the puréed soup into a large bowl. Repeat with the soup that’s left in the pan. (The soup may now be frozen for up to three months. Defrost before reheating.)\n\nPour the puréed soup back into the pan and reheat it over a medium heat for a few minutes, stirring occasionally until you can see bubbles breaking gently on the surface. Taste a spoonful and add a pinch or two of salt if you think the soup needs it, plus more pepper and sugar if you like. If the colour’s not a deep enough red for you, plop in another teaspoon of tomato purée and stir until it dissolves. Ladle into bowls and serve. Or sieve and serve chilled with some cream swirled in.",
+        "spices": [],
+        "unprocessedSegments": []
+      },
+      "normalized_preparation": "First, prepare your vegetables. You need 1-1.25kg/2lb 4oz-2lb 12oz ripe tomatoes. If the tomatoes are on their vines, pull them off. The green stalky bits should come off at the same time, but if they don't, just pull or twist them off afterwards. Throw the vines and green bits away and wash the tomatoes. Now cut each tomato into quarters and slice off any hard cores (they don't soften during cooking and you'd get hard bits in the soup at the end). Peel 1 medium onion and 1 small carrot and chop them into small pieces. Chop 1 celery stick roughly the same size.\n\nSpoon 2 tbsp olive oil into a large heavy-based pan and heat it over a low heat. Hold your hand over the pan until you can feel the heat rising from the oil, then tip in the onion, carrot and celery and mix them together with a wooden spoon. Still with the heat low, cook the vegetables until they're soft and faintly coloured. This should take about 10 minutes and you should stir them two or three times so they cook evenly and don’t stick to the bottom of the pan.\n\nHolding the tube over the pan, squirt in about 2 tsp of tomato purée, then stir it around so it turns the vegetables red. Shoot the tomatoes in off the chopping board, sprinkle in a good pinch of sugar and grind in a little black pepper. Tear 2 bay leaves into a few pieces and throw them into the pan. Stir to mix everything together, put the lid on the pan and let the tomatoes stew over a low heat for 10 minutes until they shrink down in the pan and their juices flow nicely. From time to time, give the pan a good shake – this will keep everything well mixed.\n\nSlowly pour in the 1.2 litres/2 pints of hot stock (made with boiling water and 4 rounded tsp bouillon powder or 2 stock cubes), stirring at the same time to mix it with the vegetables. Turn up the heat as high as it will go and wait until everything is bubbling, then turn the heat down to low again and put the lid back on the pan. Cook gently for 25 minutes, stirring a couple of times. At the end of cooking the tomatoes will have broken down and be very slushy-looking.\n\nRemove the pan from the heat, take the lid off and stand back for a few seconds or so while the steam escapes, then fish out the pieces of bay leaf and throw them away. Ladle the soup into your blender until it’s about three-quarters full, fit the lid on tightly and turn the machine on full. Blitz until the soup’s smooth (stop the machine and lift the lid to check after about 30 seconds), then pour the puréed soup into a large bowl. Repeat with the soup that’s left in the pan. (The soup may now be frozen for up to three months. Defrost before reheating.)\n\nPour the puréed soup back into the pan and reheat it over a medium heat for a few minutes, stirring occasionally until you can see bubbles breaking gently on the surface. Taste a spoonful and add a pinch or two of salt if you think the soup needs it, plus more pepper and sugar if you like. If the colour’s not a deep enough red for you, plop in another teaspoon of tomato purée and stir until it dissolves. Ladle into bowls and serve. Or sieve and serve chilled with some cream swirled in.",
+      "timing": {
+        "normalization_ms": 0.364,
+        "parser_ms": 0.606,
+        "draft_build_ms": 0.02,
+        "total_local_ms": 0.993
+      },
+      "title_changed": false,
+      "ingredient_count": 9,
+      "clean_rows": 3,
+      "unsupported_rows": 6,
+      "structural_corrections": 0,
+      "source_structure_warnings": [],
+      "instruction_entries_preserved": 6,
+      "required_corrections": [
+        {
+          "row": 1,
+          "classification": "REQUIRED_CORRECTION",
+          "fields": [
+            "name/quantity/unit interpretation"
+          ],
+          "reasons": [
+            "Unsupported measure/expression cannot safely be represented by current db fallback."
+          ],
+          "counting": "One row-level correction action even if multiple fields/reasons overlap."
+        },
+        {
+          "row": 4,
+          "classification": "REQUIRED_CORRECTION",
+          "fields": [
+            "name/quantity/unit interpretation"
+          ],
+          "reasons": [
+            "Unsupported measure/expression cannot safely be represented by current db fallback."
+          ],
+          "counting": "One row-level correction action even if multiple fields/reasons overlap."
+        },
+        {
+          "row": 5,
+          "classification": "REQUIRED_CORRECTION",
+          "fields": [
+            "name/quantity/unit interpretation"
+          ],
+          "reasons": [
+            "Unsupported measure/expression cannot safely be represented by current db fallback."
+          ],
+          "counting": "One row-level correction action even if multiple fields/reasons overlap."
+        },
+        {
+          "row": 6,
+          "classification": "REQUIRED_CORRECTION",
+          "fields": [
+            "name/quantity/unit interpretation"
+          ],
+          "reasons": [
+            "Unsupported measure/expression cannot safely be represented by current db fallback."
+          ],
+          "counting": "One row-level correction action even if multiple fields/reasons overlap."
+        },
+        {
+          "row": 7,
+          "classification": "REQUIRED_CORRECTION",
+          "fields": [
+            "name/quantity/unit interpretation"
+          ],
+          "reasons": [
+            "Unsupported measure/expression cannot safely be represented by current db fallback."
+          ],
+          "counting": "One row-level correction action even if multiple fields/reasons overlap."
+        },
+        {
+          "row": 9,
+          "classification": "REQUIRED_CORRECTION",
+          "fields": [
+            "name/quantity/unit interpretation"
+          ],
+          "reasons": [
+            "Unsupported measure/expression cannot safely be represented by current db fallback."
+          ],
+          "counting": "One row-level correction action even if multiple fields/reasons overlap."
+        }
+      ],
+      "review_only": [],
+      "silent_fallback_rows": 2,
+      "verdict": "POOR",
+      "verdict_reason": "6 correction actions / 9 ingredient rows; 0 review-only quantities. Usable=true.",
+      "consistency": {
+        "ingredient_fields_equal_b3_3": true,
+        "preparation_equals_normalized_input": true,
+        "b3_0_reference_verified_by_b3_2": true
+      }
+    },
+    {
+      "id": "27",
+      "url": "https://www.bbcgoodfood.com/recipes/real-tomato-soup",
+      "domain": "www.bbcgoodfood.com",
+      "raw_title": "Real tomato soup",
+      "normalized_title": "Real tomato soup",
+      "parser_input": "Real tomato soup\n\nHozzávalók:\n2 tbsp olive oil\n1 onion chopped\n1 garlic clove finely chopped\n1 tbsp tomato purée\n400g can chopped tomato\nhandful basil leaf\npinch bicarbonate of soda\n600ml milk\n\nElkészítés:\nHeat the olive oil in a large pan, then tip in the onion and garlic. Cook over a moderate heat until the onion has softened, about 5 mins. Stir in the tomato purée, then pour in the chopped tomatoes and basil leaves, and bring up to the boil. Turn the heat down and leave to simmer for about 15 mins until thick and full of flavour. If you like a smooth soup, whizz the mixture at this point to form a smooth sauce. Can now be cooled and frozen for up to 1 month.\n\nTo finish the soup, tip the tomato mixture into a pan. Spoon the baking soda into a small bowl and pour over 1 tbsp or so of the milk. Mix together until there are no lumps, then tip into the tomato mix and pour over the milk. Bring up to a boil (the mixture will froth, but don’t worry – it will go away). Gently simmer for about 5 mins until ready to serve.",
+      "draft": {
+        "title": "Real tomato soup",
+        "ingredients": [
+          {
+            "sourceOrder": 3,
+            "rawText": "2 tbsp olive oil",
+            "name": "tbsp olive oil",
+            "quantity": 2.0,
+            "canonical_unit": "db",
+            "warnings": [],
+            "sourceIngredientIndex": 0,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "UNSUPPORTED_UNIT",
+            "sourceError": false,
+            "unsupported": true,
+            "parserError": false,
+            "silentFallbackRisk": true,
+            "requiredCorrection": true,
+            "pocWarnings": [
+              "UNSUPPORTED_INPUT",
+              "SILENT_BAD_FALLBACK_RISK"
+            ],
+            "source_evidence": {
+              "source_order": 1,
+              "visible_text": "2 tbsp olive oil",
+              "json_ld_text": "2 tbsp olive oil",
+              "source_verdict": "MATCH",
+              "note": null
+            },
+            "unsupported_phrase": "tbsp",
+            "misleading_fields": [
+              "canonical_unit",
+              "name contains unresolved measure/expression"
+            ]
+          },
+          {
+            "sourceOrder": 4,
+            "rawText": "1 onion chopped",
+            "name": "onion chopped",
+            "quantity": 1.0,
+            "canonical_unit": "db",
+            "warnings": [],
+            "sourceIngredientIndex": 1,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "CORRECT",
+            "sourceError": false,
+            "unsupported": false,
+            "parserError": false,
+            "silentFallbackRisk": false,
+            "requiredCorrection": false,
+            "pocWarnings": [],
+            "source_evidence": {
+              "source_order": 2,
+              "visible_text": "1 onion chopped",
+              "json_ld_text": "1 onion chopped",
+              "source_verdict": "MATCH",
+              "note": null
+            },
+            "unsupported_phrase": null,
+            "misleading_fields": []
+          },
+          {
+            "sourceOrder": 5,
+            "rawText": "1 garlic clove finely chopped",
+            "name": "garlic clove finely chopped",
+            "quantity": 1.0,
+            "canonical_unit": "db",
+            "warnings": [],
+            "sourceIngredientIndex": 2,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "UNSUPPORTED_UNIT",
+            "sourceError": false,
+            "unsupported": true,
+            "parserError": false,
+            "silentFallbackRisk": true,
+            "requiredCorrection": true,
+            "pocWarnings": [
+              "UNSUPPORTED_INPUT",
+              "SILENT_BAD_FALLBACK_RISK"
+            ],
+            "source_evidence": {
+              "source_order": 3,
+              "visible_text": "1 garlic clove finely chopped",
+              "json_ld_text": "1 garlic clove finely chopped",
+              "source_verdict": "MATCH",
+              "note": null
+            },
+            "unsupported_phrase": "cloves",
+            "misleading_fields": [
+              "canonical_unit",
+              "name contains unresolved measure/expression"
+            ]
+          },
+          {
+            "sourceOrder": 6,
+            "rawText": "1 tbsp tomato purée",
+            "name": "tbsp tomato purée",
+            "quantity": 1.0,
+            "canonical_unit": "db",
+            "warnings": [],
+            "sourceIngredientIndex": 3,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "UNSUPPORTED_UNIT",
+            "sourceError": false,
+            "unsupported": true,
+            "parserError": false,
+            "silentFallbackRisk": true,
+            "requiredCorrection": true,
+            "pocWarnings": [
+              "UNSUPPORTED_INPUT",
+              "SILENT_BAD_FALLBACK_RISK"
+            ],
+            "source_evidence": {
+              "source_order": 4,
+              "visible_text": "1 tbsp tomato purée",
+              "json_ld_text": "1 tbsp tomato purée",
+              "source_verdict": "MATCH",
+              "note": null
+            },
+            "unsupported_phrase": "tbsp",
+            "misleading_fields": [
+              "canonical_unit",
+              "name contains unresolved measure/expression"
+            ]
+          },
+          {
+            "sourceOrder": 7,
+            "rawText": "400g can chopped tomato",
+            "name": "can chopped tomato",
+            "quantity": 400.0,
+            "canonical_unit": "g",
+            "warnings": [],
+            "sourceIngredientIndex": 4,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "CORRECT",
+            "sourceError": false,
+            "unsupported": false,
+            "parserError": false,
+            "silentFallbackRisk": false,
+            "requiredCorrection": false,
+            "pocWarnings": [],
+            "source_evidence": {
+              "source_order": 5,
+              "visible_text": "400g can chopped tomato",
+              "json_ld_text": "400g can chopped tomato",
+              "source_verdict": "MATCH",
+              "note": null
+            },
+            "unsupported_phrase": null,
+            "misleading_fields": []
+          },
+          {
+            "sourceOrder": 8,
+            "rawText": "handful basil leaf",
+            "name": "handful basil leaf",
+            "quantity": 1.0,
+            "canonical_unit": "db",
+            "warnings": [
+              "missingQuantity"
+            ],
+            "sourceIngredientIndex": 5,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "UNSUPPORTED_UNIT",
+            "sourceError": false,
+            "unsupported": true,
+            "parserError": false,
+            "silentFallbackRisk": false,
+            "requiredCorrection": true,
+            "pocWarnings": [
+              "UNSUPPORTED_INPUT"
+            ],
+            "source_evidence": {
+              "source_order": 6,
+              "visible_text": "handful basil leaf",
+              "json_ld_text": "handful basil leaf",
+              "source_verdict": "MATCH",
+              "note": null
+            },
+            "unsupported_phrase": "handful",
+            "misleading_fields": [
+              "canonical_unit",
+              "quantity interpretation",
+              "name contains unresolved measure/expression"
+            ]
+          },
+          {
+            "sourceOrder": 9,
+            "rawText": "pinch bicarbonate of soda",
+            "name": "pinch bicarbonate of soda",
+            "quantity": 1.0,
+            "canonical_unit": "db",
+            "warnings": [
+              "missingQuantity"
+            ],
+            "sourceIngredientIndex": 6,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "UNSUPPORTED_UNIT",
+            "sourceError": false,
+            "unsupported": true,
+            "parserError": false,
+            "silentFallbackRisk": false,
+            "requiredCorrection": true,
+            "pocWarnings": [
+              "UNSUPPORTED_INPUT"
+            ],
+            "source_evidence": {
+              "source_order": 7,
+              "visible_text": "pinch bicarbonate of soda",
+              "json_ld_text": "pinch bicarbonate of soda",
+              "source_verdict": "MATCH",
+              "note": null
+            },
+            "unsupported_phrase": "pinch",
+            "misleading_fields": [
+              "canonical_unit",
+              "quantity interpretation",
+              "name contains unresolved measure/expression"
+            ]
+          },
+          {
+            "sourceOrder": 10,
+            "rawText": "600ml milk",
+            "name": "milk",
+            "quantity": 600.0,
+            "canonical_unit": "ml",
+            "warnings": [],
+            "sourceIngredientIndex": 7,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "CORRECT",
+            "sourceError": false,
+            "unsupported": false,
+            "parserError": false,
+            "silentFallbackRisk": false,
+            "requiredCorrection": false,
+            "pocWarnings": [],
+            "source_evidence": {
+              "source_order": 8,
+              "visible_text": "600ml milk",
+              "json_ld_text": "600ml milk",
+              "source_verdict": "MATCH",
+              "note": null
+            },
+            "unsupported_phrase": null,
+            "misleading_fields": []
+          }
+        ],
+        "preparation": "Heat the olive oil in a large pan, then tip in the onion and garlic. Cook over a moderate heat until the onion has softened, about 5 mins. Stir in the tomato purée, then pour in the chopped tomatoes and basil leaves, and bring up to the boil. Turn the heat down and leave to simmer for about 15 mins until thick and full of flavour. If you like a smooth soup, whizz the mixture at this point to form a smooth sauce. Can now be cooled and frozen for up to 1 month.\n\nTo finish the soup, tip the tomato mixture into a pan. Spoon the baking soda into a small bowl and pour over 1 tbsp or so of the milk. Mix together until there are no lumps, then tip into the tomato mix and pour over the milk. Bring up to a boil (the mixture will froth, but don’t worry – it will go away). Gently simmer for about 5 mins until ready to serve.",
+        "spices": [],
+        "unprocessedSegments": []
+      },
+      "normalized_preparation": "Heat the olive oil in a large pan, then tip in the onion and garlic. Cook over a moderate heat until the onion has softened, about 5 mins. Stir in the tomato purée, then pour in the chopped tomatoes and basil leaves, and bring up to the boil. Turn the heat down and leave to simmer for about 15 mins until thick and full of flavour. If you like a smooth soup, whizz the mixture at this point to form a smooth sauce. Can now be cooled and frozen for up to 1 month.\n\nTo finish the soup, tip the tomato mixture into a pan. Spoon the baking soda into a small bowl and pour over 1 tbsp or so of the milk. Mix together until there are no lumps, then tip into the tomato mix and pour over the milk. Bring up to a boil (the mixture will froth, but don’t worry – it will go away). Gently simmer for about 5 mins until ready to serve.",
+      "timing": {
+        "normalization_ms": 0.252,
+        "parser_ms": 0.274,
+        "draft_build_ms": 0.016,
+        "total_local_ms": 0.544
+      },
+      "title_changed": false,
+      "ingredient_count": 8,
+      "clean_rows": 3,
+      "unsupported_rows": 5,
+      "structural_corrections": 0,
+      "source_structure_warnings": [],
+      "instruction_entries_preserved": 2,
+      "required_corrections": [
+        {
+          "row": 1,
+          "classification": "REQUIRED_CORRECTION",
+          "fields": [
+            "name/quantity/unit interpretation"
+          ],
+          "reasons": [
+            "Unsupported measure/expression cannot safely be represented by current db fallback."
+          ],
+          "counting": "One row-level correction action even if multiple fields/reasons overlap."
+        },
+        {
+          "row": 3,
+          "classification": "REQUIRED_CORRECTION",
+          "fields": [
+            "name/quantity/unit interpretation"
+          ],
+          "reasons": [
+            "Unsupported measure/expression cannot safely be represented by current db fallback."
+          ],
+          "counting": "One row-level correction action even if multiple fields/reasons overlap."
+        },
+        {
+          "row": 4,
+          "classification": "REQUIRED_CORRECTION",
+          "fields": [
+            "name/quantity/unit interpretation"
+          ],
+          "reasons": [
+            "Unsupported measure/expression cannot safely be represented by current db fallback."
+          ],
+          "counting": "One row-level correction action even if multiple fields/reasons overlap."
+        },
+        {
+          "row": 6,
+          "classification": "REQUIRED_CORRECTION",
+          "fields": [
+            "name/quantity/unit interpretation"
+          ],
+          "reasons": [
+            "Unsupported measure/expression cannot safely be represented by current db fallback."
+          ],
+          "counting": "One row-level correction action even if multiple fields/reasons overlap."
+        },
+        {
+          "row": 7,
+          "classification": "REQUIRED_CORRECTION",
+          "fields": [
+            "name/quantity/unit interpretation"
+          ],
+          "reasons": [
+            "Unsupported measure/expression cannot safely be represented by current db fallback."
+          ],
+          "counting": "One row-level correction action even if multiple fields/reasons overlap."
+        }
+      ],
+      "review_only": [],
+      "silent_fallback_rows": 3,
+      "verdict": "POOR",
+      "verdict_reason": "5 correction actions / 8 ingredient rows; 0 review-only quantities. Usable=true.",
+      "consistency": {
+        "ingredient_fields_equal_b3_3": true,
+        "preparation_equals_normalized_input": true,
+        "b3_0_reference_verified_by_b3_2": true
+      }
+    },
+    {
+      "id": "28",
+      "url": "https://www.bbcgoodfood.com/recipes/chicken-chilli-con-carne",
+      "domain": "www.bbcgoodfood.com",
+      "raw_title": "Chicken chilli con carne",
+      "normalized_title": "Chicken chilli con carne",
+      "parser_input": "Chicken chilli con carne\n\nHozzávalók:\n2 tbsp olive oil\n1 onion sliced\n2 mixed peppers sliced (use red, yellow or orange peppers)\n2 large garlic cloves crushed\n1 small bunch of coriander stalks finely chopped and leaves roughly chopped\n½ tbsp ground coriander\n1 tbsp ground cumin\n1-2 tsp chipotle paste\n400g can chopped tomatoes\n1 tbsp tomato purée\n300ml chicken stock\n1 small cinnamon stick\n4 skinless chicken thighs bone-in\n400g can black beans\n400g can kidney beans drained\n1 tbsp red wine vinegar\n20g dark chocolate (at least 70% cocoa solids)\ncooked rice or tortilla chips\nguacamole and soured cream (optional)\n\nElkészítés:\nHeat the oil in a casserole dish over a medium heat, and fry the onion and peppers for 10-12 mins, or until softened. Add the garlic, coriander stalks, ground coriander, cumin and chipotle paste, and fry for 2 mins more. Tip in the tomatoes, tomato pureé and stock, then add the cinnamon stick. Nestle the chicken thighs into the mixture, then reduce the heat to low and simmer, covered, for 45 mins or until the chicken is tender. Remove the chicken from the casserole and transfer to a chopping board, then shred the meat off the bone using two forks.\n\nReturn the shredded chicken to the pan, then tip in the black beans along with the liquid from the can, the drained kidney beans, vinegar and chocolate. Stir well to combine all of the ingredients and melt the chocolate, then turn the heat up to medium and simmer, uncovered, for 10-15 mins, or until the mixture has thickened slightly.\n\nRemove the cinnamon stick, season to taste and stir though most, or all of the coriander leaves (you can reserve a few leaves to scatter over at the end, if you like). Serve the chilli with rice or tortilla chips, topped with guacamole and soured cream, if using, and scatter over any remaining coriander.",
+      "draft": {
+        "title": "Chicken chilli con carne",
+        "ingredients": [
+          {
+            "sourceOrder": 3,
+            "rawText": "2 tbsp olive oil",
+            "name": "tbsp olive oil",
+            "quantity": 2.0,
+            "canonical_unit": "db",
+            "warnings": [],
+            "sourceIngredientIndex": 0,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "UNSUPPORTED_UNIT",
+            "sourceError": false,
+            "unsupported": true,
+            "parserError": false,
+            "silentFallbackRisk": true,
+            "requiredCorrection": true,
+            "pocWarnings": [
+              "UNSUPPORTED_INPUT",
+              "SILENT_BAD_FALLBACK_RISK"
+            ],
+            "source_evidence": {
+              "source_order": 1,
+              "visible_text": "2 tbsp olive oil",
+              "json_ld_text": "2 tbsp olive oil",
+              "source_verdict": "MATCH",
+              "note": null
+            },
+            "unsupported_phrase": "tbsp",
+            "misleading_fields": [
+              "canonical_unit",
+              "name contains unresolved measure/expression"
+            ]
+          },
+          {
+            "sourceOrder": 4,
+            "rawText": "1 onion sliced",
+            "name": "onion sliced",
+            "quantity": 1.0,
+            "canonical_unit": "db",
+            "warnings": [],
+            "sourceIngredientIndex": 1,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "CORRECT",
+            "sourceError": false,
+            "unsupported": false,
+            "parserError": false,
+            "silentFallbackRisk": false,
+            "requiredCorrection": false,
+            "pocWarnings": [],
+            "source_evidence": {
+              "source_order": 2,
+              "visible_text": "1 onion sliced",
+              "json_ld_text": "1 onion sliced",
+              "source_verdict": "MATCH",
+              "note": null
+            },
+            "unsupported_phrase": null,
+            "misleading_fields": []
+          },
+          {
+            "sourceOrder": 5,
+            "rawText": "2 mixed peppers sliced (use red, yellow or orange peppers)",
+            "name": "mixed peppers sliced (use red, yellow or orange peppers)",
+            "quantity": 2.0,
+            "canonical_unit": "db",
+            "warnings": [],
+            "sourceIngredientIndex": 2,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "CORRECT",
+            "sourceError": false,
+            "unsupported": false,
+            "parserError": false,
+            "silentFallbackRisk": false,
+            "requiredCorrection": false,
+            "pocWarnings": [],
+            "source_evidence": {
+              "source_order": 3,
+              "visible_text": "2 mixed peppers sliced (use red, yellow or orange peppers)",
+              "json_ld_text": "2 mixed peppers sliced (use red, yellow or orange peppers)",
+              "source_verdict": "MATCH",
+              "note": null
+            },
+            "unsupported_phrase": null,
+            "misleading_fields": []
+          },
+          {
+            "sourceOrder": 6,
+            "rawText": "2 large garlic cloves crushed",
+            "name": "large garlic cloves crushed",
+            "quantity": 2.0,
+            "canonical_unit": "db",
+            "warnings": [],
+            "sourceIngredientIndex": 3,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "UNSUPPORTED_UNIT",
+            "sourceError": false,
+            "unsupported": true,
+            "parserError": false,
+            "silentFallbackRisk": true,
+            "requiredCorrection": true,
+            "pocWarnings": [
+              "UNSUPPORTED_INPUT",
+              "SILENT_BAD_FALLBACK_RISK"
+            ],
+            "source_evidence": {
+              "source_order": 4,
+              "visible_text": "2 large garlic cloves crushed",
+              "json_ld_text": "2 large garlic cloves crushed",
+              "source_verdict": "MATCH",
+              "note": null
+            },
+            "unsupported_phrase": "cloves",
+            "misleading_fields": [
+              "canonical_unit",
+              "name contains unresolved measure/expression"
+            ]
+          },
+          {
+            "sourceOrder": 7,
+            "rawText": "1 small bunch of coriander stalks finely chopped and leaves roughly chopped",
+            "name": "small bunch of coriander stalks finely chopped and leaves roughly chopped",
+            "quantity": 1.0,
+            "canonical_unit": "db",
+            "warnings": [],
+            "sourceIngredientIndex": 4,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "UNSUPPORTED_UNIT",
+            "sourceError": false,
+            "unsupported": true,
+            "parserError": false,
+            "silentFallbackRisk": true,
+            "requiredCorrection": true,
+            "pocWarnings": [
+              "UNSUPPORTED_INPUT",
+              "SILENT_BAD_FALLBACK_RISK"
+            ],
+            "source_evidence": {
+              "source_order": 5,
+              "visible_text": "1 small bunch of coriander stalks finely chopped and leaves roughly chopped",
+              "json_ld_text": "1 small bunch of coriander stalks finely chopped and leaves roughly chopped",
+              "source_verdict": "MATCH",
+              "note": null
+            },
+            "unsupported_phrase": "small bunch",
+            "misleading_fields": [
+              "canonical_unit",
+              "name contains unresolved measure/expression"
+            ]
+          },
+          {
+            "sourceOrder": 8,
+            "rawText": "½ tbsp ground coriander",
+            "name": "tbsp ground coriander",
+            "quantity": 0.5,
+            "canonical_unit": "db",
+            "warnings": [],
+            "sourceIngredientIndex": 5,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "UNSUPPORTED_UNIT",
+            "sourceError": false,
+            "unsupported": true,
+            "parserError": false,
+            "silentFallbackRisk": true,
+            "requiredCorrection": true,
+            "pocWarnings": [
+              "UNSUPPORTED_INPUT",
+              "SILENT_BAD_FALLBACK_RISK"
+            ],
+            "source_evidence": {
+              "source_order": 6,
+              "visible_text": "½ tbsp ground coriander",
+              "json_ld_text": "½ tbsp ground coriander",
+              "source_verdict": "MATCH",
+              "note": null
+            },
+            "unsupported_phrase": "tbsp",
+            "misleading_fields": [
+              "canonical_unit",
+              "name contains unresolved measure/expression"
+            ]
+          },
+          {
+            "sourceOrder": 9,
+            "rawText": "1 tbsp ground cumin",
+            "name": "tbsp ground cumin",
+            "quantity": 1.0,
+            "canonical_unit": "db",
+            "warnings": [],
+            "sourceIngredientIndex": 6,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "UNSUPPORTED_UNIT",
+            "sourceError": false,
+            "unsupported": true,
+            "parserError": false,
+            "silentFallbackRisk": true,
+            "requiredCorrection": true,
+            "pocWarnings": [
+              "UNSUPPORTED_INPUT",
+              "SILENT_BAD_FALLBACK_RISK"
+            ],
+            "source_evidence": {
+              "source_order": 7,
+              "visible_text": "1 tbsp ground cumin",
+              "json_ld_text": "1 tbsp ground cumin",
+              "source_verdict": "MATCH",
+              "note": null
+            },
+            "unsupported_phrase": "tbsp",
+            "misleading_fields": [
+              "canonical_unit",
+              "name contains unresolved measure/expression"
+            ]
+          },
+          {
+            "sourceOrder": 10,
+            "rawText": "1-2 tsp chipotle paste",
+            "name": "1-2 tsp chipotle paste",
+            "quantity": 1.0,
+            "canonical_unit": "db",
+            "warnings": [
+              "missingQuantity"
+            ],
+            "sourceIngredientIndex": 7,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "PARSER_LIMITATION",
+            "sourceError": false,
+            "unsupported": true,
+            "parserError": false,
+            "silentFallbackRisk": false,
+            "requiredCorrection": true,
+            "pocWarnings": [
+              "UNSUPPORTED_INPUT",
+              "PARSER_LIMITATION"
+            ],
+            "source_evidence": {
+              "source_order": 8,
+              "visible_text": "1-2 tsp chipotle paste",
+              "json_ld_text": "1-2 tsp chipotle paste",
+              "source_verdict": "MATCH",
+              "note": null
+            },
+            "unsupported_phrase": "range tsp",
+            "misleading_fields": [
+              "canonical_unit",
+              "quantity interpretation",
+              "name contains unresolved measure/expression"
+            ]
+          },
+          {
+            "sourceOrder": 11,
+            "rawText": "400g can chopped tomatoes",
+            "name": "can chopped tomatoes",
+            "quantity": 400.0,
+            "canonical_unit": "g",
+            "warnings": [],
+            "sourceIngredientIndex": 8,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "CORRECT",
+            "sourceError": false,
+            "unsupported": false,
+            "parserError": false,
+            "silentFallbackRisk": false,
+            "requiredCorrection": false,
+            "pocWarnings": [],
+            "source_evidence": {
+              "source_order": 9,
+              "visible_text": "400g can chopped tomatoes",
+              "json_ld_text": "400g can chopped tomatoes",
+              "source_verdict": "MATCH",
+              "note": null
+            },
+            "unsupported_phrase": null,
+            "misleading_fields": []
+          },
+          {
+            "sourceOrder": 12,
+            "rawText": "1 tbsp tomato purée",
+            "name": "tbsp tomato purée",
+            "quantity": 1.0,
+            "canonical_unit": "db",
+            "warnings": [],
+            "sourceIngredientIndex": 9,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "UNSUPPORTED_UNIT",
+            "sourceError": false,
+            "unsupported": true,
+            "parserError": false,
+            "silentFallbackRisk": true,
+            "requiredCorrection": true,
+            "pocWarnings": [
+              "UNSUPPORTED_INPUT",
+              "SILENT_BAD_FALLBACK_RISK"
+            ],
+            "source_evidence": {
+              "source_order": 10,
+              "visible_text": "1 tbsp tomato purée",
+              "json_ld_text": "1 tbsp tomato purée",
+              "source_verdict": "MATCH",
+              "note": null
+            },
+            "unsupported_phrase": "tbsp",
+            "misleading_fields": [
+              "canonical_unit",
+              "name contains unresolved measure/expression"
+            ]
+          },
+          {
+            "sourceOrder": 13,
+            "rawText": "300ml chicken stock",
+            "name": "chicken stock",
+            "quantity": 300.0,
+            "canonical_unit": "ml",
+            "warnings": [],
+            "sourceIngredientIndex": 10,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "CORRECT",
+            "sourceError": false,
+            "unsupported": false,
+            "parserError": false,
+            "silentFallbackRisk": false,
+            "requiredCorrection": false,
+            "pocWarnings": [],
+            "source_evidence": {
+              "source_order": 11,
+              "visible_text": "300ml chicken stock",
+              "json_ld_text": "300ml chicken stock",
+              "source_verdict": "MATCH",
+              "note": null
+            },
+            "unsupported_phrase": null,
+            "misleading_fields": []
+          },
+          {
+            "sourceOrder": 14,
+            "rawText": "1 small cinnamon stick",
+            "name": "small cinnamon stick",
+            "quantity": 1.0,
+            "canonical_unit": "db",
+            "warnings": [],
+            "sourceIngredientIndex": 11,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "UNSUPPORTED_UNIT",
+            "sourceError": false,
+            "unsupported": true,
+            "parserError": false,
+            "silentFallbackRisk": true,
+            "requiredCorrection": true,
+            "pocWarnings": [
+              "UNSUPPORTED_INPUT",
+              "SILENT_BAD_FALLBACK_RISK"
+            ],
+            "source_evidence": {
+              "source_order": 12,
+              "visible_text": "1 small cinnamon stick",
+              "json_ld_text": "1 small cinnamon stick",
+              "source_verdict": "MATCH",
+              "note": null
+            },
+            "unsupported_phrase": "stick",
+            "misleading_fields": [
+              "canonical_unit",
+              "name contains unresolved measure/expression"
+            ]
+          },
+          {
+            "sourceOrder": 15,
+            "rawText": "4 skinless chicken thighs bone-in",
+            "name": "skinless chicken thighs bone-in",
+            "quantity": 4.0,
+            "canonical_unit": "db",
+            "warnings": [],
+            "sourceIngredientIndex": 12,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "CORRECT",
+            "sourceError": false,
+            "unsupported": false,
+            "parserError": false,
+            "silentFallbackRisk": false,
+            "requiredCorrection": false,
+            "pocWarnings": [],
+            "source_evidence": {
+              "source_order": 13,
+              "visible_text": "4 skinless chicken thighs bone-in",
+              "json_ld_text": "4 skinless chicken thighs bone-in",
+              "source_verdict": "MATCH",
+              "note": null
+            },
+            "unsupported_phrase": null,
+            "misleading_fields": []
+          },
+          {
+            "sourceOrder": 16,
+            "rawText": "400g can black beans",
+            "name": "can black beans",
+            "quantity": 400.0,
+            "canonical_unit": "g",
+            "warnings": [],
+            "sourceIngredientIndex": 13,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "CORRECT",
+            "sourceError": false,
+            "unsupported": false,
+            "parserError": false,
+            "silentFallbackRisk": false,
+            "requiredCorrection": false,
+            "pocWarnings": [],
+            "source_evidence": {
+              "source_order": 14,
+              "visible_text": "400g can black beans",
+              "json_ld_text": "400g can black beans",
+              "source_verdict": "MATCH",
+              "note": null
+            },
+            "unsupported_phrase": null,
+            "misleading_fields": []
+          },
+          {
+            "sourceOrder": 17,
+            "rawText": "400g can kidney beans drained",
+            "name": "can kidney beans drained",
+            "quantity": 400.0,
+            "canonical_unit": "g",
+            "warnings": [],
+            "sourceIngredientIndex": 14,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "CORRECT",
+            "sourceError": false,
+            "unsupported": false,
+            "parserError": false,
+            "silentFallbackRisk": false,
+            "requiredCorrection": false,
+            "pocWarnings": [],
+            "source_evidence": {
+              "source_order": 15,
+              "visible_text": "400g can kidney beans drained",
+              "json_ld_text": "400g can kidney beans drained",
+              "source_verdict": "MATCH",
+              "note": null
+            },
+            "unsupported_phrase": null,
+            "misleading_fields": []
+          },
+          {
+            "sourceOrder": 18,
+            "rawText": "1 tbsp red wine vinegar",
+            "name": "tbsp red wine vinegar",
+            "quantity": 1.0,
+            "canonical_unit": "db",
+            "warnings": [],
+            "sourceIngredientIndex": 15,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "UNSUPPORTED_UNIT",
+            "sourceError": false,
+            "unsupported": true,
+            "parserError": false,
+            "silentFallbackRisk": true,
+            "requiredCorrection": true,
+            "pocWarnings": [
+              "UNSUPPORTED_INPUT",
+              "SILENT_BAD_FALLBACK_RISK"
+            ],
+            "source_evidence": {
+              "source_order": 16,
+              "visible_text": "1 tbsp red wine vinegar",
+              "json_ld_text": "1 tbsp red wine vinegar",
+              "source_verdict": "MATCH",
+              "note": null
+            },
+            "unsupported_phrase": "tbsp",
+            "misleading_fields": [
+              "canonical_unit",
+              "name contains unresolved measure/expression"
+            ]
+          },
+          {
+            "sourceOrder": 19,
+            "rawText": "20g dark chocolate (at least 70% cocoa solids)",
+            "name": "dark chocolate (at least 70% cocoa solids)",
+            "quantity": 20.0,
+            "canonical_unit": "g",
+            "warnings": [],
+            "sourceIngredientIndex": 16,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "CORRECT",
+            "sourceError": false,
+            "unsupported": false,
+            "parserError": false,
+            "silentFallbackRisk": false,
+            "requiredCorrection": false,
+            "pocWarnings": [],
+            "source_evidence": {
+              "source_order": 17,
+              "visible_text": "20g dark chocolate (at least 70% cocoa solids)",
+              "json_ld_text": "20g dark chocolate (at least 70% cocoa solids)",
+              "source_verdict": "MATCH",
+              "note": null
+            },
+            "unsupported_phrase": null,
+            "misleading_fields": []
+          },
+          {
+            "sourceOrder": 20,
+            "rawText": "cooked rice or tortilla chips",
+            "name": "cooked rice or tortilla chips",
+            "quantity": 1.0,
+            "canonical_unit": "db",
+            "warnings": [
+              "missingQuantity"
+            ],
+            "sourceIngredientIndex": 17,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "CORRECT",
+            "sourceError": false,
+            "unsupported": false,
+            "parserError": false,
+            "silentFallbackRisk": false,
+            "requiredCorrection": false,
+            "pocWarnings": [],
+            "source_evidence": {
+              "source_order": 18,
+              "visible_text": "cooked rice or tortilla chips",
+              "json_ld_text": "cooked rice or tortilla chips",
+              "source_verdict": "MATCH",
+              "note": null
+            },
+            "unsupported_phrase": null,
+            "misleading_fields": []
+          },
+          {
+            "sourceOrder": 21,
+            "rawText": "guacamole and soured cream (optional)",
+            "name": "guacamole and soured cream (optional)",
+            "quantity": 1.0,
+            "canonical_unit": "db",
+            "warnings": [
+              "missingQuantity"
+            ],
+            "sourceIngredientIndex": 18,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "CORRECT",
+            "sourceError": false,
+            "unsupported": false,
+            "parserError": false,
+            "silentFallbackRisk": false,
+            "requiredCorrection": false,
+            "pocWarnings": [],
+            "source_evidence": {
+              "source_order": 19,
+              "visible_text": "guacamole and soured cream (optional)",
+              "json_ld_text": "guacamole and soured cream (optional)",
+              "source_verdict": "MATCH",
+              "note": null
+            },
+            "unsupported_phrase": null,
+            "misleading_fields": []
+          }
+        ],
+        "preparation": "Heat the oil in a casserole dish over a medium heat, and fry the onion and peppers for 10-12 mins, or until softened. Add the garlic, coriander stalks, ground coriander, cumin and chipotle paste, and fry for 2 mins more. Tip in the tomatoes, tomato pureé and stock, then add the cinnamon stick. Nestle the chicken thighs into the mixture, then reduce the heat to low and simmer, covered, for 45 mins or until the chicken is tender. Remove the chicken from the casserole and transfer to a chopping board, then shred the meat off the bone using two forks.\n\nReturn the shredded chicken to the pan, then tip in the black beans along with the liquid from the can, the drained kidney beans, vinegar and chocolate. Stir well to combine all of the ingredients and melt the chocolate, then turn the heat up to medium and simmer, uncovered, for 10-15 mins, or until the mixture has thickened slightly.\n\nRemove the cinnamon stick, season to taste and stir though most, or all of the coriander leaves (you can reserve a few leaves to scatter over at the end, if you like). Serve the chilli with rice or tortilla chips, topped with guacamole and soured cream, if using, and scatter over any remaining coriander.",
+        "spices": [],
+        "unprocessedSegments": []
+      },
+      "normalized_preparation": "Heat the oil in a casserole dish over a medium heat, and fry the onion and peppers for 10-12 mins, or until softened. Add the garlic, coriander stalks, ground coriander, cumin and chipotle paste, and fry for 2 mins more. Tip in the tomatoes, tomato pureé and stock, then add the cinnamon stick. Nestle the chicken thighs into the mixture, then reduce the heat to low and simmer, covered, for 45 mins or until the chicken is tender. Remove the chicken from the casserole and transfer to a chopping board, then shred the meat off the bone using two forks.\n\nReturn the shredded chicken to the pan, then tip in the black beans along with the liquid from the can, the drained kidney beans, vinegar and chocolate. Stir well to combine all of the ingredients and melt the chocolate, then turn the heat up to medium and simmer, uncovered, for 10-15 mins, or until the mixture has thickened slightly.\n\nRemove the cinnamon stick, season to taste and stir though most, or all of the coriander leaves (you can reserve a few leaves to scatter over at the end, if you like). Serve the chilli with rice or tortilla chips, topped with guacamole and soured cream, if using, and scatter over any remaining coriander.",
+      "timing": {
+        "normalization_ms": 0.246,
+        "parser_ms": 0.533,
+        "draft_build_ms": 0.026,
+        "total_local_ms": 0.808
+      },
+      "title_changed": false,
+      "ingredient_count": 19,
+      "clean_rows": 8,
+      "unsupported_rows": 9,
+      "structural_corrections": 1,
+      "source_structure_warnings": [
+        {
+          "type": "SOURCE_STRUCTURE_WARNING",
+          "evidence": {
+            "before_row": 18,
+            "heading": "To serve",
+            "verdict": "GROUP_HEADING_DIFFERENCE",
+            "json_ld": null
+          }
+        }
+      ],
+      "instruction_entries_preserved": 3,
+      "required_corrections": [
+        {
+          "row": 1,
+          "classification": "REQUIRED_CORRECTION",
+          "fields": [
+            "name/quantity/unit interpretation"
+          ],
+          "reasons": [
+            "Unsupported measure/expression cannot safely be represented by current db fallback."
+          ],
+          "counting": "One row-level correction action even if multiple fields/reasons overlap."
+        },
+        {
+          "row": 4,
+          "classification": "REQUIRED_CORRECTION",
+          "fields": [
+            "name/quantity/unit interpretation"
+          ],
+          "reasons": [
+            "Unsupported measure/expression cannot safely be represented by current db fallback."
+          ],
+          "counting": "One row-level correction action even if multiple fields/reasons overlap."
+        },
+        {
+          "row": 5,
+          "classification": "REQUIRED_CORRECTION",
+          "fields": [
+            "name/quantity/unit interpretation"
+          ],
+          "reasons": [
+            "Unsupported measure/expression cannot safely be represented by current db fallback."
+          ],
+          "counting": "One row-level correction action even if multiple fields/reasons overlap."
+        },
+        {
+          "row": 6,
+          "classification": "REQUIRED_CORRECTION",
+          "fields": [
+            "name/quantity/unit interpretation"
+          ],
+          "reasons": [
+            "Unsupported measure/expression cannot safely be represented by current db fallback."
+          ],
+          "counting": "One row-level correction action even if multiple fields/reasons overlap."
+        },
+        {
+          "row": 7,
+          "classification": "REQUIRED_CORRECTION",
+          "fields": [
+            "name/quantity/unit interpretation"
+          ],
+          "reasons": [
+            "Unsupported measure/expression cannot safely be represented by current db fallback."
+          ],
+          "counting": "One row-level correction action even if multiple fields/reasons overlap."
+        },
+        {
+          "row": 8,
+          "classification": "REQUIRED_CORRECTION",
+          "fields": [
+            "name/quantity/unit interpretation"
+          ],
+          "reasons": [
+            "Unsupported measure/expression cannot safely be represented by current db fallback."
+          ],
+          "counting": "One row-level correction action even if multiple fields/reasons overlap."
+        },
+        {
+          "row": 10,
+          "classification": "REQUIRED_CORRECTION",
+          "fields": [
+            "name/quantity/unit interpretation"
+          ],
+          "reasons": [
+            "Unsupported measure/expression cannot safely be represented by current db fallback."
+          ],
+          "counting": "One row-level correction action even if multiple fields/reasons overlap."
+        },
+        {
+          "row": 12,
+          "classification": "REQUIRED_CORRECTION",
+          "fields": [
+            "name/quantity/unit interpretation"
+          ],
+          "reasons": [
+            "Unsupported measure/expression cannot safely be represented by current db fallback."
+          ],
+          "counting": "One row-level correction action even if multiple fields/reasons overlap."
+        },
+        {
+          "row": 16,
+          "classification": "REQUIRED_CORRECTION",
+          "fields": [
+            "name/quantity/unit interpretation"
+          ],
+          "reasons": [
+            "Unsupported measure/expression cannot safely be represented by current db fallback."
+          ],
+          "counting": "One row-level correction action even if multiple fields/reasons overlap."
+        },
+        {
+          "field": "ingredient grouping",
+          "classification": "REQUIRED_CORRECTION",
+          "reason": "Ingredient group heading lost upstream; logical grouping/to-serve/optional scope needs manual representation. No automatic restoration or ingredient insertion.",
+          "evidence": {
+            "before_row": 18,
+            "heading": "To serve",
+            "verdict": "GROUP_HEADING_DIFFERENCE",
+            "json_ld": null
+          },
+          "counting": "One recipe-level structural correction; may need a note/workaround because current draft has no group field."
+        }
+      ],
+      "review_only": [
+        {
+          "row": 18,
+          "field": "quantity",
+          "classification": "REVIEW_ONLY",
+          "reason": "Source gives no quantity; accepted 1 db default requires confirmation, not a proven erroneous value."
+        },
+        {
+          "row": 19,
+          "field": "quantity",
+          "classification": "REVIEW_ONLY",
+          "reason": "Source gives no quantity; accepted 1 db default requires confirmation, not a proven erroneous value."
+        }
+      ],
+      "silent_fallback_rows": 8,
+      "verdict": "POOR",
+      "verdict_reason": "10 correction actions / 19 ingredient rows; 2 review-only quantities. Usable=true.",
+      "consistency": {
+        "ingredient_fields_equal_b3_3": true,
+        "preparation_equals_normalized_input": true,
+        "b3_0_reference_verified_by_b3_2": true
+      }
+    }
+  ]
+}

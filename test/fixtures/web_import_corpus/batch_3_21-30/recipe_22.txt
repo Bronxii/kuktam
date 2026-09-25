@@ -1,0 +1,20 @@
+CÍM:
+Easy pancakes
+
+HOZZÁVALÓK:
+100g plain flour
+2 large eggs
+300ml milk
+1 tbsp sunflower or vegetable oil plus a little extra for frying
+lemon wedges to serve (optional)
+caster sugar to serve (optional)
+
+ELKÉSZÍTÉS:
+# VISIBLE_SOURCE_REFERENCE_V1: teljes szöveg a mentett HTML-ben, nem összefoglaló.
+# Snapshot: tool/web_import_poc/results/b3_0_sources/source_22.html
+# SHA256: 3CBEE9866978FF1C042286BFFD9D7D6A820FB684C693C68D54F064D358CA59C1
+1. @VISIBLE .method-steps__list-item | index=0 | content=.editor-content | heading=step 1
+2. @VISIBLE .method-steps__list-item | index=1 | content=.editor-content | heading=step 2
+3. @VISIBLE .method-steps__list-item | index=2 | content=.editor-content | heading=step 3
+4. @VISIBLE .method-steps__list-item | index=3 | content=.editor-content | heading=step 4
+5. @VISIBLE .method-steps__list-item | index=4 | content=.editor-content | heading=step 5

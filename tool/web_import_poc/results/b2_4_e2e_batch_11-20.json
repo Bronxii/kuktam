@@ -1,0 +1,3870 @@
+{
+  "method": "Offline B2.4, 11–20 only. Existing POC simulate() invokes unchanged production RecipeTextParser on full title/ingredients/preparation. Raw ingredient input and production warnings untouched. Known host + exact Mindmegette suffix only. POC warning metadata uses B2.2/B2.3 human-audited labels, NOT an implemented online detector. No correction applied.",
+  "counting_policy": "Required: one action per objectively misleading/unsupported ingredient row, overlapping reasons counted once; plus one action per missing source ingredient group. Review-only: non-required rows with accepted missing-quantity fallback. Clean means no production OR POC warning. Source/unsupported/warning/risk categories overlap. Source-error rows excluded from silent risk, not excluded from user correction needs.",
+  "thresholds": "BROKEN if title/preparation empty or no ingredient rows. READY if 0 required actions. POOR if >=4 required actions OR required actions / ingredient rows >=40%. Otherwise REVIEW. Group loss counts one structural action and cannot necessarily be restored in existing editor without notes; no new editor support assumed.",
+  "timing_note": "Desktop Dart JIT, one sequential pass, first recipe includes cold/JIT. Core normalization/parser/draft assembly only; file IO, metadata adjudication and preview/report formatting outside timers. No network.",
+  "summary": {
+    "recipes": 10,
+    "verdicts": {
+      "READY": 0,
+      "REVIEW": 5,
+      "POOR": 5,
+      "BROKEN": 0
+    },
+    "total_rows": 110,
+    "clean_rows": 57,
+    "source_error_rows": 2,
+    "unsupported_rows": 36,
+    "parser_error_rows": 0,
+    "warning_rows": 53,
+    "production_warning_rows": 24,
+    "silent_fallback_risk_rows": 27,
+    "silent_fallback_affected_recipes": 10,
+    "required_correction_rows": 37,
+    "required_correction_actions": 38,
+    "avg_required_corrections": 3.8,
+    "avg_review_only": 1.6
+  },
+  "domains": {
+    "www.mindmegette.hu": {
+      "recipes": 5,
+      "verdicts": {
+        "READY": 0,
+        "REVIEW": 4,
+        "POOR": 1,
+        "BROKEN": 0
+      },
+      "total_rows": 48,
+      "clean_rows": 26,
+      "source_error_rows": 2,
+      "unsupported_rows": 10,
+      "parser_error_rows": 0,
+      "warning_rows": 22,
+      "production_warning_rows": 12,
+      "silent_fallback_risk_rows": 8,
+      "silent_fallback_affected_recipes": 5,
+      "required_correction_rows": 11,
+      "required_correction_actions": 11,
+      "avg_required_corrections": 2.2,
+      "avg_review_only": 2.2
+    },
+    "www.bbcgoodfood.com": {
+      "recipes": 5,
+      "verdicts": {
+        "READY": 0,
+        "REVIEW": 1,
+        "POOR": 4,
+        "BROKEN": 0
+      },
+      "total_rows": 62,
+      "clean_rows": 31,
+      "source_error_rows": 0,
+      "unsupported_rows": 26,
+      "parser_error_rows": 0,
+      "warning_rows": 31,
+      "production_warning_rows": 12,
+      "silent_fallback_risk_rows": 19,
+      "silent_fallback_affected_recipes": 5,
+      "required_correction_rows": 26,
+      "required_correction_actions": 27,
+      "avg_required_corrections": 5.4,
+      "avg_review_only": 1.0
+    }
+  },
+  "timing": {
+    "normalization_ms": {
+      "total": 23.004,
+      "average": 2.3004000000000002,
+      "max": 19.575
+    },
+    "parser_ms": {
+      "total": 10.751000000000001,
+      "average": 1.0751000000000002,
+      "max": 5.12
+    },
+    "draft_build_ms": {
+      "total": 0.3890000000000001,
+      "average": 0.03890000000000001,
+      "max": 0.183
+    },
+    "total_local_ms": {
+      "total": 34.177,
+      "average": 3.4177,
+      "max": 24.886
+    }
+  },
+  "recipes": [
+    {
+      "id": "11",
+      "url": "https://www.mindmegette.hu/recept/lecso",
+      "domain": "www.mindmegette.hu",
+      "raw_title": "Lecsó | Mindmegette.hu",
+      "normalized_title": "Lecsó",
+      "parser_input": "Lecsó\n\nHozzávalók:\n40 dkg Paradicsom\n80 dkg Paprika\n2 fej Hagyma\n5 dkg Füstölt szalonna\n2 ek Olaj\n1 ek Pirospaprika\nSó\n\nElkészítés:\n1. lépés: A lecsó elkészítéséhez a paradicsomot leforrázzuk, meghámozzuk, és gerezdekre vágjuk. A paprikát megmossuk, kicsumázzuk, az ereket és a magjait eltávolítjuk, majd ujjnyi vastag karikákra szeljük. A hagymát meghámozzuk, és apróra felkockázzuk. A szalonnát ugyancsak apró kockákra vágjuk.\n\n2. lépés: Az olajra tesszük a szalonnát, és mérsékelt tűzön a zsírjából kisütjük. Megfonnyasztjuk benne a hagymát, majd lehúzzuk a tűzről, megszórjuk a pirospaprikával, rádobjuk a paradicsomot, és ízlés szerint megsózzuk. Visszatesszük a tűzre, és néhány percig fedő nélkül forraljuk.\n\n3. lépés: Beleforgatjuk a paprikát, és félig lefedve, mérsékelt tűzön puhára főzzük 15 perc alatt, végül megkóstoljuk, és újra megsózzuk, ha szükséges.\n\n4. lépés: Az elkészült lecsót friss kenyérrel tálaljuk, úgy a legfinomabb.",
+      "draft": {
+        "title": "Lecsó",
+        "ingredients": [
+          {
+            "sourceOrder": 3,
+            "rawText": "40 dkg Paradicsom",
+            "name": "Paradicsom",
+            "quantity": 400.0,
+            "canonical_unit": "g",
+            "warnings": [],
+            "sourceIngredientIndex": 0,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "SUPPORTED_NORMALIZATION",
+            "sourceError": false,
+            "unsupported": false,
+            "parserError": false,
+            "silentFallbackRisk": false,
+            "requiredCorrection": false,
+            "pocWarnings": [],
+            "source_evidence": {
+              "source_order": 1,
+              "visible_text": "40 dkg paradicsom",
+              "json_ld_text": "40 dkg Paradicsom",
+              "source_verdict": "FORMAT_DIFFERENCE",
+              "note": null
+            },
+            "unsupported_phrase": null
+          },
+          {
+            "sourceOrder": 4,
+            "rawText": "80 dkg Paprika",
+            "name": "Paprika",
+            "quantity": 800.0,
+            "canonical_unit": "g",
+            "warnings": [],
+            "sourceIngredientIndex": 1,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "SUPPORTED_NORMALIZATION",
+            "sourceError": false,
+            "unsupported": false,
+            "parserError": false,
+            "silentFallbackRisk": false,
+            "requiredCorrection": false,
+            "pocWarnings": [],
+            "source_evidence": {
+              "source_order": 2,
+              "visible_text": "80 dkg paprika",
+              "json_ld_text": "80 dkg Paprika",
+              "source_verdict": "FORMAT_DIFFERENCE",
+              "note": null
+            },
+            "unsupported_phrase": null
+          },
+          {
+            "sourceOrder": 5,
+            "rawText": "2 fej Hagyma",
+            "name": "fej Hagyma",
+            "quantity": 2.0,
+            "canonical_unit": "db",
+            "warnings": [],
+            "sourceIngredientIndex": 2,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "UNSUPPORTED_UNIT",
+            "sourceError": false,
+            "unsupported": true,
+            "parserError": false,
+            "silentFallbackRisk": true,
+            "requiredCorrection": true,
+            "pocWarnings": [
+              "UNSUPPORTED_INPUT",
+              "SILENT_BAD_FALLBACK_RISK"
+            ],
+            "source_evidence": {
+              "source_order": 3,
+              "visible_text": "2 fej hagyma",
+              "json_ld_text": "2 fej Hagyma",
+              "source_verdict": "FORMAT_DIFFERENCE",
+              "note": null
+            },
+            "unsupported_phrase": "fej"
+          },
+          {
+            "sourceOrder": 6,
+            "rawText": "5 dkg Füstölt szalonna",
+            "name": "Füstölt szalonna",
+            "quantity": 50.0,
+            "canonical_unit": "g",
+            "warnings": [],
+            "sourceIngredientIndex": 3,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "SUPPORTED_NORMALIZATION",
+            "sourceError": false,
+            "unsupported": false,
+            "parserError": false,
+            "silentFallbackRisk": false,
+            "requiredCorrection": false,
+            "pocWarnings": [],
+            "source_evidence": {
+              "source_order": 4,
+              "visible_text": "5 dkg füstölt szalonna",
+              "json_ld_text": "5 dkg Füstölt szalonna",
+              "source_verdict": "FORMAT_DIFFERENCE",
+              "note": null
+            },
+            "unsupported_phrase": null
+          },
+          {
+            "sourceOrder": 7,
+            "rawText": "2 ek Olaj",
+            "name": "Olaj",
+            "quantity": 2.0,
+            "canonical_unit": "ek",
+            "warnings": [],
+            "sourceIngredientIndex": 4,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "CORRECT",
+            "sourceError": false,
+            "unsupported": false,
+            "parserError": false,
+            "silentFallbackRisk": false,
+            "requiredCorrection": false,
+            "pocWarnings": [],
+            "source_evidence": {
+              "source_order": 5,
+              "visible_text": "2 ek olaj",
+              "json_ld_text": "2 ek Olaj",
+              "source_verdict": "FORMAT_DIFFERENCE",
+              "note": null
+            },
+            "unsupported_phrase": null
+          },
+          {
+            "sourceOrder": 8,
+            "rawText": "1 ek Pirospaprika",
+            "name": "Pirospaprika",
+            "quantity": 1.0,
+            "canonical_unit": "ek",
+            "warnings": [],
+            "sourceIngredientIndex": 5,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "CORRECT",
+            "sourceError": false,
+            "unsupported": false,
+            "parserError": false,
+            "silentFallbackRisk": false,
+            "requiredCorrection": false,
+            "pocWarnings": [],
+            "source_evidence": {
+              "source_order": 6,
+              "visible_text": "1 ek pirospaprika",
+              "json_ld_text": "1 ek Pirospaprika",
+              "source_verdict": "FORMAT_DIFFERENCE",
+              "note": null
+            },
+            "unsupported_phrase": null
+          },
+          {
+            "sourceOrder": 9,
+            "rawText": "Só",
+            "name": "Só",
+            "quantity": 1.0,
+            "canonical_unit": "db",
+            "warnings": [
+              "missingQuantity"
+            ],
+            "sourceIngredientIndex": 6,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "CORRECT",
+            "sourceError": false,
+            "unsupported": false,
+            "parserError": false,
+            "silentFallbackRisk": false,
+            "requiredCorrection": false,
+            "pocWarnings": [],
+            "source_evidence": {
+              "source_order": 7,
+              "visible_text": "só",
+              "json_ld_text": "Só",
+              "source_verdict": "FORMAT_DIFFERENCE",
+              "note": null
+            },
+            "unsupported_phrase": null
+          }
+        ],
+        "preparation": "1. lépés: A lecsó elkészítéséhez a paradicsomot leforrázzuk, meghámozzuk, és gerezdekre vágjuk. A paprikát megmossuk, kicsumázzuk, az ereket és a magjait eltávolítjuk, majd ujjnyi vastag karikákra szeljük. A hagymát meghámozzuk, és apróra felkockázzuk. A szalonnát ugyancsak apró kockákra vágjuk.\n\n2. lépés: Az olajra tesszük a szalonnát, és mérsékelt tűzön a zsírjából kisütjük. Megfonnyasztjuk benne a hagymát, majd lehúzzuk a tűzről, megszórjuk a pirospaprikával, rádobjuk a paradicsomot, és ízlés szerint megsózzuk. Visszatesszük a tűzre, és néhány percig fedő nélkül forraljuk.\n\n3. lépés: Beleforgatjuk a paprikát, és félig lefedve, mérsékelt tűzön puhára főzzük 15 perc alatt, végül megkóstoljuk, és újra megsózzuk, ha szükséges.\n\n4. lépés: Az elkészült lecsót friss kenyérrel tálaljuk, úgy a legfinomabb.",
+        "spices": [],
+        "unprocessedSegments": []
+      },
+      "normalized_preparation": "1. lépés: A lecsó elkészítéséhez a paradicsomot leforrázzuk, meghámozzuk, és gerezdekre vágjuk. A paprikát megmossuk, kicsumázzuk, az ereket és a magjait eltávolítjuk, majd ujjnyi vastag karikákra szeljük. A hagymát meghámozzuk, és apróra felkockázzuk. A szalonnát ugyancsak apró kockákra vágjuk.\n\n2. lépés: Az olajra tesszük a szalonnát, és mérsékelt tűzön a zsírjából kisütjük. Megfonnyasztjuk benne a hagymát, majd lehúzzuk a tűzről, megszórjuk a pirospaprikával, rádobjuk a paradicsomot, és ízlés szerint megsózzuk. Visszatesszük a tűzre, és néhány percig fedő nélkül forraljuk.\n\n3. lépés: Beleforgatjuk a paprikát, és félig lefedve, mérsékelt tűzön puhára főzzük 15 perc alatt, végül megkóstoljuk, és újra megsózzuk, ha szükséges.\n\n4. lépés: Az elkészült lecsót friss kenyérrel tálaljuk, úgy a legfinomabb.",
+      "timing": {
+        "normalization_ms": 19.575,
+        "parser_ms": 5.12,
+        "draft_build_ms": 0.183,
+        "total_local_ms": 24.886
+      },
+      "required_corrections": [
+        {
+          "row": 3,
+          "classification": "REQUIRED_CORRECTION",
+          "fields": [
+            "name/quantity/unit interpretation"
+          ],
+          "reasons": [
+            "Unsupported measure/expression cannot safely be represented by current db fallback."
+          ],
+          "counting": "One row-level correction action even if multiple fields/reasons overlap."
+        }
+      ],
+      "review_only": [
+        {
+          "row": 7,
+          "field": "quantity",
+          "classification": "REVIEW_ONLY",
+          "reason": "Source gives no quantity; accepted 1 db default requires confirmation, not a proven erroneous value."
+        }
+      ],
+      "silent_fallback_rows": 1,
+      "verdict": "REVIEW",
+      "verdict_reason": "1 correction actions / 7 ingredient rows; 1 review-only quantities. Usable=true.",
+      "consistency": {
+        "ingredient_fields_equal_b2_3": true,
+        "preparation_equals_normalized_input": true,
+        "b2_0_reference_verified_by_b2_2": true
+      }
+    },
+    {
+      "id": "12",
+      "url": "https://www.mindmegette.hu/recept/toltott-kaposzta",
+      "domain": "www.mindmegette.hu",
+      "raw_title": "Töltött káposzta | Mindmegette.hu",
+      "normalized_title": "Töltött káposzta",
+      "parser_input": "Töltött káposzta\n\nHozzávalók:\n80 dkg savanyú káposzta\n8 darab savanyított káposztalevél\n2 fej Hagyma\n1 gerezd Fokhagyma\n5 dkg Füstölt szalonna\n40 dkg darált sertéshús\n2 kávéskanál édesnemes pirospaprika\n8 dkg Rizs\n1 darab Tojás\n1 csipet őrölt köménymag\n1 mokkáskanál Majoránna\n2 evőkanál Olaj\n2 evőkanál Liszt\n2 dl Tejföl\n\nElkészítés:\nElkészítés: 1. A savanyú káposztát hideg vízben átmossuk. A káposztalevelekről levágjuk a vastagabb ereket. A hagymát és a fokhagymát meghámozzuk, apróra, a szalonnát kis kockákra vágjuk. 2. A szalonnát nagy lábosba zsírjára pirítjuk, a pörcöt a darált húshoz adjuk, és a zsírban megpirítjuk a hagymát. A felét a darált húshoz adjuk. 3. A maradékot lehúzzuk a tűzről, meghintjük 1 kávéskanál pirospaprikával, ráöntünk 1 dl vizet, és összekeverjük a savanyú káposzta felével. 4. A darált húshoz adjuk a fokhagymát, a rizst, a tojást, 1 kávéskanál pirospaprikát, a köménymagot, a majoránnát, és ízlés szerint sóval, borssal fűszerezzük. A masszát arányosan elosztva kis gombócokká kerekítjük, a káposztalevelekre rakjuk. A hosszanti széleket a húsra hajtjuk, majd alulról feltekerjük a leveleket. A lábosba tesszük a káposztára. Rászórjuk a maradék savanyú káposztát, és fedő alatt, lassú tűzön, puhára főzzük (kb. 1 óra. Közben többször megrázogatjuk a lábost, keverni nem szabad! 5. A töltelékeket óvatosan kiszedjük, és berántjuk a káposztát. Ehhez az olajat felforrósítjuk, megpirítjuk benne a lisztet. Felöntjük 2 dl hideg vízzel, csomómentesre elkeverjük, a káposztához adjuk, és 10 percig forraljuk. A töltelékeket a tetejére tesszük, és tejföllel kínáljuk.",
+      "draft": {
+        "title": "Töltött káposzta",
+        "ingredients": [
+          {
+            "sourceOrder": 3,
+            "rawText": "80 dkg savanyú káposzta",
+            "name": "savanyú káposzta",
+            "quantity": 800.0,
+            "canonical_unit": "g",
+            "warnings": [],
+            "sourceIngredientIndex": 0,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "SUPPORTED_NORMALIZATION",
+            "sourceError": false,
+            "unsupported": false,
+            "parserError": false,
+            "silentFallbackRisk": false,
+            "requiredCorrection": false,
+            "pocWarnings": [],
+            "source_evidence": {
+              "source_order": 1,
+              "visible_text": "80 dkg savanyú káposzta",
+              "json_ld_text": "80 dkg savanyú káposzta",
+              "source_verdict": "MATCH",
+              "note": null
+            },
+            "unsupported_phrase": null
+          },
+          {
+            "sourceOrder": 4,
+            "rawText": "8 darab savanyított káposztalevél",
+            "name": "savanyított káposztalevél",
+            "quantity": 8.0,
+            "canonical_unit": "db",
+            "warnings": [],
+            "sourceIngredientIndex": 1,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "SUPPORTED_NORMALIZATION",
+            "sourceError": false,
+            "unsupported": false,
+            "parserError": false,
+            "silentFallbackRisk": false,
+            "requiredCorrection": false,
+            "pocWarnings": [],
+            "source_evidence": {
+              "source_order": 2,
+              "visible_text": "8 darab savanyított káposztalevél",
+              "json_ld_text": "8 darab savanyított káposztalevél",
+              "source_verdict": "MATCH",
+              "note": null
+            },
+            "unsupported_phrase": null
+          },
+          {
+            "sourceOrder": 5,
+            "rawText": "2 fej Hagyma",
+            "name": "fej Hagyma",
+            "quantity": 2.0,
+            "canonical_unit": "db",
+            "warnings": [],
+            "sourceIngredientIndex": 2,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "UNSUPPORTED_UNIT",
+            "sourceError": false,
+            "unsupported": true,
+            "parserError": false,
+            "silentFallbackRisk": true,
+            "requiredCorrection": true,
+            "pocWarnings": [
+              "UNSUPPORTED_INPUT",
+              "SILENT_BAD_FALLBACK_RISK"
+            ],
+            "source_evidence": {
+              "source_order": 3,
+              "visible_text": "2 fej hagyma",
+              "json_ld_text": "2 fej Hagyma",
+              "source_verdict": "FORMAT_DIFFERENCE",
+              "note": null
+            },
+            "unsupported_phrase": "fej"
+          },
+          {
+            "sourceOrder": 6,
+            "rawText": "1 gerezd Fokhagyma",
+            "name": "gerezd Fokhagyma",
+            "quantity": 1.0,
+            "canonical_unit": "db",
+            "warnings": [],
+            "sourceIngredientIndex": 3,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "UNSUPPORTED_UNIT",
+            "sourceError": false,
+            "unsupported": true,
+            "parserError": false,
+            "silentFallbackRisk": true,
+            "requiredCorrection": true,
+            "pocWarnings": [
+              "UNSUPPORTED_INPUT",
+              "SILENT_BAD_FALLBACK_RISK"
+            ],
+            "source_evidence": {
+              "source_order": 4,
+              "visible_text": "1 gerezd fokhagyma",
+              "json_ld_text": "1 gerezd Fokhagyma",
+              "source_verdict": "FORMAT_DIFFERENCE",
+              "note": null
+            },
+            "unsupported_phrase": "gerezd"
+          },
+          {
+            "sourceOrder": 7,
+            "rawText": "5 dkg Füstölt szalonna",
+            "name": "Füstölt szalonna",
+            "quantity": 50.0,
+            "canonical_unit": "g",
+            "warnings": [],
+            "sourceIngredientIndex": 4,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "SUPPORTED_NORMALIZATION",
+            "sourceError": false,
+            "unsupported": false,
+            "parserError": false,
+            "silentFallbackRisk": false,
+            "requiredCorrection": false,
+            "pocWarnings": [],
+            "source_evidence": {
+              "source_order": 5,
+              "visible_text": "5 dkg füstölt szalonna",
+              "json_ld_text": "5 dkg Füstölt szalonna",
+              "source_verdict": "FORMAT_DIFFERENCE",
+              "note": null
+            },
+            "unsupported_phrase": null
+          },
+          {
+            "sourceOrder": 8,
+            "rawText": "40 dkg darált sertéshús",
+            "name": "darált sertéshús",
+            "quantity": 400.0,
+            "canonical_unit": "g",
+            "warnings": [],
+            "sourceIngredientIndex": 5,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "SUPPORTED_NORMALIZATION",
+            "sourceError": false,
+            "unsupported": false,
+            "parserError": false,
+            "silentFallbackRisk": false,
+            "requiredCorrection": false,
+            "pocWarnings": [],
+            "source_evidence": {
+              "source_order": 6,
+              "visible_text": "40 dkg darált sertéshús",
+              "json_ld_text": "40 dkg darált sertéshús",
+              "source_verdict": "MATCH",
+              "note": null
+            },
+            "unsupported_phrase": null
+          },
+          {
+            "sourceOrder": 9,
+            "rawText": "2 kávéskanál édesnemes pirospaprika",
+            "name": "kávéskanál édesnemes pirospaprika",
+            "quantity": 2.0,
+            "canonical_unit": "db",
+            "warnings": [],
+            "sourceIngredientIndex": 6,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "UNSUPPORTED_UNIT",
+            "sourceError": false,
+            "unsupported": true,
+            "parserError": false,
+            "silentFallbackRisk": true,
+            "requiredCorrection": true,
+            "pocWarnings": [
+              "UNSUPPORTED_INPUT",
+              "SILENT_BAD_FALLBACK_RISK"
+            ],
+            "source_evidence": {
+              "source_order": 7,
+              "visible_text": "2 kávéskanál édesnemes pirospaprika",
+              "json_ld_text": "2 kávéskanál édesnemes pirospaprika",
+              "source_verdict": "MATCH",
+              "note": null
+            },
+            "unsupported_phrase": "kávéskanál"
+          },
+          {
+            "sourceOrder": 10,
+            "rawText": "8 dkg Rizs",
+            "name": "Rizs",
+            "quantity": 80.0,
+            "canonical_unit": "g",
+            "warnings": [],
+            "sourceIngredientIndex": 7,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "SUPPORTED_NORMALIZATION",
+            "sourceError": false,
+            "unsupported": false,
+            "parserError": false,
+            "silentFallbackRisk": false,
+            "requiredCorrection": false,
+            "pocWarnings": [],
+            "source_evidence": {
+              "source_order": 8,
+              "visible_text": "8 dkg rizs",
+              "json_ld_text": "8 dkg Rizs",
+              "source_verdict": "FORMAT_DIFFERENCE",
+              "note": null
+            },
+            "unsupported_phrase": null
+          },
+          {
+            "sourceOrder": 11,
+            "rawText": "1 darab Tojás",
+            "name": "Tojás",
+            "quantity": 1.0,
+            "canonical_unit": "db",
+            "warnings": [],
+            "sourceIngredientIndex": 8,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "SUPPORTED_NORMALIZATION",
+            "sourceError": false,
+            "unsupported": false,
+            "parserError": false,
+            "silentFallbackRisk": false,
+            "requiredCorrection": false,
+            "pocWarnings": [],
+            "source_evidence": {
+              "source_order": 9,
+              "visible_text": "1 darab tojás",
+              "json_ld_text": "1 darab Tojás",
+              "source_verdict": "FORMAT_DIFFERENCE",
+              "note": null
+            },
+            "unsupported_phrase": null
+          },
+          {
+            "sourceOrder": 12,
+            "rawText": "1 csipet őrölt köménymag",
+            "name": "őrölt köménymag",
+            "quantity": 1.0,
+            "canonical_unit": "db",
+            "warnings": [
+              "unknownUnit"
+            ],
+            "sourceIngredientIndex": 9,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "UNSUPPORTED_UNIT",
+            "sourceError": false,
+            "unsupported": true,
+            "parserError": false,
+            "silentFallbackRisk": false,
+            "requiredCorrection": true,
+            "pocWarnings": [
+              "UNSUPPORTED_INPUT"
+            ],
+            "source_evidence": {
+              "source_order": 10,
+              "visible_text": "1 csipet őrölt köménymag",
+              "json_ld_text": "1 csipet őrölt köménymag",
+              "source_verdict": "MATCH",
+              "note": null
+            },
+            "unsupported_phrase": "csipet"
+          },
+          {
+            "sourceOrder": 13,
+            "rawText": "1 mokkáskanál Majoránna",
+            "name": "mokkáskanál Majoránna",
+            "quantity": 1.0,
+            "canonical_unit": "db",
+            "warnings": [],
+            "sourceIngredientIndex": 10,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "UNSUPPORTED_UNIT",
+            "sourceError": false,
+            "unsupported": true,
+            "parserError": false,
+            "silentFallbackRisk": true,
+            "requiredCorrection": true,
+            "pocWarnings": [
+              "UNSUPPORTED_INPUT",
+              "SILENT_BAD_FALLBACK_RISK"
+            ],
+            "source_evidence": {
+              "source_order": 11,
+              "visible_text": "1 mokkáskanál majoránna",
+              "json_ld_text": "1 mokkáskanál Majoránna",
+              "source_verdict": "FORMAT_DIFFERENCE",
+              "note": null
+            },
+            "unsupported_phrase": "mokkáskanál"
+          },
+          {
+            "sourceOrder": 14,
+            "rawText": "2 evőkanál Olaj",
+            "name": "Olaj",
+            "quantity": 2.0,
+            "canonical_unit": "ek",
+            "warnings": [],
+            "sourceIngredientIndex": 11,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "SUPPORTED_NORMALIZATION",
+            "sourceError": false,
+            "unsupported": false,
+            "parserError": false,
+            "silentFallbackRisk": false,
+            "requiredCorrection": false,
+            "pocWarnings": [],
+            "source_evidence": {
+              "source_order": 12,
+              "visible_text": "2 evőkanál olaj",
+              "json_ld_text": "2 evőkanál Olaj",
+              "source_verdict": "FORMAT_DIFFERENCE",
+              "note": null
+            },
+            "unsupported_phrase": null
+          },
+          {
+            "sourceOrder": 15,
+            "rawText": "2 evőkanál Liszt",
+            "name": "Liszt",
+            "quantity": 2.0,
+            "canonical_unit": "ek",
+            "warnings": [],
+            "sourceIngredientIndex": 12,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "SUPPORTED_NORMALIZATION",
+            "sourceError": false,
+            "unsupported": false,
+            "parserError": false,
+            "silentFallbackRisk": false,
+            "requiredCorrection": false,
+            "pocWarnings": [],
+            "source_evidence": {
+              "source_order": 13,
+              "visible_text": "2 evőkanál liszt",
+              "json_ld_text": "2 evőkanál Liszt",
+              "source_verdict": "FORMAT_DIFFERENCE",
+              "note": null
+            },
+            "unsupported_phrase": null
+          },
+          {
+            "sourceOrder": 16,
+            "rawText": "2 dl Tejföl",
+            "name": "Tejföl",
+            "quantity": 200.0,
+            "canonical_unit": "ml",
+            "warnings": [],
+            "sourceIngredientIndex": 13,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "SUPPORTED_NORMALIZATION",
+            "sourceError": false,
+            "unsupported": false,
+            "parserError": false,
+            "silentFallbackRisk": false,
+            "requiredCorrection": false,
+            "pocWarnings": [],
+            "source_evidence": {
+              "source_order": 14,
+              "visible_text": "2 dl tejföl",
+              "json_ld_text": "2 dl Tejföl",
+              "source_verdict": "FORMAT_DIFFERENCE",
+              "note": null
+            },
+            "unsupported_phrase": null
+          }
+        ],
+        "preparation": "Elkészítés: 1. A savanyú káposztát hideg vízben átmossuk. A káposztalevelekről levágjuk a vastagabb ereket. A hagymát és a fokhagymát meghámozzuk, apróra, a szalonnát kis kockákra vágjuk. 2. A szalonnát nagy lábosba zsírjára pirítjuk, a pörcöt a darált húshoz adjuk, és a zsírban megpirítjuk a hagymát. A felét a darált húshoz adjuk. 3. A maradékot lehúzzuk a tűzről, meghintjük 1 kávéskanál pirospaprikával, ráöntünk 1 dl vizet, és összekeverjük a savanyú káposzta felével. 4. A darált húshoz adjuk a fokhagymát, a rizst, a tojást, 1 kávéskanál pirospaprikát, a köménymagot, a majoránnát, és ízlés szerint sóval, borssal fűszerezzük. A masszát arányosan elosztva kis gombócokká kerekítjük, a káposztalevelekre rakjuk. A hosszanti széleket a húsra hajtjuk, majd alulról feltekerjük a leveleket. A lábosba tesszük a káposztára. Rászórjuk a maradék savanyú káposztát, és fedő alatt, lassú tűzön, puhára főzzük (kb. 1 óra. Közben többször megrázogatjuk a lábost, keverni nem szabad! 5. A töltelékeket óvatosan kiszedjük, és berántjuk a káposztát. Ehhez az olajat felforrósítjuk, megpirítjuk benne a lisztet. Felöntjük 2 dl hideg vízzel, csomómentesre elkeverjük, a káposztához adjuk, és 10 percig forraljuk. A töltelékeket a tetejére tesszük, és tejföllel kínáljuk.",
+        "spices": [],
+        "unprocessedSegments": []
+      },
+      "normalized_preparation": "Elkészítés: 1. A savanyú káposztát hideg vízben átmossuk. A káposztalevelekről levágjuk a vastagabb ereket. A hagymát és a fokhagymát meghámozzuk, apróra, a szalonnát kis kockákra vágjuk. 2. A szalonnát nagy lábosba zsírjára pirítjuk, a pörcöt a darált húshoz adjuk, és a zsírban megpirítjuk a hagymát. A felét a darált húshoz adjuk. 3. A maradékot lehúzzuk a tűzről, meghintjük 1 kávéskanál pirospaprikával, ráöntünk 1 dl vizet, és összekeverjük a savanyú káposzta felével. 4. A darált húshoz adjuk a fokhagymát, a rizst, a tojást, 1 kávéskanál pirospaprikát, a köménymagot, a majoránnát, és ízlés szerint sóval, borssal fűszerezzük. A masszát arányosan elosztva kis gombócokká kerekítjük, a káposztalevelekre rakjuk. A hosszanti széleket a húsra hajtjuk, majd alulról feltekerjük a leveleket. A lábosba tesszük a káposztára. Rászórjuk a maradék savanyú káposztát, és fedő alatt, lassú tűzön, puhára főzzük (kb. 1 óra. Közben többször megrázogatjuk a lábost, keverni nem szabad! 5. A töltelékeket óvatosan kiszedjük, és berántjuk a káposztát. Ehhez az olajat felforrósítjuk, megpirítjuk benne a lisztet. Felöntjük 2 dl hideg vízzel, csomómentesre elkeverjük, a káposztához adjuk, és 10 percig forraljuk. A töltelékeket a tetejére tesszük, és tejföllel kínáljuk.",
+      "timing": {
+        "normalization_ms": 0.341,
+        "parser_ms": 0.898,
+        "draft_build_ms": 0.028,
+        "total_local_ms": 1.269
+      },
+      "required_corrections": [
+        {
+          "row": 3,
+          "classification": "REQUIRED_CORRECTION",
+          "fields": [
+            "name/quantity/unit interpretation"
+          ],
+          "reasons": [
+            "Unsupported measure/expression cannot safely be represented by current db fallback."
+          ],
+          "counting": "One row-level correction action even if multiple fields/reasons overlap."
+        },
+        {
+          "row": 4,
+          "classification": "REQUIRED_CORRECTION",
+          "fields": [
+            "name/quantity/unit interpretation"
+          ],
+          "reasons": [
+            "Unsupported measure/expression cannot safely be represented by current db fallback."
+          ],
+          "counting": "One row-level correction action even if multiple fields/reasons overlap."
+        },
+        {
+          "row": 7,
+          "classification": "REQUIRED_CORRECTION",
+          "fields": [
+            "name/quantity/unit interpretation"
+          ],
+          "reasons": [
+            "Unsupported measure/expression cannot safely be represented by current db fallback."
+          ],
+          "counting": "One row-level correction action even if multiple fields/reasons overlap."
+        },
+        {
+          "row": 10,
+          "classification": "REQUIRED_CORRECTION",
+          "fields": [
+            "name/quantity/unit interpretation"
+          ],
+          "reasons": [
+            "Unsupported measure/expression cannot safely be represented by current db fallback."
+          ],
+          "counting": "One row-level correction action even if multiple fields/reasons overlap."
+        },
+        {
+          "row": 11,
+          "classification": "REQUIRED_CORRECTION",
+          "fields": [
+            "name/quantity/unit interpretation"
+          ],
+          "reasons": [
+            "Unsupported measure/expression cannot safely be represented by current db fallback."
+          ],
+          "counting": "One row-level correction action even if multiple fields/reasons overlap."
+        }
+      ],
+      "review_only": [],
+      "silent_fallback_rows": 4,
+      "verdict": "POOR",
+      "verdict_reason": "5 correction actions / 14 ingredient rows; 0 review-only quantities. Usable=true.",
+      "consistency": {
+        "ingredient_fields_equal_b2_3": true,
+        "preparation_equals_normalized_input": true,
+        "b2_0_reference_verified_by_b2_2": true
+      }
+    },
+    {
+      "id": "13",
+      "url": "https://www.mindmegette.hu/recept/klasszikus-paprikas-krumpli",
+      "domain": "www.mindmegette.hu",
+      "raw_title": "Klasszikus paprikás krumpli | Mindmegette.hu",
+      "normalized_title": "Klasszikus paprikás krumpli",
+      "parser_input": "Klasszikus paprikás krumpli\n\nHozzávalók:\n1 kg Burgonya\n1 db Vöröshagyma\n15 dkg szárazkolbász\n4 ek Étolaj\n2 gerezd Fokhagyma\n2 tk Pirospaprika\nSó\nBors\nfriss petrezselyem\n\nElkészítés:\n1. lépés: A klasszikus paprikás krumpli elkészítéséhez a krumplit megtisztítjuk, majd felkockázzuk és a hagymát is apróra vágjuk. A kolbászt felkarikázzuk.\n\n2. lépés: Felforrósítjuk az olajat, beletesszük a hagymát, üvegesre pároljuk, majd a tűzről lehúzva hozzákeverjük az őrölt pirospaprikát. Hozzáadjuk a krumplit, a kolbászkarikákat és a zúzott fokhagymát is, majd ízlés szerint sózzuk, borsozzuk. Felöntjük egy kevés vízzel, de ne lepje el teljesen.\n\n3. lépés: Közepes lángon, fedő alatt főzzük, amíg a burgonya teljesen megpuhul. Friss petrezselyemmel megszórva tálalhatjuk.",
+      "draft": {
+        "title": "Klasszikus paprikás krumpli",
+        "ingredients": [
+          {
+            "sourceOrder": 3,
+            "rawText": "1 kg Burgonya",
+            "name": "Burgonya",
+            "quantity": 1.0,
+            "canonical_unit": "kg",
+            "warnings": [],
+            "sourceIngredientIndex": 0,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "CORRECT",
+            "sourceError": false,
+            "unsupported": false,
+            "parserError": false,
+            "silentFallbackRisk": false,
+            "requiredCorrection": false,
+            "pocWarnings": [],
+            "source_evidence": {
+              "source_order": 1,
+              "visible_text": "1 kg burgonya",
+              "json_ld_text": "1 kg Burgonya",
+              "source_verdict": "FORMAT_DIFFERENCE",
+              "note": null
+            },
+            "unsupported_phrase": null
+          },
+          {
+            "sourceOrder": 4,
+            "rawText": "1 db Vöröshagyma",
+            "name": "Vöröshagyma",
+            "quantity": 1.0,
+            "canonical_unit": "db",
+            "warnings": [],
+            "sourceIngredientIndex": 1,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "CORRECT",
+            "sourceError": false,
+            "unsupported": false,
+            "parserError": false,
+            "silentFallbackRisk": false,
+            "requiredCorrection": false,
+            "pocWarnings": [],
+            "source_evidence": {
+              "source_order": 2,
+              "visible_text": "1 db vöröshagyma",
+              "json_ld_text": "1 db Vöröshagyma",
+              "source_verdict": "FORMAT_DIFFERENCE",
+              "note": null
+            },
+            "unsupported_phrase": null
+          },
+          {
+            "sourceOrder": 5,
+            "rawText": "15 dkg szárazkolbász",
+            "name": "szárazkolbász",
+            "quantity": 150.0,
+            "canonical_unit": "g",
+            "warnings": [],
+            "sourceIngredientIndex": 2,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "SUPPORTED_NORMALIZATION",
+            "sourceError": false,
+            "unsupported": false,
+            "parserError": false,
+            "silentFallbackRisk": false,
+            "requiredCorrection": false,
+            "pocWarnings": [],
+            "source_evidence": {
+              "source_order": 3,
+              "visible_text": "15 dkg szárazkolbász",
+              "json_ld_text": "15 dkg szárazkolbász",
+              "source_verdict": "MATCH",
+              "note": null
+            },
+            "unsupported_phrase": null
+          },
+          {
+            "sourceOrder": 6,
+            "rawText": "4 ek Étolaj",
+            "name": "Étolaj",
+            "quantity": 4.0,
+            "canonical_unit": "ek",
+            "warnings": [],
+            "sourceIngredientIndex": 3,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "CORRECT",
+            "sourceError": false,
+            "unsupported": false,
+            "parserError": false,
+            "silentFallbackRisk": false,
+            "requiredCorrection": false,
+            "pocWarnings": [],
+            "source_evidence": {
+              "source_order": 4,
+              "visible_text": "4 ek étolaj",
+              "json_ld_text": "4 ek Étolaj",
+              "source_verdict": "FORMAT_DIFFERENCE",
+              "note": null
+            },
+            "unsupported_phrase": null
+          },
+          {
+            "sourceOrder": 7,
+            "rawText": "2 gerezd Fokhagyma",
+            "name": "gerezd Fokhagyma",
+            "quantity": 2.0,
+            "canonical_unit": "db",
+            "warnings": [],
+            "sourceIngredientIndex": 4,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "UNSUPPORTED_UNIT",
+            "sourceError": false,
+            "unsupported": true,
+            "parserError": false,
+            "silentFallbackRisk": true,
+            "requiredCorrection": true,
+            "pocWarnings": [
+              "UNSUPPORTED_INPUT",
+              "SILENT_BAD_FALLBACK_RISK"
+            ],
+            "source_evidence": {
+              "source_order": 5,
+              "visible_text": "2 gerezd fokhagyma",
+              "json_ld_text": "2 gerezd Fokhagyma",
+              "source_verdict": "FORMAT_DIFFERENCE",
+              "note": null
+            },
+            "unsupported_phrase": "gerezd"
+          },
+          {
+            "sourceOrder": 8,
+            "rawText": "2 tk Pirospaprika",
+            "name": "Pirospaprika",
+            "quantity": 2.0,
+            "canonical_unit": "tk",
+            "warnings": [],
+            "sourceIngredientIndex": 5,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "CORRECT",
+            "sourceError": false,
+            "unsupported": false,
+            "parserError": false,
+            "silentFallbackRisk": false,
+            "requiredCorrection": false,
+            "pocWarnings": [],
+            "source_evidence": {
+              "source_order": 6,
+              "visible_text": "2 tk pirospaprika",
+              "json_ld_text": "2 tk Pirospaprika",
+              "source_verdict": "FORMAT_DIFFERENCE",
+              "note": null
+            },
+            "unsupported_phrase": null
+          },
+          {
+            "sourceOrder": 9,
+            "rawText": "Só",
+            "name": "Só",
+            "quantity": 1.0,
+            "canonical_unit": "db",
+            "warnings": [
+              "missingQuantity"
+            ],
+            "sourceIngredientIndex": 6,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "CORRECT",
+            "sourceError": false,
+            "unsupported": false,
+            "parserError": false,
+            "silentFallbackRisk": false,
+            "requiredCorrection": false,
+            "pocWarnings": [],
+            "source_evidence": {
+              "source_order": 7,
+              "visible_text": "só",
+              "json_ld_text": "Só",
+              "source_verdict": "FORMAT_DIFFERENCE",
+              "note": null
+            },
+            "unsupported_phrase": null
+          },
+          {
+            "sourceOrder": 10,
+            "rawText": "Bors",
+            "name": "Bors",
+            "quantity": 1.0,
+            "canonical_unit": "db",
+            "warnings": [
+              "missingQuantity"
+            ],
+            "sourceIngredientIndex": 7,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "CORRECT",
+            "sourceError": false,
+            "unsupported": false,
+            "parserError": false,
+            "silentFallbackRisk": false,
+            "requiredCorrection": false,
+            "pocWarnings": [],
+            "source_evidence": {
+              "source_order": 8,
+              "visible_text": "bors",
+              "json_ld_text": "Bors",
+              "source_verdict": "FORMAT_DIFFERENCE",
+              "note": null
+            },
+            "unsupported_phrase": null
+          },
+          {
+            "sourceOrder": 11,
+            "rawText": "friss petrezselyem",
+            "name": "friss petrezselyem",
+            "quantity": 1.0,
+            "canonical_unit": "db",
+            "warnings": [
+              "missingQuantity"
+            ],
+            "sourceIngredientIndex": 8,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "CORRECT",
+            "sourceError": false,
+            "unsupported": false,
+            "parserError": false,
+            "silentFallbackRisk": false,
+            "requiredCorrection": false,
+            "pocWarnings": [],
+            "source_evidence": {
+              "source_order": 9,
+              "visible_text": "friss petrezselyem",
+              "json_ld_text": "friss petrezselyem",
+              "source_verdict": "MATCH",
+              "note": null
+            },
+            "unsupported_phrase": null
+          }
+        ],
+        "preparation": "1. lépés: A klasszikus paprikás krumpli elkészítéséhez a krumplit megtisztítjuk, majd felkockázzuk és a hagymát is apróra vágjuk. A kolbászt felkarikázzuk.\n\n2. lépés: Felforrósítjuk az olajat, beletesszük a hagymát, üvegesre pároljuk, majd a tűzről lehúzva hozzákeverjük az őrölt pirospaprikát. Hozzáadjuk a krumplit, a kolbászkarikákat és a zúzott fokhagymát is, majd ízlés szerint sózzuk, borsozzuk. Felöntjük egy kevés vízzel, de ne lepje el teljesen.\n\n3. lépés: Közepes lángon, fedő alatt főzzük, amíg a burgonya teljesen megpuhul. Friss petrezselyemmel megszórva tálalhatjuk.",
+        "spices": [],
+        "unprocessedSegments": []
+      },
+      "normalized_preparation": "1. lépés: A klasszikus paprikás krumpli elkészítéséhez a krumplit megtisztítjuk, majd felkockázzuk és a hagymát is apróra vágjuk. A kolbászt felkarikázzuk.\n\n2. lépés: Felforrósítjuk az olajat, beletesszük a hagymát, üvegesre pároljuk, majd a tűzről lehúzva hozzákeverjük az őrölt pirospaprikát. Hozzáadjuk a krumplit, a kolbászkarikákat és a zúzott fokhagymát is, majd ízlés szerint sózzuk, borsozzuk. Felöntjük egy kevés vízzel, de ne lepje el teljesen.\n\n3. lépés: Közepes lángon, fedő alatt főzzük, amíg a burgonya teljesen megpuhul. Friss petrezselyemmel megszórva tálalhatjuk.",
+      "timing": {
+        "normalization_ms": 0.317,
+        "parser_ms": 0.666,
+        "draft_build_ms": 0.02,
+        "total_local_ms": 1.006
+      },
+      "required_corrections": [
+        {
+          "row": 5,
+          "classification": "REQUIRED_CORRECTION",
+          "fields": [
+            "name/quantity/unit interpretation"
+          ],
+          "reasons": [
+            "Unsupported measure/expression cannot safely be represented by current db fallback."
+          ],
+          "counting": "One row-level correction action even if multiple fields/reasons overlap."
+        }
+      ],
+      "review_only": [
+        {
+          "row": 7,
+          "field": "quantity",
+          "classification": "REVIEW_ONLY",
+          "reason": "Source gives no quantity; accepted 1 db default requires confirmation, not a proven erroneous value."
+        },
+        {
+          "row": 8,
+          "field": "quantity",
+          "classification": "REVIEW_ONLY",
+          "reason": "Source gives no quantity; accepted 1 db default requires confirmation, not a proven erroneous value."
+        },
+        {
+          "row": 9,
+          "field": "quantity",
+          "classification": "REVIEW_ONLY",
+          "reason": "Source gives no quantity; accepted 1 db default requires confirmation, not a proven erroneous value."
+        }
+      ],
+      "silent_fallback_rows": 1,
+      "verdict": "REVIEW",
+      "verdict_reason": "1 correction actions / 9 ingredient rows; 3 review-only quantities. Usable=true.",
+      "consistency": {
+        "ingredient_fields_equal_b2_3": true,
+        "preparation_equals_normalized_input": true,
+        "b2_0_reference_verified_by_b2_2": true
+      }
+    },
+    {
+      "id": "14",
+      "url": "https://www.mindmegette.hu/recept/hagyomanyos-szatmari-toltott-kaposzta",
+      "domain": "www.mindmegette.hu",
+      "raw_title": "Hagyományos szatmári töltött káposzta | Mindmegette.hu",
+      "normalized_title": "Hagyományos szatmári töltött káposzta",
+      "parser_input": "Hagyományos szatmári töltött káposzta\n\nHozzávalók:\n1 kis fej Hagyma\n5 dkg Sertészsír\n50 dkg darált sertéshús\n25 dkg Rizs\nSó\nBors\n1 ek Pirospaprika\n1 fej édes káposzta\n3 dl paradicsomlé\n2 dl Tejföl\n\nElkészítés:\n1. lépés: A hagymát apróra vágjuk, és 2 dkg felforrósított zsíron üvegesre pároljuk, majd félretesszük hűlni. Ezután a hagymát, a darált húst és a rizst összekeverjük, és sóval, borssal, pirospaprikával ízesítjük.\n\n2. lépés: A káposztát forró vízben megpuhítjuk. A leválasztott levelekre a vastag erek laposra vágása után tölteléket teszünk. Ezután mindet feltekerjük, és a két végüket benyomjuk.\n\n3. lépés: A levelekről levágott részeket és a belső, túl apró leveleket laskára metéljük. Egy nagyobb lábost kikenünk 3 dkg zsírral. Az aljára tesszük a vágott káposzta felét, sorban rárakjuk a töltelékeket, majd rászórjuk a megmaradt aprítékot. Annyi vizet öntünk rá, amennyi ellepi, és feltesszük főni. Közben az elfőtt folyadékot időnként vízzel pótoljuk.\n\n4. lépés: Amikor kb. 40 perc alatt félpuhára főtt, felöntjük paradicsomlével. Ezután jól befedjük, és lassú tűzön készre főzzük. Tejföllel meglocsolva tálaljuk.",
+      "draft": {
+        "title": "Hagyományos szatmári töltött káposzta",
+        "ingredients": [
+          {
+            "sourceOrder": 3,
+            "rawText": "1 kis fej Hagyma",
+            "name": "kis fej Hagyma",
+            "quantity": 1.0,
+            "canonical_unit": "db",
+            "warnings": [],
+            "sourceIngredientIndex": 0,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "UNSUPPORTED_UNIT",
+            "sourceError": false,
+            "unsupported": true,
+            "parserError": false,
+            "silentFallbackRisk": true,
+            "requiredCorrection": true,
+            "pocWarnings": [
+              "UNSUPPORTED_INPUT",
+              "SILENT_BAD_FALLBACK_RISK"
+            ],
+            "source_evidence": {
+              "source_order": 1,
+              "visible_text": "1 kis fej hagyma",
+              "json_ld_text": "1 kis fej Hagyma",
+              "source_verdict": "FORMAT_DIFFERENCE",
+              "note": null
+            },
+            "unsupported_phrase": "kis fej"
+          },
+          {
+            "sourceOrder": 4,
+            "rawText": "5 dkg Sertészsír",
+            "name": "Sertészsír",
+            "quantity": 50.0,
+            "canonical_unit": "g",
+            "warnings": [],
+            "sourceIngredientIndex": 1,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "SUPPORTED_NORMALIZATION",
+            "sourceError": false,
+            "unsupported": false,
+            "parserError": false,
+            "silentFallbackRisk": false,
+            "requiredCorrection": false,
+            "pocWarnings": [],
+            "source_evidence": {
+              "source_order": 2,
+              "visible_text": "5 dkg sertészsír",
+              "json_ld_text": "5 dkg Sertészsír",
+              "source_verdict": "FORMAT_DIFFERENCE",
+              "note": null
+            },
+            "unsupported_phrase": null
+          },
+          {
+            "sourceOrder": 5,
+            "rawText": "50 dkg darált sertéshús",
+            "name": "darált sertéshús",
+            "quantity": 500.0,
+            "canonical_unit": "g",
+            "warnings": [],
+            "sourceIngredientIndex": 2,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "SUPPORTED_NORMALIZATION",
+            "sourceError": false,
+            "unsupported": false,
+            "parserError": false,
+            "silentFallbackRisk": false,
+            "requiredCorrection": false,
+            "pocWarnings": [],
+            "source_evidence": {
+              "source_order": 3,
+              "visible_text": "50 dkg darált sertéshús",
+              "json_ld_text": "50 dkg darált sertéshús",
+              "source_verdict": "MATCH",
+              "note": null
+            },
+            "unsupported_phrase": null
+          },
+          {
+            "sourceOrder": 6,
+            "rawText": "25 dkg Rizs",
+            "name": "Rizs",
+            "quantity": 250.0,
+            "canonical_unit": "g",
+            "warnings": [],
+            "sourceIngredientIndex": 3,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "SUPPORTED_NORMALIZATION",
+            "sourceError": false,
+            "unsupported": false,
+            "parserError": false,
+            "silentFallbackRisk": false,
+            "requiredCorrection": false,
+            "pocWarnings": [],
+            "source_evidence": {
+              "source_order": 4,
+              "visible_text": "25 dkg rizs",
+              "json_ld_text": "25 dkg Rizs",
+              "source_verdict": "FORMAT_DIFFERENCE",
+              "note": null
+            },
+            "unsupported_phrase": null
+          },
+          {
+            "sourceOrder": 7,
+            "rawText": "Só",
+            "name": "Só",
+            "quantity": 1.0,
+            "canonical_unit": "db",
+            "warnings": [
+              "missingQuantity"
+            ],
+            "sourceIngredientIndex": 4,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "CORRECT",
+            "sourceError": false,
+            "unsupported": false,
+            "parserError": false,
+            "silentFallbackRisk": false,
+            "requiredCorrection": false,
+            "pocWarnings": [],
+            "source_evidence": {
+              "source_order": 5,
+              "visible_text": "só",
+              "json_ld_text": "Só",
+              "source_verdict": "FORMAT_DIFFERENCE",
+              "note": null
+            },
+            "unsupported_phrase": null
+          },
+          {
+            "sourceOrder": 8,
+            "rawText": "Bors",
+            "name": "Bors",
+            "quantity": 1.0,
+            "canonical_unit": "db",
+            "warnings": [
+              "missingQuantity"
+            ],
+            "sourceIngredientIndex": 5,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "CORRECT",
+            "sourceError": false,
+            "unsupported": false,
+            "parserError": false,
+            "silentFallbackRisk": false,
+            "requiredCorrection": false,
+            "pocWarnings": [],
+            "source_evidence": {
+              "source_order": 6,
+              "visible_text": "bors",
+              "json_ld_text": "Bors",
+              "source_verdict": "FORMAT_DIFFERENCE",
+              "note": null
+            },
+            "unsupported_phrase": null
+          },
+          {
+            "sourceOrder": 9,
+            "rawText": "1 ek Pirospaprika",
+            "name": "Pirospaprika",
+            "quantity": 1.0,
+            "canonical_unit": "ek",
+            "warnings": [],
+            "sourceIngredientIndex": 6,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "CORRECT",
+            "sourceError": false,
+            "unsupported": false,
+            "parserError": false,
+            "silentFallbackRisk": false,
+            "requiredCorrection": false,
+            "pocWarnings": [],
+            "source_evidence": {
+              "source_order": 7,
+              "visible_text": "1 ek pirospaprika",
+              "json_ld_text": "1 ek Pirospaprika",
+              "source_verdict": "FORMAT_DIFFERENCE",
+              "note": null
+            },
+            "unsupported_phrase": null
+          },
+          {
+            "sourceOrder": 10,
+            "rawText": "1 fej édes káposzta",
+            "name": "fej édes káposzta",
+            "quantity": 1.0,
+            "canonical_unit": "db",
+            "warnings": [],
+            "sourceIngredientIndex": 7,
+            "source_status": "SOURCE_ERROR",
+            "parser_status": "UNSUPPORTED_UNIT",
+            "sourceError": true,
+            "unsupported": true,
+            "parserError": false,
+            "silentFallbackRisk": false,
+            "requiredCorrection": true,
+            "pocWarnings": [
+              "SOURCE_WARNING",
+              "UNSUPPORTED_INPUT"
+            ],
+            "source_evidence": {
+              "source_order": 8,
+              "visible_text": "1 fej édes káposzta (1,5 kg)",
+              "json_ld_text": "1 fej édes káposzta",
+              "source_verdict": "MISSING_NOTE",
+              "note": "The missing note includes supplementary weight (1,5 kg); main quantity 1 fej remains."
+            },
+            "unsupported_phrase": "fej"
+          },
+          {
+            "sourceOrder": 11,
+            "rawText": "3 dl paradicsomlé",
+            "name": "paradicsomlé",
+            "quantity": 300.0,
+            "canonical_unit": "ml",
+            "warnings": [],
+            "sourceIngredientIndex": 8,
+            "source_status": "SOURCE_ERROR",
+            "parser_status": "SUPPORTED_NORMALIZATION",
+            "sourceError": true,
+            "unsupported": false,
+            "parserError": false,
+            "silentFallbackRisk": false,
+            "requiredCorrection": true,
+            "pocWarnings": [
+              "SOURCE_WARNING"
+            ],
+            "source_evidence": {
+              "source_order": 9,
+              "visible_text": "3 dl paradicsomlé (házi)",
+              "json_ld_text": "3 dl paradicsomlé",
+              "source_verdict": "MISSING_NOTE",
+              "note": null
+            },
+            "unsupported_phrase": null
+          },
+          {
+            "sourceOrder": 12,
+            "rawText": "2 dl Tejföl",
+            "name": "Tejföl",
+            "quantity": 200.0,
+            "canonical_unit": "ml",
+            "warnings": [],
+            "sourceIngredientIndex": 9,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "SUPPORTED_NORMALIZATION",
+            "sourceError": false,
+            "unsupported": false,
+            "parserError": false,
+            "silentFallbackRisk": false,
+            "requiredCorrection": false,
+            "pocWarnings": [],
+            "source_evidence": {
+              "source_order": 10,
+              "visible_text": "2 dl tejföl",
+              "json_ld_text": "2 dl Tejföl",
+              "source_verdict": "FORMAT_DIFFERENCE",
+              "note": null
+            },
+            "unsupported_phrase": null
+          }
+        ],
+        "preparation": "1. lépés: A hagymát apróra vágjuk, és 2 dkg felforrósított zsíron üvegesre pároljuk, majd félretesszük hűlni. Ezután a hagymát, a darált húst és a rizst összekeverjük, és sóval, borssal, pirospaprikával ízesítjük.\n\n2. lépés: A káposztát forró vízben megpuhítjuk. A leválasztott levelekre a vastag erek laposra vágása után tölteléket teszünk. Ezután mindet feltekerjük, és a két végüket benyomjuk.\n\n3. lépés: A levelekről levágott részeket és a belső, túl apró leveleket laskára metéljük. Egy nagyobb lábost kikenünk 3 dkg zsírral. Az aljára tesszük a vágott káposzta felét, sorban rárakjuk a töltelékeket, majd rászórjuk a megmaradt aprítékot. Annyi vizet öntünk rá, amennyi ellepi, és feltesszük főni. Közben az elfőtt folyadékot időnként vízzel pótoljuk.\n\n4. lépés: Amikor kb. 40 perc alatt félpuhára főtt, felöntjük paradicsomlével. Ezután jól befedjük, és lassú tűzön készre főzzük. Tejföllel meglocsolva tálaljuk.",
+        "spices": [],
+        "unprocessedSegments": []
+      },
+      "normalized_preparation": "1. lépés: A hagymát apróra vágjuk, és 2 dkg felforrósított zsíron üvegesre pároljuk, majd félretesszük hűlni. Ezután a hagymát, a darált húst és a rizst összekeverjük, és sóval, borssal, pirospaprikával ízesítjük.\n\n2. lépés: A káposztát forró vízben megpuhítjuk. A leválasztott levelekre a vastag erek laposra vágása után tölteléket teszünk. Ezután mindet feltekerjük, és a két végüket benyomjuk.\n\n3. lépés: A levelekről levágott részeket és a belső, túl apró leveleket laskára metéljük. Egy nagyobb lábost kikenünk 3 dkg zsírral. Az aljára tesszük a vágott káposzta felét, sorban rárakjuk a töltelékeket, majd rászórjuk a megmaradt aprítékot. Annyi vizet öntünk rá, amennyi ellepi, és feltesszük főni. Közben az elfőtt folyadékot időnként vízzel pótoljuk.\n\n4. lépés: Amikor kb. 40 perc alatt félpuhára főtt, felöntjük paradicsomlével. Ezután jól befedjük, és lassú tűzön készre főzzük. Tejföllel meglocsolva tálaljuk.",
+      "timing": {
+        "normalization_ms": 0.561,
+        "parser_ms": 0.44,
+        "draft_build_ms": 0.021,
+        "total_local_ms": 1.025
+      },
+      "required_corrections": [
+        {
+          "row": 1,
+          "classification": "REQUIRED_CORRECTION",
+          "fields": [
+            "name/quantity/unit interpretation"
+          ],
+          "reasons": [
+            "Unsupported measure/expression cannot safely be represented by current db fallback."
+          ],
+          "counting": "One row-level correction action even if multiple fields/reasons overlap."
+        },
+        {
+          "row": 8,
+          "classification": "REQUIRED_CORRECTION",
+          "fields": [
+            "name/source note",
+            "name/quantity/unit interpretation"
+          ],
+          "reasons": [
+            "Visible source note lost in JSON-LD; not repaired.",
+            "Unsupported measure/expression cannot safely be represented by current db fallback."
+          ],
+          "counting": "One row-level correction action even if multiple fields/reasons overlap."
+        },
+        {
+          "row": 9,
+          "classification": "REQUIRED_CORRECTION",
+          "fields": [
+            "name/source note"
+          ],
+          "reasons": [
+            "Visible source note lost in JSON-LD; not repaired."
+          ],
+          "counting": "One row-level correction action even if multiple fields/reasons overlap."
+        }
+      ],
+      "review_only": [
+        {
+          "row": 5,
+          "field": "quantity",
+          "classification": "REVIEW_ONLY",
+          "reason": "Source gives no quantity; accepted 1 db default requires confirmation, not a proven erroneous value."
+        },
+        {
+          "row": 6,
+          "field": "quantity",
+          "classification": "REVIEW_ONLY",
+          "reason": "Source gives no quantity; accepted 1 db default requires confirmation, not a proven erroneous value."
+        }
+      ],
+      "silent_fallback_rows": 1,
+      "verdict": "REVIEW",
+      "verdict_reason": "3 correction actions / 10 ingredient rows; 2 review-only quantities. Usable=true.",
+      "consistency": {
+        "ingredient_fields_equal_b2_3": true,
+        "preparation_equals_normalized_input": true,
+        "b2_0_reference_verified_by_b2_2": true
+      }
+    },
+    {
+      "id": "15",
+      "url": "https://www.mindmegette.hu/recept/rakott-krumpli-magyarosan",
+      "domain": "www.mindmegette.hu",
+      "raw_title": "Rakott krumpli magyarosan  | Mindmegette.hu",
+      "normalized_title": "Rakott krumpli magyarosan ",
+      "parser_input": "Rakott krumpli magyarosan \n\nHozzávalók:\n50 dkg Krumpli\n1 fej Vöröshagyma\n6 db Tojás\nKolbász\nTejföl\nSzalonna\nSó\nBors\n\nElkészítés:\nElkészítés: A krumplit héjában, sós vízben megfőzzük, a tojásokat keményre főzzük szintén sós vízben. Eközben a hagymát kockákra, a kolbászt karikákra vágjuk, a szalonnát felszeleteljük. A megfőtt tojást megpucoljuk és karikákra vágjuk, a megfőtt krumplit meghámozzuk, szintén karikákra vágjuk. Egy tűzálló tálat kivajazunk, egy sor krumplit rakunk az aljára, sózzuk, borsozzuk, hagymát szórunk rá, kolbász- és tojáskarikákat ráhelyezünk, és tejföllel meglocsoljuk, majd újra egy sor krumpli következik. Így folytatjuk a rétegezést, amíg a hozzávalók tartanak, a tetejére krumpli kerül, illetve erre helyezzük a szalonnacsíkokat, melyeket bevagdalhatunk. 30 percig sütjük sütőben.",
+      "draft": {
+        "title": "Rakott krumpli magyarosan",
+        "ingredients": [
+          {
+            "sourceOrder": 3,
+            "rawText": "50 dkg Krumpli",
+            "name": "Krumpli",
+            "quantity": 500.0,
+            "canonical_unit": "g",
+            "warnings": [],
+            "sourceIngredientIndex": 0,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "SUPPORTED_NORMALIZATION",
+            "sourceError": false,
+            "unsupported": false,
+            "parserError": false,
+            "silentFallbackRisk": false,
+            "requiredCorrection": false,
+            "pocWarnings": [],
+            "source_evidence": {
+              "source_order": 1,
+              "visible_text": "50 dkg krumpli",
+              "json_ld_text": "50 dkg Krumpli",
+              "source_verdict": "FORMAT_DIFFERENCE",
+              "note": null
+            },
+            "unsupported_phrase": null
+          },
+          {
+            "sourceOrder": 4,
+            "rawText": "1 fej Vöröshagyma",
+            "name": "fej Vöröshagyma",
+            "quantity": 1.0,
+            "canonical_unit": "db",
+            "warnings": [],
+            "sourceIngredientIndex": 1,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "UNSUPPORTED_UNIT",
+            "sourceError": false,
+            "unsupported": true,
+            "parserError": false,
+            "silentFallbackRisk": true,
+            "requiredCorrection": true,
+            "pocWarnings": [
+              "UNSUPPORTED_INPUT",
+              "SILENT_BAD_FALLBACK_RISK"
+            ],
+            "source_evidence": {
+              "source_order": 2,
+              "visible_text": "1 fej vöröshagyma",
+              "json_ld_text": "1 fej Vöröshagyma",
+              "source_verdict": "FORMAT_DIFFERENCE",
+              "note": null
+            },
+            "unsupported_phrase": "fej"
+          },
+          {
+            "sourceOrder": 5,
+            "rawText": "6 db Tojás",
+            "name": "Tojás",
+            "quantity": 6.0,
+            "canonical_unit": "db",
+            "warnings": [],
+            "sourceIngredientIndex": 2,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "CORRECT",
+            "sourceError": false,
+            "unsupported": false,
+            "parserError": false,
+            "silentFallbackRisk": false,
+            "requiredCorrection": false,
+            "pocWarnings": [],
+            "source_evidence": {
+              "source_order": 3,
+              "visible_text": "6 db tojás",
+              "json_ld_text": "6 db Tojás",
+              "source_verdict": "FORMAT_DIFFERENCE",
+              "note": null
+            },
+            "unsupported_phrase": null
+          },
+          {
+            "sourceOrder": 6,
+            "rawText": "Kolbász",
+            "name": "Kolbász",
+            "quantity": 1.0,
+            "canonical_unit": "db",
+            "warnings": [
+              "missingQuantity"
+            ],
+            "sourceIngredientIndex": 3,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "CORRECT",
+            "sourceError": false,
+            "unsupported": false,
+            "parserError": false,
+            "silentFallbackRisk": false,
+            "requiredCorrection": false,
+            "pocWarnings": [],
+            "source_evidence": {
+              "source_order": 4,
+              "visible_text": "kolbász",
+              "json_ld_text": "Kolbász",
+              "source_verdict": "FORMAT_DIFFERENCE",
+              "note": null
+            },
+            "unsupported_phrase": null
+          },
+          {
+            "sourceOrder": 7,
+            "rawText": "Tejföl",
+            "name": "Tejföl",
+            "quantity": 1.0,
+            "canonical_unit": "db",
+            "warnings": [
+              "missingQuantity"
+            ],
+            "sourceIngredientIndex": 4,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "CORRECT",
+            "sourceError": false,
+            "unsupported": false,
+            "parserError": false,
+            "silentFallbackRisk": false,
+            "requiredCorrection": false,
+            "pocWarnings": [],
+            "source_evidence": {
+              "source_order": 5,
+              "visible_text": "tejföl",
+              "json_ld_text": "Tejföl",
+              "source_verdict": "FORMAT_DIFFERENCE",
+              "note": null
+            },
+            "unsupported_phrase": null
+          },
+          {
+            "sourceOrder": 8,
+            "rawText": "Szalonna",
+            "name": "Szalonna",
+            "quantity": 1.0,
+            "canonical_unit": "db",
+            "warnings": [
+              "missingQuantity"
+            ],
+            "sourceIngredientIndex": 5,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "CORRECT",
+            "sourceError": false,
+            "unsupported": false,
+            "parserError": false,
+            "silentFallbackRisk": false,
+            "requiredCorrection": false,
+            "pocWarnings": [],
+            "source_evidence": {
+              "source_order": 6,
+              "visible_text": "szalonna",
+              "json_ld_text": "Szalonna",
+              "source_verdict": "FORMAT_DIFFERENCE",
+              "note": null
+            },
+            "unsupported_phrase": null
+          },
+          {
+            "sourceOrder": 9,
+            "rawText": "Só",
+            "name": "Só",
+            "quantity": 1.0,
+            "canonical_unit": "db",
+            "warnings": [
+              "missingQuantity"
+            ],
+            "sourceIngredientIndex": 6,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "CORRECT",
+            "sourceError": false,
+            "unsupported": false,
+            "parserError": false,
+            "silentFallbackRisk": false,
+            "requiredCorrection": false,
+            "pocWarnings": [],
+            "source_evidence": {
+              "source_order": 7,
+              "visible_text": "só",
+              "json_ld_text": "Só",
+              "source_verdict": "FORMAT_DIFFERENCE",
+              "note": null
+            },
+            "unsupported_phrase": null
+          },
+          {
+            "sourceOrder": 10,
+            "rawText": "Bors",
+            "name": "Bors",
+            "quantity": 1.0,
+            "canonical_unit": "db",
+            "warnings": [
+              "missingQuantity"
+            ],
+            "sourceIngredientIndex": 7,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "CORRECT",
+            "sourceError": false,
+            "unsupported": false,
+            "parserError": false,
+            "silentFallbackRisk": false,
+            "requiredCorrection": false,
+            "pocWarnings": [],
+            "source_evidence": {
+              "source_order": 8,
+              "visible_text": "bors",
+              "json_ld_text": "Bors",
+              "source_verdict": "FORMAT_DIFFERENCE",
+              "note": null
+            },
+            "unsupported_phrase": null
+          }
+        ],
+        "preparation": "Elkészítés: A krumplit héjában, sós vízben megfőzzük, a tojásokat keményre főzzük szintén sós vízben. Eközben a hagymát kockákra, a kolbászt karikákra vágjuk, a szalonnát felszeleteljük. A megfőtt tojást megpucoljuk és karikákra vágjuk, a megfőtt krumplit meghámozzuk, szintén karikákra vágjuk. Egy tűzálló tálat kivajazunk, egy sor krumplit rakunk az aljára, sózzuk, borsozzuk, hagymát szórunk rá, kolbász- és tojáskarikákat ráhelyezünk, és tejföllel meglocsoljuk, majd újra egy sor krumpli következik. Így folytatjuk a rétegezést, amíg a hozzávalók tartanak, a tetejére krumpli kerül, illetve erre helyezzük a szalonnacsíkokat, melyeket bevagdalhatunk. 30 percig sütjük sütőben.",
+        "spices": [],
+        "unprocessedSegments": []
+      },
+      "normalized_preparation": "Elkészítés: A krumplit héjában, sós vízben megfőzzük, a tojásokat keményre főzzük szintén sós vízben. Eközben a hagymát kockákra, a kolbászt karikákra vágjuk, a szalonnát felszeleteljük. A megfőtt tojást megpucoljuk és karikákra vágjuk, a megfőtt krumplit meghámozzuk, szintén karikákra vágjuk. Egy tűzálló tálat kivajazunk, egy sor krumplit rakunk az aljára, sózzuk, borsozzuk, hagymát szórunk rá, kolbász- és tojáskarikákat ráhelyezünk, és tejföllel meglocsoljuk, majd újra egy sor krumpli következik. Így folytatjuk a rétegezést, amíg a hozzávalók tartanak, a tetejére krumpli kerül, illetve erre helyezzük a szalonnacsíkokat, melyeket bevagdalhatunk. 30 percig sütjük sütőben.",
+      "timing": {
+        "normalization_ms": 0.168,
+        "parser_ms": 0.239,
+        "draft_build_ms": 0.017,
+        "total_local_ms": 0.427
+      },
+      "required_corrections": [
+        {
+          "row": 2,
+          "classification": "REQUIRED_CORRECTION",
+          "fields": [
+            "name/quantity/unit interpretation"
+          ],
+          "reasons": [
+            "Unsupported measure/expression cannot safely be represented by current db fallback."
+          ],
+          "counting": "One row-level correction action even if multiple fields/reasons overlap."
+        }
+      ],
+      "review_only": [
+        {
+          "row": 4,
+          "field": "quantity",
+          "classification": "REVIEW_ONLY",
+          "reason": "Source gives no quantity; accepted 1 db default requires confirmation, not a proven erroneous value."
+        },
+        {
+          "row": 5,
+          "field": "quantity",
+          "classification": "REVIEW_ONLY",
+          "reason": "Source gives no quantity; accepted 1 db default requires confirmation, not a proven erroneous value."
+        },
+        {
+          "row": 6,
+          "field": "quantity",
+          "classification": "REVIEW_ONLY",
+          "reason": "Source gives no quantity; accepted 1 db default requires confirmation, not a proven erroneous value."
+        },
+        {
+          "row": 7,
+          "field": "quantity",
+          "classification": "REVIEW_ONLY",
+          "reason": "Source gives no quantity; accepted 1 db default requires confirmation, not a proven erroneous value."
+        },
+        {
+          "row": 8,
+          "field": "quantity",
+          "classification": "REVIEW_ONLY",
+          "reason": "Source gives no quantity; accepted 1 db default requires confirmation, not a proven erroneous value."
+        }
+      ],
+      "silent_fallback_rows": 1,
+      "verdict": "REVIEW",
+      "verdict_reason": "1 correction actions / 8 ingredient rows; 5 review-only quantities. Usable=true.",
+      "consistency": {
+        "ingredient_fields_equal_b2_3": true,
+        "preparation_equals_normalized_input": true,
+        "b2_0_reference_verified_by_b2_2": true
+      }
+    },
+    {
+      "id": "16",
+      "url": "https://www.bbcgoodfood.com/recipes/ultimate-spaghetti-carbonara-recipe",
+      "domain": "www.bbcgoodfood.com",
+      "raw_title": "Ultimate spaghetti carbonara recipe",
+      "normalized_title": "Ultimate spaghetti carbonara recipe",
+      "parser_input": "Ultimate spaghetti carbonara recipe\n\nHozzávalók:\n100g pancetta\n50g pecorino cheese\n50g parmesan\n3 large eggs\n350g spaghetti\n2 plump garlic cloves peeled and left whole\n50g unsalted butter\nsea salt and freshly ground black pepper\n\nElkészítés:\nPut a large saucepan of water on to boil.\n\nFinely chop the 100g pancetta, having first removed any rind. Finely grate 50g pecorino cheese and 50g parmesan and mix them together.\n\nBeat the 3 large eggs in a medium bowl and season with a little freshly grated black pepper. Set everything aside.\n\nAdd 1 tsp salt to the boiling water, add 350g spaghetti and when the water comes back to the boil, cook at a constant simmer, covered, for 10 minutes or until al dente (just cooked).\n\nSquash 2 peeled plump garlic cloves with the blade of a knife, just to bruise it.\n\nWhile the spaghetti is cooking, fry the pancetta with the garlic. Drop 50g unsalted butter into a large frying pan or wok and, as soon as the butter has melted, tip in the pancetta and garlic.\n\nLeave to cook on a medium heat for about 5 minutes, stirring often, until the pancetta is golden and crisp. The garlic has now imparted its flavour, so take it out with a slotted spoon and discard.\n\nKeep the heat under the pancetta on low. When the pasta is ready, lift it from the water with a pasta fork or tongs and put it in the frying pan with the pancetta. Don’t worry if a little water drops in the pan as well (you want this to happen) and don’t throw the pasta water away yet.\n\nMix most of the cheese in with the eggs, keeping a small handful back for sprinkling over later.\n\nTake the pan of spaghetti and pancetta off the heat. Now quickly pour in the eggs and cheese. Using the tongs or a long fork, lift up the spaghetti so it mixes easily with the egg mixture, which thickens but doesn’t scramble, and everything is coated.\n\nAdd extra pasta cooking water to keep it saucy (several tablespoons should do it). You don’t want it wet, just moist. Season with a little salt, if needed.\n\nUse a long-pronged fork to twist the pasta on to the serving plate or bowl. Serve immediately with a little sprinkling of the remaining cheese and a grating of black pepper. If the dish does get a little dry before serving, splash in some more hot pasta water and the glossy sauciness will be revived.",
+      "draft": {
+        "title": "Ultimate spaghetti carbonara recipe",
+        "ingredients": [
+          {
+            "sourceOrder": 3,
+            "rawText": "100g pancetta",
+            "name": "pancetta",
+            "quantity": 100.0,
+            "canonical_unit": "g",
+            "warnings": [],
+            "sourceIngredientIndex": 0,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "CORRECT",
+            "sourceError": false,
+            "unsupported": false,
+            "parserError": false,
+            "silentFallbackRisk": false,
+            "requiredCorrection": false,
+            "pocWarnings": [],
+            "source_evidence": {
+              "source_order": 1,
+              "visible_text": "100g pancetta",
+              "json_ld_text": "100g pancetta",
+              "source_verdict": "MATCH",
+              "note": null
+            },
+            "unsupported_phrase": null
+          },
+          {
+            "sourceOrder": 4,
+            "rawText": "50g pecorino cheese",
+            "name": "pecorino cheese",
+            "quantity": 50.0,
+            "canonical_unit": "g",
+            "warnings": [],
+            "sourceIngredientIndex": 1,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "CORRECT",
+            "sourceError": false,
+            "unsupported": false,
+            "parserError": false,
+            "silentFallbackRisk": false,
+            "requiredCorrection": false,
+            "pocWarnings": [],
+            "source_evidence": {
+              "source_order": 2,
+              "visible_text": "50g pecorino cheese",
+              "json_ld_text": "50g pecorino cheese",
+              "source_verdict": "MATCH",
+              "note": null
+            },
+            "unsupported_phrase": null
+          },
+          {
+            "sourceOrder": 5,
+            "rawText": "50g parmesan",
+            "name": "parmesan",
+            "quantity": 50.0,
+            "canonical_unit": "g",
+            "warnings": [],
+            "sourceIngredientIndex": 2,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "CORRECT",
+            "sourceError": false,
+            "unsupported": false,
+            "parserError": false,
+            "silentFallbackRisk": false,
+            "requiredCorrection": false,
+            "pocWarnings": [],
+            "source_evidence": {
+              "source_order": 3,
+              "visible_text": "50g parmesan",
+              "json_ld_text": "50g parmesan",
+              "source_verdict": "MATCH",
+              "note": null
+            },
+            "unsupported_phrase": null
+          },
+          {
+            "sourceOrder": 6,
+            "rawText": "3 large eggs",
+            "name": "large eggs",
+            "quantity": 3.0,
+            "canonical_unit": "db",
+            "warnings": [],
+            "sourceIngredientIndex": 3,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "CORRECT",
+            "sourceError": false,
+            "unsupported": false,
+            "parserError": false,
+            "silentFallbackRisk": false,
+            "requiredCorrection": false,
+            "pocWarnings": [],
+            "source_evidence": {
+              "source_order": 4,
+              "visible_text": "3 large eggs",
+              "json_ld_text": "3 large eggs",
+              "source_verdict": "MATCH",
+              "note": null
+            },
+            "unsupported_phrase": null
+          },
+          {
+            "sourceOrder": 7,
+            "rawText": "350g spaghetti",
+            "name": "spaghetti",
+            "quantity": 350.0,
+            "canonical_unit": "g",
+            "warnings": [],
+            "sourceIngredientIndex": 4,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "CORRECT",
+            "sourceError": false,
+            "unsupported": false,
+            "parserError": false,
+            "silentFallbackRisk": false,
+            "requiredCorrection": false,
+            "pocWarnings": [],
+            "source_evidence": {
+              "source_order": 5,
+              "visible_text": "350g spaghetti",
+              "json_ld_text": "350g spaghetti",
+              "source_verdict": "MATCH",
+              "note": null
+            },
+            "unsupported_phrase": null
+          },
+          {
+            "sourceOrder": 8,
+            "rawText": "2 plump garlic cloves peeled and left whole",
+            "name": "plump garlic cloves peeled and left whole",
+            "quantity": 2.0,
+            "canonical_unit": "db",
+            "warnings": [],
+            "sourceIngredientIndex": 5,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "UNSUPPORTED_UNIT",
+            "sourceError": false,
+            "unsupported": true,
+            "parserError": false,
+            "silentFallbackRisk": true,
+            "requiredCorrection": true,
+            "pocWarnings": [
+              "UNSUPPORTED_INPUT",
+              "SILENT_BAD_FALLBACK_RISK"
+            ],
+            "source_evidence": {
+              "source_order": 6,
+              "visible_text": "2 plump garlic cloves peeled and left whole",
+              "json_ld_text": "2 plump garlic cloves peeled and left whole",
+              "source_verdict": "MATCH",
+              "note": null
+            },
+            "unsupported_phrase": "cloves"
+          },
+          {
+            "sourceOrder": 9,
+            "rawText": "50g unsalted butter",
+            "name": "unsalted butter",
+            "quantity": 50.0,
+            "canonical_unit": "g",
+            "warnings": [],
+            "sourceIngredientIndex": 6,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "CORRECT",
+            "sourceError": false,
+            "unsupported": false,
+            "parserError": false,
+            "silentFallbackRisk": false,
+            "requiredCorrection": false,
+            "pocWarnings": [],
+            "source_evidence": {
+              "source_order": 7,
+              "visible_text": "50g unsalted butter",
+              "json_ld_text": "50g unsalted butter",
+              "source_verdict": "MATCH",
+              "note": null
+            },
+            "unsupported_phrase": null
+          },
+          {
+            "sourceOrder": 10,
+            "rawText": "sea salt and freshly ground black pepper",
+            "name": "sea salt and freshly ground black pepper",
+            "quantity": 1.0,
+            "canonical_unit": "db",
+            "warnings": [
+              "missingQuantity"
+            ],
+            "sourceIngredientIndex": 7,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "CORRECT",
+            "sourceError": false,
+            "unsupported": false,
+            "parserError": false,
+            "silentFallbackRisk": false,
+            "requiredCorrection": false,
+            "pocWarnings": [],
+            "source_evidence": {
+              "source_order": 8,
+              "visible_text": "sea salt and freshly ground black pepper",
+              "json_ld_text": "sea salt and freshly ground black pepper",
+              "source_verdict": "MATCH",
+              "note": null
+            },
+            "unsupported_phrase": null
+          }
+        ],
+        "preparation": "Put a large saucepan of water on to boil.\n\nFinely chop the 100g pancetta, having first removed any rind. Finely grate 50g pecorino cheese and 50g parmesan and mix them together.\n\nBeat the 3 large eggs in a medium bowl and season with a little freshly grated black pepper. Set everything aside.\n\nAdd 1 tsp salt to the boiling water, add 350g spaghetti and when the water comes back to the boil, cook at a constant simmer, covered, for 10 minutes or until al dente (just cooked).\n\nSquash 2 peeled plump garlic cloves with the blade of a knife, just to bruise it.\n\nWhile the spaghetti is cooking, fry the pancetta with the garlic. Drop 50g unsalted butter into a large frying pan or wok and, as soon as the butter has melted, tip in the pancetta and garlic.\n\nLeave to cook on a medium heat for about 5 minutes, stirring often, until the pancetta is golden and crisp. The garlic has now imparted its flavour, so take it out with a slotted spoon and discard.\n\nKeep the heat under the pancetta on low. When the pasta is ready, lift it from the water with a pasta fork or tongs and put it in the frying pan with the pancetta. Don’t worry if a little water drops in the pan as well (you want this to happen) and don’t throw the pasta water away yet.\n\nMix most of the cheese in with the eggs, keeping a small handful back for sprinkling over later.\n\nTake the pan of spaghetti and pancetta off the heat. Now quickly pour in the eggs and cheese. Using the tongs or a long fork, lift up the spaghetti so it mixes easily with the egg mixture, which thickens but doesn’t scramble, and everything is coated.\n\nAdd extra pasta cooking water to keep it saucy (several tablespoons should do it). You don’t want it wet, just moist. Season with a little salt, if needed.\n\nUse a long-pronged fork to twist the pasta on to the serving plate or bowl. Serve immediately with a little sprinkling of the remaining cheese and a grating of black pepper. If the dish does get a little dry before serving, splash in some more hot pasta water and the glossy sauciness will be revived.",
+        "spices": [],
+        "unprocessedSegments": []
+      },
+      "normalized_preparation": "Put a large saucepan of water on to boil.\n\nFinely chop the 100g pancetta, having first removed any rind. Finely grate 50g pecorino cheese and 50g parmesan and mix them together.\n\nBeat the 3 large eggs in a medium bowl and season with a little freshly grated black pepper. Set everything aside.\n\nAdd 1 tsp salt to the boiling water, add 350g spaghetti and when the water comes back to the boil, cook at a constant simmer, covered, for 10 minutes or until al dente (just cooked).\n\nSquash 2 peeled plump garlic cloves with the blade of a knife, just to bruise it.\n\nWhile the spaghetti is cooking, fry the pancetta with the garlic. Drop 50g unsalted butter into a large frying pan or wok and, as soon as the butter has melted, tip in the pancetta and garlic.\n\nLeave to cook on a medium heat for about 5 minutes, stirring often, until the pancetta is golden and crisp. The garlic has now imparted its flavour, so take it out with a slotted spoon and discard.\n\nKeep the heat under the pancetta on low. When the pasta is ready, lift it from the water with a pasta fork or tongs and put it in the frying pan with the pancetta. Don’t worry if a little water drops in the pan as well (you want this to happen) and don’t throw the pasta water away yet.\n\nMix most of the cheese in with the eggs, keeping a small handful back for sprinkling over later.\n\nTake the pan of spaghetti and pancetta off the heat. Now quickly pour in the eggs and cheese. Using the tongs or a long fork, lift up the spaghetti so it mixes easily with the egg mixture, which thickens but doesn’t scramble, and everything is coated.\n\nAdd extra pasta cooking water to keep it saucy (several tablespoons should do it). You don’t want it wet, just moist. Season with a little salt, if needed.\n\nUse a long-pronged fork to twist the pasta on to the serving plate or bowl. Serve immediately with a little sprinkling of the remaining cheese and a grating of black pepper. If the dish does get a little dry before serving, splash in some more hot pasta water and the glossy sauciness will be revived.",
+      "timing": {
+        "normalization_ms": 0.591,
+        "parser_ms": 0.614,
+        "draft_build_ms": 0.017,
+        "total_local_ms": 1.225
+      },
+      "required_corrections": [
+        {
+          "row": 6,
+          "classification": "REQUIRED_CORRECTION",
+          "fields": [
+            "name/quantity/unit interpretation"
+          ],
+          "reasons": [
+            "Unsupported measure/expression cannot safely be represented by current db fallback."
+          ],
+          "counting": "One row-level correction action even if multiple fields/reasons overlap."
+        }
+      ],
+      "review_only": [
+        {
+          "row": 8,
+          "field": "quantity",
+          "classification": "REVIEW_ONLY",
+          "reason": "Source gives no quantity; accepted 1 db default requires confirmation, not a proven erroneous value."
+        }
+      ],
+      "silent_fallback_rows": 1,
+      "verdict": "REVIEW",
+      "verdict_reason": "1 correction actions / 8 ingredient rows; 1 review-only quantities. Usable=true.",
+      "consistency": {
+        "ingredient_fields_equal_b2_3": true,
+        "preparation_equals_normalized_input": true,
+        "b2_0_reference_verified_by_b2_2": true
+      }
+    },
+    {
+      "id": "17",
+      "url": "https://www.bbcgoodfood.com/recipes/classic-victoria-sandwich-recipe",
+      "domain": "www.bbcgoodfood.com",
+      "raw_title": "Classic Victoria sandwich recipe",
+      "normalized_title": "Classic Victoria sandwich recipe",
+      "parser_input": "Classic Victoria sandwich recipe\n\nHozzávalók:\n200g caster sugar\n200g softened butter\n4 eggs beaten\n200g self-raising flour\n1 tsp  baking powder\n2 tbsp milk\n100g butter softened\n140g icing sugar sifted\ndrop vanilla extract (optional)\nhalf a 340g jar good-quality strawberry jam\nicing sugar to decorate\n\nElkészítés:\nHeat oven to 190C/fan 170C/gas 5. Butter two 20cm sandwich tins and line with non-stick baking paper.\n\nIn a large bowl, beat 200g caster sugar, 200g softened butter, 4 beaten eggs, 200g self-raising flour, 1 tsp baking powder and 2 tbsp milk together until you have a smooth, soft batter.\n\nDivide the mixture between the tins, smooth the surface with a spatula or the back of a spoon.\n\nBake for about 20 mins until golden and the cake springs back when pressed.\n\nTurn onto a cooling rack and leave to cool completely.\n\nTo make the filling, beat the 100g softened butter until smooth and creamy, then gradually beat in 140g sifted icing sugar and a drop of vanilla extract (if you’re using it).\n\nSpread the buttercream over the bottom of one of the sponges. Top it with 170g strawberry jam and sandwich the second sponge on top.\n\nDust with a little icing sugar before serving. Keep in an airtight container and eat within 2 days.",
+      "draft": {
+        "title": "Classic Victoria sandwich recipe",
+        "ingredients": [
+          {
+            "sourceOrder": 3,
+            "rawText": "200g caster sugar",
+            "name": "caster sugar",
+            "quantity": 200.0,
+            "canonical_unit": "g",
+            "warnings": [],
+            "sourceIngredientIndex": 0,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "CORRECT",
+            "sourceError": false,
+            "unsupported": false,
+            "parserError": false,
+            "silentFallbackRisk": false,
+            "requiredCorrection": false,
+            "pocWarnings": [],
+            "source_evidence": {
+              "source_order": 1,
+              "visible_text": "200g caster sugar",
+              "json_ld_text": "200g caster sugar",
+              "source_verdict": "MATCH",
+              "note": null
+            },
+            "unsupported_phrase": null
+          },
+          {
+            "sourceOrder": 4,
+            "rawText": "200g softened butter",
+            "name": "softened butter",
+            "quantity": 200.0,
+            "canonical_unit": "g",
+            "warnings": [],
+            "sourceIngredientIndex": 1,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "CORRECT",
+            "sourceError": false,
+            "unsupported": false,
+            "parserError": false,
+            "silentFallbackRisk": false,
+            "requiredCorrection": false,
+            "pocWarnings": [],
+            "source_evidence": {
+              "source_order": 2,
+              "visible_text": "200g softened butter",
+              "json_ld_text": "200g softened butter",
+              "source_verdict": "MATCH",
+              "note": null
+            },
+            "unsupported_phrase": null
+          },
+          {
+            "sourceOrder": 5,
+            "rawText": "4 eggs beaten",
+            "name": "eggs beaten",
+            "quantity": 4.0,
+            "canonical_unit": "db",
+            "warnings": [],
+            "sourceIngredientIndex": 2,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "CORRECT",
+            "sourceError": false,
+            "unsupported": false,
+            "parserError": false,
+            "silentFallbackRisk": false,
+            "requiredCorrection": false,
+            "pocWarnings": [],
+            "source_evidence": {
+              "source_order": 3,
+              "visible_text": "4 eggs beaten",
+              "json_ld_text": "4 eggs beaten",
+              "source_verdict": "MATCH",
+              "note": null
+            },
+            "unsupported_phrase": null
+          },
+          {
+            "sourceOrder": 6,
+            "rawText": "200g self-raising flour",
+            "name": "self-raising flour",
+            "quantity": 200.0,
+            "canonical_unit": "g",
+            "warnings": [],
+            "sourceIngredientIndex": 3,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "CORRECT",
+            "sourceError": false,
+            "unsupported": false,
+            "parserError": false,
+            "silentFallbackRisk": false,
+            "requiredCorrection": false,
+            "pocWarnings": [],
+            "source_evidence": {
+              "source_order": 4,
+              "visible_text": "200g self-raising flour",
+              "json_ld_text": "200g self-raising flour",
+              "source_verdict": "MATCH",
+              "note": null
+            },
+            "unsupported_phrase": null
+          },
+          {
+            "sourceOrder": 7,
+            "rawText": "1 tsp  baking powder",
+            "name": "tsp baking powder",
+            "quantity": 1.0,
+            "canonical_unit": "db",
+            "warnings": [],
+            "sourceIngredientIndex": 4,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "UNSUPPORTED_UNIT",
+            "sourceError": false,
+            "unsupported": true,
+            "parserError": false,
+            "silentFallbackRisk": true,
+            "requiredCorrection": true,
+            "pocWarnings": [
+              "UNSUPPORTED_INPUT",
+              "SILENT_BAD_FALLBACK_RISK"
+            ],
+            "source_evidence": {
+              "source_order": 5,
+              "visible_text": "1 tsp baking powder",
+              "json_ld_text": "1 tsp  baking powder",
+              "source_verdict": "FORMAT_DIFFERENCE",
+              "note": null
+            },
+            "unsupported_phrase": "tsp"
+          },
+          {
+            "sourceOrder": 8,
+            "rawText": "2 tbsp milk",
+            "name": "tbsp milk",
+            "quantity": 2.0,
+            "canonical_unit": "db",
+            "warnings": [],
+            "sourceIngredientIndex": 5,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "UNSUPPORTED_UNIT",
+            "sourceError": false,
+            "unsupported": true,
+            "parserError": false,
+            "silentFallbackRisk": true,
+            "requiredCorrection": true,
+            "pocWarnings": [
+              "UNSUPPORTED_INPUT",
+              "SILENT_BAD_FALLBACK_RISK"
+            ],
+            "source_evidence": {
+              "source_order": 6,
+              "visible_text": "2 tbsp milk",
+              "json_ld_text": "2 tbsp milk",
+              "source_verdict": "MATCH",
+              "note": null
+            },
+            "unsupported_phrase": "tbsp"
+          },
+          {
+            "sourceOrder": 9,
+            "rawText": "100g butter softened",
+            "name": "butter softened",
+            "quantity": 100.0,
+            "canonical_unit": "g",
+            "warnings": [],
+            "sourceIngredientIndex": 6,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "CORRECT",
+            "sourceError": false,
+            "unsupported": false,
+            "parserError": false,
+            "silentFallbackRisk": false,
+            "requiredCorrection": false,
+            "pocWarnings": [],
+            "source_evidence": {
+              "source_order": 7,
+              "visible_text": "100g butter softened",
+              "json_ld_text": "100g butter softened",
+              "source_verdict": "MATCH",
+              "note": null
+            },
+            "unsupported_phrase": null
+          },
+          {
+            "sourceOrder": 10,
+            "rawText": "140g icing sugar sifted",
+            "name": "icing sugar sifted",
+            "quantity": 140.0,
+            "canonical_unit": "g",
+            "warnings": [],
+            "sourceIngredientIndex": 7,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "CORRECT",
+            "sourceError": false,
+            "unsupported": false,
+            "parserError": false,
+            "silentFallbackRisk": false,
+            "requiredCorrection": false,
+            "pocWarnings": [],
+            "source_evidence": {
+              "source_order": 8,
+              "visible_text": "140g icing sugar sifted",
+              "json_ld_text": "140g icing sugar sifted",
+              "source_verdict": "MATCH",
+              "note": null
+            },
+            "unsupported_phrase": null
+          },
+          {
+            "sourceOrder": 11,
+            "rawText": "drop vanilla extract (optional)",
+            "name": "drop vanilla extract (optional)",
+            "quantity": 1.0,
+            "canonical_unit": "db",
+            "warnings": [
+              "missingQuantity"
+            ],
+            "sourceIngredientIndex": 8,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "UNSUPPORTED_UNIT",
+            "sourceError": false,
+            "unsupported": true,
+            "parserError": false,
+            "silentFallbackRisk": false,
+            "requiredCorrection": true,
+            "pocWarnings": [
+              "UNSUPPORTED_INPUT",
+              "PARSER_LIMITATION"
+            ],
+            "source_evidence": {
+              "source_order": 9,
+              "visible_text": "drop vanilla extract (optional)",
+              "json_ld_text": "drop vanilla extract (optional)",
+              "source_verdict": "MATCH",
+              "note": null
+            },
+            "unsupported_phrase": "drop"
+          },
+          {
+            "sourceOrder": 12,
+            "rawText": "half a 340g jar good-quality strawberry jam",
+            "name": "half a 340g jar good-quality strawberry jam",
+            "quantity": null,
+            "canonical_unit": "db",
+            "warnings": [
+              "ambiguousIngredient"
+            ],
+            "sourceIngredientIndex": 9,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "UNSUPPORTED_UNIT",
+            "sourceError": false,
+            "unsupported": true,
+            "parserError": false,
+            "silentFallbackRisk": false,
+            "requiredCorrection": true,
+            "pocWarnings": [
+              "UNSUPPORTED_INPUT",
+              "PARSER_LIMITATION"
+            ],
+            "source_evidence": {
+              "source_order": 10,
+              "visible_text": "half a 340g jar good-quality strawberry jam",
+              "json_ld_text": "half a 340g jar good-quality strawberry jam",
+              "source_verdict": "MATCH",
+              "note": null
+            },
+            "unsupported_phrase": "half a … jar"
+          },
+          {
+            "sourceOrder": 13,
+            "rawText": "icing sugar to decorate",
+            "name": "icing sugar to decorate",
+            "quantity": 1.0,
+            "canonical_unit": "db",
+            "warnings": [
+              "missingQuantity"
+            ],
+            "sourceIngredientIndex": 10,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "CORRECT",
+            "sourceError": false,
+            "unsupported": false,
+            "parserError": false,
+            "silentFallbackRisk": false,
+            "requiredCorrection": false,
+            "pocWarnings": [],
+            "source_evidence": {
+              "source_order": 11,
+              "visible_text": "icing sugar to decorate",
+              "json_ld_text": "icing sugar to decorate",
+              "source_verdict": "MATCH",
+              "note": null
+            },
+            "unsupported_phrase": null
+          }
+        ],
+        "preparation": "Heat oven to 190C/fan 170C/gas 5. Butter two 20cm sandwich tins and line with non-stick baking paper.\n\nIn a large bowl, beat 200g caster sugar, 200g softened butter, 4 beaten eggs, 200g self-raising flour, 1 tsp baking powder and 2 tbsp milk together until you have a smooth, soft batter.\n\nDivide the mixture between the tins, smooth the surface with a spatula or the back of a spoon.\n\nBake for about 20 mins until golden and the cake springs back when pressed.\n\nTurn onto a cooling rack and leave to cool completely.\n\nTo make the filling, beat the 100g softened butter until smooth and creamy, then gradually beat in 140g sifted icing sugar and a drop of vanilla extract (if you’re using it).\n\nSpread the buttercream over the bottom of one of the sponges. Top it with 170g strawberry jam and sandwich the second sponge on top.\n\nDust with a little icing sugar before serving. Keep in an airtight container and eat within 2 days.",
+        "spices": [],
+        "unprocessedSegments": []
+      },
+      "normalized_preparation": "Heat oven to 190C/fan 170C/gas 5. Butter two 20cm sandwich tins and line with non-stick baking paper.\n\nIn a large bowl, beat 200g caster sugar, 200g softened butter, 4 beaten eggs, 200g self-raising flour, 1 tsp baking powder and 2 tbsp milk together until you have a smooth, soft batter.\n\nDivide the mixture between the tins, smooth the surface with a spatula or the back of a spoon.\n\nBake for about 20 mins until golden and the cake springs back when pressed.\n\nTurn onto a cooling rack and leave to cool completely.\n\nTo make the filling, beat the 100g softened butter until smooth and creamy, then gradually beat in 140g sifted icing sugar and a drop of vanilla extract (if you’re using it).\n\nSpread the buttercream over the bottom of one of the sponges. Top it with 170g strawberry jam and sandwich the second sponge on top.\n\nDust with a little icing sugar before serving. Keep in an airtight container and eat within 2 days.",
+      "timing": {
+        "normalization_ms": 0.299,
+        "parser_ms": 0.686,
+        "draft_build_ms": 0.022,
+        "total_local_ms": 1.009
+      },
+      "required_corrections": [
+        {
+          "row": 5,
+          "classification": "REQUIRED_CORRECTION",
+          "fields": [
+            "name/quantity/unit interpretation"
+          ],
+          "reasons": [
+            "Unsupported measure/expression cannot safely be represented by current db fallback."
+          ],
+          "counting": "One row-level correction action even if multiple fields/reasons overlap."
+        },
+        {
+          "row": 6,
+          "classification": "REQUIRED_CORRECTION",
+          "fields": [
+            "name/quantity/unit interpretation"
+          ],
+          "reasons": [
+            "Unsupported measure/expression cannot safely be represented by current db fallback."
+          ],
+          "counting": "One row-level correction action even if multiple fields/reasons overlap."
+        },
+        {
+          "row": 9,
+          "classification": "REQUIRED_CORRECTION",
+          "fields": [
+            "name/quantity/unit interpretation"
+          ],
+          "reasons": [
+            "Unsupported measure/expression cannot safely be represented by current db fallback."
+          ],
+          "counting": "One row-level correction action even if multiple fields/reasons overlap."
+        },
+        {
+          "row": 10,
+          "classification": "REQUIRED_CORRECTION",
+          "fields": [
+            "name/quantity/unit interpretation"
+          ],
+          "reasons": [
+            "Unsupported measure/expression cannot safely be represented by current db fallback."
+          ],
+          "counting": "One row-level correction action even if multiple fields/reasons overlap."
+        },
+        {
+          "field": "ingredient grouping",
+          "classification": "REQUIRED_CORRECTION",
+          "reason": "For the filling group heading lost upstream; no automatic restoration or ingredient insertion.",
+          "evidence": {
+            "before_row": 7,
+            "heading": "For the filling",
+            "verdict": "GROUP_HEADING_DIFFERENCE",
+            "json_ld": null
+          },
+          "counting": "One recipe-level structural correction; may need a note/workaround because current draft has no group field."
+        }
+      ],
+      "review_only": [
+        {
+          "row": 11,
+          "field": "quantity",
+          "classification": "REVIEW_ONLY",
+          "reason": "Source gives no quantity; accepted 1 db default requires confirmation, not a proven erroneous value."
+        }
+      ],
+      "silent_fallback_rows": 2,
+      "verdict": "POOR",
+      "verdict_reason": "5 correction actions / 11 ingredient rows; 1 review-only quantities. Usable=true.",
+      "consistency": {
+        "ingredient_fields_equal_b2_3": true,
+        "preparation_equals_normalized_input": true,
+        "b2_0_reference_verified_by_b2_2": true
+      }
+    },
+    {
+      "id": "18",
+      "url": "https://www.bbcgoodfood.com/recipes/chilli-con-carne-recipe",
+      "domain": "www.bbcgoodfood.com",
+      "raw_title": "Chilli con carne recipe",
+      "normalized_title": "Chilli con carne recipe",
+      "parser_input": "Chilli con carne recipe\n\nHozzávalók:\n1 large onion\n1 red pepper\n2 garlic cloves\n1 tbsp oil\n1 heaped tsp hot chilli powder (or 1 level tbsp if you only have mild)\n1 tsp paprika\n1 tsp ground cumin\n500g lean minced beef\n1 beef stock cube\n400g can Mutti chopped tomatoes\n½ tsp dried marjoram\n1 tsp sugar (or add a thumbnail-sized piece of dark chocolate along with the beans instead, see tip)\n2 tbsp tomato purée\n410g can red kidney beans\nplain boiled long grain rice to serve\nsoured cream to serve\n\nElkészítés:\nPrepare your vegetables. Chop 1 large onion into small dice, about 5mm square. The easiest way to do this is to cut the onion in half from root to tip, peel it and slice each half into thick matchsticks lengthways, not quite cutting all the way to the root end so they are still held together. Slice across the matchsticks into neat dice.\n\nCut 1 red pepper in half lengthways, remove stalk and wash the seeds away, then chop. Peel and finely chop 2 garlic cloves.\n\nStart cooking. Put your pan on the hob over a medium heat. Add 1 tbsp oil and leave it for 1-2 minutes until hot (a little longer for an electric hob).\n\nAdd the onion and cook, stirring fairly frequently, for about 5 minutes, or until the onion is soft, squidgy and slightly translucent.\n\nTip in the garlic, red pepper, 1 heaped tsp hot chilli powder or 1 level tbsp mild chilli powder, 1 tsp paprika and 1 tsp ground cumin.\n\nGive it a good stir, then leave it to cook for another 5 minutes, stirring occasionally.\n\nBrown 500g lean minced beef. Turn the heat up a bit, add the meat to the pan and break it up with your spoon or spatula. The mix should sizzle a bit when you add the mince.\n\nKeep stirring and prodding for at least 5 minutes, until all the mince is in uniform, mince-sized lumps and there are no more pink bits. Make sure you keep the heat hot enough for the meat to fry and become brown, rather than just stew.\n\nMake the sauce. Crumble 1 beef stock cube into 300ml hot water. Pour this into the pan with the mince mixture.\n\nAdd a 400g can of chopped tomatoes. Tip in ½ tsp dried marjoram, 1 tsp sugar and add a good shake of salt and pepper. Squirt in about 2 tbsp tomato purée and stir the sauce well.\n\nSimmer it gently. Bring the whole thing to the boil, give it a good stir and put a lid on the pan. Turn down the heat until it is gently bubbling and leave it for 20 minutes.\n\nCheck on the pan occasionally to stir it and make sure the sauce doesn’t catch on the bottom of the pan or isn’t drying out. If it is, add a couple of tablespoons of water and make sure that the heat really is low enough. After simmering gently, the saucy mince mixture should look thick, moist and juicy.\n\nDrain and rinse a 410g can of red kidney beans in a sieve and stir them into the chilli pot. Bring to the boil again, and gently bubble without the lid for another 10 minutes, adding a little more water if it looks too dry.\n\nTaste a bit of the chilli and season. It will probably take a lot more seasoning than you think.\n\nNow replace the lid, turn off the heat and leave your chilli to stand for 10 minutes before serving. This is really important as it allows the flavours to mingle.\n\nServe with soured cream and plain boiled long grain rice.",
+      "draft": {
+        "title": "Chilli con carne recipe",
+        "ingredients": [
+          {
+            "sourceOrder": 3,
+            "rawText": "1 large onion",
+            "name": "large onion",
+            "quantity": 1.0,
+            "canonical_unit": "db",
+            "warnings": [],
+            "sourceIngredientIndex": 0,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "CORRECT",
+            "sourceError": false,
+            "unsupported": false,
+            "parserError": false,
+            "silentFallbackRisk": false,
+            "requiredCorrection": false,
+            "pocWarnings": [],
+            "source_evidence": {
+              "source_order": 1,
+              "visible_text": "1 large onion",
+              "json_ld_text": "1 large onion",
+              "source_verdict": "MATCH",
+              "note": null
+            },
+            "unsupported_phrase": null
+          },
+          {
+            "sourceOrder": 4,
+            "rawText": "1 red pepper",
+            "name": "red pepper",
+            "quantity": 1.0,
+            "canonical_unit": "db",
+            "warnings": [],
+            "sourceIngredientIndex": 1,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "CORRECT",
+            "sourceError": false,
+            "unsupported": false,
+            "parserError": false,
+            "silentFallbackRisk": false,
+            "requiredCorrection": false,
+            "pocWarnings": [],
+            "source_evidence": {
+              "source_order": 2,
+              "visible_text": "1 red pepper",
+              "json_ld_text": "1 red pepper",
+              "source_verdict": "MATCH",
+              "note": null
+            },
+            "unsupported_phrase": null
+          },
+          {
+            "sourceOrder": 5,
+            "rawText": "2 garlic cloves",
+            "name": "garlic cloves",
+            "quantity": 2.0,
+            "canonical_unit": "db",
+            "warnings": [],
+            "sourceIngredientIndex": 2,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "UNSUPPORTED_UNIT",
+            "sourceError": false,
+            "unsupported": true,
+            "parserError": false,
+            "silentFallbackRisk": true,
+            "requiredCorrection": true,
+            "pocWarnings": [
+              "UNSUPPORTED_INPUT",
+              "SILENT_BAD_FALLBACK_RISK"
+            ],
+            "source_evidence": {
+              "source_order": 3,
+              "visible_text": "2 garlic cloves",
+              "json_ld_text": "2 garlic cloves",
+              "source_verdict": "MATCH",
+              "note": null
+            },
+            "unsupported_phrase": "cloves"
+          },
+          {
+            "sourceOrder": 6,
+            "rawText": "1 tbsp oil",
+            "name": "tbsp oil",
+            "quantity": 1.0,
+            "canonical_unit": "db",
+            "warnings": [],
+            "sourceIngredientIndex": 3,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "UNSUPPORTED_UNIT",
+            "sourceError": false,
+            "unsupported": true,
+            "parserError": false,
+            "silentFallbackRisk": true,
+            "requiredCorrection": true,
+            "pocWarnings": [
+              "UNSUPPORTED_INPUT",
+              "SILENT_BAD_FALLBACK_RISK"
+            ],
+            "source_evidence": {
+              "source_order": 4,
+              "visible_text": "1 tbsp oil",
+              "json_ld_text": "1 tbsp oil",
+              "source_verdict": "MATCH",
+              "note": null
+            },
+            "unsupported_phrase": "tbsp"
+          },
+          {
+            "sourceOrder": 7,
+            "rawText": "1 heaped tsp hot chilli powder (or 1 level tbsp if you only have mild)",
+            "name": "1 heaped tsp hot chilli powder (or 1 level tbsp if you only have mild)",
+            "quantity": null,
+            "canonical_unit": "db",
+            "warnings": [
+              "ambiguousIngredient"
+            ],
+            "sourceIngredientIndex": 4,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "UNSUPPORTED_UNIT",
+            "sourceError": false,
+            "unsupported": true,
+            "parserError": false,
+            "silentFallbackRisk": false,
+            "requiredCorrection": true,
+            "pocWarnings": [
+              "UNSUPPORTED_INPUT",
+              "PARSER_LIMITATION"
+            ],
+            "source_evidence": {
+              "source_order": 5,
+              "visible_text": "1 heaped tsp hot chilli powder (or 1 level tbsp if you only have mild)",
+              "json_ld_text": "1 heaped tsp hot chilli powder (or 1 level tbsp if you only have mild)",
+              "source_verdict": "MATCH",
+              "note": null
+            },
+            "unsupported_phrase": "heaped tsp; alternative level tbsp"
+          },
+          {
+            "sourceOrder": 8,
+            "rawText": "1 tsp paprika",
+            "name": "tsp paprika",
+            "quantity": 1.0,
+            "canonical_unit": "db",
+            "warnings": [],
+            "sourceIngredientIndex": 5,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "UNSUPPORTED_UNIT",
+            "sourceError": false,
+            "unsupported": true,
+            "parserError": false,
+            "silentFallbackRisk": true,
+            "requiredCorrection": true,
+            "pocWarnings": [
+              "UNSUPPORTED_INPUT",
+              "SILENT_BAD_FALLBACK_RISK"
+            ],
+            "source_evidence": {
+              "source_order": 6,
+              "visible_text": "1 tsp paprika",
+              "json_ld_text": "1 tsp paprika",
+              "source_verdict": "MATCH",
+              "note": null
+            },
+            "unsupported_phrase": "tsp"
+          },
+          {
+            "sourceOrder": 9,
+            "rawText": "1 tsp ground cumin",
+            "name": "tsp ground cumin",
+            "quantity": 1.0,
+            "canonical_unit": "db",
+            "warnings": [],
+            "sourceIngredientIndex": 6,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "UNSUPPORTED_UNIT",
+            "sourceError": false,
+            "unsupported": true,
+            "parserError": false,
+            "silentFallbackRisk": true,
+            "requiredCorrection": true,
+            "pocWarnings": [
+              "UNSUPPORTED_INPUT",
+              "SILENT_BAD_FALLBACK_RISK"
+            ],
+            "source_evidence": {
+              "source_order": 7,
+              "visible_text": "1 tsp ground cumin",
+              "json_ld_text": "1 tsp ground cumin",
+              "source_verdict": "MATCH",
+              "note": null
+            },
+            "unsupported_phrase": "tsp"
+          },
+          {
+            "sourceOrder": 10,
+            "rawText": "500g lean minced beef",
+            "name": "lean minced beef",
+            "quantity": 500.0,
+            "canonical_unit": "g",
+            "warnings": [],
+            "sourceIngredientIndex": 7,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "CORRECT",
+            "sourceError": false,
+            "unsupported": false,
+            "parserError": false,
+            "silentFallbackRisk": false,
+            "requiredCorrection": false,
+            "pocWarnings": [],
+            "source_evidence": {
+              "source_order": 8,
+              "visible_text": "500g lean minced beef",
+              "json_ld_text": "500g lean minced beef",
+              "source_verdict": "MATCH",
+              "note": null
+            },
+            "unsupported_phrase": null
+          },
+          {
+            "sourceOrder": 11,
+            "rawText": "1 beef stock cube",
+            "name": "beef stock cube",
+            "quantity": 1.0,
+            "canonical_unit": "db",
+            "warnings": [],
+            "sourceIngredientIndex": 8,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "CORRECT",
+            "sourceError": false,
+            "unsupported": false,
+            "parserError": false,
+            "silentFallbackRisk": false,
+            "requiredCorrection": false,
+            "pocWarnings": [],
+            "source_evidence": {
+              "source_order": 9,
+              "visible_text": "1 beef stock cube",
+              "json_ld_text": "1 beef stock cube",
+              "source_verdict": "MATCH",
+              "note": null
+            },
+            "unsupported_phrase": null
+          },
+          {
+            "sourceOrder": 12,
+            "rawText": "400g can Mutti chopped tomatoes",
+            "name": "can Mutti chopped tomatoes",
+            "quantity": 400.0,
+            "canonical_unit": "g",
+            "warnings": [],
+            "sourceIngredientIndex": 9,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "CORRECT",
+            "sourceError": false,
+            "unsupported": false,
+            "parserError": false,
+            "silentFallbackRisk": false,
+            "requiredCorrection": false,
+            "pocWarnings": [],
+            "source_evidence": {
+              "source_order": 10,
+              "visible_text": "400g can Mutti chopped tomatoes",
+              "json_ld_text": "400g can Mutti chopped tomatoes",
+              "source_verdict": "MATCH",
+              "note": null
+            },
+            "unsupported_phrase": null
+          },
+          {
+            "sourceOrder": 13,
+            "rawText": "½ tsp dried marjoram",
+            "name": "tsp dried marjoram",
+            "quantity": 0.5,
+            "canonical_unit": "db",
+            "warnings": [],
+            "sourceIngredientIndex": 10,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "UNSUPPORTED_UNIT",
+            "sourceError": false,
+            "unsupported": true,
+            "parserError": false,
+            "silentFallbackRisk": true,
+            "requiredCorrection": true,
+            "pocWarnings": [
+              "UNSUPPORTED_INPUT",
+              "SILENT_BAD_FALLBACK_RISK"
+            ],
+            "source_evidence": {
+              "source_order": 11,
+              "visible_text": "½ tsp dried marjoram",
+              "json_ld_text": "½ tsp dried marjoram",
+              "source_verdict": "MATCH",
+              "note": null
+            },
+            "unsupported_phrase": "tsp"
+          },
+          {
+            "sourceOrder": 14,
+            "rawText": "1 tsp sugar (or add a thumbnail-sized piece of dark chocolate along with the beans instead, see tip)",
+            "name": "tsp sugar (or add a thumbnail-sized piece of dark chocolate along with the beans instead, see tip)",
+            "quantity": 1.0,
+            "canonical_unit": "db",
+            "warnings": [],
+            "sourceIngredientIndex": 11,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "UNSUPPORTED_UNIT",
+            "sourceError": false,
+            "unsupported": true,
+            "parserError": false,
+            "silentFallbackRisk": true,
+            "requiredCorrection": true,
+            "pocWarnings": [
+              "UNSUPPORTED_INPUT",
+              "SILENT_BAD_FALLBACK_RISK"
+            ],
+            "source_evidence": {
+              "source_order": 12,
+              "visible_text": "1 tsp sugar (or add a thumbnail-sized piece of dark chocolate along with the beans instead, see tip)",
+              "json_ld_text": "1 tsp sugar (or add a thumbnail-sized piece of dark chocolate along with the beans instead, see tip)",
+              "source_verdict": "MATCH",
+              "note": null
+            },
+            "unsupported_phrase": "tsp"
+          },
+          {
+            "sourceOrder": 15,
+            "rawText": "2 tbsp tomato purée",
+            "name": "tbsp tomato purée",
+            "quantity": 2.0,
+            "canonical_unit": "db",
+            "warnings": [],
+            "sourceIngredientIndex": 12,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "UNSUPPORTED_UNIT",
+            "sourceError": false,
+            "unsupported": true,
+            "parserError": false,
+            "silentFallbackRisk": true,
+            "requiredCorrection": true,
+            "pocWarnings": [
+              "UNSUPPORTED_INPUT",
+              "SILENT_BAD_FALLBACK_RISK"
+            ],
+            "source_evidence": {
+              "source_order": 13,
+              "visible_text": "2 tbsp tomato purée",
+              "json_ld_text": "2 tbsp tomato purée",
+              "source_verdict": "MATCH",
+              "note": null
+            },
+            "unsupported_phrase": "tbsp"
+          },
+          {
+            "sourceOrder": 16,
+            "rawText": "410g can red kidney beans",
+            "name": "can red kidney beans",
+            "quantity": 410.0,
+            "canonical_unit": "g",
+            "warnings": [],
+            "sourceIngredientIndex": 13,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "CORRECT",
+            "sourceError": false,
+            "unsupported": false,
+            "parserError": false,
+            "silentFallbackRisk": false,
+            "requiredCorrection": false,
+            "pocWarnings": [],
+            "source_evidence": {
+              "source_order": 14,
+              "visible_text": "410g can red kidney beans",
+              "json_ld_text": "410g can red kidney beans",
+              "source_verdict": "MATCH",
+              "note": null
+            },
+            "unsupported_phrase": null
+          },
+          {
+            "sourceOrder": 17,
+            "rawText": "plain boiled long grain rice to serve",
+            "name": "plain boiled long grain rice to serve",
+            "quantity": 1.0,
+            "canonical_unit": "db",
+            "warnings": [
+              "missingQuantity"
+            ],
+            "sourceIngredientIndex": 14,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "CORRECT",
+            "sourceError": false,
+            "unsupported": false,
+            "parserError": false,
+            "silentFallbackRisk": false,
+            "requiredCorrection": false,
+            "pocWarnings": [],
+            "source_evidence": {
+              "source_order": 15,
+              "visible_text": "plain boiled long grain rice to serve",
+              "json_ld_text": "plain boiled long grain rice to serve",
+              "source_verdict": "MATCH",
+              "note": null
+            },
+            "unsupported_phrase": null
+          },
+          {
+            "sourceOrder": 18,
+            "rawText": "soured cream to serve",
+            "name": "soured cream to serve",
+            "quantity": 1.0,
+            "canonical_unit": "db",
+            "warnings": [
+              "missingQuantity"
+            ],
+            "sourceIngredientIndex": 15,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "CORRECT",
+            "sourceError": false,
+            "unsupported": false,
+            "parserError": false,
+            "silentFallbackRisk": false,
+            "requiredCorrection": false,
+            "pocWarnings": [],
+            "source_evidence": {
+              "source_order": 16,
+              "visible_text": "soured cream to serve",
+              "json_ld_text": "soured cream to serve",
+              "source_verdict": "MATCH",
+              "note": null
+            },
+            "unsupported_phrase": null
+          }
+        ],
+        "preparation": "Prepare your vegetables. Chop 1 large onion into small dice, about 5mm square. The easiest way to do this is to cut the onion in half from root to tip, peel it and slice each half into thick matchsticks lengthways, not quite cutting all the way to the root end so they are still held together. Slice across the matchsticks into neat dice.\n\nCut 1 red pepper in half lengthways, remove stalk and wash the seeds away, then chop. Peel and finely chop 2 garlic cloves.\n\nStart cooking. Put your pan on the hob over a medium heat. Add 1 tbsp oil and leave it for 1-2 minutes until hot (a little longer for an electric hob).\n\nAdd the onion and cook, stirring fairly frequently, for about 5 minutes, or until the onion is soft, squidgy and slightly translucent.\n\nTip in the garlic, red pepper, 1 heaped tsp hot chilli powder or 1 level tbsp mild chilli powder, 1 tsp paprika and 1 tsp ground cumin.\n\nGive it a good stir, then leave it to cook for another 5 minutes, stirring occasionally.\n\nBrown 500g lean minced beef. Turn the heat up a bit, add the meat to the pan and break it up with your spoon or spatula. The mix should sizzle a bit when you add the mince.\n\nKeep stirring and prodding for at least 5 minutes, until all the mince is in uniform, mince-sized lumps and there are no more pink bits. Make sure you keep the heat hot enough for the meat to fry and become brown, rather than just stew.\n\nMake the sauce. Crumble 1 beef stock cube into 300ml hot water. Pour this into the pan with the mince mixture.\n\nAdd a 400g can of chopped tomatoes. Tip in ½ tsp dried marjoram, 1 tsp sugar and add a good shake of salt and pepper. Squirt in about 2 tbsp tomato purée and stir the sauce well.\n\nSimmer it gently. Bring the whole thing to the boil, give it a good stir and put a lid on the pan. Turn down the heat until it is gently bubbling and leave it for 20 minutes.\n\nCheck on the pan occasionally to stir it and make sure the sauce doesn’t catch on the bottom of the pan or isn’t drying out. If it is, add a couple of tablespoons of water and make sure that the heat really is low enough. After simmering gently, the saucy mince mixture should look thick, moist and juicy.\n\nDrain and rinse a 410g can of red kidney beans in a sieve and stir them into the chilli pot. Bring to the boil again, and gently bubble without the lid for another 10 minutes, adding a little more water if it looks too dry.\n\nTaste a bit of the chilli and season. It will probably take a lot more seasoning than you think.\n\nNow replace the lid, turn off the heat and leave your chilli to stand for 10 minutes before serving. This is really important as it allows the flavours to mingle.\n\nServe with soured cream and plain boiled long grain rice.",
+        "spices": [],
+        "unprocessedSegments": []
+      },
+      "normalized_preparation": "Prepare your vegetables. Chop 1 large onion into small dice, about 5mm square. The easiest way to do this is to cut the onion in half from root to tip, peel it and slice each half into thick matchsticks lengthways, not quite cutting all the way to the root end so they are still held together. Slice across the matchsticks into neat dice.\n\nCut 1 red pepper in half lengthways, remove stalk and wash the seeds away, then chop. Peel and finely chop 2 garlic cloves.\n\nStart cooking. Put your pan on the hob over a medium heat. Add 1 tbsp oil and leave it for 1-2 minutes until hot (a little longer for an electric hob).\n\nAdd the onion and cook, stirring fairly frequently, for about 5 minutes, or until the onion is soft, squidgy and slightly translucent.\n\nTip in the garlic, red pepper, 1 heaped tsp hot chilli powder or 1 level tbsp mild chilli powder, 1 tsp paprika and 1 tsp ground cumin.\n\nGive it a good stir, then leave it to cook for another 5 minutes, stirring occasionally.\n\nBrown 500g lean minced beef. Turn the heat up a bit, add the meat to the pan and break it up with your spoon or spatula. The mix should sizzle a bit when you add the mince.\n\nKeep stirring and prodding for at least 5 minutes, until all the mince is in uniform, mince-sized lumps and there are no more pink bits. Make sure you keep the heat hot enough for the meat to fry and become brown, rather than just stew.\n\nMake the sauce. Crumble 1 beef stock cube into 300ml hot water. Pour this into the pan with the mince mixture.\n\nAdd a 400g can of chopped tomatoes. Tip in ½ tsp dried marjoram, 1 tsp sugar and add a good shake of salt and pepper. Squirt in about 2 tbsp tomato purée and stir the sauce well.\n\nSimmer it gently. Bring the whole thing to the boil, give it a good stir and put a lid on the pan. Turn down the heat until it is gently bubbling and leave it for 20 minutes.\n\nCheck on the pan occasionally to stir it and make sure the sauce doesn’t catch on the bottom of the pan or isn’t drying out. If it is, add a couple of tablespoons of water and make sure that the heat really is low enough. After simmering gently, the saucy mince mixture should look thick, moist and juicy.\n\nDrain and rinse a 410g can of red kidney beans in a sieve and stir them into the chilli pot. Bring to the boil again, and gently bubble without the lid for another 10 minutes, adding a little more water if it looks too dry.\n\nTaste a bit of the chilli and season. It will probably take a lot more seasoning than you think.\n\nNow replace the lid, turn off the heat and leave your chilli to stand for 10 minutes before serving. This is really important as it allows the flavours to mingle.\n\nServe with soured cream and plain boiled long grain rice.",
+      "timing": {
+        "normalization_ms": 0.599,
+        "parser_ms": 0.893,
+        "draft_build_ms": 0.034,
+        "total_local_ms": 1.53
+      },
+      "required_corrections": [
+        {
+          "row": 3,
+          "classification": "REQUIRED_CORRECTION",
+          "fields": [
+            "name/quantity/unit interpretation"
+          ],
+          "reasons": [
+            "Unsupported measure/expression cannot safely be represented by current db fallback."
+          ],
+          "counting": "One row-level correction action even if multiple fields/reasons overlap."
+        },
+        {
+          "row": 4,
+          "classification": "REQUIRED_CORRECTION",
+          "fields": [
+            "name/quantity/unit interpretation"
+          ],
+          "reasons": [
+            "Unsupported measure/expression cannot safely be represented by current db fallback."
+          ],
+          "counting": "One row-level correction action even if multiple fields/reasons overlap."
+        },
+        {
+          "row": 5,
+          "classification": "REQUIRED_CORRECTION",
+          "fields": [
+            "name/quantity/unit interpretation"
+          ],
+          "reasons": [
+            "Unsupported measure/expression cannot safely be represented by current db fallback."
+          ],
+          "counting": "One row-level correction action even if multiple fields/reasons overlap."
+        },
+        {
+          "row": 6,
+          "classification": "REQUIRED_CORRECTION",
+          "fields": [
+            "name/quantity/unit interpretation"
+          ],
+          "reasons": [
+            "Unsupported measure/expression cannot safely be represented by current db fallback."
+          ],
+          "counting": "One row-level correction action even if multiple fields/reasons overlap."
+        },
+        {
+          "row": 7,
+          "classification": "REQUIRED_CORRECTION",
+          "fields": [
+            "name/quantity/unit interpretation"
+          ],
+          "reasons": [
+            "Unsupported measure/expression cannot safely be represented by current db fallback."
+          ],
+          "counting": "One row-level correction action even if multiple fields/reasons overlap."
+        },
+        {
+          "row": 11,
+          "classification": "REQUIRED_CORRECTION",
+          "fields": [
+            "name/quantity/unit interpretation"
+          ],
+          "reasons": [
+            "Unsupported measure/expression cannot safely be represented by current db fallback."
+          ],
+          "counting": "One row-level correction action even if multiple fields/reasons overlap."
+        },
+        {
+          "row": 12,
+          "classification": "REQUIRED_CORRECTION",
+          "fields": [
+            "name/quantity/unit interpretation"
+          ],
+          "reasons": [
+            "Unsupported measure/expression cannot safely be represented by current db fallback."
+          ],
+          "counting": "One row-level correction action even if multiple fields/reasons overlap."
+        },
+        {
+          "row": 13,
+          "classification": "REQUIRED_CORRECTION",
+          "fields": [
+            "name/quantity/unit interpretation"
+          ],
+          "reasons": [
+            "Unsupported measure/expression cannot safely be represented by current db fallback."
+          ],
+          "counting": "One row-level correction action even if multiple fields/reasons overlap."
+        }
+      ],
+      "review_only": [
+        {
+          "row": 15,
+          "field": "quantity",
+          "classification": "REVIEW_ONLY",
+          "reason": "Source gives no quantity; accepted 1 db default requires confirmation, not a proven erroneous value."
+        },
+        {
+          "row": 16,
+          "field": "quantity",
+          "classification": "REVIEW_ONLY",
+          "reason": "Source gives no quantity; accepted 1 db default requires confirmation, not a proven erroneous value."
+        }
+      ],
+      "silent_fallback_rows": 7,
+      "verdict": "POOR",
+      "verdict_reason": "8 correction actions / 16 ingredient rows; 2 review-only quantities. Usable=true.",
+      "consistency": {
+        "ingredient_fields_equal_b2_3": true,
+        "preparation_equals_normalized_input": true,
+        "b2_0_reference_verified_by_b2_2": true
+      }
+    },
+    {
+      "id": "19",
+      "url": "https://www.bbcgoodfood.com/recipes/chicken-tikka-masala",
+      "domain": "www.bbcgoodfood.com",
+      "raw_title": "Chicken tikka masala",
+      "normalized_title": "Chicken tikka masala",
+      "parser_input": "Chicken tikka masala\n\nHozzávalók:\n4 tbsp vegetable oil\n25g butter\n4 onions roughly chopped\n6 tbsp chicken tikka masala paste (use shop-bought or make your own – see recipe, below)\n2 red peppers deseeded and cut into chunks\n8 boneless, skinless chicken breasts cut into 2.5cm cubes\n2 x 400g cans  chopped tomatoes\n4 tbsp tomato purée\n2-3 tbsp  mango chutney\n150ml double cream\n150ml natural  yogurt\nchopped  coriander leaves, to serve\n\nElkészítés:\nHeat the vegetable oil and butter in a large, lidded casserole on the hob, then add the onions and a pinch of salt. Cook for 15-20 mins until soft and golden.\n\nAdd the tikka masala paste and peppers, then cook for 5 mins more to cook out the rawness of the spices.\n\nAdd the chicken breasts and stir well to coat in the paste. Cook for 2 mins, then tip in the chopped tomatoes, tomato purée and 200ml water. Cover with a lid and gently simmer for 15 mins, stirring occasionally, until the chicken is cooked through.\n\nRemove the lid, stir through the mango chutney, double cream and natural yogurt, then gently warm through. Season, then set aside whatever you want to freeze. Will keep, in an airtight container, in the freezer for up to three months.\n\nScatter the rest with coriander leaves and serve with basmati rice and naan bread.",
+      "draft": {
+        "title": "Chicken tikka masala",
+        "ingredients": [
+          {
+            "sourceOrder": 3,
+            "rawText": "4 tbsp vegetable oil",
+            "name": "tbsp vegetable oil",
+            "quantity": 4.0,
+            "canonical_unit": "db",
+            "warnings": [],
+            "sourceIngredientIndex": 0,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "UNSUPPORTED_UNIT",
+            "sourceError": false,
+            "unsupported": true,
+            "parserError": false,
+            "silentFallbackRisk": true,
+            "requiredCorrection": true,
+            "pocWarnings": [
+              "UNSUPPORTED_INPUT",
+              "SILENT_BAD_FALLBACK_RISK"
+            ],
+            "source_evidence": {
+              "source_order": 1,
+              "visible_text": "4 tbsp vegetable oil",
+              "json_ld_text": "4 tbsp vegetable oil",
+              "source_verdict": "MATCH",
+              "note": null
+            },
+            "unsupported_phrase": "tbsp"
+          },
+          {
+            "sourceOrder": 4,
+            "rawText": "25g butter",
+            "name": "butter",
+            "quantity": 25.0,
+            "canonical_unit": "g",
+            "warnings": [],
+            "sourceIngredientIndex": 1,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "CORRECT",
+            "sourceError": false,
+            "unsupported": false,
+            "parserError": false,
+            "silentFallbackRisk": false,
+            "requiredCorrection": false,
+            "pocWarnings": [],
+            "source_evidence": {
+              "source_order": 2,
+              "visible_text": "25g butter",
+              "json_ld_text": "25g butter",
+              "source_verdict": "MATCH",
+              "note": null
+            },
+            "unsupported_phrase": null
+          },
+          {
+            "sourceOrder": 5,
+            "rawText": "4 onions roughly chopped",
+            "name": "onions roughly chopped",
+            "quantity": 4.0,
+            "canonical_unit": "db",
+            "warnings": [],
+            "sourceIngredientIndex": 2,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "CORRECT",
+            "sourceError": false,
+            "unsupported": false,
+            "parserError": false,
+            "silentFallbackRisk": false,
+            "requiredCorrection": false,
+            "pocWarnings": [],
+            "source_evidence": {
+              "source_order": 3,
+              "visible_text": "4 onions roughly chopped",
+              "json_ld_text": "4 onions roughly chopped",
+              "source_verdict": "MATCH",
+              "note": null
+            },
+            "unsupported_phrase": null
+          },
+          {
+            "sourceOrder": 6,
+            "rawText": "6 tbsp chicken tikka masala paste (use shop-bought or make your own – see recipe, below)",
+            "name": "tbsp chicken tikka masala paste (use shop-bought or make your own – see recipe, below)",
+            "quantity": 6.0,
+            "canonical_unit": "db",
+            "warnings": [],
+            "sourceIngredientIndex": 3,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "UNSUPPORTED_UNIT",
+            "sourceError": false,
+            "unsupported": true,
+            "parserError": false,
+            "silentFallbackRisk": true,
+            "requiredCorrection": true,
+            "pocWarnings": [
+              "UNSUPPORTED_INPUT",
+              "SILENT_BAD_FALLBACK_RISK"
+            ],
+            "source_evidence": {
+              "source_order": 4,
+              "visible_text": "6 tbsp chicken tikka masala paste (use shop-bought or make your own – see recipe, below)",
+              "json_ld_text": "6 tbsp chicken tikka masala paste (use shop-bought or make your own – see recipe, below)",
+              "source_verdict": "MATCH",
+              "note": null
+            },
+            "unsupported_phrase": "tbsp"
+          },
+          {
+            "sourceOrder": 7,
+            "rawText": "2 red peppers deseeded and cut into chunks",
+            "name": "red peppers deseeded and cut into chunks",
+            "quantity": 2.0,
+            "canonical_unit": "db",
+            "warnings": [],
+            "sourceIngredientIndex": 4,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "CORRECT",
+            "sourceError": false,
+            "unsupported": false,
+            "parserError": false,
+            "silentFallbackRisk": false,
+            "requiredCorrection": false,
+            "pocWarnings": [],
+            "source_evidence": {
+              "source_order": 5,
+              "visible_text": "2 red peppers deseeded and cut into chunks",
+              "json_ld_text": "2 red peppers deseeded and cut into chunks",
+              "source_verdict": "MATCH",
+              "note": null
+            },
+            "unsupported_phrase": null
+          },
+          {
+            "sourceOrder": 8,
+            "rawText": "8 boneless, skinless chicken breasts cut into 2.5cm cubes",
+            "name": "boneless, skinless chicken breasts cut into 2.5cm cubes",
+            "quantity": 8.0,
+            "canonical_unit": "db",
+            "warnings": [],
+            "sourceIngredientIndex": 5,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "CORRECT",
+            "sourceError": false,
+            "unsupported": false,
+            "parserError": false,
+            "silentFallbackRisk": false,
+            "requiredCorrection": false,
+            "pocWarnings": [],
+            "source_evidence": {
+              "source_order": 6,
+              "visible_text": "8 boneless, skinless chicken breasts cut into 2.5cm cubes",
+              "json_ld_text": "8 boneless, skinless chicken breasts cut into 2.5cm cubes",
+              "source_verdict": "MATCH",
+              "note": null
+            },
+            "unsupported_phrase": null
+          },
+          {
+            "sourceOrder": 9,
+            "rawText": "2 x 400g cans  chopped tomatoes",
+            "name": "2 x 400g cans  chopped tomatoes",
+            "quantity": null,
+            "canonical_unit": "db",
+            "warnings": [
+              "ambiguousIngredient"
+            ],
+            "sourceIngredientIndex": 6,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "UNSUPPORTED_UNIT",
+            "sourceError": false,
+            "unsupported": true,
+            "parserError": false,
+            "silentFallbackRisk": false,
+            "requiredCorrection": true,
+            "pocWarnings": [
+              "UNSUPPORTED_INPUT",
+              "PARSER_LIMITATION"
+            ],
+            "source_evidence": {
+              "source_order": 7,
+              "visible_text": "2 x 400g cans chopped tomatoes",
+              "json_ld_text": "2 x 400g cans  chopped tomatoes",
+              "source_verdict": "FORMAT_DIFFERENCE",
+              "note": null
+            },
+            "unsupported_phrase": "2 x 400g cans"
+          },
+          {
+            "sourceOrder": 10,
+            "rawText": "4 tbsp tomato purée",
+            "name": "tbsp tomato purée",
+            "quantity": 4.0,
+            "canonical_unit": "db",
+            "warnings": [],
+            "sourceIngredientIndex": 7,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "UNSUPPORTED_UNIT",
+            "sourceError": false,
+            "unsupported": true,
+            "parserError": false,
+            "silentFallbackRisk": true,
+            "requiredCorrection": true,
+            "pocWarnings": [
+              "UNSUPPORTED_INPUT",
+              "SILENT_BAD_FALLBACK_RISK"
+            ],
+            "source_evidence": {
+              "source_order": 8,
+              "visible_text": "4 tbsp tomato purée",
+              "json_ld_text": "4 tbsp tomato purée",
+              "source_verdict": "MATCH",
+              "note": null
+            },
+            "unsupported_phrase": "tbsp"
+          },
+          {
+            "sourceOrder": 11,
+            "rawText": "2-3 tbsp  mango chutney",
+            "name": "2-3 tbsp  mango chutney",
+            "quantity": 1.0,
+            "canonical_unit": "db",
+            "warnings": [
+              "missingQuantity"
+            ],
+            "sourceIngredientIndex": 8,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "UNSUPPORTED_UNIT",
+            "sourceError": false,
+            "unsupported": true,
+            "parserError": false,
+            "silentFallbackRisk": false,
+            "requiredCorrection": true,
+            "pocWarnings": [
+              "UNSUPPORTED_INPUT",
+              "PARSER_LIMITATION"
+            ],
+            "source_evidence": {
+              "source_order": 9,
+              "visible_text": "2-3 tbsp mango chutney",
+              "json_ld_text": "2-3 tbsp  mango chutney",
+              "source_verdict": "FORMAT_DIFFERENCE",
+              "note": null
+            },
+            "unsupported_phrase": "range tbsp"
+          },
+          {
+            "sourceOrder": 12,
+            "rawText": "150ml double cream",
+            "name": "double cream",
+            "quantity": 150.0,
+            "canonical_unit": "ml",
+            "warnings": [],
+            "sourceIngredientIndex": 9,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "CORRECT",
+            "sourceError": false,
+            "unsupported": false,
+            "parserError": false,
+            "silentFallbackRisk": false,
+            "requiredCorrection": false,
+            "pocWarnings": [],
+            "source_evidence": {
+              "source_order": 10,
+              "visible_text": "150ml double cream",
+              "json_ld_text": "150ml double cream",
+              "source_verdict": "MATCH",
+              "note": null
+            },
+            "unsupported_phrase": null
+          },
+          {
+            "sourceOrder": 13,
+            "rawText": "150ml natural  yogurt",
+            "name": "natural yogurt",
+            "quantity": 150.0,
+            "canonical_unit": "ml",
+            "warnings": [],
+            "sourceIngredientIndex": 10,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "FORMAT_ONLY",
+            "sourceError": false,
+            "unsupported": false,
+            "parserError": false,
+            "silentFallbackRisk": false,
+            "requiredCorrection": false,
+            "pocWarnings": [],
+            "source_evidence": {
+              "source_order": 11,
+              "visible_text": "150ml natural yogurt",
+              "json_ld_text": "150ml natural  yogurt",
+              "source_verdict": "FORMAT_DIFFERENCE",
+              "note": null
+            },
+            "unsupported_phrase": null
+          },
+          {
+            "sourceOrder": 14,
+            "rawText": "chopped  coriander leaves, to serve",
+            "name": "chopped  coriander leaves, to serve",
+            "quantity": 1.0,
+            "canonical_unit": "db",
+            "warnings": [
+              "missingQuantity"
+            ],
+            "sourceIngredientIndex": 11,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "FORMAT_ONLY",
+            "sourceError": false,
+            "unsupported": false,
+            "parserError": false,
+            "silentFallbackRisk": false,
+            "requiredCorrection": false,
+            "pocWarnings": [],
+            "source_evidence": {
+              "source_order": 12,
+              "visible_text": "chopped coriander leaves, to serve",
+              "json_ld_text": "chopped  coriander leaves, to serve",
+              "source_verdict": "FORMAT_DIFFERENCE",
+              "note": null
+            },
+            "unsupported_phrase": null
+          }
+        ],
+        "preparation": "Heat the vegetable oil and butter in a large, lidded casserole on the hob, then add the onions and a pinch of salt. Cook for 15-20 mins until soft and golden.\n\nAdd the tikka masala paste and peppers, then cook for 5 mins more to cook out the rawness of the spices.\n\nAdd the chicken breasts and stir well to coat in the paste. Cook for 2 mins, then tip in the chopped tomatoes, tomato purée and 200ml water. Cover with a lid and gently simmer for 15 mins, stirring occasionally, until the chicken is cooked through.\n\nRemove the lid, stir through the mango chutney, double cream and natural yogurt, then gently warm through. Season, then set aside whatever you want to freeze. Will keep, in an airtight container, in the freezer for up to three months.\n\nScatter the rest with coriander leaves and serve with basmati rice and naan bread.",
+        "spices": [],
+        "unprocessedSegments": []
+      },
+      "normalized_preparation": "Heat the vegetable oil and butter in a large, lidded casserole on the hob, then add the onions and a pinch of salt. Cook for 15-20 mins until soft and golden.\n\nAdd the tikka masala paste and peppers, then cook for 5 mins more to cook out the rawness of the spices.\n\nAdd the chicken breasts and stir well to coat in the paste. Cook for 2 mins, then tip in the chopped tomatoes, tomato purée and 200ml water. Cover with a lid and gently simmer for 15 mins, stirring occasionally, until the chicken is cooked through.\n\nRemove the lid, stir through the mango chutney, double cream and natural yogurt, then gently warm through. Season, then set aside whatever you want to freeze. Will keep, in an airtight container, in the freezer for up to three months.\n\nScatter the rest with coriander leaves and serve with basmati rice and naan bread.",
+      "timing": {
+        "normalization_ms": 0.271,
+        "parser_ms": 0.733,
+        "draft_build_ms": 0.023,
+        "total_local_ms": 1.03
+      },
+      "required_corrections": [
+        {
+          "row": 1,
+          "classification": "REQUIRED_CORRECTION",
+          "fields": [
+            "name/quantity/unit interpretation"
+          ],
+          "reasons": [
+            "Unsupported measure/expression cannot safely be represented by current db fallback."
+          ],
+          "counting": "One row-level correction action even if multiple fields/reasons overlap."
+        },
+        {
+          "row": 4,
+          "classification": "REQUIRED_CORRECTION",
+          "fields": [
+            "name/quantity/unit interpretation"
+          ],
+          "reasons": [
+            "Unsupported measure/expression cannot safely be represented by current db fallback."
+          ],
+          "counting": "One row-level correction action even if multiple fields/reasons overlap."
+        },
+        {
+          "row": 7,
+          "classification": "REQUIRED_CORRECTION",
+          "fields": [
+            "name/quantity/unit interpretation"
+          ],
+          "reasons": [
+            "Unsupported measure/expression cannot safely be represented by current db fallback."
+          ],
+          "counting": "One row-level correction action even if multiple fields/reasons overlap."
+        },
+        {
+          "row": 8,
+          "classification": "REQUIRED_CORRECTION",
+          "fields": [
+            "name/quantity/unit interpretation"
+          ],
+          "reasons": [
+            "Unsupported measure/expression cannot safely be represented by current db fallback."
+          ],
+          "counting": "One row-level correction action even if multiple fields/reasons overlap."
+        },
+        {
+          "row": 9,
+          "classification": "REQUIRED_CORRECTION",
+          "fields": [
+            "name/quantity/unit interpretation"
+          ],
+          "reasons": [
+            "Unsupported measure/expression cannot safely be represented by current db fallback."
+          ],
+          "counting": "One row-level correction action even if multiple fields/reasons overlap."
+        }
+      ],
+      "review_only": [
+        {
+          "row": 12,
+          "field": "quantity",
+          "classification": "REVIEW_ONLY",
+          "reason": "Source gives no quantity; accepted 1 db default requires confirmation, not a proven erroneous value."
+        }
+      ],
+      "silent_fallback_rows": 3,
+      "verdict": "POOR",
+      "verdict_reason": "5 correction actions / 12 ingredient rows; 1 review-only quantities. Usable=true.",
+      "consistency": {
+        "ingredient_fields_equal_b2_3": true,
+        "preparation_equals_normalized_input": true,
+        "b2_0_reference_verified_by_b2_2": true
+      }
+    },
+    {
+      "id": "20",
+      "url": "https://www.bbcgoodfood.com/recipes/classic-lasagne",
+      "domain": "www.bbcgoodfood.com",
+      "raw_title": "Easy classic lasagne",
+      "normalized_title": "Easy classic lasagne",
+      "parser_input": "Easy classic lasagne\n\nHozzávalók:\n1 tbsp olive oil\n2 rashers smoked streaky bacon\n1 onion finely chopped\n1 celery stick, finely chopped\n1 medium carrot grated\n2 garlic cloves finely chopped\n500g beef mince\n1 tbsp tomato purée\n2 x 400g cans chopped tomatoes\n1 tbsp clear honey\n500g pack fresh egg lasagne sheets\n400ml crème fraîche\n125g ball mozzarella roughly torn\n50g freshly grated parmesan\nlarge handful basil leaves torn (optional)\n\nElkészítés:\nHeat the oil in a large saucepan. Use kitchen scissors to snip the bacon into small pieces, or use a sharp knife to chop it on a chopping board. Add the bacon to the pan and cook for just a few mins until starting to turn golden. Add the onion, celery and carrot, and cook over a medium heat for 5 mins, stirring occasionally, until softened.\n\nAdd the garlic and cook for 1 min, then tip in the mince and cook, stirring and breaking it up with a wooden spoon, for about 6 mins until browned all over.\n\nStir in the tomato purée and cook for 1 min, mixing in well with the beef and vegetables. Tip in the chopped tomatoes. Fill each can half full with water to rinse out any tomatoes left in the can, and add to the pan. Add the honey and season to taste. Simmer for 20 mins.\n\nHeat oven to 200C/180C fan/gas 6. To assemble the lasagne, ladle a little of the ragu sauce into the bottom of the roasting tin or casserole dish, spreading the sauce all over the base. Place 2 sheets of lasagne on top of the sauce overlapping to make it fit, then repeat with more sauce and another layer of pasta. Repeat with a further 2 layers of sauce and pasta, finishing with a layer of pasta.\n\nPut the crème fraîche in a bowl and mix with 2 tbsp water to loosen it and make a smooth pourable sauce. Pour this over the top of the pasta, then top with the mozzarella. Sprinkle Parmesan over the top and bake for 25–30 mins until golden and bubbling. Serve scattered with basil, if you like.",
+      "draft": {
+        "title": "Easy classic lasagne",
+        "ingredients": [
+          {
+            "sourceOrder": 3,
+            "rawText": "1 tbsp olive oil",
+            "name": "tbsp olive oil",
+            "quantity": 1.0,
+            "canonical_unit": "db",
+            "warnings": [],
+            "sourceIngredientIndex": 0,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "UNSUPPORTED_UNIT",
+            "sourceError": false,
+            "unsupported": true,
+            "parserError": false,
+            "silentFallbackRisk": true,
+            "requiredCorrection": true,
+            "pocWarnings": [
+              "UNSUPPORTED_INPUT",
+              "SILENT_BAD_FALLBACK_RISK"
+            ],
+            "source_evidence": {
+              "source_order": 1,
+              "visible_text": "1 tbsp olive oil",
+              "json_ld_text": "1 tbsp olive oil",
+              "source_verdict": "MATCH",
+              "note": null
+            },
+            "unsupported_phrase": "tbsp"
+          },
+          {
+            "sourceOrder": 4,
+            "rawText": "2 rashers smoked streaky bacon",
+            "name": "rashers smoked streaky bacon",
+            "quantity": 2.0,
+            "canonical_unit": "db",
+            "warnings": [],
+            "sourceIngredientIndex": 1,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "UNSUPPORTED_UNIT",
+            "sourceError": false,
+            "unsupported": true,
+            "parserError": false,
+            "silentFallbackRisk": true,
+            "requiredCorrection": true,
+            "pocWarnings": [
+              "UNSUPPORTED_INPUT",
+              "SILENT_BAD_FALLBACK_RISK"
+            ],
+            "source_evidence": {
+              "source_order": 2,
+              "visible_text": "2 rashers smoked streaky bacon",
+              "json_ld_text": "2 rashers smoked streaky bacon",
+              "source_verdict": "MATCH",
+              "note": null
+            },
+            "unsupported_phrase": "rashers"
+          },
+          {
+            "sourceOrder": 5,
+            "rawText": "1 onion finely chopped",
+            "name": "onion finely chopped",
+            "quantity": 1.0,
+            "canonical_unit": "db",
+            "warnings": [],
+            "sourceIngredientIndex": 2,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "CORRECT",
+            "sourceError": false,
+            "unsupported": false,
+            "parserError": false,
+            "silentFallbackRisk": false,
+            "requiredCorrection": false,
+            "pocWarnings": [],
+            "source_evidence": {
+              "source_order": 3,
+              "visible_text": "1 onion finely chopped",
+              "json_ld_text": "1 onion finely chopped",
+              "source_verdict": "MATCH",
+              "note": null
+            },
+            "unsupported_phrase": null
+          },
+          {
+            "sourceOrder": 6,
+            "rawText": "1 celery stick, finely chopped",
+            "name": "celery stick, finely chopped",
+            "quantity": 1.0,
+            "canonical_unit": "db",
+            "warnings": [],
+            "sourceIngredientIndex": 3,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "UNSUPPORTED_UNIT",
+            "sourceError": false,
+            "unsupported": true,
+            "parserError": false,
+            "silentFallbackRisk": true,
+            "requiredCorrection": true,
+            "pocWarnings": [
+              "UNSUPPORTED_INPUT",
+              "SILENT_BAD_FALLBACK_RISK"
+            ],
+            "source_evidence": {
+              "source_order": 4,
+              "visible_text": "1 celery stick, finely chopped",
+              "json_ld_text": "1 celery stick, finely chopped",
+              "source_verdict": "MATCH",
+              "note": null
+            },
+            "unsupported_phrase": "stick"
+          },
+          {
+            "sourceOrder": 7,
+            "rawText": "1 medium carrot grated",
+            "name": "medium carrot grated",
+            "quantity": 1.0,
+            "canonical_unit": "db",
+            "warnings": [],
+            "sourceIngredientIndex": 4,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "CORRECT",
+            "sourceError": false,
+            "unsupported": false,
+            "parserError": false,
+            "silentFallbackRisk": false,
+            "requiredCorrection": false,
+            "pocWarnings": [],
+            "source_evidence": {
+              "source_order": 5,
+              "visible_text": "1 medium carrot grated",
+              "json_ld_text": "1 medium carrot grated",
+              "source_verdict": "MATCH",
+              "note": null
+            },
+            "unsupported_phrase": null
+          },
+          {
+            "sourceOrder": 8,
+            "rawText": "2 garlic cloves finely chopped",
+            "name": "garlic cloves finely chopped",
+            "quantity": 2.0,
+            "canonical_unit": "db",
+            "warnings": [],
+            "sourceIngredientIndex": 5,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "UNSUPPORTED_UNIT",
+            "sourceError": false,
+            "unsupported": true,
+            "parserError": false,
+            "silentFallbackRisk": true,
+            "requiredCorrection": true,
+            "pocWarnings": [
+              "UNSUPPORTED_INPUT",
+              "SILENT_BAD_FALLBACK_RISK"
+            ],
+            "source_evidence": {
+              "source_order": 6,
+              "visible_text": "2 garlic cloves finely chopped",
+              "json_ld_text": "2 garlic cloves finely chopped",
+              "source_verdict": "MATCH",
+              "note": null
+            },
+            "unsupported_phrase": "cloves"
+          },
+          {
+            "sourceOrder": 9,
+            "rawText": "500g beef mince",
+            "name": "beef mince",
+            "quantity": 500.0,
+            "canonical_unit": "g",
+            "warnings": [],
+            "sourceIngredientIndex": 6,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "CORRECT",
+            "sourceError": false,
+            "unsupported": false,
+            "parserError": false,
+            "silentFallbackRisk": false,
+            "requiredCorrection": false,
+            "pocWarnings": [],
+            "source_evidence": {
+              "source_order": 7,
+              "visible_text": "500g beef mince",
+              "json_ld_text": "500g beef mince",
+              "source_verdict": "MATCH",
+              "note": null
+            },
+            "unsupported_phrase": null
+          },
+          {
+            "sourceOrder": 10,
+            "rawText": "1 tbsp tomato purée",
+            "name": "tbsp tomato purée",
+            "quantity": 1.0,
+            "canonical_unit": "db",
+            "warnings": [],
+            "sourceIngredientIndex": 7,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "UNSUPPORTED_UNIT",
+            "sourceError": false,
+            "unsupported": true,
+            "parserError": false,
+            "silentFallbackRisk": true,
+            "requiredCorrection": true,
+            "pocWarnings": [
+              "UNSUPPORTED_INPUT",
+              "SILENT_BAD_FALLBACK_RISK"
+            ],
+            "source_evidence": {
+              "source_order": 8,
+              "visible_text": "1 tbsp tomato purée",
+              "json_ld_text": "1 tbsp tomato purée",
+              "source_verdict": "MATCH",
+              "note": null
+            },
+            "unsupported_phrase": "tbsp"
+          },
+          {
+            "sourceOrder": 11,
+            "rawText": "2 x 400g cans chopped tomatoes",
+            "name": "2 x 400g cans chopped tomatoes",
+            "quantity": null,
+            "canonical_unit": "db",
+            "warnings": [
+              "ambiguousIngredient"
+            ],
+            "sourceIngredientIndex": 8,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "UNSUPPORTED_UNIT",
+            "sourceError": false,
+            "unsupported": true,
+            "parserError": false,
+            "silentFallbackRisk": false,
+            "requiredCorrection": true,
+            "pocWarnings": [
+              "UNSUPPORTED_INPUT",
+              "PARSER_LIMITATION"
+            ],
+            "source_evidence": {
+              "source_order": 9,
+              "visible_text": "2 x 400g cans chopped tomatoes",
+              "json_ld_text": "2 x 400g cans chopped tomatoes",
+              "source_verdict": "MATCH",
+              "note": null
+            },
+            "unsupported_phrase": "2 x 400g cans"
+          },
+          {
+            "sourceOrder": 12,
+            "rawText": "1 tbsp clear honey",
+            "name": "tbsp clear honey",
+            "quantity": 1.0,
+            "canonical_unit": "db",
+            "warnings": [],
+            "sourceIngredientIndex": 9,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "UNSUPPORTED_UNIT",
+            "sourceError": false,
+            "unsupported": true,
+            "parserError": false,
+            "silentFallbackRisk": true,
+            "requiredCorrection": true,
+            "pocWarnings": [
+              "UNSUPPORTED_INPUT",
+              "SILENT_BAD_FALLBACK_RISK"
+            ],
+            "source_evidence": {
+              "source_order": 10,
+              "visible_text": "1 tbsp clear honey",
+              "json_ld_text": "1 tbsp clear honey",
+              "source_verdict": "MATCH",
+              "note": null
+            },
+            "unsupported_phrase": "tbsp"
+          },
+          {
+            "sourceOrder": 13,
+            "rawText": "500g pack fresh egg lasagne sheets",
+            "name": "pack fresh egg lasagne sheets",
+            "quantity": 500.0,
+            "canonical_unit": "g",
+            "warnings": [],
+            "sourceIngredientIndex": 10,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "CORRECT",
+            "sourceError": false,
+            "unsupported": false,
+            "parserError": false,
+            "silentFallbackRisk": false,
+            "requiredCorrection": false,
+            "pocWarnings": [],
+            "source_evidence": {
+              "source_order": 11,
+              "visible_text": "500g pack fresh egg lasagne sheets",
+              "json_ld_text": "500g pack fresh egg lasagne sheets",
+              "source_verdict": "MATCH",
+              "note": null
+            },
+            "unsupported_phrase": null
+          },
+          {
+            "sourceOrder": 14,
+            "rawText": "400ml crème fraîche",
+            "name": "crème fraîche",
+            "quantity": 400.0,
+            "canonical_unit": "ml",
+            "warnings": [],
+            "sourceIngredientIndex": 11,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "CORRECT",
+            "sourceError": false,
+            "unsupported": false,
+            "parserError": false,
+            "silentFallbackRisk": false,
+            "requiredCorrection": false,
+            "pocWarnings": [],
+            "source_evidence": {
+              "source_order": 12,
+              "visible_text": "400ml crème fraîche",
+              "json_ld_text": "400ml crème fraîche",
+              "source_verdict": "MATCH",
+              "note": null
+            },
+            "unsupported_phrase": null
+          },
+          {
+            "sourceOrder": 15,
+            "rawText": "125g ball mozzarella roughly torn",
+            "name": "ball mozzarella roughly torn",
+            "quantity": 125.0,
+            "canonical_unit": "g",
+            "warnings": [],
+            "sourceIngredientIndex": 12,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "CORRECT",
+            "sourceError": false,
+            "unsupported": false,
+            "parserError": false,
+            "silentFallbackRisk": false,
+            "requiredCorrection": false,
+            "pocWarnings": [],
+            "source_evidence": {
+              "source_order": 13,
+              "visible_text": "125g ball mozzarella roughly torn",
+              "json_ld_text": "125g ball mozzarella roughly torn",
+              "source_verdict": "MATCH",
+              "note": null
+            },
+            "unsupported_phrase": null
+          },
+          {
+            "sourceOrder": 16,
+            "rawText": "50g freshly grated parmesan",
+            "name": "freshly grated parmesan",
+            "quantity": 50.0,
+            "canonical_unit": "g",
+            "warnings": [],
+            "sourceIngredientIndex": 13,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "CORRECT",
+            "sourceError": false,
+            "unsupported": false,
+            "parserError": false,
+            "silentFallbackRisk": false,
+            "requiredCorrection": false,
+            "pocWarnings": [],
+            "source_evidence": {
+              "source_order": 14,
+              "visible_text": "50g freshly grated parmesan",
+              "json_ld_text": "50g freshly grated parmesan",
+              "source_verdict": "MATCH",
+              "note": null
+            },
+            "unsupported_phrase": null
+          },
+          {
+            "sourceOrder": 17,
+            "rawText": "large handful basil leaves torn (optional)",
+            "name": "large handful basil leaves torn (optional)",
+            "quantity": 1.0,
+            "canonical_unit": "db",
+            "warnings": [
+              "missingQuantity"
+            ],
+            "sourceIngredientIndex": 14,
+            "source_status": "VALID_SOURCE",
+            "parser_status": "UNSUPPORTED_UNIT",
+            "sourceError": false,
+            "unsupported": true,
+            "parserError": false,
+            "silentFallbackRisk": false,
+            "requiredCorrection": true,
+            "pocWarnings": [
+              "UNSUPPORTED_INPUT",
+              "PARSER_LIMITATION"
+            ],
+            "source_evidence": {
+              "source_order": 15,
+              "visible_text": "large handful basil leaves torn (optional)",
+              "json_ld_text": "large handful basil leaves torn (optional)",
+              "source_verdict": "MATCH",
+              "note": null
+            },
+            "unsupported_phrase": "large handful"
+          }
+        ],
+        "preparation": "Heat the oil in a large saucepan. Use kitchen scissors to snip the bacon into small pieces, or use a sharp knife to chop it on a chopping board. Add the bacon to the pan and cook for just a few mins until starting to turn golden. Add the onion, celery and carrot, and cook over a medium heat for 5 mins, stirring occasionally, until softened.\n\nAdd the garlic and cook for 1 min, then tip in the mince and cook, stirring and breaking it up with a wooden spoon, for about 6 mins until browned all over.\n\nStir in the tomato purée and cook for 1 min, mixing in well with the beef and vegetables. Tip in the chopped tomatoes. Fill each can half full with water to rinse out any tomatoes left in the can, and add to the pan. Add the honey and season to taste. Simmer for 20 mins.\n\nHeat oven to 200C/180C fan/gas 6. To assemble the lasagne, ladle a little of the ragu sauce into the bottom of the roasting tin or casserole dish, spreading the sauce all over the base. Place 2 sheets of lasagne on top of the sauce overlapping to make it fit, then repeat with more sauce and another layer of pasta. Repeat with a further 2 layers of sauce and pasta, finishing with a layer of pasta.\n\nPut the crème fraîche in a bowl and mix with 2 tbsp water to loosen it and make a smooth pourable sauce. Pour this over the top of the pasta, then top with the mozzarella. Sprinkle Parmesan over the top and bake for 25–30 mins until golden and bubbling. Serve scattered with basil, if you like.",
+        "spices": [],
+        "unprocessedSegments": []
+      },
+      "normalized_preparation": "Heat the oil in a large saucepan. Use kitchen scissors to snip the bacon into small pieces, or use a sharp knife to chop it on a chopping board. Add the bacon to the pan and cook for just a few mins until starting to turn golden. Add the onion, celery and carrot, and cook over a medium heat for 5 mins, stirring occasionally, until softened.\n\nAdd the garlic and cook for 1 min, then tip in the mince and cook, stirring and breaking it up with a wooden spoon, for about 6 mins until browned all over.\n\nStir in the tomato purée and cook for 1 min, mixing in well with the beef and vegetables. Tip in the chopped tomatoes. Fill each can half full with water to rinse out any tomatoes left in the can, and add to the pan. Add the honey and season to taste. Simmer for 20 mins.\n\nHeat oven to 200C/180C fan/gas 6. To assemble the lasagne, ladle a little of the ragu sauce into the bottom of the roasting tin or casserole dish, spreading the sauce all over the base. Place 2 sheets of lasagne on top of the sauce overlapping to make it fit, then repeat with more sauce and another layer of pasta. Repeat with a further 2 layers of sauce and pasta, finishing with a layer of pasta.\n\nPut the crème fraîche in a bowl and mix with 2 tbsp water to loosen it and make a smooth pourable sauce. Pour this over the top of the pasta, then top with the mozzarella. Sprinkle Parmesan over the top and bake for 25–30 mins until golden and bubbling. Serve scattered with basil, if you like.",
+      "timing": {
+        "normalization_ms": 0.282,
+        "parser_ms": 0.462,
+        "draft_build_ms": 0.024,
+        "total_local_ms": 0.77
+      },
+      "required_corrections": [
+        {
+          "row": 1,
+          "classification": "REQUIRED_CORRECTION",
+          "fields": [
+            "name/quantity/unit interpretation"
+          ],
+          "reasons": [
+            "Unsupported measure/expression cannot safely be represented by current db fallback."
+          ],
+          "counting": "One row-level correction action even if multiple fields/reasons overlap."
+        },
+        {
+          "row": 2,
+          "classification": "REQUIRED_CORRECTION",
+          "fields": [
+            "name/quantity/unit interpretation"
+          ],
+          "reasons": [
+            "Unsupported measure/expression cannot safely be represented by current db fallback."
+          ],
+          "counting": "One row-level correction action even if multiple fields/reasons overlap."
+        },
+        {
+          "row": 4,
+          "classification": "REQUIRED_CORRECTION",
+          "fields": [
+            "name/quantity/unit interpretation"
+          ],
+          "reasons": [
+            "Unsupported measure/expression cannot safely be represented by current db fallback."
+          ],
+          "counting": "One row-level correction action even if multiple fields/reasons overlap."
+        },
+        {
+          "row": 6,
+          "classification": "REQUIRED_CORRECTION",
+          "fields": [
+            "name/quantity/unit interpretation"
+          ],
+          "reasons": [
+            "Unsupported measure/expression cannot safely be represented by current db fallback."
+          ],
+          "counting": "One row-level correction action even if multiple fields/reasons overlap."
+        },
+        {
+          "row": 8,
+          "classification": "REQUIRED_CORRECTION",
+          "fields": [
+            "name/quantity/unit interpretation"
+          ],
+          "reasons": [
+            "Unsupported measure/expression cannot safely be represented by current db fallback."
+          ],
+          "counting": "One row-level correction action even if multiple fields/reasons overlap."
+        },
+        {
+          "row": 9,
+          "classification": "REQUIRED_CORRECTION",
+          "fields": [
+            "name/quantity/unit interpretation"
+          ],
+          "reasons": [
+            "Unsupported measure/expression cannot safely be represented by current db fallback."
+          ],
+          "counting": "One row-level correction action even if multiple fields/reasons overlap."
+        },
+        {
+          "row": 10,
+          "classification": "REQUIRED_CORRECTION",
+          "fields": [
+            "name/quantity/unit interpretation"
+          ],
+          "reasons": [
+            "Unsupported measure/expression cannot safely be represented by current db fallback."
+          ],
+          "counting": "One row-level correction action even if multiple fields/reasons overlap."
+        },
+        {
+          "row": 15,
+          "classification": "REQUIRED_CORRECTION",
+          "fields": [
+            "name/quantity/unit interpretation"
+          ],
+          "reasons": [
+            "Unsupported measure/expression cannot safely be represented by current db fallback."
+          ],
+          "counting": "One row-level correction action even if multiple fields/reasons overlap."
+        }
+      ],
+      "review_only": [],
+      "silent_fallback_rows": 6,
+      "verdict": "POOR",
+      "verdict_reason": "8 correction actions / 15 ingredient rows; 0 review-only quantities. Usable=true.",
+      "consistency": {
+        "ingredient_fields_equal_b2_3": true,
+        "preparation_equals_normalized_input": true,
+        "b2_0_reference_verified_by_b2_2": true
+      }
+    }
+  ]
+}

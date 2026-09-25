@@ -1,0 +1,2107 @@
+{
+  "phase": "B3.2",
+  "method": "Offline saved snapshots only. B3.0 DOM selectors reused; @VISIBLE resolved, full text checked without republication. Case/whitespace only ingredient comparison, no unit/quantity conversion. Source ingredient alignment manually reviewed. No parser/fetch or source correction. GOOD requires clean title and no structural/content differences; decoration alone is USABLE_WITH_ISSUES. Counts are specific to these frozen snapshots; DOM audit is not a browser rendering test.",
+  "summary": {
+    "technical_extraction_success": {
+      "success": 8,
+      "total": 10,
+      "percent": 80.0,
+      "evidence": "Frozen B3.1 results; not re-fetched"
+    },
+    "snapshot_stability": {
+      "unchanged_recipe_content": 8,
+      "technical_html_changes_only": 2,
+      "identical_html": 6,
+      "changed_recipe_content": 0,
+      "format_only_change": 0,
+      "unresolved": 0
+    },
+    "extractor_data_preservation": {
+      "lossless_recipes": 8,
+      "ingredient_rows": 82,
+      "instruction_entries": 47,
+      "lost_ingredient_rows": 0,
+      "added_ingredient_rows": 0,
+      "modified_ingredient_rows": 0,
+      "order_errors": 0,
+      "lost_instruction_entries": 0,
+      "added_instruction_entries": 0,
+      "title_mutations": 0,
+      "candidate_selection_problems": 0
+    },
+    "source_quality": {
+      "ingredients": {
+        "total_visible": 82,
+        "total_json_ld": 82,
+        "exact_matches": 81,
+        "format_only_matches": 1,
+        "exact_or_normalized_matches": 82,
+        "quantity_differences": 0,
+        "unit_differences": 0,
+        "missing_notes": 0,
+        "missing_rows": 0,
+        "extra_rows": 0,
+        "order_errors": 0,
+        "group_heading_differences": 4
+      },
+      "instructions": {
+        "complete": 8,
+        "structure_only_differences": 0,
+        "content_omissions": 0,
+        "extra_content": 0,
+        "order_errors": 0
+      },
+      "titles": {
+        "clean": 8,
+        "decorated": 0,
+        "wrong": 0,
+        "missing": 0
+      }
+    },
+    "domains": {
+      "www.bbcgoodfood.com": {
+        "recipes": 8,
+        "source_quality": {
+          "GOOD": 6,
+          "USABLE_WITH_ISSUES": 2,
+          "POOR": 0
+        },
+        "visible_ingredients": 82,
+        "missing_note_rows": 0,
+        "group_heading_differences": 4
+      }
+    }
+  },
+  "denominators": {
+    "technical": 10,
+    "source_quality_recipes": 8,
+    "extractor_recipes": 8,
+    "excluded_ids": [
+      "29",
+      "30"
+    ]
+  },
+  "access_blocked": [
+    {
+      "id": "29",
+      "url": "https://www.foodnetwork.com/recipes/food-network-kitchen/classic-meatloaf-5484735",
+      "http_status": 403,
+      "response_bytes": 450,
+      "status": "ACCESS_BLOCKED",
+      "content_status": "UNRESOLVED_CONTENT",
+      "usable_recipe_snapshot": false,
+      "verified_ground_truth": false,
+      "extractor_content_verdict": null,
+      "note": "ACCESS / FETCH LIMITATION. Non-2xx body not retained by B3.1. Extraction skipped: zero candidates does not prove absence of JSON-LD. Excluded from content/source/extractor/parser denominators; retained as technical failure. No retry."
+    },
+    {
+      "id": "30",
+      "url": "https://www.foodnetwork.com/recipes/guacamole-recipe2-1956046",
+      "http_status": 403,
+      "response_bytes": 418,
+      "status": "ACCESS_BLOCKED",
+      "content_status": "UNRESOLVED_CONTENT",
+      "usable_recipe_snapshot": false,
+      "verified_ground_truth": false,
+      "extractor_content_verdict": null,
+      "note": "ACCESS / FETCH LIMITATION. Non-2xx body not retained by B3.1. Extraction skipped: zero candidates does not prove absence of JSON-LD. Excluded from content/source/extractor/parser denominators; retained as technical failure. No retry."
+    }
+  ],
+  "recipes": [
+    {
+      "id": "21",
+      "url": "https://www.bbcgoodfood.com/recipes/easy-chicken-curry",
+      "domain": "www.bbcgoodfood.com",
+      "snapshot": {
+        "b3_0_sha256": "b4d6f70b796d381aadb6e0c1f8d0481fc48041e5a8b31436627539ff0cf57003",
+        "b3_1_sha256": "79f76ba98713df7b503ba8db7e7787f9f62342d8578da7f602e255ce2363ca8f",
+        "b3_0_manifest_and_visible_references_verified": true,
+        "b3_1_bytes_verified": true,
+        "verdict": "UNCHANGED_RECIPE_CONTENT",
+        "html_changed": true,
+        "fields_equal": {
+          "title": true,
+          "ingredients": true,
+          "ingredient_groups": true,
+          "steps": true,
+          "instruction_selector": true,
+          "servings": true
+        },
+        "servings_before": [
+          "Serves 4"
+        ],
+        "servings_after": [
+          "Serves 4"
+        ],
+        "b3_0": "b3_0_sources/source_21.html",
+        "b3_1": "b3_1_html/source_21.html",
+        "quantity_unit_notes_check": "Full ingredient strings compared without conversions; unchanged.",
+        "reference": "Existing B3.0 reference valid; no replacement created."
+      },
+      "reference_check": {
+        "resolved_visible_references": 4,
+        "exact_text_match": true,
+        "ground_truth_ingredients_match": true
+      },
+      "title": {
+        "visible": "Easy chicken curry",
+        "json_ld": "Easy chicken curry",
+        "verdict": "CLEAN"
+      },
+      "ingredients": [
+        {
+          "source_order": 1,
+          "visible_text": "2 tbsp sunflower oil",
+          "json_ld_text": "2 tbsp sunflower oil",
+          "source_verdict": "MATCH",
+          "note": null
+        },
+        {
+          "source_order": 2,
+          "visible_text": "1 onion thinly sliced",
+          "json_ld_text": "1 onion thinly sliced",
+          "source_verdict": "MATCH",
+          "note": null
+        },
+        {
+          "source_order": 3,
+          "visible_text": "2 garlic cloves crushed",
+          "json_ld_text": "2 garlic cloves crushed",
+          "source_verdict": "MATCH",
+          "note": null
+        },
+        {
+          "source_order": 4,
+          "visible_text": "thumb-sized piece of ginger grated",
+          "json_ld_text": "thumb-sized piece of ginger grated",
+          "source_verdict": "MATCH",
+          "note": null
+        },
+        {
+          "source_order": 5,
+          "visible_text": "6 chicken thighs boneless and skinless",
+          "json_ld_text": "6 chicken thighs boneless and skinless",
+          "source_verdict": "MATCH",
+          "note": null
+        },
+        {
+          "source_order": 6,
+          "visible_text": "3 tbsp medium spice paste (tikka works well)",
+          "json_ld_text": "3 tbsp medium spice paste (tikka works well)",
+          "source_verdict": "MATCH",
+          "note": null
+        },
+        {
+          "source_order": 7,
+          "visible_text": "400g can chopped tomatoes",
+          "json_ld_text": "400g can chopped tomatoes",
+          "source_verdict": "MATCH",
+          "note": null
+        },
+        {
+          "source_order": 8,
+          "visible_text": "100g Greek yogurt",
+          "json_ld_text": "100g Greek yogurt",
+          "source_verdict": "MATCH",
+          "note": null
+        },
+        {
+          "source_order": 9,
+          "visible_text": "1 small bunch of coriander leaves chopped",
+          "json_ld_text": "1 small bunch of coriander leaves chopped",
+          "source_verdict": "MATCH",
+          "note": null
+        },
+        {
+          "source_order": 10,
+          "visible_text": "50g ground almonds",
+          "json_ld_text": "50g ground almonds",
+          "source_verdict": "MATCH",
+          "note": null
+        },
+        {
+          "source_order": 11,
+          "visible_text": "naan breads or cooked basmati rice, to serve",
+          "json_ld_text": "naan breads or cooked basmati rice, to serve",
+          "source_verdict": "MATCH",
+          "note": null
+        }
+      ],
+      "visible_ingredient_count": 11,
+      "json_ld_ingredient_count": 11,
+      "ingredient_order_preserved": true,
+      "missing_ingredient_rows": 0,
+      "extra_ingredient_rows": 0,
+      "group_heading_differences": [],
+      "instructions": {
+        "verdict": "COMPLETE",
+        "visible_actual_blocks": 4,
+        "json_ld_step_count": 4,
+        "extracted_entry_count": 4,
+        "json_ld_heading_count": 0,
+        "visible_step_headings": [
+          "step 1",
+          "step 2",
+          "step 3",
+          "step 4"
+        ],
+        "json_ld_headings": [],
+        "visible_text_lengths": [
+          204,
+          56,
+          276,
+          109
+        ],
+        "json_ld_text_lengths": [
+          204,
+          56,
+          276,
+          109
+        ],
+        "ordered_full_text_equal_after_whitespace_collapse": true,
+        "missing_steps": 0,
+        "extra_steps": 0,
+        "order_errors": 0,
+        "content_omissions": 0,
+        "extra_content": 0,
+        "note": "Step bodies equal in source order. Ordinal step labels are presentation, not extra cooking steps.",
+        "references": [
+          {
+            "index": 1,
+            "snapshot": "results/b3_0_sources/source_21.html",
+            "snapshot_sha256": "B4D6F70B796D381AADB6E0C1F8D0481FC48041E5A8B31436627539FF0CF57003",
+            "selector": ".method-steps__list-item",
+            "selector_index_zero_based": 0,
+            "heading": "step 1",
+            "content_scope": ".editor-content",
+            "text_length": 204
+          },
+          {
+            "index": 2,
+            "snapshot": "results/b3_0_sources/source_21.html",
+            "snapshot_sha256": "B4D6F70B796D381AADB6E0C1F8D0481FC48041E5A8B31436627539FF0CF57003",
+            "selector": ".method-steps__list-item",
+            "selector_index_zero_based": 1,
+            "heading": "step 2",
+            "content_scope": ".editor-content",
+            "text_length": 56
+          },
+          {
+            "index": 3,
+            "snapshot": "results/b3_0_sources/source_21.html",
+            "snapshot_sha256": "B4D6F70B796D381AADB6E0C1F8D0481FC48041E5A8B31436627539FF0CF57003",
+            "selector": ".method-steps__list-item",
+            "selector_index_zero_based": 2,
+            "heading": "step 3",
+            "content_scope": ".editor-content",
+            "text_length": 276
+          },
+          {
+            "index": 4,
+            "snapshot": "results/b3_0_sources/source_21.html",
+            "snapshot_sha256": "B4D6F70B796D381AADB6E0C1F8D0481FC48041E5A8B31436627539FF0CF57003",
+            "selector": ".method-steps__list-item",
+            "selector_index_zero_based": 3,
+            "heading": "step 4",
+            "content_scope": ".editor-content",
+            "text_length": 109
+          }
+        ]
+      },
+      "extractor_evidence": {
+        "ingredients": {
+          "expected_count": 11,
+          "actual_count": 11,
+          "lost": 0,
+          "added": 0,
+          "modified_positions": [],
+          "order_error": false,
+          "exact_ordered_equality": true
+        },
+        "instructions": {
+          "expected_count": 4,
+          "actual_count": 4,
+          "lost": 0,
+          "added": 0,
+          "modified_positions": [],
+          "order_error": false,
+          "exact_ordered_equality": true
+        },
+        "title_mutation": false,
+        "raw_ingredients_preserved": true,
+        "raw_instructions_preserved": true,
+        "candidate_selection_problem": false
+      },
+      "source_quality": "GOOD",
+      "extractor_verdict": "LOSSLESS"
+    },
+    {
+      "id": "22",
+      "url": "https://www.bbcgoodfood.com/recipes/easy-pancakes",
+      "domain": "www.bbcgoodfood.com",
+      "snapshot": {
+        "b3_0_sha256": "3cbee9866978ff1c042286bffd9d7d6a820fb684c693c68d54f064d358ca59c1",
+        "b3_1_sha256": "3cbee9866978ff1c042286bffd9d7d6a820fb684c693c68d54f064d358ca59c1",
+        "b3_0_manifest_and_visible_references_verified": true,
+        "b3_1_bytes_verified": true,
+        "verdict": "UNCHANGED_RECIPE_CONTENT",
+        "html_changed": false,
+        "fields_equal": {
+          "title": true,
+          "ingredients": true,
+          "ingredient_groups": true,
+          "steps": true,
+          "instruction_selector": true,
+          "servings": true
+        },
+        "servings_before": [
+          "Makes 12"
+        ],
+        "servings_after": [
+          "Makes 12"
+        ],
+        "b3_0": "b3_0_sources/source_22.html",
+        "b3_1": "b3_1_html/source_22.html",
+        "quantity_unit_notes_check": "Full ingredient strings compared without conversions; unchanged.",
+        "reference": "Existing B3.0 reference valid; no replacement created."
+      },
+      "reference_check": {
+        "resolved_visible_references": 5,
+        "exact_text_match": true,
+        "ground_truth_ingredients_match": true
+      },
+      "title": {
+        "visible": "Easy pancakes",
+        "json_ld": "Easy pancakes",
+        "verdict": "CLEAN"
+      },
+      "ingredients": [
+        {
+          "source_order": 1,
+          "visible_text": "100g plain flour",
+          "json_ld_text": "100g plain flour",
+          "source_verdict": "MATCH",
+          "note": null
+        },
+        {
+          "source_order": 2,
+          "visible_text": "2 large eggs",
+          "json_ld_text": "2 large eggs",
+          "source_verdict": "MATCH",
+          "note": null
+        },
+        {
+          "source_order": 3,
+          "visible_text": "300ml milk",
+          "json_ld_text": "300ml milk",
+          "source_verdict": "MATCH",
+          "note": null
+        },
+        {
+          "source_order": 4,
+          "visible_text": "1 tbsp sunflower or vegetable oil plus a little extra for frying",
+          "json_ld_text": "1 tbsp sunflower or vegetable oil plus a little extra for frying",
+          "source_verdict": "MATCH",
+          "note": null
+        },
+        {
+          "source_order": 5,
+          "visible_text": "lemon wedges to serve (optional)",
+          "json_ld_text": "lemon wedges to serve (optional)",
+          "source_verdict": "MATCH",
+          "note": null
+        },
+        {
+          "source_order": 6,
+          "visible_text": "caster sugar to serve (optional)",
+          "json_ld_text": "caster sugar to serve (optional)",
+          "source_verdict": "MATCH",
+          "note": null
+        }
+      ],
+      "visible_ingredient_count": 6,
+      "json_ld_ingredient_count": 6,
+      "ingredient_order_preserved": true,
+      "missing_ingredient_rows": 0,
+      "extra_ingredient_rows": 0,
+      "group_heading_differences": [],
+      "instructions": {
+        "verdict": "COMPLETE",
+        "visible_actual_blocks": 5,
+        "json_ld_step_count": 5,
+        "extracted_entry_count": 5,
+        "json_ld_heading_count": 0,
+        "visible_step_headings": [
+          "step 1",
+          "step 2",
+          "step 3",
+          "step 4",
+          "step 5"
+        ],
+        "json_ld_headings": [],
+        "visible_text_lengths": [
+          213,
+          79,
+          108,
+          168,
+          189
+        ],
+        "json_ld_text_lengths": [
+          213,
+          79,
+          108,
+          168,
+          189
+        ],
+        "ordered_full_text_equal_after_whitespace_collapse": true,
+        "missing_steps": 0,
+        "extra_steps": 0,
+        "order_errors": 0,
+        "content_omissions": 0,
+        "extra_content": 0,
+        "note": "Step bodies equal in source order. Ordinal step labels are presentation, not extra cooking steps.",
+        "references": [
+          {
+            "index": 1,
+            "snapshot": "results/b3_0_sources/source_22.html",
+            "snapshot_sha256": "3CBEE9866978FF1C042286BFFD9D7D6A820FB684C693C68D54F064D358CA59C1",
+            "selector": ".method-steps__list-item",
+            "selector_index_zero_based": 0,
+            "heading": "step 1",
+            "content_scope": ".editor-content",
+            "text_length": 213
+          },
+          {
+            "index": 2,
+            "snapshot": "results/b3_0_sources/source_22.html",
+            "snapshot_sha256": "3CBEE9866978FF1C042286BFFD9D7D6A820FB684C693C68D54F064D358CA59C1",
+            "selector": ".method-steps__list-item",
+            "selector_index_zero_based": 1,
+            "heading": "step 2",
+            "content_scope": ".editor-content",
+            "text_length": 79
+          },
+          {
+            "index": 3,
+            "snapshot": "results/b3_0_sources/source_22.html",
+            "snapshot_sha256": "3CBEE9866978FF1C042286BFFD9D7D6A820FB684C693C68D54F064D358CA59C1",
+            "selector": ".method-steps__list-item",
+            "selector_index_zero_based": 2,
+            "heading": "step 3",
+            "content_scope": ".editor-content",
+            "text_length": 108
+          },
+          {
+            "index": 4,
+            "snapshot": "results/b3_0_sources/source_22.html",
+            "snapshot_sha256": "3CBEE9866978FF1C042286BFFD9D7D6A820FB684C693C68D54F064D358CA59C1",
+            "selector": ".method-steps__list-item",
+            "selector_index_zero_based": 3,
+            "heading": "step 4",
+            "content_scope": ".editor-content",
+            "text_length": 168
+          },
+          {
+            "index": 5,
+            "snapshot": "results/b3_0_sources/source_22.html",
+            "snapshot_sha256": "3CBEE9866978FF1C042286BFFD9D7D6A820FB684C693C68D54F064D358CA59C1",
+            "selector": ".method-steps__list-item",
+            "selector_index_zero_based": 4,
+            "heading": "step 5",
+            "content_scope": ".editor-content",
+            "text_length": 189
+          }
+        ]
+      },
+      "extractor_evidence": {
+        "ingredients": {
+          "expected_count": 6,
+          "actual_count": 6,
+          "lost": 0,
+          "added": 0,
+          "modified_positions": [],
+          "order_error": false,
+          "exact_ordered_equality": true
+        },
+        "instructions": {
+          "expected_count": 5,
+          "actual_count": 5,
+          "lost": 0,
+          "added": 0,
+          "modified_positions": [],
+          "order_error": false,
+          "exact_ordered_equality": true
+        },
+        "title_mutation": false,
+        "raw_ingredients_preserved": true,
+        "raw_instructions_preserved": true,
+        "candidate_selection_problem": false
+      },
+      "source_quality": "GOOD",
+      "extractor_verdict": "LOSSLESS"
+    },
+    {
+      "id": "23",
+      "url": "https://www.bbcgoodfood.com/recipes/fish-pie-four-steps",
+      "domain": "www.bbcgoodfood.com",
+      "snapshot": {
+        "b3_0_sha256": "699410c301850cf0c5ce870b42f8fda04e39b5a351cb34afa199b82975eae6cb",
+        "b3_1_sha256": "699410c301850cf0c5ce870b42f8fda04e39b5a351cb34afa199b82975eae6cb",
+        "b3_0_manifest_and_visible_references_verified": true,
+        "b3_1_bytes_verified": true,
+        "verdict": "UNCHANGED_RECIPE_CONTENT",
+        "html_changed": false,
+        "fields_equal": {
+          "title": true,
+          "ingredients": true,
+          "ingredient_groups": true,
+          "steps": true,
+          "instruction_selector": true,
+          "servings": true
+        },
+        "servings_before": [
+          "Serves 4"
+        ],
+        "servings_after": [
+          "Serves 4"
+        ],
+        "b3_0": "b3_0_sources/source_23.html",
+        "b3_1": "b3_1_html/source_23.html",
+        "quantity_unit_notes_check": "Full ingredient strings compared without conversions; unchanged.",
+        "reference": "Existing B3.0 reference valid; no replacement created."
+      },
+      "reference_check": {
+        "resolved_visible_references": 4,
+        "exact_text_match": true,
+        "ground_truth_ingredients_match": true
+      },
+      "title": {
+        "visible": "Fish pie - in four steps",
+        "json_ld": "Fish pie - in four steps",
+        "verdict": "CLEAN"
+      },
+      "ingredients": [
+        {
+          "source_order": 1,
+          "visible_text": "400g skinless white fish fillet",
+          "json_ld_text": "400g skinless white fish fillet",
+          "source_verdict": "MATCH",
+          "note": null
+        },
+        {
+          "source_order": 2,
+          "visible_text": "400g skinless smoked haddock fillet",
+          "json_ld_text": "400g skinless smoked haddock fillet",
+          "source_verdict": "MATCH",
+          "note": null
+        },
+        {
+          "source_order": 3,
+          "visible_text": "600ml semi-skimmed milk",
+          "json_ld_text": "600ml semi-skimmed milk",
+          "source_verdict": "MATCH",
+          "note": null
+        },
+        {
+          "source_order": 4,
+          "visible_text": "1 small onion quartered",
+          "json_ld_text": "1 small onion quartered",
+          "source_verdict": "MATCH",
+          "note": null
+        },
+        {
+          "source_order": 5,
+          "visible_text": "4 cloves",
+          "json_ld_text": "4 cloves",
+          "source_verdict": "MATCH",
+          "note": null
+        },
+        {
+          "source_order": 6,
+          "visible_text": "2 bay leaves",
+          "json_ld_text": "2 bay leaves",
+          "source_verdict": "MATCH",
+          "note": null
+        },
+        {
+          "source_order": 7,
+          "visible_text": "4 eggs",
+          "json_ld_text": "4 eggs",
+          "source_verdict": "MATCH",
+          "note": null
+        },
+        {
+          "source_order": 8,
+          "visible_text": "small bunch parsley leaves only, chopped",
+          "json_ld_text": "small bunch parsley leaves only, chopped",
+          "source_verdict": "MATCH",
+          "note": null
+        },
+        {
+          "source_order": 9,
+          "visible_text": "100g butter",
+          "json_ld_text": "100g butter",
+          "source_verdict": "MATCH",
+          "note": null
+        },
+        {
+          "source_order": 10,
+          "visible_text": "50g plain flour",
+          "json_ld_text": "50g plain flour",
+          "source_verdict": "MATCH",
+          "note": null
+        },
+        {
+          "source_order": 11,
+          "visible_text": "pinch freshly grated nutmeg",
+          "json_ld_text": "pinch freshly grated nutmeg",
+          "source_verdict": "MATCH",
+          "note": null
+        },
+        {
+          "source_order": 12,
+          "visible_text": "1kg floury potato peeled and cut into even-sized chunks",
+          "json_ld_text": "1kg floury potato peeled and cut into even-sized chunks",
+          "source_verdict": "MATCH",
+          "note": null
+        },
+        {
+          "source_order": 13,
+          "visible_text": "50g cheddar grated",
+          "json_ld_text": "50g cheddar grated",
+          "source_verdict": "MATCH",
+          "note": null
+        }
+      ],
+      "visible_ingredient_count": 13,
+      "json_ld_ingredient_count": 13,
+      "ingredient_order_preserved": true,
+      "missing_ingredient_rows": 0,
+      "extra_ingredient_rows": 0,
+      "group_heading_differences": [],
+      "instructions": {
+        "verdict": "COMPLETE",
+        "visible_actual_blocks": 4,
+        "json_ld_step_count": 4,
+        "extracted_entry_count": 4,
+        "json_ld_heading_count": 0,
+        "visible_step_headings": [
+          "step 1",
+          "step 2",
+          "step 3",
+          "step 4"
+        ],
+        "json_ld_headings": [],
+        "visible_text_lengths": [
+          483,
+          410,
+          498,
+          447
+        ],
+        "json_ld_text_lengths": [
+          483,
+          410,
+          498,
+          447
+        ],
+        "ordered_full_text_equal_after_whitespace_collapse": true,
+        "missing_steps": 0,
+        "extra_steps": 0,
+        "order_errors": 0,
+        "content_omissions": 0,
+        "extra_content": 0,
+        "note": "Step bodies equal in source order. Ordinal step labels are presentation, not extra cooking steps.",
+        "references": [
+          {
+            "index": 1,
+            "snapshot": "results/b3_0_sources/source_23.html",
+            "snapshot_sha256": "699410C301850CF0C5CE870B42F8FDA04E39B5A351CB34AFA199B82975EAE6CB",
+            "selector": ".method-steps__list-item",
+            "selector_index_zero_based": 0,
+            "heading": "step 1",
+            "content_scope": ".editor-content",
+            "text_length": 483
+          },
+          {
+            "index": 2,
+            "snapshot": "results/b3_0_sources/source_23.html",
+            "snapshot_sha256": "699410C301850CF0C5CE870B42F8FDA04E39B5A351CB34AFA199B82975EAE6CB",
+            "selector": ".method-steps__list-item",
+            "selector_index_zero_based": 1,
+            "heading": "step 2",
+            "content_scope": ".editor-content",
+            "text_length": 410
+          },
+          {
+            "index": 3,
+            "snapshot": "results/b3_0_sources/source_23.html",
+            "snapshot_sha256": "699410C301850CF0C5CE870B42F8FDA04E39B5A351CB34AFA199B82975EAE6CB",
+            "selector": ".method-steps__list-item",
+            "selector_index_zero_based": 2,
+            "heading": "step 3",
+            "content_scope": ".editor-content",
+            "text_length": 498
+          },
+          {
+            "index": 4,
+            "snapshot": "results/b3_0_sources/source_23.html",
+            "snapshot_sha256": "699410C301850CF0C5CE870B42F8FDA04E39B5A351CB34AFA199B82975EAE6CB",
+            "selector": ".method-steps__list-item",
+            "selector_index_zero_based": 3,
+            "heading": "step 4",
+            "content_scope": ".editor-content",
+            "text_length": 447
+          }
+        ]
+      },
+      "extractor_evidence": {
+        "ingredients": {
+          "expected_count": 13,
+          "actual_count": 13,
+          "lost": 0,
+          "added": 0,
+          "modified_positions": [],
+          "order_error": false,
+          "exact_ordered_equality": true
+        },
+        "instructions": {
+          "expected_count": 4,
+          "actual_count": 4,
+          "lost": 0,
+          "added": 0,
+          "modified_positions": [],
+          "order_error": false,
+          "exact_ordered_equality": true
+        },
+        "title_mutation": false,
+        "raw_ingredients_preserved": true,
+        "raw_instructions_preserved": true,
+        "candidate_selection_problem": false
+      },
+      "source_quality": "GOOD",
+      "extractor_verdict": "LOSSLESS"
+    },
+    {
+      "id": "24",
+      "url": "https://www.bbcgoodfood.com/recipes/best-ever-chocolate-brownies-recipe",
+      "domain": "www.bbcgoodfood.com",
+      "snapshot": {
+        "b3_0_sha256": "34761fbbfcaa228a5327c1ad96e3d9e5ed33aeb00b6a7d37f887bf43821f6905",
+        "b3_1_sha256": "2a45389122ca8b2c0737f3c0e6adbbb4661eb136dac14fd3255e1c9670f921e5",
+        "b3_0_manifest_and_visible_references_verified": true,
+        "b3_1_bytes_verified": true,
+        "verdict": "UNCHANGED_RECIPE_CONTENT",
+        "html_changed": true,
+        "fields_equal": {
+          "title": true,
+          "ingredients": true,
+          "ingredient_groups": true,
+          "steps": true,
+          "instruction_selector": true,
+          "servings": true
+        },
+        "servings_before": [
+          "Cuts into 16 squares or 32 triangles"
+        ],
+        "servings_after": [
+          "Cuts into 16 squares or 32 triangles"
+        ],
+        "b3_0": "b3_0_sources/source_24.html",
+        "b3_1": "b3_1_html/source_24.html",
+        "quantity_unit_notes_check": "Full ingredient strings compared without conversions; unchanged.",
+        "reference": "Existing B3.0 reference valid; no replacement created."
+      },
+      "reference_check": {
+        "resolved_visible_references": 15,
+        "exact_text_match": true,
+        "ground_truth_ingredients_match": true
+      },
+      "title": {
+        "visible": "Best ever chocolate brownies recipe",
+        "json_ld": "Best ever chocolate brownies recipe",
+        "verdict": "CLEAN"
+      },
+      "ingredients": [
+        {
+          "source_order": 1,
+          "visible_text": "185g unsalted butter",
+          "json_ld_text": "185g unsalted butter",
+          "source_verdict": "MATCH",
+          "note": null
+        },
+        {
+          "source_order": 2,
+          "visible_text": "185g best dark chocolate",
+          "json_ld_text": "185g best dark chocolate",
+          "source_verdict": "MATCH",
+          "note": null
+        },
+        {
+          "source_order": 3,
+          "visible_text": "85g plain flour",
+          "json_ld_text": "85g plain flour",
+          "source_verdict": "MATCH",
+          "note": null
+        },
+        {
+          "source_order": 4,
+          "visible_text": "40g cocoa powder",
+          "json_ld_text": "40g cocoa powder",
+          "source_verdict": "MATCH",
+          "note": null
+        },
+        {
+          "source_order": 5,
+          "visible_text": "50g white chocolate",
+          "json_ld_text": "50g white chocolate",
+          "source_verdict": "MATCH",
+          "note": null
+        },
+        {
+          "source_order": 6,
+          "visible_text": "50g milk chocolate",
+          "json_ld_text": "50g milk chocolate",
+          "source_verdict": "MATCH",
+          "note": null
+        },
+        {
+          "source_order": 7,
+          "visible_text": "3 large eggs",
+          "json_ld_text": "3 large eggs",
+          "source_verdict": "MATCH",
+          "note": null
+        },
+        {
+          "source_order": 8,
+          "visible_text": "275g golden caster sugar",
+          "json_ld_text": "275g golden caster sugar",
+          "source_verdict": "MATCH",
+          "note": null
+        }
+      ],
+      "visible_ingredient_count": 8,
+      "json_ld_ingredient_count": 8,
+      "ingredient_order_preserved": true,
+      "missing_ingredient_rows": 0,
+      "extra_ingredient_rows": 0,
+      "group_heading_differences": [],
+      "instructions": {
+        "verdict": "COMPLETE",
+        "visible_actual_blocks": 15,
+        "json_ld_step_count": 15,
+        "extracted_entry_count": 15,
+        "json_ld_heading_count": 0,
+        "visible_step_headings": [
+          "step 1",
+          "step 2",
+          "step 3",
+          "step 4",
+          "step 5",
+          "step 6",
+          "step 7",
+          "step 8",
+          "step 9",
+          "step 10",
+          "step 11",
+          "step 12",
+          "step 13",
+          "step 14",
+          "step 15"
+        ],
+        "json_ld_headings": [],
+        "visible_text_lengths": [
+          137,
+          241,
+          185,
+          130,
+          277,
+          71,
+          587,
+          515,
+          156,
+          312,
+          85,
+          213,
+          367,
+          343,
+          96
+        ],
+        "json_ld_text_lengths": [
+          137,
+          241,
+          185,
+          130,
+          277,
+          71,
+          587,
+          515,
+          156,
+          312,
+          85,
+          213,
+          367,
+          343,
+          96
+        ],
+        "ordered_full_text_equal_after_whitespace_collapse": true,
+        "missing_steps": 0,
+        "extra_steps": 0,
+        "order_errors": 0,
+        "content_omissions": 0,
+        "extra_content": 0,
+        "note": "Step bodies equal in source order. Ordinal step labels are presentation, not extra cooking steps.",
+        "references": [
+          {
+            "index": 1,
+            "snapshot": "results/b3_0_sources/source_24.html",
+            "snapshot_sha256": "34761FBBFCAA228A5327C1AD96E3D9E5ED33AEB00B6A7D37F887BF43821F6905",
+            "selector": ".method-steps__list-item",
+            "selector_index_zero_based": 0,
+            "heading": "step 1",
+            "content_scope": ".editor-content",
+            "text_length": 137
+          },
+          {
+            "index": 2,
+            "snapshot": "results/b3_0_sources/source_24.html",
+            "snapshot_sha256": "34761FBBFCAA228A5327C1AD96E3D9E5ED33AEB00B6A7D37F887BF43821F6905",
+            "selector": ".method-steps__list-item",
+            "selector_index_zero_based": 1,
+            "heading": "step 2",
+            "content_scope": ".editor-content",
+            "text_length": 241
+          },
+          {
+            "index": 3,
+            "snapshot": "results/b3_0_sources/source_24.html",
+            "snapshot_sha256": "34761FBBFCAA228A5327C1AD96E3D9E5ED33AEB00B6A7D37F887BF43821F6905",
+            "selector": ".method-steps__list-item",
+            "selector_index_zero_based": 2,
+            "heading": "step 3",
+            "content_scope": ".editor-content",
+            "text_length": 185
+          },
+          {
+            "index": 4,
+            "snapshot": "results/b3_0_sources/source_24.html",
+            "snapshot_sha256": "34761FBBFCAA228A5327C1AD96E3D9E5ED33AEB00B6A7D37F887BF43821F6905",
+            "selector": ".method-steps__list-item",
+            "selector_index_zero_based": 3,
+            "heading": "step 4",
+            "content_scope": ".editor-content",
+            "text_length": 130
+          },
+          {
+            "index": 5,
+            "snapshot": "results/b3_0_sources/source_24.html",
+            "snapshot_sha256": "34761FBBFCAA228A5327C1AD96E3D9E5ED33AEB00B6A7D37F887BF43821F6905",
+            "selector": ".method-steps__list-item",
+            "selector_index_zero_based": 4,
+            "heading": "step 5",
+            "content_scope": ".editor-content",
+            "text_length": 277
+          },
+          {
+            "index": 6,
+            "snapshot": "results/b3_0_sources/source_24.html",
+            "snapshot_sha256": "34761FBBFCAA228A5327C1AD96E3D9E5ED33AEB00B6A7D37F887BF43821F6905",
+            "selector": ".method-steps__list-item",
+            "selector_index_zero_based": 5,
+            "heading": "step 6",
+            "content_scope": ".editor-content",
+            "text_length": 71
+          },
+          {
+            "index": 7,
+            "snapshot": "results/b3_0_sources/source_24.html",
+            "snapshot_sha256": "34761FBBFCAA228A5327C1AD96E3D9E5ED33AEB00B6A7D37F887BF43821F6905",
+            "selector": ".method-steps__list-item",
+            "selector_index_zero_based": 6,
+            "heading": "step 7",
+            "content_scope": ".editor-content",
+            "text_length": 587
+          },
+          {
+            "index": 8,
+            "snapshot": "results/b3_0_sources/source_24.html",
+            "snapshot_sha256": "34761FBBFCAA228A5327C1AD96E3D9E5ED33AEB00B6A7D37F887BF43821F6905",
+            "selector": ".method-steps__list-item",
+            "selector_index_zero_based": 7,
+            "heading": "step 8",
+            "content_scope": ".editor-content",
+            "text_length": 515
+          },
+          {
+            "index": 9,
+            "snapshot": "results/b3_0_sources/source_24.html",
+            "snapshot_sha256": "34761FBBFCAA228A5327C1AD96E3D9E5ED33AEB00B6A7D37F887BF43821F6905",
+            "selector": ".method-steps__list-item",
+            "selector_index_zero_based": 8,
+            "heading": "step 9",
+            "content_scope": ".editor-content",
+            "text_length": 156
+          },
+          {
+            "index": 10,
+            "snapshot": "results/b3_0_sources/source_24.html",
+            "snapshot_sha256": "34761FBBFCAA228A5327C1AD96E3D9E5ED33AEB00B6A7D37F887BF43821F6905",
+            "selector": ".method-steps__list-item",
+            "selector_index_zero_based": 9,
+            "heading": "step 10",
+            "content_scope": ".editor-content",
+            "text_length": 312
+          },
+          {
+            "index": 11,
+            "snapshot": "results/b3_0_sources/source_24.html",
+            "snapshot_sha256": "34761FBBFCAA228A5327C1AD96E3D9E5ED33AEB00B6A7D37F887BF43821F6905",
+            "selector": ".method-steps__list-item",
+            "selector_index_zero_based": 10,
+            "heading": "step 11",
+            "content_scope": ".editor-content",
+            "text_length": 85
+          },
+          {
+            "index": 12,
+            "snapshot": "results/b3_0_sources/source_24.html",
+            "snapshot_sha256": "34761FBBFCAA228A5327C1AD96E3D9E5ED33AEB00B6A7D37F887BF43821F6905",
+            "selector": ".method-steps__list-item",
+            "selector_index_zero_based": 11,
+            "heading": "step 12",
+            "content_scope": ".editor-content",
+            "text_length": 213
+          },
+          {
+            "index": 13,
+            "snapshot": "results/b3_0_sources/source_24.html",
+            "snapshot_sha256": "34761FBBFCAA228A5327C1AD96E3D9E5ED33AEB00B6A7D37F887BF43821F6905",
+            "selector": ".method-steps__list-item",
+            "selector_index_zero_based": 12,
+            "heading": "step 13",
+            "content_scope": ".editor-content",
+            "text_length": 367
+          },
+          {
+            "index": 14,
+            "snapshot": "results/b3_0_sources/source_24.html",
+            "snapshot_sha256": "34761FBBFCAA228A5327C1AD96E3D9E5ED33AEB00B6A7D37F887BF43821F6905",
+            "selector": ".method-steps__list-item",
+            "selector_index_zero_based": 13,
+            "heading": "step 14",
+            "content_scope": ".editor-content",
+            "text_length": 343
+          },
+          {
+            "index": 15,
+            "snapshot": "results/b3_0_sources/source_24.html",
+            "snapshot_sha256": "34761FBBFCAA228A5327C1AD96E3D9E5ED33AEB00B6A7D37F887BF43821F6905",
+            "selector": ".method-steps__list-item",
+            "selector_index_zero_based": 14,
+            "heading": "step 15",
+            "content_scope": ".editor-content",
+            "text_length": 96
+          }
+        ]
+      },
+      "extractor_evidence": {
+        "ingredients": {
+          "expected_count": 8,
+          "actual_count": 8,
+          "lost": 0,
+          "added": 0,
+          "modified_positions": [],
+          "order_error": false,
+          "exact_ordered_equality": true
+        },
+        "instructions": {
+          "expected_count": 15,
+          "actual_count": 15,
+          "lost": 0,
+          "added": 0,
+          "modified_positions": [],
+          "order_error": false,
+          "exact_ordered_equality": true
+        },
+        "title_mutation": false,
+        "raw_ingredients_preserved": true,
+        "raw_instructions_preserved": true,
+        "candidate_selection_problem": false
+      },
+      "source_quality": "GOOD",
+      "extractor_verdict": "LOSSLESS"
+    },
+    {
+      "id": "25",
+      "url": "https://www.bbcgoodfood.com/recipes/best-apple-crumble",
+      "domain": "www.bbcgoodfood.com",
+      "snapshot": {
+        "b3_0_sha256": "92681788a6d6db71430738d4181295fa2844af9833114c4a54eb988b7798cde8",
+        "b3_1_sha256": "92681788a6d6db71430738d4181295fa2844af9833114c4a54eb988b7798cde8",
+        "b3_0_manifest_and_visible_references_verified": true,
+        "b3_1_bytes_verified": true,
+        "verdict": "UNCHANGED_RECIPE_CONTENT",
+        "html_changed": false,
+        "fields_equal": {
+          "title": true,
+          "ingredients": true,
+          "ingredient_groups": true,
+          "steps": true,
+          "instruction_selector": true,
+          "servings": true
+        },
+        "servings_before": [
+          "Serves 4"
+        ],
+        "servings_after": [
+          "Serves 4"
+        ],
+        "b3_0": "b3_0_sources/source_25.html",
+        "b3_1": "b3_1_html/source_25.html",
+        "quantity_unit_notes_check": "Full ingredient strings compared without conversions; unchanged.",
+        "reference": "Existing B3.0 reference valid; no replacement created."
+      },
+      "reference_check": {
+        "resolved_visible_references": 8,
+        "exact_text_match": true,
+        "ground_truth_ingredients_match": true
+      },
+      "title": {
+        "visible": "Easy apple crumble recipe",
+        "json_ld": "Easy apple crumble recipe",
+        "verdict": "CLEAN"
+      },
+      "ingredients": [
+        {
+          "source_order": 1,
+          "visible_text": "575g Bramley apple (3 medium apples), peeled, cored and sliced to 1cm thick",
+          "json_ld_text": "575g Bramley apple (3 medium apples), peeled, cored and sliced to 1cm thick",
+          "source_verdict": "MATCH",
+          "note": null
+        },
+        {
+          "source_order": 2,
+          "visible_text": "2 tbsp golden caster sugar",
+          "json_ld_text": "2 tbsp golden caster sugar",
+          "source_verdict": "MATCH",
+          "note": null
+        },
+        {
+          "source_order": 3,
+          "visible_text": "175g plain flour",
+          "json_ld_text": "175g plain flour",
+          "source_verdict": "MATCH",
+          "note": null
+        },
+        {
+          "source_order": 4,
+          "visible_text": "110g golden caster sugar",
+          "json_ld_text": "110g golden caster sugar",
+          "source_verdict": "MATCH",
+          "note": null
+        },
+        {
+          "source_order": 5,
+          "visible_text": "110g cold butter",
+          "json_ld_text": "110g cold butter",
+          "source_verdict": "MATCH",
+          "note": null
+        },
+        {
+          "source_order": 6,
+          "visible_text": "1 tbsp rolled oats",
+          "json_ld_text": "1 tbsp rolled oats",
+          "source_verdict": "MATCH",
+          "note": null
+        },
+        {
+          "source_order": 7,
+          "visible_text": "1 tbsp demerara sugar",
+          "json_ld_text": "1 tbsp demerara sugar",
+          "source_verdict": "MATCH",
+          "note": null
+        },
+        {
+          "source_order": 8,
+          "visible_text": "double cream clotted cream or custard, to serve",
+          "json_ld_text": "double cream clotted cream or custard, to serve",
+          "source_verdict": "MATCH",
+          "note": null
+        }
+      ],
+      "visible_ingredient_count": 8,
+      "json_ld_ingredient_count": 8,
+      "ingredient_order_preserved": true,
+      "missing_ingredient_rows": 0,
+      "extra_ingredient_rows": 0,
+      "group_heading_differences": [
+        {
+          "before_row": 1,
+          "heading": "For the filling",
+          "verdict": "GROUP_HEADING_DIFFERENCE",
+          "json_ld": null
+        },
+        {
+          "before_row": 3,
+          "heading": "For the crumble",
+          "verdict": "GROUP_HEADING_DIFFERENCE",
+          "json_ld": null
+        },
+        {
+          "before_row": 6,
+          "heading": "For the topping (optional)",
+          "verdict": "GROUP_HEADING_DIFFERENCE",
+          "json_ld": null
+        }
+      ],
+      "instructions": {
+        "verdict": "COMPLETE",
+        "visible_actual_blocks": 8,
+        "json_ld_step_count": 8,
+        "extracted_entry_count": 8,
+        "json_ld_heading_count": 0,
+        "visible_step_headings": [
+          "step 1",
+          "step 2",
+          "step 3",
+          "step 4",
+          "step 5",
+          "step 6",
+          "step 7",
+          "step 8"
+        ],
+        "json_ld_headings": [],
+        "visible_text_lengths": [
+          36,
+          232,
+          86,
+          250,
+          93,
+          161,
+          79,
+          206
+        ],
+        "json_ld_text_lengths": [
+          36,
+          232,
+          86,
+          250,
+          93,
+          161,
+          79,
+          206
+        ],
+        "ordered_full_text_equal_after_whitespace_collapse": true,
+        "missing_steps": 0,
+        "extra_steps": 0,
+        "order_errors": 0,
+        "content_omissions": 0,
+        "extra_content": 0,
+        "note": "Step bodies equal in source order. Ordinal step labels are presentation, not extra cooking steps.",
+        "references": [
+          {
+            "index": 1,
+            "snapshot": "results/b3_0_sources/source_25.html",
+            "snapshot_sha256": "92681788A6D6DB71430738D4181295FA2844AF9833114C4A54EB988B7798CDE8",
+            "selector": ".method-steps__list-item",
+            "selector_index_zero_based": 0,
+            "heading": "step 1",
+            "content_scope": ".editor-content",
+            "text_length": 36
+          },
+          {
+            "index": 2,
+            "snapshot": "results/b3_0_sources/source_25.html",
+            "snapshot_sha256": "92681788A6D6DB71430738D4181295FA2844AF9833114C4A54EB988B7798CDE8",
+            "selector": ".method-steps__list-item",
+            "selector_index_zero_based": 1,
+            "heading": "step 2",
+            "content_scope": ".editor-content",
+            "text_length": 232
+          },
+          {
+            "index": 3,
+            "snapshot": "results/b3_0_sources/source_25.html",
+            "snapshot_sha256": "92681788A6D6DB71430738D4181295FA2844AF9833114C4A54EB988B7798CDE8",
+            "selector": ".method-steps__list-item",
+            "selector_index_zero_based": 2,
+            "heading": "step 3",
+            "content_scope": ".editor-content",
+            "text_length": 86
+          },
+          {
+            "index": 4,
+            "snapshot": "results/b3_0_sources/source_25.html",
+            "snapshot_sha256": "92681788A6D6DB71430738D4181295FA2844AF9833114C4A54EB988B7798CDE8",
+            "selector": ".method-steps__list-item",
+            "selector_index_zero_based": 3,
+            "heading": "step 4",
+            "content_scope": ".editor-content",
+            "text_length": 250
+          },
+          {
+            "index": 5,
+            "snapshot": "results/b3_0_sources/source_25.html",
+            "snapshot_sha256": "92681788A6D6DB71430738D4181295FA2844AF9833114C4A54EB988B7798CDE8",
+            "selector": ".method-steps__list-item",
+            "selector_index_zero_based": 4,
+            "heading": "step 5",
+            "content_scope": ".editor-content",
+            "text_length": 93
+          },
+          {
+            "index": 6,
+            "snapshot": "results/b3_0_sources/source_25.html",
+            "snapshot_sha256": "92681788A6D6DB71430738D4181295FA2844AF9833114C4A54EB988B7798CDE8",
+            "selector": ".method-steps__list-item",
+            "selector_index_zero_based": 5,
+            "heading": "step 6",
+            "content_scope": ".editor-content",
+            "text_length": 161
+          },
+          {
+            "index": 7,
+            "snapshot": "results/b3_0_sources/source_25.html",
+            "snapshot_sha256": "92681788A6D6DB71430738D4181295FA2844AF9833114C4A54EB988B7798CDE8",
+            "selector": ".method-steps__list-item",
+            "selector_index_zero_based": 6,
+            "heading": "step 7",
+            "content_scope": ".editor-content",
+            "text_length": 79
+          },
+          {
+            "index": 8,
+            "snapshot": "results/b3_0_sources/source_25.html",
+            "snapshot_sha256": "92681788A6D6DB71430738D4181295FA2844AF9833114C4A54EB988B7798CDE8",
+            "selector": ".method-steps__list-item",
+            "selector_index_zero_based": 7,
+            "heading": "step 8",
+            "content_scope": ".editor-content",
+            "text_length": 206
+          }
+        ]
+      },
+      "extractor_evidence": {
+        "ingredients": {
+          "expected_count": 8,
+          "actual_count": 8,
+          "lost": 0,
+          "added": 0,
+          "modified_positions": [],
+          "order_error": false,
+          "exact_ordered_equality": true
+        },
+        "instructions": {
+          "expected_count": 8,
+          "actual_count": 8,
+          "lost": 0,
+          "added": 0,
+          "modified_positions": [],
+          "order_error": false,
+          "exact_ordered_equality": true
+        },
+        "title_mutation": false,
+        "raw_ingredients_preserved": true,
+        "raw_instructions_preserved": true,
+        "candidate_selection_problem": false
+      },
+      "source_quality": "USABLE_WITH_ISSUES",
+      "extractor_verdict": "LOSSLESS"
+    },
+    {
+      "id": "26",
+      "url": "https://www.bbcgoodfood.com/recipes/tomato-soup",
+      "domain": "www.bbcgoodfood.com",
+      "snapshot": {
+        "b3_0_sha256": "eb24c9cd530ffd2c7ea35b515e3fae0970608cec29c56b0204d51290b6e7b014",
+        "b3_1_sha256": "eb24c9cd530ffd2c7ea35b515e3fae0970608cec29c56b0204d51290b6e7b014",
+        "b3_0_manifest_and_visible_references_verified": true,
+        "b3_1_bytes_verified": true,
+        "verdict": "UNCHANGED_RECIPE_CONTENT",
+        "html_changed": false,
+        "fields_equal": {
+          "title": true,
+          "ingredients": true,
+          "ingredient_groups": true,
+          "steps": true,
+          "instruction_selector": true,
+          "servings": true
+        },
+        "servings_before": [
+          "serves 4 for lunch or 6 as a starter"
+        ],
+        "servings_after": [
+          "serves 4 for lunch or 6 as a starter"
+        ],
+        "b3_0": "b3_0_sources/source_26.html",
+        "b3_1": "b3_1_html/source_26.html",
+        "quantity_unit_notes_check": "Full ingredient strings compared without conversions; unchanged.",
+        "reference": "Existing B3.0 reference valid; no replacement created."
+      },
+      "reference_check": {
+        "resolved_visible_references": 6,
+        "exact_text_match": true,
+        "ground_truth_ingredients_match": true
+      },
+      "title": {
+        "visible": "Tomato soup",
+        "json_ld": "Tomato soup",
+        "verdict": "CLEAN"
+      },
+      "ingredients": [
+        {
+          "source_order": 1,
+          "visible_text": "1-1.25kg/2lb 4oz-2lb 12oz ripe tomatoes",
+          "json_ld_text": "1-1.25kg/2lb 4oz-2lb 12oz ripe  tomatoes",
+          "source_verdict": "FORMAT_DIFFERENCE",
+          "note": null
+        },
+        {
+          "source_order": 2,
+          "visible_text": "1 medium onion",
+          "json_ld_text": "1 medium onion",
+          "source_verdict": "MATCH",
+          "note": null
+        },
+        {
+          "source_order": 3,
+          "visible_text": "1 small carrot",
+          "json_ld_text": "1 small carrot",
+          "source_verdict": "MATCH",
+          "note": null
+        },
+        {
+          "source_order": 4,
+          "visible_text": "1 celery stick",
+          "json_ld_text": "1 celery stick",
+          "source_verdict": "MATCH",
+          "note": null
+        },
+        {
+          "source_order": 5,
+          "visible_text": "2 tbsp olive oil",
+          "json_ld_text": "2 tbsp olive oil",
+          "source_verdict": "MATCH",
+          "note": null
+        },
+        {
+          "source_order": 6,
+          "visible_text": "2 squirts of tomato purée (about 2 tsp)",
+          "json_ld_text": "2 squirts of tomato purée (about 2 tsp)",
+          "source_verdict": "MATCH",
+          "note": null
+        },
+        {
+          "source_order": 7,
+          "visible_text": "a good pinch of sugar",
+          "json_ld_text": "a good pinch of sugar",
+          "source_verdict": "MATCH",
+          "note": null
+        },
+        {
+          "source_order": 8,
+          "visible_text": "2 bay leaves",
+          "json_ld_text": "2 bay leaves",
+          "source_verdict": "MATCH",
+          "note": null
+        },
+        {
+          "source_order": 9,
+          "visible_text": "1.2 litres/2 pints hot vegetable stock (made with boiling water and 4 rounded tsp bouillon powder or 2 stock cubes)",
+          "json_ld_text": "1.2 litres/2 pints hot vegetable stock (made with boiling water and 4 rounded tsp bouillon powder or 2 stock cubes)",
+          "source_verdict": "MATCH",
+          "note": null
+        }
+      ],
+      "visible_ingredient_count": 9,
+      "json_ld_ingredient_count": 9,
+      "ingredient_order_preserved": true,
+      "missing_ingredient_rows": 0,
+      "extra_ingredient_rows": 0,
+      "group_heading_differences": [],
+      "instructions": {
+        "verdict": "COMPLETE",
+        "visible_actual_blocks": 6,
+        "json_ld_step_count": 6,
+        "extracted_entry_count": 6,
+        "json_ld_heading_count": 0,
+        "visible_step_headings": [
+          "step 1",
+          "step 2",
+          "step 3",
+          "step 4",
+          "step 5",
+          "step 6"
+        ],
+        "json_ld_headings": [],
+        "visible_text_lengths": [
+          567,
+          467,
+          564,
+          474,
+          560,
+          490
+        ],
+        "json_ld_text_lengths": [
+          567,
+          467,
+          564,
+          474,
+          560,
+          490
+        ],
+        "ordered_full_text_equal_after_whitespace_collapse": true,
+        "missing_steps": 0,
+        "extra_steps": 0,
+        "order_errors": 0,
+        "content_omissions": 0,
+        "extra_content": 0,
+        "note": "Step bodies equal in source order. Ordinal step labels are presentation, not extra cooking steps.",
+        "references": [
+          {
+            "index": 1,
+            "snapshot": "results/b3_0_sources/source_26.html",
+            "snapshot_sha256": "EB24C9CD530FFD2C7EA35B515E3FAE0970608CEC29C56B0204D51290B6E7B014",
+            "selector": ".method-steps__list-item",
+            "selector_index_zero_based": 0,
+            "heading": "step 1",
+            "content_scope": ".editor-content",
+            "text_length": 567
+          },
+          {
+            "index": 2,
+            "snapshot": "results/b3_0_sources/source_26.html",
+            "snapshot_sha256": "EB24C9CD530FFD2C7EA35B515E3FAE0970608CEC29C56B0204D51290B6E7B014",
+            "selector": ".method-steps__list-item",
+            "selector_index_zero_based": 1,
+            "heading": "step 2",
+            "content_scope": ".editor-content",
+            "text_length": 467
+          },
+          {
+            "index": 3,
+            "snapshot": "results/b3_0_sources/source_26.html",
+            "snapshot_sha256": "EB24C9CD530FFD2C7EA35B515E3FAE0970608CEC29C56B0204D51290B6E7B014",
+            "selector": ".method-steps__list-item",
+            "selector_index_zero_based": 2,
+            "heading": "step 3",
+            "content_scope": ".editor-content",
+            "text_length": 564
+          },
+          {
+            "index": 4,
+            "snapshot": "results/b3_0_sources/source_26.html",
+            "snapshot_sha256": "EB24C9CD530FFD2C7EA35B515E3FAE0970608CEC29C56B0204D51290B6E7B014",
+            "selector": ".method-steps__list-item",
+            "selector_index_zero_based": 3,
+            "heading": "step 4",
+            "content_scope": ".editor-content",
+            "text_length": 474
+          },
+          {
+            "index": 5,
+            "snapshot": "results/b3_0_sources/source_26.html",
+            "snapshot_sha256": "EB24C9CD530FFD2C7EA35B515E3FAE0970608CEC29C56B0204D51290B6E7B014",
+            "selector": ".method-steps__list-item",
+            "selector_index_zero_based": 4,
+            "heading": "step 5",
+            "content_scope": ".editor-content",
+            "text_length": 560
+          },
+          {
+            "index": 6,
+            "snapshot": "results/b3_0_sources/source_26.html",
+            "snapshot_sha256": "EB24C9CD530FFD2C7EA35B515E3FAE0970608CEC29C56B0204D51290B6E7B014",
+            "selector": ".method-steps__list-item",
+            "selector_index_zero_based": 5,
+            "heading": "step 6",
+            "content_scope": ".editor-content",
+            "text_length": 490
+          }
+        ]
+      },
+      "extractor_evidence": {
+        "ingredients": {
+          "expected_count": 9,
+          "actual_count": 9,
+          "lost": 0,
+          "added": 0,
+          "modified_positions": [],
+          "order_error": false,
+          "exact_ordered_equality": true
+        },
+        "instructions": {
+          "expected_count": 6,
+          "actual_count": 6,
+          "lost": 0,
+          "added": 0,
+          "modified_positions": [],
+          "order_error": false,
+          "exact_ordered_equality": true
+        },
+        "title_mutation": false,
+        "raw_ingredients_preserved": true,
+        "raw_instructions_preserved": true,
+        "candidate_selection_problem": false
+      },
+      "source_quality": "GOOD",
+      "extractor_verdict": "LOSSLESS"
+    },
+    {
+      "id": "27",
+      "url": "https://www.bbcgoodfood.com/recipes/real-tomato-soup",
+      "domain": "www.bbcgoodfood.com",
+      "snapshot": {
+        "b3_0_sha256": "89199ba080737cbbd4ecc2287655c577427e1ee4e40b542826b0c18697a63e57",
+        "b3_1_sha256": "89199ba080737cbbd4ecc2287655c577427e1ee4e40b542826b0c18697a63e57",
+        "b3_0_manifest_and_visible_references_verified": true,
+        "b3_1_bytes_verified": true,
+        "verdict": "UNCHANGED_RECIPE_CONTENT",
+        "html_changed": false,
+        "fields_equal": {
+          "title": true,
+          "ingredients": true,
+          "ingredient_groups": true,
+          "steps": true,
+          "instruction_selector": true,
+          "servings": true
+        },
+        "servings_before": [
+          "Serves 4"
+        ],
+        "servings_after": [
+          "Serves 4"
+        ],
+        "b3_0": "b3_0_sources/source_27.html",
+        "b3_1": "b3_1_html/source_27.html",
+        "quantity_unit_notes_check": "Full ingredient strings compared without conversions; unchanged.",
+        "reference": "Existing B3.0 reference valid; no replacement created."
+      },
+      "reference_check": {
+        "resolved_visible_references": 2,
+        "exact_text_match": true,
+        "ground_truth_ingredients_match": true
+      },
+      "title": {
+        "visible": "Real tomato soup",
+        "json_ld": "Real tomato soup",
+        "verdict": "CLEAN"
+      },
+      "ingredients": [
+        {
+          "source_order": 1,
+          "visible_text": "2 tbsp olive oil",
+          "json_ld_text": "2 tbsp olive oil",
+          "source_verdict": "MATCH",
+          "note": null
+        },
+        {
+          "source_order": 2,
+          "visible_text": "1 onion chopped",
+          "json_ld_text": "1 onion chopped",
+          "source_verdict": "MATCH",
+          "note": null
+        },
+        {
+          "source_order": 3,
+          "visible_text": "1 garlic clove finely chopped",
+          "json_ld_text": "1 garlic clove finely chopped",
+          "source_verdict": "MATCH",
+          "note": null
+        },
+        {
+          "source_order": 4,
+          "visible_text": "1 tbsp tomato purée",
+          "json_ld_text": "1 tbsp tomato purée",
+          "source_verdict": "MATCH",
+          "note": null
+        },
+        {
+          "source_order": 5,
+          "visible_text": "400g can chopped tomato",
+          "json_ld_text": "400g can chopped tomato",
+          "source_verdict": "MATCH",
+          "note": null
+        },
+        {
+          "source_order": 6,
+          "visible_text": "handful basil leaf",
+          "json_ld_text": "handful basil leaf",
+          "source_verdict": "MATCH",
+          "note": null
+        },
+        {
+          "source_order": 7,
+          "visible_text": "pinch bicarbonate of soda",
+          "json_ld_text": "pinch bicarbonate of soda",
+          "source_verdict": "MATCH",
+          "note": null
+        },
+        {
+          "source_order": 8,
+          "visible_text": "600ml milk",
+          "json_ld_text": "600ml milk",
+          "source_verdict": "MATCH",
+          "note": null
+        }
+      ],
+      "visible_ingredient_count": 8,
+      "json_ld_ingredient_count": 8,
+      "ingredient_order_preserved": true,
+      "missing_ingredient_rows": 0,
+      "extra_ingredient_rows": 0,
+      "group_heading_differences": [],
+      "instructions": {
+        "verdict": "COMPLETE",
+        "visible_actual_blocks": 2,
+        "json_ld_step_count": 2,
+        "extracted_entry_count": 2,
+        "json_ld_heading_count": 0,
+        "visible_step_headings": [
+          "step 1",
+          "step 2"
+        ],
+        "json_ld_headings": [],
+        "visible_text_lengths": [
+          463,
+          359
+        ],
+        "json_ld_text_lengths": [
+          463,
+          359
+        ],
+        "ordered_full_text_equal_after_whitespace_collapse": true,
+        "missing_steps": 0,
+        "extra_steps": 0,
+        "order_errors": 0,
+        "content_omissions": 0,
+        "extra_content": 0,
+        "note": "Step bodies equal in source order. Ordinal step labels are presentation, not extra cooking steps.",
+        "references": [
+          {
+            "index": 1,
+            "snapshot": "results/b3_0_sources/source_27.html",
+            "snapshot_sha256": "89199BA080737CBBD4ECC2287655C577427E1EE4E40B542826B0C18697A63E57",
+            "selector": ".method-steps__list-item",
+            "selector_index_zero_based": 0,
+            "heading": "step 1",
+            "content_scope": ".editor-content",
+            "text_length": 463
+          },
+          {
+            "index": 2,
+            "snapshot": "results/b3_0_sources/source_27.html",
+            "snapshot_sha256": "89199BA080737CBBD4ECC2287655C577427E1EE4E40B542826B0C18697A63E57",
+            "selector": ".method-steps__list-item",
+            "selector_index_zero_based": 1,
+            "heading": "step 2",
+            "content_scope": ".editor-content",
+            "text_length": 359
+          }
+        ]
+      },
+      "extractor_evidence": {
+        "ingredients": {
+          "expected_count": 8,
+          "actual_count": 8,
+          "lost": 0,
+          "added": 0,
+          "modified_positions": [],
+          "order_error": false,
+          "exact_ordered_equality": true
+        },
+        "instructions": {
+          "expected_count": 2,
+          "actual_count": 2,
+          "lost": 0,
+          "added": 0,
+          "modified_positions": [],
+          "order_error": false,
+          "exact_ordered_equality": true
+        },
+        "title_mutation": false,
+        "raw_ingredients_preserved": true,
+        "raw_instructions_preserved": true,
+        "candidate_selection_problem": false
+      },
+      "source_quality": "GOOD",
+      "extractor_verdict": "LOSSLESS"
+    },
+    {
+      "id": "28",
+      "url": "https://www.bbcgoodfood.com/recipes/chicken-chilli-con-carne",
+      "domain": "www.bbcgoodfood.com",
+      "snapshot": {
+        "b3_0_sha256": "8ec49df4e37e0990867181d0388a22fd85e987dc45ec9ee4321a0f5a012d586a",
+        "b3_1_sha256": "8ec49df4e37e0990867181d0388a22fd85e987dc45ec9ee4321a0f5a012d586a",
+        "b3_0_manifest_and_visible_references_verified": true,
+        "b3_1_bytes_verified": true,
+        "verdict": "UNCHANGED_RECIPE_CONTENT",
+        "html_changed": false,
+        "fields_equal": {
+          "title": true,
+          "ingredients": true,
+          "ingredient_groups": true,
+          "steps": true,
+          "instruction_selector": true,
+          "servings": true
+        },
+        "servings_before": [
+          "Serves 4 - 6"
+        ],
+        "servings_after": [
+          "Serves 4 - 6"
+        ],
+        "b3_0": "b3_0_sources/source_28.html",
+        "b3_1": "b3_1_html/source_28.html",
+        "quantity_unit_notes_check": "Full ingredient strings compared without conversions; unchanged.",
+        "reference": "Existing B3.0 reference valid; no replacement created."
+      },
+      "reference_check": {
+        "resolved_visible_references": 3,
+        "exact_text_match": true,
+        "ground_truth_ingredients_match": true
+      },
+      "title": {
+        "visible": "Chicken chilli con carne",
+        "json_ld": "Chicken chilli con carne",
+        "verdict": "CLEAN"
+      },
+      "ingredients": [
+        {
+          "source_order": 1,
+          "visible_text": "2 tbsp olive oil",
+          "json_ld_text": "2 tbsp olive oil",
+          "source_verdict": "MATCH",
+          "note": null
+        },
+        {
+          "source_order": 2,
+          "visible_text": "1 onion sliced",
+          "json_ld_text": "1 onion sliced",
+          "source_verdict": "MATCH",
+          "note": null
+        },
+        {
+          "source_order": 3,
+          "visible_text": "2 mixed peppers sliced (use red, yellow or orange peppers)",
+          "json_ld_text": "2 mixed peppers sliced (use red, yellow or orange peppers)",
+          "source_verdict": "MATCH",
+          "note": null
+        },
+        {
+          "source_order": 4,
+          "visible_text": "2 large garlic cloves crushed",
+          "json_ld_text": "2 large garlic cloves crushed",
+          "source_verdict": "MATCH",
+          "note": null
+        },
+        {
+          "source_order": 5,
+          "visible_text": "1 small bunch of coriander stalks finely chopped and leaves roughly chopped",
+          "json_ld_text": "1 small bunch of coriander stalks finely chopped and leaves roughly chopped",
+          "source_verdict": "MATCH",
+          "note": null
+        },
+        {
+          "source_order": 6,
+          "visible_text": "½ tbsp ground coriander",
+          "json_ld_text": "½ tbsp ground coriander",
+          "source_verdict": "MATCH",
+          "note": null
+        },
+        {
+          "source_order": 7,
+          "visible_text": "1 tbsp ground cumin",
+          "json_ld_text": "1 tbsp ground cumin",
+          "source_verdict": "MATCH",
+          "note": null
+        },
+        {
+          "source_order": 8,
+          "visible_text": "1-2 tsp chipotle paste",
+          "json_ld_text": "1-2 tsp chipotle paste",
+          "source_verdict": "MATCH",
+          "note": null
+        },
+        {
+          "source_order": 9,
+          "visible_text": "400g can chopped tomatoes",
+          "json_ld_text": "400g can chopped tomatoes",
+          "source_verdict": "MATCH",
+          "note": null
+        },
+        {
+          "source_order": 10,
+          "visible_text": "1 tbsp tomato purée",
+          "json_ld_text": "1 tbsp tomato purée",
+          "source_verdict": "MATCH",
+          "note": null
+        },
+        {
+          "source_order": 11,
+          "visible_text": "300ml chicken stock",
+          "json_ld_text": "300ml chicken stock",
+          "source_verdict": "MATCH",
+          "note": null
+        },
+        {
+          "source_order": 12,
+          "visible_text": "1 small cinnamon stick",
+          "json_ld_text": "1 small cinnamon stick",
+          "source_verdict": "MATCH",
+          "note": null
+        },
+        {
+          "source_order": 13,
+          "visible_text": "4 skinless chicken thighs bone-in",
+          "json_ld_text": "4 skinless chicken thighs bone-in",
+          "source_verdict": "MATCH",
+          "note": null
+        },
+        {
+          "source_order": 14,
+          "visible_text": "400g can black beans",
+          "json_ld_text": "400g can black beans",
+          "source_verdict": "MATCH",
+          "note": null
+        },
+        {
+          "source_order": 15,
+          "visible_text": "400g can kidney beans drained",
+          "json_ld_text": "400g can kidney beans drained",
+          "source_verdict": "MATCH",
+          "note": null
+        },
+        {
+          "source_order": 16,
+          "visible_text": "1 tbsp red wine vinegar",
+          "json_ld_text": "1 tbsp red wine vinegar",
+          "source_verdict": "MATCH",
+          "note": null
+        },
+        {
+          "source_order": 17,
+          "visible_text": "20g dark chocolate (at least 70% cocoa solids)",
+          "json_ld_text": "20g dark chocolate (at least 70% cocoa solids)",
+          "source_verdict": "MATCH",
+          "note": null
+        },
+        {
+          "source_order": 18,
+          "visible_text": "cooked rice or tortilla chips",
+          "json_ld_text": "cooked rice or tortilla chips",
+          "source_verdict": "MATCH",
+          "note": null
+        },
+        {
+          "source_order": 19,
+          "visible_text": "guacamole and soured cream (optional)",
+          "json_ld_text": "guacamole and soured cream (optional)",
+          "source_verdict": "MATCH",
+          "note": null
+        }
+      ],
+      "visible_ingredient_count": 19,
+      "json_ld_ingredient_count": 19,
+      "ingredient_order_preserved": true,
+      "missing_ingredient_rows": 0,
+      "extra_ingredient_rows": 0,
+      "group_heading_differences": [
+        {
+          "before_row": 18,
+          "heading": "To serve",
+          "verdict": "GROUP_HEADING_DIFFERENCE",
+          "json_ld": null
+        }
+      ],
+      "instructions": {
+        "verdict": "COMPLETE",
+        "visible_actual_blocks": 3,
+        "json_ld_step_count": 3,
+        "extracted_entry_count": 3,
+        "json_ld_heading_count": 0,
+        "visible_step_headings": [
+          "step 1",
+          "step 2",
+          "step 3"
+        ],
+        "json_ld_headings": [],
+        "visible_text_lengths": [
+          553,
+          336,
+          305
+        ],
+        "json_ld_text_lengths": [
+          553,
+          336,
+          305
+        ],
+        "ordered_full_text_equal_after_whitespace_collapse": true,
+        "missing_steps": 0,
+        "extra_steps": 0,
+        "order_errors": 0,
+        "content_omissions": 0,
+        "extra_content": 0,
+        "note": "Step bodies equal in source order. Ordinal step labels are presentation, not extra cooking steps.",
+        "references": [
+          {
+            "index": 1,
+            "snapshot": "results/b3_0_sources/source_28.html",
+            "snapshot_sha256": "8EC49DF4E37E0990867181D0388A22FD85E987DC45EC9EE4321A0F5A012D586A",
+            "selector": ".method-steps__list-item",
+            "selector_index_zero_based": 0,
+            "heading": "step 1",
+            "content_scope": ".editor-content",
+            "text_length": 553
+          },
+          {
+            "index": 2,
+            "snapshot": "results/b3_0_sources/source_28.html",
+            "snapshot_sha256": "8EC49DF4E37E0990867181D0388A22FD85E987DC45EC9EE4321A0F5A012D586A",
+            "selector": ".method-steps__list-item",
+            "selector_index_zero_based": 1,
+            "heading": "step 2",
+            "content_scope": ".editor-content",
+            "text_length": 336
+          },
+          {
+            "index": 3,
+            "snapshot": "results/b3_0_sources/source_28.html",
+            "snapshot_sha256": "8EC49DF4E37E0990867181D0388A22FD85E987DC45EC9EE4321A0F5A012D586A",
+            "selector": ".method-steps__list-item",
+            "selector_index_zero_based": 2,
+            "heading": "step 3",
+            "content_scope": ".editor-content",
+            "text_length": 305
+          }
+        ]
+      },
+      "extractor_evidence": {
+        "ingredients": {
+          "expected_count": 19,
+          "actual_count": 19,
+          "lost": 0,
+          "added": 0,
+          "modified_positions": [],
+          "order_error": false,
+          "exact_ordered_equality": true
+        },
+        "instructions": {
+          "expected_count": 3,
+          "actual_count": 3,
+          "lost": 0,
+          "added": 0,
+          "modified_positions": [],
+          "order_error": false,
+          "exact_ordered_equality": true
+        },
+        "title_mutation": false,
+        "raw_ingredients_preserved": true,
+        "raw_instructions_preserved": true,
+        "candidate_selection_problem": false
+      },
+      "source_quality": "USABLE_WITH_ISSUES",
+      "extractor_verdict": "LOSSLESS"
+    }
+  ]
+}

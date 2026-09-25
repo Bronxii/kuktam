@@ -1,0 +1,20 @@
+CÍM:
+Lecsó
+
+HOZZÁVALÓK:
+40 dkg paradicsom
+80 dkg paprika
+2 fej hagyma
+5 dkg füstölt szalonna
+2 ek olaj
+1 ek pirospaprika
+só
+
+ELKÉSZÍTÉS:
+# VISIBLE_SOURCE_REFERENCE_V1: teljes szöveg a mentett HTML-ben, nem összefoglaló.
+# Snapshot: tool/web_import_poc/results/b2_0_sources/source_11.html
+# SHA256: 652C8972F8919BB48C0CFA429148E7B9C01555626B4357C9CD93CD5D175A1CCB
+1. @VISIBLE .block-content ol > li | index=0 | content=entire element
+2. @VISIBLE .block-content ol > li | index=1 | content=entire element
+3. @VISIBLE .block-content ol > li | index=2 | content=entire element
+4. @VISIBLE .block-content ol > li | index=3 | content=entire element

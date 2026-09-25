@@ -1,0 +1,50 @@
+{
+  "21": {
+    "b3_0_sha256": "b4d6f70b796d381aadb6e0c1f8d0481fc48041e5a8b31436627539ff0cf57003",
+    "b3_1_sha256": "79f76ba98713df7b503ba8db7e7787f9f62342d8578da7f602e255ce2363ca8f",
+    "b3_0_manifest_and_visible_references_verified": true,
+    "b3_1_bytes_verified": true
+  },
+  "22": {
+    "b3_0_sha256": "3cbee9866978ff1c042286bffd9d7d6a820fb684c693c68d54f064d358ca59c1",
+    "b3_1_sha256": "3cbee9866978ff1c042286bffd9d7d6a820fb684c693c68d54f064d358ca59c1",
+    "b3_0_manifest_and_visible_references_verified": true,
+    "b3_1_bytes_verified": true
+  },
+  "23": {
+    "b3_0_sha256": "699410c301850cf0c5ce870b42f8fda04e39b5a351cb34afa199b82975eae6cb",
+    "b3_1_sha256": "699410c301850cf0c5ce870b42f8fda04e39b5a351cb34afa199b82975eae6cb",
+    "b3_0_manifest_and_visible_references_verified": true,
+    "b3_1_bytes_verified": true
+  },
+  "24": {
+    "b3_0_sha256": "34761fbbfcaa228a5327c1ad96e3d9e5ed33aeb00b6a7d37f887bf43821f6905",
+    "b3_1_sha256": "2a45389122ca8b2c0737f3c0e6adbbb4661eb136dac14fd3255e1c9670f921e5",
+    "b3_0_manifest_and_visible_references_verified": true,
+    "b3_1_bytes_verified": true
+  },
+  "25": {
+    "b3_0_sha256": "92681788a6d6db71430738d4181295fa2844af9833114c4a54eb988b7798cde8",
+    "b3_1_sha256": "92681788a6d6db71430738d4181295fa2844af9833114c4a54eb988b7798cde8",
+    "b3_0_manifest_and_visible_references_verified": true,
+    "b3_1_bytes_verified": true
+  },
+  "26": {
+    "b3_0_sha256": "eb24c9cd530ffd2c7ea35b515e3fae0970608cec29c56b0204d51290b6e7b014",
+    "b3_1_sha256": "eb24c9cd530ffd2c7ea35b515e3fae0970608cec29c56b0204d51290b6e7b014",
+    "b3_0_manifest_and_visible_references_verified": true,
+    "b3_1_bytes_verified": true
+  },
+  "27": {
+    "b3_0_sha256": "89199ba080737cbbd4ecc2287655c577427e1ee4e40b542826b0c18697a63e57",
+    "b3_1_sha256": "89199ba080737cbbd4ecc2287655c577427e1ee4e40b542826b0c18697a63e57",
+    "b3_0_manifest_and_visible_references_verified": true,
+    "b3_1_bytes_verified": true
+  },
+  "28": {
+    "b3_0_sha256": "8ec49df4e37e0990867181d0388a22fd85e987dc45ec9ee4321a0f5a012d586a",
+    "b3_1_sha256": "8ec49df4e37e0990867181d0388a22fd85e987dc45ec9ee4321a0f5a012d586a",
+    "b3_0_manifest_and_visible_references_verified": true,
+    "b3_1_bytes_verified": true
+  }
+}

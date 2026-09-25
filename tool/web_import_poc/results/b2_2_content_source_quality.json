@@ -1,0 +1,2636 @@
+{
+  "phase": "B2.2",
+  "method": "Offline saved snapshots only. B2.0 DOM selectors reused; @VISIBLE resolved, full text checked without republication. Case/whitespace only ingredient comparison, no unit/quantity conversion. Source ingredient alignment manually reviewed. No parser/fetch or source correction. GOOD requires clean title and no structural/content differences; decoration alone is USABLE_WITH_ISSUES. Counts are specific to these frozen snapshots; DOM audit is not a browser rendering test.",
+  "summary": {
+    "technical_extraction_success": {
+      "success": 10,
+      "total": 10,
+      "percent": 100,
+      "evidence": "Frozen B2.1 results; not re-fetched"
+    },
+    "snapshot_stability": {
+      "unchanged_recipe_content": 10,
+      "technical_html_changes_only": 8,
+      "identical_html": 2,
+      "changed_recipe_content": 0,
+      "format_only_change": 0,
+      "unresolved": 0
+    },
+    "extractor_data_preservation": {
+      "lossless_recipes": 10,
+      "ingredient_rows": 110,
+      "instruction_entries": 70,
+      "lost_ingredient_rows": 0,
+      "added_ingredient_rows": 0,
+      "modified_ingredient_rows": 0,
+      "order_errors": 0,
+      "lost_instruction_entries": 0,
+      "added_instruction_entries": 0,
+      "title_mutations": 0,
+      "candidate_selection_problems": 0
+    },
+    "source_quality": {
+      "ingredients": {
+        "total_visible": 110,
+        "total_json_ld": 110,
+        "exact_matches": 65,
+        "format_only_matches": 43,
+        "exact_or_normalized_matches": 108,
+        "quantity_differences": 0,
+        "unit_differences": 0,
+        "missing_notes": 2,
+        "missing_rows": 0,
+        "extra_rows": 0,
+        "order_errors": 0,
+        "group_heading_differences": 1,
+        "supplementary_quantity_note_omissions": 1,
+        "note": "Supplementary 1,5 kg omission counted as MISSING_NOTE, not a second row error; main quantity unchanged."
+      },
+      "instructions": {
+        "complete": 9,
+        "structure_only_differences": 1,
+        "content_omissions": 0,
+        "extra_content": 0,
+        "order_errors": 0
+      },
+      "titles": {
+        "clean": 5,
+        "decorated": 5,
+        "wrong": 0,
+        "missing": 0
+      }
+    },
+    "domains": {
+      "www.mindmegette.hu": {
+        "recipes": 5,
+        "source_quality": {
+          "GOOD": 0,
+          "USABLE_WITH_ISSUES": 5,
+          "POOR": 0
+        },
+        "visible_ingredients": 48,
+        "missing_note_rows": 2,
+        "group_heading_differences": 0
+      },
+      "www.bbcgoodfood.com": {
+        "recipes": 5,
+        "source_quality": {
+          "GOOD": 4,
+          "USABLE_WITH_ISSUES": 1,
+          "POOR": 0
+        },
+        "visible_ingredients": 62,
+        "missing_note_rows": 0,
+        "group_heading_differences": 1
+      }
+    }
+  },
+  "recipes": [
+    {
+      "id": "11",
+      "url": "https://www.mindmegette.hu/recept/lecso",
+      "domain": "www.mindmegette.hu",
+      "snapshot": {
+        "verdict": "UNCHANGED_RECIPE_CONTENT",
+        "html_changed": true,
+        "fields_equal": {
+          "title": true,
+          "ingredients": true,
+          "ingredient_groups": true,
+          "steps": true,
+          "instruction_selector": true,
+          "servings": true
+        },
+        "servings_before": [
+          "4 adag"
+        ],
+        "servings_after": [
+          "4 adag"
+        ],
+        "b2_0": "b2_0_sources/source_11.html",
+        "b2_1": "b2_1_html/source_11.html",
+        "quantity_unit_notes_check": "Full ingredient strings compared without conversions; unchanged.",
+        "reference": "Existing B2.0 reference valid; no replacement created."
+      },
+      "reference_check": {
+        "resolved_visible_references": 4,
+        "exact_text_match": true,
+        "ground_truth_ingredients_match": true
+      },
+      "title": {
+        "visible": "Lecsó",
+        "json_ld": "Lecsó | Mindmegette.hu",
+        "verdict": "TITLE_DECORATION"
+      },
+      "ingredients": [
+        {
+          "source_order": 1,
+          "visible_text": "40 dkg paradicsom",
+          "json_ld_text": "40 dkg Paradicsom",
+          "source_verdict": "FORMAT_DIFFERENCE",
+          "note": null
+        },
+        {
+          "source_order": 2,
+          "visible_text": "80 dkg paprika",
+          "json_ld_text": "80 dkg Paprika",
+          "source_verdict": "FORMAT_DIFFERENCE",
+          "note": null
+        },
+        {
+          "source_order": 3,
+          "visible_text": "2 fej hagyma",
+          "json_ld_text": "2 fej Hagyma",
+          "source_verdict": "FORMAT_DIFFERENCE",
+          "note": null
+        },
+        {
+          "source_order": 4,
+          "visible_text": "5 dkg füstölt szalonna",
+          "json_ld_text": "5 dkg Füstölt szalonna",
+          "source_verdict": "FORMAT_DIFFERENCE",
+          "note": null
+        },
+        {
+          "source_order": 5,
+          "visible_text": "2 ek olaj",
+          "json_ld_text": "2 ek Olaj",
+          "source_verdict": "FORMAT_DIFFERENCE",
+          "note": null
+        },
+        {
+          "source_order": 6,
+          "visible_text": "1 ek pirospaprika",
+          "json_ld_text": "1 ek Pirospaprika",
+          "source_verdict": "FORMAT_DIFFERENCE",
+          "note": null
+        },
+        {
+          "source_order": 7,
+          "visible_text": "só",
+          "json_ld_text": "Só",
+          "source_verdict": "FORMAT_DIFFERENCE",
+          "note": null
+        }
+      ],
+      "visible_ingredient_count": 7,
+      "json_ld_ingredient_count": 7,
+      "ingredient_order_preserved": true,
+      "missing_ingredient_rows": 0,
+      "extra_ingredient_rows": 0,
+      "group_heading_differences": [],
+      "instructions": {
+        "verdict": "COMPLETE",
+        "visible_actual_blocks": 4,
+        "json_ld_step_count": 4,
+        "extracted_entry_count": 8,
+        "json_ld_heading_count": 4,
+        "visible_step_headings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "json_ld_headings": [
+          "1. lépés",
+          "2. lépés",
+          "3. lépés",
+          "4. lépés"
+        ],
+        "visible_text_lengths": [
+          286,
+          274,
+          141,
+          64
+        ],
+        "json_ld_text_lengths": [
+          286,
+          274,
+          141,
+          64
+        ],
+        "ordered_full_text_equal_after_whitespace_collapse": true,
+        "missing_steps": 0,
+        "extra_steps": 0,
+        "order_errors": 0,
+        "content_omissions": 0,
+        "extra_content": 0,
+        "note": "Step bodies equal in source order. Ordinal step labels are presentation, not extra cooking steps.",
+        "references": [
+          {
+            "index": 1,
+            "snapshot": "results/b2_0_sources/source_11.html",
+            "snapshot_sha256": "652C8972F8919BB48C0CFA429148E7B9C01555626B4357C9CD93CD5D175A1CCB",
+            "selector": ".block-content ol > li",
+            "selector_index_zero_based": 0,
+            "heading": null,
+            "content_scope": "entire element",
+            "text_length": 286
+          },
+          {
+            "index": 2,
+            "snapshot": "results/b2_0_sources/source_11.html",
+            "snapshot_sha256": "652C8972F8919BB48C0CFA429148E7B9C01555626B4357C9CD93CD5D175A1CCB",
+            "selector": ".block-content ol > li",
+            "selector_index_zero_based": 1,
+            "heading": null,
+            "content_scope": "entire element",
+            "text_length": 274
+          },
+          {
+            "index": 3,
+            "snapshot": "results/b2_0_sources/source_11.html",
+            "snapshot_sha256": "652C8972F8919BB48C0CFA429148E7B9C01555626B4357C9CD93CD5D175A1CCB",
+            "selector": ".block-content ol > li",
+            "selector_index_zero_based": 2,
+            "heading": null,
+            "content_scope": "entire element",
+            "text_length": 141
+          },
+          {
+            "index": 4,
+            "snapshot": "results/b2_0_sources/source_11.html",
+            "snapshot_sha256": "652C8972F8919BB48C0CFA429148E7B9C01555626B4357C9CD93CD5D175A1CCB",
+            "selector": ".block-content ol > li",
+            "selector_index_zero_based": 3,
+            "heading": null,
+            "content_scope": "entire element",
+            "text_length": 64
+          }
+        ]
+      },
+      "extractor_evidence": {
+        "ingredients": {
+          "expected_count": 7,
+          "actual_count": 7,
+          "lost": 0,
+          "added": 0,
+          "modified_positions": [],
+          "order_error": false,
+          "exact_ordered_equality": true
+        },
+        "instructions": {
+          "expected_count": 8,
+          "actual_count": 8,
+          "lost": 0,
+          "added": 0,
+          "modified_positions": [],
+          "order_error": false,
+          "exact_ordered_equality": true
+        },
+        "title_mutation": false,
+        "raw_ingredients_preserved": true,
+        "raw_instructions_preserved": true,
+        "candidate_selection_problem": false
+      },
+      "source_quality": "USABLE_WITH_ISSUES",
+      "extractor_verdict": "LOSSLESS"
+    },
+    {
+      "id": "12",
+      "url": "https://www.mindmegette.hu/recept/toltott-kaposzta",
+      "domain": "www.mindmegette.hu",
+      "snapshot": {
+        "verdict": "UNCHANGED_RECIPE_CONTENT",
+        "html_changed": true,
+        "fields_equal": {
+          "title": true,
+          "ingredients": true,
+          "ingredient_groups": true,
+          "steps": true,
+          "instruction_selector": true,
+          "servings": true
+        },
+        "servings_before": [
+          "0 adag"
+        ],
+        "servings_after": [
+          "0 adag"
+        ],
+        "b2_0": "b2_0_sources/source_12.html",
+        "b2_1": "b2_1_html/source_12.html",
+        "quantity_unit_notes_check": "Full ingredient strings compared without conversions; unchanged.",
+        "reference": "Existing B2.0 reference valid; no replacement created."
+      },
+      "reference_check": {
+        "resolved_visible_references": 5,
+        "exact_text_match": true,
+        "ground_truth_ingredients_match": true
+      },
+      "title": {
+        "visible": "Töltött káposzta",
+        "json_ld": "Töltött káposzta | Mindmegette.hu",
+        "verdict": "TITLE_DECORATION"
+      },
+      "ingredients": [
+        {
+          "source_order": 1,
+          "visible_text": "80 dkg savanyú káposzta",
+          "json_ld_text": "80 dkg savanyú káposzta",
+          "source_verdict": "MATCH",
+          "note": null
+        },
+        {
+          "source_order": 2,
+          "visible_text": "8 darab savanyított káposztalevél",
+          "json_ld_text": "8 darab savanyított káposztalevél",
+          "source_verdict": "MATCH",
+          "note": null
+        },
+        {
+          "source_order": 3,
+          "visible_text": "2 fej hagyma",
+          "json_ld_text": "2 fej Hagyma",
+          "source_verdict": "FORMAT_DIFFERENCE",
+          "note": null
+        },
+        {
+          "source_order": 4,
+          "visible_text": "1 gerezd fokhagyma",
+          "json_ld_text": "1 gerezd Fokhagyma",
+          "source_verdict": "FORMAT_DIFFERENCE",
+          "note": null
+        },
+        {
+          "source_order": 5,
+          "visible_text": "5 dkg füstölt szalonna",
+          "json_ld_text": "5 dkg Füstölt szalonna",
+          "source_verdict": "FORMAT_DIFFERENCE",
+          "note": null
+        },
+        {
+          "source_order": 6,
+          "visible_text": "40 dkg darált sertéshús",
+          "json_ld_text": "40 dkg darált sertéshús",
+          "source_verdict": "MATCH",
+          "note": null
+        },
+        {
+          "source_order": 7,
+          "visible_text": "2 kávéskanál édesnemes pirospaprika",
+          "json_ld_text": "2 kávéskanál édesnemes pirospaprika",
+          "source_verdict": "MATCH",
+          "note": null
+        },
+        {
+          "source_order": 8,
+          "visible_text": "8 dkg rizs",
+          "json_ld_text": "8 dkg Rizs",
+          "source_verdict": "FORMAT_DIFFERENCE",
+          "note": null
+        },
+        {
+          "source_order": 9,
+          "visible_text": "1 darab tojás",
+          "json_ld_text": "1 darab Tojás",
+          "source_verdict": "FORMAT_DIFFERENCE",
+          "note": null
+        },
+        {
+          "source_order": 10,
+          "visible_text": "1 csipet őrölt köménymag",
+          "json_ld_text": "1 csipet őrölt köménymag",
+          "source_verdict": "MATCH",
+          "note": null
+        },
+        {
+          "source_order": 11,
+          "visible_text": "1 mokkáskanál majoránna",
+          "json_ld_text": "1 mokkáskanál Majoránna",
+          "source_verdict": "FORMAT_DIFFERENCE",
+          "note": null
+        },
+        {
+          "source_order": 12,
+          "visible_text": "2 evőkanál olaj",
+          "json_ld_text": "2 evőkanál Olaj",
+          "source_verdict": "FORMAT_DIFFERENCE",
+          "note": null
+        },
+        {
+          "source_order": 13,
+          "visible_text": "2 evőkanál liszt",
+          "json_ld_text": "2 evőkanál Liszt",
+          "source_verdict": "FORMAT_DIFFERENCE",
+          "note": null
+        },
+        {
+          "source_order": 14,
+          "visible_text": "2 dl tejföl",
+          "json_ld_text": "2 dl Tejföl",
+          "source_verdict": "FORMAT_DIFFERENCE",
+          "note": null
+        }
+      ],
+      "visible_ingredient_count": 14,
+      "json_ld_ingredient_count": 14,
+      "ingredient_order_preserved": true,
+      "missing_ingredient_rows": 0,
+      "extra_ingredient_rows": 0,
+      "group_heading_differences": [],
+      "instructions": {
+        "verdict": "COMPLETE_WITH_STRUCTURE_DIFFERENCE",
+        "visible_actual_blocks": 5,
+        "json_ld_step_count": 1,
+        "extracted_entry_count": 1,
+        "json_ld_heading_count": 0,
+        "visible_step_headings": [
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        "json_ld_headings": [],
+        "visible_text_lengths": [
+          187,
+          145,
+          140,
+          504,
+          282
+        ],
+        "json_ld_text_lengths": [
+          1262
+        ],
+        "ordered_full_text_equal_after_whitespace_collapse": true,
+        "missing_steps": 0,
+        "extra_steps": 0,
+        "order_errors": 0,
+        "content_omissions": 0,
+        "extra_content": 0,
+        "note": "Five numbered visible paragraphs are one JSON-LD string; full ordered text is equal.",
+        "references": [
+          {
+            "index": 1,
+            "snapshot": "results/b2_0_sources/source_12.html",
+            "snapshot_sha256": "D059D2E5D7CCFF1D7812A35C05B9919F1365102AA1A374EF0A22E5FAEA0587F4",
+            "selector": ".block-content > p",
+            "selector_index_zero_based": 0,
+            "heading": null,
+            "content_scope": "entire element",
+            "text_length": 187
+          },
+          {
+            "index": 2,
+            "snapshot": "results/b2_0_sources/source_12.html",
+            "snapshot_sha256": "D059D2E5D7CCFF1D7812A35C05B9919F1365102AA1A374EF0A22E5FAEA0587F4",
+            "selector": ".block-content > p",
+            "selector_index_zero_based": 1,
+            "heading": null,
+            "content_scope": "entire element",
+            "text_length": 145
+          },
+          {
+            "index": 3,
+            "snapshot": "results/b2_0_sources/source_12.html",
+            "snapshot_sha256": "D059D2E5D7CCFF1D7812A35C05B9919F1365102AA1A374EF0A22E5FAEA0587F4",
+            "selector": ".block-content > p",
+            "selector_index_zero_based": 2,
+            "heading": null,
+            "content_scope": "entire element",
+            "text_length": 140
+          },
+          {
+            "index": 4,
+            "snapshot": "results/b2_0_sources/source_12.html",
+            "snapshot_sha256": "D059D2E5D7CCFF1D7812A35C05B9919F1365102AA1A374EF0A22E5FAEA0587F4",
+            "selector": ".block-content > p",
+            "selector_index_zero_based": 3,
+            "heading": null,
+            "content_scope": "entire element",
+            "text_length": 504
+          },
+          {
+            "index": 5,
+            "snapshot": "results/b2_0_sources/source_12.html",
+            "snapshot_sha256": "D059D2E5D7CCFF1D7812A35C05B9919F1365102AA1A374EF0A22E5FAEA0587F4",
+            "selector": ".block-content > p",
+            "selector_index_zero_based": 4,
+            "heading": null,
+            "content_scope": "entire element",
+            "text_length": 282
+          }
+        ]
+      },
+      "extractor_evidence": {
+        "ingredients": {
+          "expected_count": 14,
+          "actual_count": 14,
+          "lost": 0,
+          "added": 0,
+          "modified_positions": [],
+          "order_error": false,
+          "exact_ordered_equality": true
+        },
+        "instructions": {
+          "expected_count": 1,
+          "actual_count": 1,
+          "lost": 0,
+          "added": 0,
+          "modified_positions": [],
+          "order_error": false,
+          "exact_ordered_equality": true
+        },
+        "title_mutation": false,
+        "raw_ingredients_preserved": true,
+        "raw_instructions_preserved": true,
+        "candidate_selection_problem": false
+      },
+      "source_quality": "USABLE_WITH_ISSUES",
+      "extractor_verdict": "LOSSLESS"
+    },
+    {
+      "id": "13",
+      "url": "https://www.mindmegette.hu/recept/klasszikus-paprikas-krumpli",
+      "domain": "www.mindmegette.hu",
+      "snapshot": {
+        "verdict": "UNCHANGED_RECIPE_CONTENT",
+        "html_changed": true,
+        "fields_equal": {
+          "title": true,
+          "ingredients": true,
+          "ingredient_groups": true,
+          "steps": true,
+          "instruction_selector": true,
+          "servings": true
+        },
+        "servings_before": [
+          "4 adag"
+        ],
+        "servings_after": [
+          "4 adag"
+        ],
+        "b2_0": "b2_0_sources/source_13.html",
+        "b2_1": "b2_1_html/source_13.html",
+        "quantity_unit_notes_check": "Full ingredient strings compared without conversions; unchanged.",
+        "reference": "Existing B2.0 reference valid; no replacement created."
+      },
+      "reference_check": {
+        "resolved_visible_references": 3,
+        "exact_text_match": true,
+        "ground_truth_ingredients_match": true
+      },
+      "title": {
+        "visible": "Klasszikus paprikás krumpli",
+        "json_ld": "Klasszikus paprikás krumpli | Mindmegette.hu",
+        "verdict": "TITLE_DECORATION"
+      },
+      "ingredients": [
+        {
+          "source_order": 1,
+          "visible_text": "1 kg burgonya",
+          "json_ld_text": "1 kg Burgonya",
+          "source_verdict": "FORMAT_DIFFERENCE",
+          "note": null
+        },
+        {
+          "source_order": 2,
+          "visible_text": "1 db vöröshagyma",
+          "json_ld_text": "1 db Vöröshagyma",
+          "source_verdict": "FORMAT_DIFFERENCE",
+          "note": null
+        },
+        {
+          "source_order": 3,
+          "visible_text": "15 dkg szárazkolbász",
+          "json_ld_text": "15 dkg szárazkolbász",
+          "source_verdict": "MATCH",
+          "note": null
+        },
+        {
+          "source_order": 4,
+          "visible_text": "4 ek étolaj",
+          "json_ld_text": "4 ek Étolaj",
+          "source_verdict": "FORMAT_DIFFERENCE",
+          "note": null
+        },
+        {
+          "source_order": 5,
+          "visible_text": "2 gerezd fokhagyma",
+          "json_ld_text": "2 gerezd Fokhagyma",
+          "source_verdict": "FORMAT_DIFFERENCE",
+          "note": null
+        },
+        {
+          "source_order": 6,
+          "visible_text": "2 tk pirospaprika",
+          "json_ld_text": "2 tk Pirospaprika",
+          "source_verdict": "FORMAT_DIFFERENCE",
+          "note": null
+        },
+        {
+          "source_order": 7,
+          "visible_text": "só",
+          "json_ld_text": "Só",
+          "source_verdict": "FORMAT_DIFFERENCE",
+          "note": null
+        },
+        {
+          "source_order": 8,
+          "visible_text": "bors",
+          "json_ld_text": "Bors",
+          "source_verdict": "FORMAT_DIFFERENCE",
+          "note": null
+        },
+        {
+          "source_order": 9,
+          "visible_text": "friss petrezselyem",
+          "json_ld_text": "friss petrezselyem",
+          "source_verdict": "MATCH",
+          "note": null
+        }
+      ],
+      "visible_ingredient_count": 9,
+      "json_ld_ingredient_count": 9,
+      "ingredient_order_preserved": true,
+      "missing_ingredient_rows": 0,
+      "extra_ingredient_rows": 0,
+      "group_heading_differences": [],
+      "instructions": {
+        "verdict": "COMPLETE",
+        "visible_actual_blocks": 3,
+        "json_ld_step_count": 3,
+        "extracted_entry_count": 6,
+        "json_ld_heading_count": 3,
+        "visible_step_headings": [
+          null,
+          null,
+          null
+        ],
+        "json_ld_headings": [
+          "1. lépés",
+          "2. lépés",
+          "3. lépés"
+        ],
+        "visible_text_lengths": [
+          145,
+          287,
+          114
+        ],
+        "json_ld_text_lengths": [
+          145,
+          287,
+          114
+        ],
+        "ordered_full_text_equal_after_whitespace_collapse": true,
+        "missing_steps": 0,
+        "extra_steps": 0,
+        "order_errors": 0,
+        "content_omissions": 0,
+        "extra_content": 0,
+        "note": "Step bodies equal in source order. Ordinal step labels are presentation, not extra cooking steps.",
+        "references": [
+          {
+            "index": 1,
+            "snapshot": "results/b2_0_sources/source_13.html",
+            "snapshot_sha256": "8BDD89F45F6FE525E423E6C7BDE39834CB33FA03A8AD690F94330EE84D0645A4",
+            "selector": ".block-content ol > li",
+            "selector_index_zero_based": 0,
+            "heading": null,
+            "content_scope": "entire element",
+            "text_length": 145
+          },
+          {
+            "index": 2,
+            "snapshot": "results/b2_0_sources/source_13.html",
+            "snapshot_sha256": "8BDD89F45F6FE525E423E6C7BDE39834CB33FA03A8AD690F94330EE84D0645A4",
+            "selector": ".block-content ol > li",
+            "selector_index_zero_based": 1,
+            "heading": null,
+            "content_scope": "entire element",
+            "text_length": 287
+          },
+          {
+            "index": 3,
+            "snapshot": "results/b2_0_sources/source_13.html",
+            "snapshot_sha256": "8BDD89F45F6FE525E423E6C7BDE39834CB33FA03A8AD690F94330EE84D0645A4",
+            "selector": ".block-content ol > li",
+            "selector_index_zero_based": 2,
+            "heading": null,
+            "content_scope": "entire element",
+            "text_length": 114
+          }
+        ]
+      },
+      "extractor_evidence": {
+        "ingredients": {
+          "expected_count": 9,
+          "actual_count": 9,
+          "lost": 0,
+          "added": 0,
+          "modified_positions": [],
+          "order_error": false,
+          "exact_ordered_equality": true
+        },
+        "instructions": {
+          "expected_count": 6,
+          "actual_count": 6,
+          "lost": 0,
+          "added": 0,
+          "modified_positions": [],
+          "order_error": false,
+          "exact_ordered_equality": true
+        },
+        "title_mutation": false,
+        "raw_ingredients_preserved": true,
+        "raw_instructions_preserved": true,
+        "candidate_selection_problem": false
+      },
+      "source_quality": "USABLE_WITH_ISSUES",
+      "extractor_verdict": "LOSSLESS"
+    },
+    {
+      "id": "14",
+      "url": "https://www.mindmegette.hu/recept/hagyomanyos-szatmari-toltott-kaposzta",
+      "domain": "www.mindmegette.hu",
+      "snapshot": {
+        "verdict": "UNCHANGED_RECIPE_CONTENT",
+        "html_changed": true,
+        "fields_equal": {
+          "title": true,
+          "ingredients": true,
+          "ingredient_groups": true,
+          "steps": true,
+          "instruction_selector": true,
+          "servings": true
+        },
+        "servings_before": [
+          "4 adag"
+        ],
+        "servings_after": [
+          "4 adag"
+        ],
+        "b2_0": "b2_0_sources/source_14.html",
+        "b2_1": "b2_1_html/source_14.html",
+        "quantity_unit_notes_check": "Full ingredient strings compared without conversions; unchanged.",
+        "reference": "Existing B2.0 reference valid; no replacement created."
+      },
+      "reference_check": {
+        "resolved_visible_references": 4,
+        "exact_text_match": true,
+        "ground_truth_ingredients_match": true
+      },
+      "title": {
+        "visible": "Hagyományos szatmári töltött káposzta",
+        "json_ld": "Hagyományos szatmári töltött káposzta | Mindmegette.hu",
+        "verdict": "TITLE_DECORATION"
+      },
+      "ingredients": [
+        {
+          "source_order": 1,
+          "visible_text": "1 kis fej hagyma",
+          "json_ld_text": "1 kis fej Hagyma",
+          "source_verdict": "FORMAT_DIFFERENCE",
+          "note": null
+        },
+        {
+          "source_order": 2,
+          "visible_text": "5 dkg sertészsír",
+          "json_ld_text": "5 dkg Sertészsír",
+          "source_verdict": "FORMAT_DIFFERENCE",
+          "note": null
+        },
+        {
+          "source_order": 3,
+          "visible_text": "50 dkg darált sertéshús",
+          "json_ld_text": "50 dkg darált sertéshús",
+          "source_verdict": "MATCH",
+          "note": null
+        },
+        {
+          "source_order": 4,
+          "visible_text": "25 dkg rizs",
+          "json_ld_text": "25 dkg Rizs",
+          "source_verdict": "FORMAT_DIFFERENCE",
+          "note": null
+        },
+        {
+          "source_order": 5,
+          "visible_text": "só",
+          "json_ld_text": "Só",
+          "source_verdict": "FORMAT_DIFFERENCE",
+          "note": null
+        },
+        {
+          "source_order": 6,
+          "visible_text": "bors",
+          "json_ld_text": "Bors",
+          "source_verdict": "FORMAT_DIFFERENCE",
+          "note": null
+        },
+        {
+          "source_order": 7,
+          "visible_text": "1 ek pirospaprika",
+          "json_ld_text": "1 ek Pirospaprika",
+          "source_verdict": "FORMAT_DIFFERENCE",
+          "note": null
+        },
+        {
+          "source_order": 8,
+          "visible_text": "1 fej édes káposzta (1,5 kg)",
+          "json_ld_text": "1 fej édes káposzta",
+          "source_verdict": "MISSING_NOTE",
+          "note": "The missing note includes supplementary weight (1,5 kg); main quantity 1 fej remains."
+        },
+        {
+          "source_order": 9,
+          "visible_text": "3 dl paradicsomlé (házi)",
+          "json_ld_text": "3 dl paradicsomlé",
+          "source_verdict": "MISSING_NOTE",
+          "note": null
+        },
+        {
+          "source_order": 10,
+          "visible_text": "2 dl tejföl",
+          "json_ld_text": "2 dl Tejföl",
+          "source_verdict": "FORMAT_DIFFERENCE",
+          "note": null
+        }
+      ],
+      "visible_ingredient_count": 10,
+      "json_ld_ingredient_count": 10,
+      "ingredient_order_preserved": true,
+      "missing_ingredient_rows": 0,
+      "extra_ingredient_rows": 0,
+      "group_heading_differences": [],
+      "instructions": {
+        "verdict": "COMPLETE",
+        "visible_actual_blocks": 4,
+        "json_ld_step_count": 4,
+        "extracted_entry_count": 8,
+        "json_ld_heading_count": 4,
+        "visible_step_headings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "json_ld_headings": [
+          "1. lépés",
+          "2. lépés",
+          "3. lépés",
+          "4. lépés"
+        ],
+        "visible_text_lengths": [
+          203,
+          171,
+          348,
+          150
+        ],
+        "json_ld_text_lengths": [
+          203,
+          171,
+          348,
+          150
+        ],
+        "ordered_full_text_equal_after_whitespace_collapse": true,
+        "missing_steps": 0,
+        "extra_steps": 0,
+        "order_errors": 0,
+        "content_omissions": 0,
+        "extra_content": 0,
+        "note": "Step bodies equal in source order. Ordinal step labels are presentation, not extra cooking steps.",
+        "references": [
+          {
+            "index": 1,
+            "snapshot": "results/b2_0_sources/source_14.html",
+            "snapshot_sha256": "101CB422D31FC7AB661B0F2D6B30B89178D7A79CD6CE551BC9E4FEA278B39B7B",
+            "selector": ".block-content ol > li",
+            "selector_index_zero_based": 0,
+            "heading": null,
+            "content_scope": "entire element",
+            "text_length": 203
+          },
+          {
+            "index": 2,
+            "snapshot": "results/b2_0_sources/source_14.html",
+            "snapshot_sha256": "101CB422D31FC7AB661B0F2D6B30B89178D7A79CD6CE551BC9E4FEA278B39B7B",
+            "selector": ".block-content ol > li",
+            "selector_index_zero_based": 1,
+            "heading": null,
+            "content_scope": "entire element",
+            "text_length": 171
+          },
+          {
+            "index": 3,
+            "snapshot": "results/b2_0_sources/source_14.html",
+            "snapshot_sha256": "101CB422D31FC7AB661B0F2D6B30B89178D7A79CD6CE551BC9E4FEA278B39B7B",
+            "selector": ".block-content ol > li",
+            "selector_index_zero_based": 2,
+            "heading": null,
+            "content_scope": "entire element",
+            "text_length": 348
+          },
+          {
+            "index": 4,
+            "snapshot": "results/b2_0_sources/source_14.html",
+            "snapshot_sha256": "101CB422D31FC7AB661B0F2D6B30B89178D7A79CD6CE551BC9E4FEA278B39B7B",
+            "selector": ".block-content ol > li",
+            "selector_index_zero_based": 3,
+            "heading": null,
+            "content_scope": "entire element",
+            "text_length": 150
+          }
+        ]
+      },
+      "extractor_evidence": {
+        "ingredients": {
+          "expected_count": 10,
+          "actual_count": 10,
+          "lost": 0,
+          "added": 0,
+          "modified_positions": [],
+          "order_error": false,
+          "exact_ordered_equality": true
+        },
+        "instructions": {
+          "expected_count": 8,
+          "actual_count": 8,
+          "lost": 0,
+          "added": 0,
+          "modified_positions": [],
+          "order_error": false,
+          "exact_ordered_equality": true
+        },
+        "title_mutation": false,
+        "raw_ingredients_preserved": true,
+        "raw_instructions_preserved": true,
+        "candidate_selection_problem": false
+      },
+      "source_quality": "USABLE_WITH_ISSUES",
+      "extractor_verdict": "LOSSLESS"
+    },
+    {
+      "id": "15",
+      "url": "https://www.mindmegette.hu/recept/rakott-krumpli-magyarosan",
+      "domain": "www.mindmegette.hu",
+      "snapshot": {
+        "verdict": "UNCHANGED_RECIPE_CONTENT",
+        "html_changed": true,
+        "fields_equal": {
+          "title": true,
+          "ingredients": true,
+          "ingredient_groups": true,
+          "steps": true,
+          "instruction_selector": true,
+          "servings": true
+        },
+        "servings_before": [
+          "0 adag"
+        ],
+        "servings_after": [
+          "0 adag"
+        ],
+        "b2_0": "b2_0_sources/source_15.html",
+        "b2_1": "b2_1_html/source_15.html",
+        "quantity_unit_notes_check": "Full ingredient strings compared without conversions; unchanged.",
+        "reference": "Existing B2.0 reference valid; no replacement created."
+      },
+      "reference_check": {
+        "resolved_visible_references": 1,
+        "exact_text_match": true,
+        "ground_truth_ingredients_match": true
+      },
+      "title": {
+        "visible": "Rakott krumpli magyarosan",
+        "json_ld": "Rakott krumpli magyarosan  | Mindmegette.hu",
+        "verdict": "TITLE_DECORATION"
+      },
+      "ingredients": [
+        {
+          "source_order": 1,
+          "visible_text": "50 dkg krumpli",
+          "json_ld_text": "50 dkg Krumpli",
+          "source_verdict": "FORMAT_DIFFERENCE",
+          "note": null
+        },
+        {
+          "source_order": 2,
+          "visible_text": "1 fej vöröshagyma",
+          "json_ld_text": "1 fej Vöröshagyma",
+          "source_verdict": "FORMAT_DIFFERENCE",
+          "note": null
+        },
+        {
+          "source_order": 3,
+          "visible_text": "6 db tojás",
+          "json_ld_text": "6 db Tojás",
+          "source_verdict": "FORMAT_DIFFERENCE",
+          "note": null
+        },
+        {
+          "source_order": 4,
+          "visible_text": "kolbász",
+          "json_ld_text": "Kolbász",
+          "source_verdict": "FORMAT_DIFFERENCE",
+          "note": null
+        },
+        {
+          "source_order": 5,
+          "visible_text": "tejföl",
+          "json_ld_text": "Tejföl",
+          "source_verdict": "FORMAT_DIFFERENCE",
+          "note": null
+        },
+        {
+          "source_order": 6,
+          "visible_text": "szalonna",
+          "json_ld_text": "Szalonna",
+          "source_verdict": "FORMAT_DIFFERENCE",
+          "note": null
+        },
+        {
+          "source_order": 7,
+          "visible_text": "só",
+          "json_ld_text": "Só",
+          "source_verdict": "FORMAT_DIFFERENCE",
+          "note": null
+        },
+        {
+          "source_order": 8,
+          "visible_text": "bors",
+          "json_ld_text": "Bors",
+          "source_verdict": "FORMAT_DIFFERENCE",
+          "note": null
+        }
+      ],
+      "visible_ingredient_count": 8,
+      "json_ld_ingredient_count": 8,
+      "ingredient_order_preserved": true,
+      "missing_ingredient_rows": 0,
+      "extra_ingredient_rows": 0,
+      "group_heading_differences": [],
+      "instructions": {
+        "verdict": "COMPLETE",
+        "visible_actual_blocks": 1,
+        "json_ld_step_count": 1,
+        "extracted_entry_count": 1,
+        "json_ld_heading_count": 0,
+        "visible_step_headings": [
+          null
+        ],
+        "json_ld_headings": [],
+        "visible_text_lengths": [
+          680
+        ],
+        "json_ld_text_lengths": [
+          680
+        ],
+        "ordered_full_text_equal_after_whitespace_collapse": true,
+        "missing_steps": 0,
+        "extra_steps": 0,
+        "order_errors": 0,
+        "content_omissions": 0,
+        "extra_content": 0,
+        "note": "Step bodies equal in source order. Ordinal step labels are presentation, not extra cooking steps.",
+        "references": [
+          {
+            "index": 1,
+            "snapshot": "results/b2_0_sources/source_15.html",
+            "snapshot_sha256": "CFEE4334CA8D2333679C9291735723B1A8A81E130F302983B8DE42309C339047",
+            "selector": ".block-content > p",
+            "selector_index_zero_based": 0,
+            "heading": null,
+            "content_scope": "entire element",
+            "text_length": 680
+          }
+        ]
+      },
+      "extractor_evidence": {
+        "ingredients": {
+          "expected_count": 8,
+          "actual_count": 8,
+          "lost": 0,
+          "added": 0,
+          "modified_positions": [],
+          "order_error": false,
+          "exact_ordered_equality": true
+        },
+        "instructions": {
+          "expected_count": 1,
+          "actual_count": 1,
+          "lost": 0,
+          "added": 0,
+          "modified_positions": [],
+          "order_error": false,
+          "exact_ordered_equality": true
+        },
+        "title_mutation": false,
+        "raw_ingredients_preserved": true,
+        "raw_instructions_preserved": true,
+        "candidate_selection_problem": false
+      },
+      "source_quality": "USABLE_WITH_ISSUES",
+      "extractor_verdict": "LOSSLESS"
+    },
+    {
+      "id": "16",
+      "url": "https://www.bbcgoodfood.com/recipes/ultimate-spaghetti-carbonara-recipe",
+      "domain": "www.bbcgoodfood.com",
+      "snapshot": {
+        "verdict": "UNCHANGED_RECIPE_CONTENT",
+        "html_changed": false,
+        "fields_equal": {
+          "title": true,
+          "ingredients": true,
+          "ingredient_groups": true,
+          "steps": true,
+          "instruction_selector": true,
+          "servings": true
+        },
+        "servings_before": [
+          "Serves 4"
+        ],
+        "servings_after": [
+          "Serves 4"
+        ],
+        "b2_0": "b2_0_sources/source_16.html",
+        "b2_1": "b2_1_html/source_16.html",
+        "quantity_unit_notes_check": "Full ingredient strings compared without conversions; unchanged.",
+        "reference": "Existing B2.0 reference valid; no replacement created."
+      },
+      "reference_check": {
+        "resolved_visible_references": 12,
+        "exact_text_match": true,
+        "ground_truth_ingredients_match": true
+      },
+      "title": {
+        "visible": "Ultimate spaghetti carbonara recipe",
+        "json_ld": "Ultimate spaghetti carbonara recipe",
+        "verdict": "CLEAN"
+      },
+      "ingredients": [
+        {
+          "source_order": 1,
+          "visible_text": "100g pancetta",
+          "json_ld_text": "100g pancetta",
+          "source_verdict": "MATCH",
+          "note": null
+        },
+        {
+          "source_order": 2,
+          "visible_text": "50g pecorino cheese",
+          "json_ld_text": "50g pecorino cheese",
+          "source_verdict": "MATCH",
+          "note": null
+        },
+        {
+          "source_order": 3,
+          "visible_text": "50g parmesan",
+          "json_ld_text": "50g parmesan",
+          "source_verdict": "MATCH",
+          "note": null
+        },
+        {
+          "source_order": 4,
+          "visible_text": "3 large eggs",
+          "json_ld_text": "3 large eggs",
+          "source_verdict": "MATCH",
+          "note": null
+        },
+        {
+          "source_order": 5,
+          "visible_text": "350g spaghetti",
+          "json_ld_text": "350g spaghetti",
+          "source_verdict": "MATCH",
+          "note": null
+        },
+        {
+          "source_order": 6,
+          "visible_text": "2 plump garlic cloves peeled and left whole",
+          "json_ld_text": "2 plump garlic cloves peeled and left whole",
+          "source_verdict": "MATCH",
+          "note": null
+        },
+        {
+          "source_order": 7,
+          "visible_text": "50g unsalted butter",
+          "json_ld_text": "50g unsalted butter",
+          "source_verdict": "MATCH",
+          "note": null
+        },
+        {
+          "source_order": 8,
+          "visible_text": "sea salt and freshly ground black pepper",
+          "json_ld_text": "sea salt and freshly ground black pepper",
+          "source_verdict": "MATCH",
+          "note": null
+        }
+      ],
+      "visible_ingredient_count": 8,
+      "json_ld_ingredient_count": 8,
+      "ingredient_order_preserved": true,
+      "missing_ingredient_rows": 0,
+      "extra_ingredient_rows": 0,
+      "group_heading_differences": [],
+      "instructions": {
+        "verdict": "COMPLETE",
+        "visible_actual_blocks": 12,
+        "json_ld_step_count": 12,
+        "extracted_entry_count": 12,
+        "json_ld_heading_count": 0,
+        "visible_step_headings": [
+          "step 1",
+          "step 2",
+          "step 3",
+          "step 4",
+          "step 5",
+          "step 6",
+          "step 7",
+          "step 8",
+          "step 9",
+          "step 10",
+          "step 11",
+          "step 12"
+        ],
+        "json_ld_headings": [],
+        "visible_text_lengths": [
+          41,
+          134,
+          114,
+          182,
+          81,
+          192,
+          197,
+          286,
+          96,
+          251,
+          155,
+          301
+        ],
+        "json_ld_text_lengths": [
+          41,
+          134,
+          114,
+          182,
+          81,
+          192,
+          197,
+          286,
+          96,
+          251,
+          155,
+          301
+        ],
+        "ordered_full_text_equal_after_whitespace_collapse": true,
+        "missing_steps": 0,
+        "extra_steps": 0,
+        "order_errors": 0,
+        "content_omissions": 0,
+        "extra_content": 0,
+        "note": "Step bodies equal in source order. Ordinal step labels are presentation, not extra cooking steps.",
+        "references": [
+          {
+            "index": 1,
+            "snapshot": "results/b2_0_sources/source_16.html",
+            "snapshot_sha256": "7C66ECCDFCFA8F93FF3DE2FB58AD6A117C32854780D1EC65F6B7DEE210E18BF4",
+            "selector": ".method-steps__list-item",
+            "selector_index_zero_based": 0,
+            "heading": "step 1",
+            "content_scope": ".editor-content",
+            "text_length": 41
+          },
+          {
+            "index": 2,
+            "snapshot": "results/b2_0_sources/source_16.html",
+            "snapshot_sha256": "7C66ECCDFCFA8F93FF3DE2FB58AD6A117C32854780D1EC65F6B7DEE210E18BF4",
+            "selector": ".method-steps__list-item",
+            "selector_index_zero_based": 1,
+            "heading": "step 2",
+            "content_scope": ".editor-content",
+            "text_length": 134
+          },
+          {
+            "index": 3,
+            "snapshot": "results/b2_0_sources/source_16.html",
+            "snapshot_sha256": "7C66ECCDFCFA8F93FF3DE2FB58AD6A117C32854780D1EC65F6B7DEE210E18BF4",
+            "selector": ".method-steps__list-item",
+            "selector_index_zero_based": 2,
+            "heading": "step 3",
+            "content_scope": ".editor-content",
+            "text_length": 114
+          },
+          {
+            "index": 4,
+            "snapshot": "results/b2_0_sources/source_16.html",
+            "snapshot_sha256": "7C66ECCDFCFA8F93FF3DE2FB58AD6A117C32854780D1EC65F6B7DEE210E18BF4",
+            "selector": ".method-steps__list-item",
+            "selector_index_zero_based": 3,
+            "heading": "step 4",
+            "content_scope": ".editor-content",
+            "text_length": 182
+          },
+          {
+            "index": 5,
+            "snapshot": "results/b2_0_sources/source_16.html",
+            "snapshot_sha256": "7C66ECCDFCFA8F93FF3DE2FB58AD6A117C32854780D1EC65F6B7DEE210E18BF4",
+            "selector": ".method-steps__list-item",
+            "selector_index_zero_based": 4,
+            "heading": "step 5",
+            "content_scope": ".editor-content",
+            "text_length": 81
+          },
+          {
+            "index": 6,
+            "snapshot": "results/b2_0_sources/source_16.html",
+            "snapshot_sha256": "7C66ECCDFCFA8F93FF3DE2FB58AD6A117C32854780D1EC65F6B7DEE210E18BF4",
+            "selector": ".method-steps__list-item",
+            "selector_index_zero_based": 5,
+            "heading": "step 6",
+            "content_scope": ".editor-content",
+            "text_length": 192
+          },
+          {
+            "index": 7,
+            "snapshot": "results/b2_0_sources/source_16.html",
+            "snapshot_sha256": "7C66ECCDFCFA8F93FF3DE2FB58AD6A117C32854780D1EC65F6B7DEE210E18BF4",
+            "selector": ".method-steps__list-item",
+            "selector_index_zero_based": 6,
+            "heading": "step 7",
+            "content_scope": ".editor-content",
+            "text_length": 197
+          },
+          {
+            "index": 8,
+            "snapshot": "results/b2_0_sources/source_16.html",
+            "snapshot_sha256": "7C66ECCDFCFA8F93FF3DE2FB58AD6A117C32854780D1EC65F6B7DEE210E18BF4",
+            "selector": ".method-steps__list-item",
+            "selector_index_zero_based": 7,
+            "heading": "step 8",
+            "content_scope": ".editor-content",
+            "text_length": 286
+          },
+          {
+            "index": 9,
+            "snapshot": "results/b2_0_sources/source_16.html",
+            "snapshot_sha256": "7C66ECCDFCFA8F93FF3DE2FB58AD6A117C32854780D1EC65F6B7DEE210E18BF4",
+            "selector": ".method-steps__list-item",
+            "selector_index_zero_based": 8,
+            "heading": "step 9",
+            "content_scope": ".editor-content",
+            "text_length": 96
+          },
+          {
+            "index": 10,
+            "snapshot": "results/b2_0_sources/source_16.html",
+            "snapshot_sha256": "7C66ECCDFCFA8F93FF3DE2FB58AD6A117C32854780D1EC65F6B7DEE210E18BF4",
+            "selector": ".method-steps__list-item",
+            "selector_index_zero_based": 9,
+            "heading": "step 10",
+            "content_scope": ".editor-content",
+            "text_length": 251
+          },
+          {
+            "index": 11,
+            "snapshot": "results/b2_0_sources/source_16.html",
+            "snapshot_sha256": "7C66ECCDFCFA8F93FF3DE2FB58AD6A117C32854780D1EC65F6B7DEE210E18BF4",
+            "selector": ".method-steps__list-item",
+            "selector_index_zero_based": 10,
+            "heading": "step 11",
+            "content_scope": ".editor-content",
+            "text_length": 155
+          },
+          {
+            "index": 12,
+            "snapshot": "results/b2_0_sources/source_16.html",
+            "snapshot_sha256": "7C66ECCDFCFA8F93FF3DE2FB58AD6A117C32854780D1EC65F6B7DEE210E18BF4",
+            "selector": ".method-steps__list-item",
+            "selector_index_zero_based": 11,
+            "heading": "step 12",
+            "content_scope": ".editor-content",
+            "text_length": 301
+          }
+        ]
+      },
+      "extractor_evidence": {
+        "ingredients": {
+          "expected_count": 8,
+          "actual_count": 8,
+          "lost": 0,
+          "added": 0,
+          "modified_positions": [],
+          "order_error": false,
+          "exact_ordered_equality": true
+        },
+        "instructions": {
+          "expected_count": 12,
+          "actual_count": 12,
+          "lost": 0,
+          "added": 0,
+          "modified_positions": [],
+          "order_error": false,
+          "exact_ordered_equality": true
+        },
+        "title_mutation": false,
+        "raw_ingredients_preserved": true,
+        "raw_instructions_preserved": true,
+        "candidate_selection_problem": false
+      },
+      "source_quality": "GOOD",
+      "extractor_verdict": "LOSSLESS"
+    },
+    {
+      "id": "17",
+      "url": "https://www.bbcgoodfood.com/recipes/classic-victoria-sandwich-recipe",
+      "domain": "www.bbcgoodfood.com",
+      "snapshot": {
+        "verdict": "UNCHANGED_RECIPE_CONTENT",
+        "html_changed": true,
+        "fields_equal": {
+          "title": true,
+          "ingredients": true,
+          "ingredient_groups": true,
+          "steps": true,
+          "instruction_selector": true,
+          "servings": true
+        },
+        "servings_before": [
+          "Cuts into 10 slices"
+        ],
+        "servings_after": [
+          "Cuts into 10 slices"
+        ],
+        "b2_0": "b2_0_sources/source_17.html",
+        "b2_1": "b2_1_html/source_17.html",
+        "quantity_unit_notes_check": "Full ingredient strings compared without conversions; unchanged.",
+        "reference": "Existing B2.0 reference valid; no replacement created."
+      },
+      "reference_check": {
+        "resolved_visible_references": 8,
+        "exact_text_match": true,
+        "ground_truth_ingredients_match": true
+      },
+      "title": {
+        "visible": "Classic Victoria sandwich recipe",
+        "json_ld": "Classic Victoria sandwich recipe",
+        "verdict": "CLEAN"
+      },
+      "ingredients": [
+        {
+          "source_order": 1,
+          "visible_text": "200g caster sugar",
+          "json_ld_text": "200g caster sugar",
+          "source_verdict": "MATCH",
+          "note": null
+        },
+        {
+          "source_order": 2,
+          "visible_text": "200g softened butter",
+          "json_ld_text": "200g softened butter",
+          "source_verdict": "MATCH",
+          "note": null
+        },
+        {
+          "source_order": 3,
+          "visible_text": "4 eggs beaten",
+          "json_ld_text": "4 eggs beaten",
+          "source_verdict": "MATCH",
+          "note": null
+        },
+        {
+          "source_order": 4,
+          "visible_text": "200g self-raising flour",
+          "json_ld_text": "200g self-raising flour",
+          "source_verdict": "MATCH",
+          "note": null
+        },
+        {
+          "source_order": 5,
+          "visible_text": "1 tsp baking powder",
+          "json_ld_text": "1 tsp  baking powder",
+          "source_verdict": "FORMAT_DIFFERENCE",
+          "note": null
+        },
+        {
+          "source_order": 6,
+          "visible_text": "2 tbsp milk",
+          "json_ld_text": "2 tbsp milk",
+          "source_verdict": "MATCH",
+          "note": null
+        },
+        {
+          "source_order": 7,
+          "visible_text": "100g butter softened",
+          "json_ld_text": "100g butter softened",
+          "source_verdict": "MATCH",
+          "note": null
+        },
+        {
+          "source_order": 8,
+          "visible_text": "140g icing sugar sifted",
+          "json_ld_text": "140g icing sugar sifted",
+          "source_verdict": "MATCH",
+          "note": null
+        },
+        {
+          "source_order": 9,
+          "visible_text": "drop vanilla extract (optional)",
+          "json_ld_text": "drop vanilla extract (optional)",
+          "source_verdict": "MATCH",
+          "note": null
+        },
+        {
+          "source_order": 10,
+          "visible_text": "half a 340g jar good-quality strawberry jam",
+          "json_ld_text": "half a 340g jar good-quality strawberry jam",
+          "source_verdict": "MATCH",
+          "note": null
+        },
+        {
+          "source_order": 11,
+          "visible_text": "icing sugar to decorate",
+          "json_ld_text": "icing sugar to decorate",
+          "source_verdict": "MATCH",
+          "note": null
+        }
+      ],
+      "visible_ingredient_count": 11,
+      "json_ld_ingredient_count": 11,
+      "ingredient_order_preserved": true,
+      "missing_ingredient_rows": 0,
+      "extra_ingredient_rows": 0,
+      "group_heading_differences": [
+        {
+          "before_row": 7,
+          "heading": "For the filling",
+          "verdict": "GROUP_HEADING_DIFFERENCE",
+          "json_ld": null
+        }
+      ],
+      "instructions": {
+        "verdict": "COMPLETE",
+        "visible_actual_blocks": 8,
+        "json_ld_step_count": 8,
+        "extracted_entry_count": 8,
+        "json_ld_heading_count": 0,
+        "visible_step_headings": [
+          "step 1",
+          "step 2",
+          "step 3",
+          "step 4",
+          "step 5",
+          "step 6",
+          "step 7",
+          "step 8"
+        ],
+        "json_ld_headings": [],
+        "visible_text_lengths": [
+          101,
+          185,
+          94,
+          75,
+          54,
+          174,
+          132,
+          99
+        ],
+        "json_ld_text_lengths": [
+          101,
+          185,
+          94,
+          75,
+          54,
+          174,
+          132,
+          99
+        ],
+        "ordered_full_text_equal_after_whitespace_collapse": true,
+        "missing_steps": 0,
+        "extra_steps": 0,
+        "order_errors": 0,
+        "content_omissions": 0,
+        "extra_content": 0,
+        "note": "Step bodies equal in source order. Ordinal step labels are presentation, not extra cooking steps.",
+        "references": [
+          {
+            "index": 1,
+            "snapshot": "results/b2_0_sources/source_17.html",
+            "snapshot_sha256": "222C023C2BF7A9CE20E21B6D70F296EFB2FC2F6B7007F4610298FE642EF78D58",
+            "selector": ".method-steps__list-item",
+            "selector_index_zero_based": 0,
+            "heading": "step 1",
+            "content_scope": ".editor-content",
+            "text_length": 101
+          },
+          {
+            "index": 2,
+            "snapshot": "results/b2_0_sources/source_17.html",
+            "snapshot_sha256": "222C023C2BF7A9CE20E21B6D70F296EFB2FC2F6B7007F4610298FE642EF78D58",
+            "selector": ".method-steps__list-item",
+            "selector_index_zero_based": 1,
+            "heading": "step 2",
+            "content_scope": ".editor-content",
+            "text_length": 185
+          },
+          {
+            "index": 3,
+            "snapshot": "results/b2_0_sources/source_17.html",
+            "snapshot_sha256": "222C023C2BF7A9CE20E21B6D70F296EFB2FC2F6B7007F4610298FE642EF78D58",
+            "selector": ".method-steps__list-item",
+            "selector_index_zero_based": 2,
+            "heading": "step 3",
+            "content_scope": ".editor-content",
+            "text_length": 94
+          },
+          {
+            "index": 4,
+            "snapshot": "results/b2_0_sources/source_17.html",
+            "snapshot_sha256": "222C023C2BF7A9CE20E21B6D70F296EFB2FC2F6B7007F4610298FE642EF78D58",
+            "selector": ".method-steps__list-item",
+            "selector_index_zero_based": 3,
+            "heading": "step 4",
+            "content_scope": ".editor-content",
+            "text_length": 75
+          },
+          {
+            "index": 5,
+            "snapshot": "results/b2_0_sources/source_17.html",
+            "snapshot_sha256": "222C023C2BF7A9CE20E21B6D70F296EFB2FC2F6B7007F4610298FE642EF78D58",
+            "selector": ".method-steps__list-item",
+            "selector_index_zero_based": 4,
+            "heading": "step 5",
+            "content_scope": ".editor-content",
+            "text_length": 54
+          },
+          {
+            "index": 6,
+            "snapshot": "results/b2_0_sources/source_17.html",
+            "snapshot_sha256": "222C023C2BF7A9CE20E21B6D70F296EFB2FC2F6B7007F4610298FE642EF78D58",
+            "selector": ".method-steps__list-item",
+            "selector_index_zero_based": 5,
+            "heading": "step 6",
+            "content_scope": ".editor-content",
+            "text_length": 174
+          },
+          {
+            "index": 7,
+            "snapshot": "results/b2_0_sources/source_17.html",
+            "snapshot_sha256": "222C023C2BF7A9CE20E21B6D70F296EFB2FC2F6B7007F4610298FE642EF78D58",
+            "selector": ".method-steps__list-item",
+            "selector_index_zero_based": 6,
+            "heading": "step 7",
+            "content_scope": ".editor-content",
+            "text_length": 132
+          },
+          {
+            "index": 8,
+            "snapshot": "results/b2_0_sources/source_17.html",
+            "snapshot_sha256": "222C023C2BF7A9CE20E21B6D70F296EFB2FC2F6B7007F4610298FE642EF78D58",
+            "selector": ".method-steps__list-item",
+            "selector_index_zero_based": 7,
+            "heading": "step 8",
+            "content_scope": ".editor-content",
+            "text_length": 99
+          }
+        ]
+      },
+      "extractor_evidence": {
+        "ingredients": {
+          "expected_count": 11,
+          "actual_count": 11,
+          "lost": 0,
+          "added": 0,
+          "modified_positions": [],
+          "order_error": false,
+          "exact_ordered_equality": true
+        },
+        "instructions": {
+          "expected_count": 8,
+          "actual_count": 8,
+          "lost": 0,
+          "added": 0,
+          "modified_positions": [],
+          "order_error": false,
+          "exact_ordered_equality": true
+        },
+        "title_mutation": false,
+        "raw_ingredients_preserved": true,
+        "raw_instructions_preserved": true,
+        "candidate_selection_problem": false
+      },
+      "source_quality": "USABLE_WITH_ISSUES",
+      "extractor_verdict": "LOSSLESS"
+    },
+    {
+      "id": "18",
+      "url": "https://www.bbcgoodfood.com/recipes/chilli-con-carne-recipe",
+      "domain": "www.bbcgoodfood.com",
+      "snapshot": {
+        "verdict": "UNCHANGED_RECIPE_CONTENT",
+        "html_changed": true,
+        "fields_equal": {
+          "title": true,
+          "ingredients": true,
+          "ingredient_groups": true,
+          "steps": true,
+          "instruction_selector": true,
+          "servings": true
+        },
+        "servings_before": [
+          "Serves 4"
+        ],
+        "servings_after": [
+          "Serves 4"
+        ],
+        "b2_0": "b2_0_sources/source_18.html",
+        "b2_1": "b2_1_html/source_18.html",
+        "quantity_unit_notes_check": "Full ingredient strings compared without conversions; unchanged.",
+        "reference": "Existing B2.0 reference valid; no replacement created."
+      },
+      "reference_check": {
+        "resolved_visible_references": 16,
+        "exact_text_match": true,
+        "ground_truth_ingredients_match": true
+      },
+      "title": {
+        "visible": "Chilli con carne recipe",
+        "json_ld": "Chilli con carne recipe",
+        "verdict": "CLEAN"
+      },
+      "ingredients": [
+        {
+          "source_order": 1,
+          "visible_text": "1 large onion",
+          "json_ld_text": "1 large onion",
+          "source_verdict": "MATCH",
+          "note": null
+        },
+        {
+          "source_order": 2,
+          "visible_text": "1 red pepper",
+          "json_ld_text": "1 red pepper",
+          "source_verdict": "MATCH",
+          "note": null
+        },
+        {
+          "source_order": 3,
+          "visible_text": "2 garlic cloves",
+          "json_ld_text": "2 garlic cloves",
+          "source_verdict": "MATCH",
+          "note": null
+        },
+        {
+          "source_order": 4,
+          "visible_text": "1 tbsp oil",
+          "json_ld_text": "1 tbsp oil",
+          "source_verdict": "MATCH",
+          "note": null
+        },
+        {
+          "source_order": 5,
+          "visible_text": "1 heaped tsp hot chilli powder (or 1 level tbsp if you only have mild)",
+          "json_ld_text": "1 heaped tsp hot chilli powder (or 1 level tbsp if you only have mild)",
+          "source_verdict": "MATCH",
+          "note": null
+        },
+        {
+          "source_order": 6,
+          "visible_text": "1 tsp paprika",
+          "json_ld_text": "1 tsp paprika",
+          "source_verdict": "MATCH",
+          "note": null
+        },
+        {
+          "source_order": 7,
+          "visible_text": "1 tsp ground cumin",
+          "json_ld_text": "1 tsp ground cumin",
+          "source_verdict": "MATCH",
+          "note": null
+        },
+        {
+          "source_order": 8,
+          "visible_text": "500g lean minced beef",
+          "json_ld_text": "500g lean minced beef",
+          "source_verdict": "MATCH",
+          "note": null
+        },
+        {
+          "source_order": 9,
+          "visible_text": "1 beef stock cube",
+          "json_ld_text": "1 beef stock cube",
+          "source_verdict": "MATCH",
+          "note": null
+        },
+        {
+          "source_order": 10,
+          "visible_text": "400g can Mutti chopped tomatoes",
+          "json_ld_text": "400g can Mutti chopped tomatoes",
+          "source_verdict": "MATCH",
+          "note": null
+        },
+        {
+          "source_order": 11,
+          "visible_text": "½ tsp dried marjoram",
+          "json_ld_text": "½ tsp dried marjoram",
+          "source_verdict": "MATCH",
+          "note": null
+        },
+        {
+          "source_order": 12,
+          "visible_text": "1 tsp sugar (or add a thumbnail-sized piece of dark chocolate along with the beans instead, see tip)",
+          "json_ld_text": "1 tsp sugar (or add a thumbnail-sized piece of dark chocolate along with the beans instead, see tip)",
+          "source_verdict": "MATCH",
+          "note": null
+        },
+        {
+          "source_order": 13,
+          "visible_text": "2 tbsp tomato purée",
+          "json_ld_text": "2 tbsp tomato purée",
+          "source_verdict": "MATCH",
+          "note": null
+        },
+        {
+          "source_order": 14,
+          "visible_text": "410g can red kidney beans",
+          "json_ld_text": "410g can red kidney beans",
+          "source_verdict": "MATCH",
+          "note": null
+        },
+        {
+          "source_order": 15,
+          "visible_text": "plain boiled long grain rice to serve",
+          "json_ld_text": "plain boiled long grain rice to serve",
+          "source_verdict": "MATCH",
+          "note": null
+        },
+        {
+          "source_order": 16,
+          "visible_text": "soured cream to serve",
+          "json_ld_text": "soured cream to serve",
+          "source_verdict": "MATCH",
+          "note": null
+        }
+      ],
+      "visible_ingredient_count": 16,
+      "json_ld_ingredient_count": 16,
+      "ingredient_order_preserved": true,
+      "missing_ingredient_rows": 0,
+      "extra_ingredient_rows": 0,
+      "group_heading_differences": [],
+      "instructions": {
+        "verdict": "COMPLETE",
+        "visible_actual_blocks": 16,
+        "json_ld_step_count": 16,
+        "extracted_entry_count": 16,
+        "json_ld_heading_count": 0,
+        "visible_step_headings": [
+          "step 1",
+          "step 2",
+          "step 3",
+          "step 4",
+          "step 5",
+          "step 6",
+          "step 7",
+          "step 8",
+          "step 9",
+          "step 10",
+          "step 11",
+          "step 12",
+          "step 13",
+          "step 14",
+          "step 15",
+          "step 16"
+        ],
+        "json_ld_headings": [],
+        "visible_text_lengths": [
+          338,
+          123,
+          151,
+          134,
+          135,
+          88,
+          172,
+          236,
+          110,
+          178,
+          174,
+          305,
+          223,
+          96,
+          162,
+          57
+        ],
+        "json_ld_text_lengths": [
+          338,
+          123,
+          151,
+          134,
+          135,
+          88,
+          172,
+          236,
+          110,
+          178,
+          174,
+          305,
+          223,
+          96,
+          162,
+          57
+        ],
+        "ordered_full_text_equal_after_whitespace_collapse": true,
+        "missing_steps": 0,
+        "extra_steps": 0,
+        "order_errors": 0,
+        "content_omissions": 0,
+        "extra_content": 0,
+        "note": "Step bodies equal in source order. Ordinal step labels are presentation, not extra cooking steps.",
+        "references": [
+          {
+            "index": 1,
+            "snapshot": "results/b2_0_sources/source_18.html",
+            "snapshot_sha256": "94355B2B6E2C9B0589400A7DCB2B3D768FD46DC4D8296B5E225FFAB766434A05",
+            "selector": ".method-steps__list-item",
+            "selector_index_zero_based": 0,
+            "heading": "step 1",
+            "content_scope": ".editor-content",
+            "text_length": 338
+          },
+          {
+            "index": 2,
+            "snapshot": "results/b2_0_sources/source_18.html",
+            "snapshot_sha256": "94355B2B6E2C9B0589400A7DCB2B3D768FD46DC4D8296B5E225FFAB766434A05",
+            "selector": ".method-steps__list-item",
+            "selector_index_zero_based": 1,
+            "heading": "step 2",
+            "content_scope": ".editor-content",
+            "text_length": 123
+          },
+          {
+            "index": 3,
+            "snapshot": "results/b2_0_sources/source_18.html",
+            "snapshot_sha256": "94355B2B6E2C9B0589400A7DCB2B3D768FD46DC4D8296B5E225FFAB766434A05",
+            "selector": ".method-steps__list-item",
+            "selector_index_zero_based": 2,
+            "heading": "step 3",
+            "content_scope": ".editor-content",
+            "text_length": 151
+          },
+          {
+            "index": 4,
+            "snapshot": "results/b2_0_sources/source_18.html",
+            "snapshot_sha256": "94355B2B6E2C9B0589400A7DCB2B3D768FD46DC4D8296B5E225FFAB766434A05",
+            "selector": ".method-steps__list-item",
+            "selector_index_zero_based": 3,
+            "heading": "step 4",
+            "content_scope": ".editor-content",
+            "text_length": 134
+          },
+          {
+            "index": 5,
+            "snapshot": "results/b2_0_sources/source_18.html",
+            "snapshot_sha256": "94355B2B6E2C9B0589400A7DCB2B3D768FD46DC4D8296B5E225FFAB766434A05",
+            "selector": ".method-steps__list-item",
+            "selector_index_zero_based": 4,
+            "heading": "step 5",
+            "content_scope": ".editor-content",
+            "text_length": 135
+          },
+          {
+            "index": 6,
+            "snapshot": "results/b2_0_sources/source_18.html",
+            "snapshot_sha256": "94355B2B6E2C9B0589400A7DCB2B3D768FD46DC4D8296B5E225FFAB766434A05",
+            "selector": ".method-steps__list-item",
+            "selector_index_zero_based": 5,
+            "heading": "step 6",
+            "content_scope": ".editor-content",
+            "text_length": 88
+          },
+          {
+            "index": 7,
+            "snapshot": "results/b2_0_sources/source_18.html",
+            "snapshot_sha256": "94355B2B6E2C9B0589400A7DCB2B3D768FD46DC4D8296B5E225FFAB766434A05",
+            "selector": ".method-steps__list-item",
+            "selector_index_zero_based": 6,
+            "heading": "step 7",
+            "content_scope": ".editor-content",
+            "text_length": 172
+          },
+          {
+            "index": 8,
+            "snapshot": "results/b2_0_sources/source_18.html",
+            "snapshot_sha256": "94355B2B6E2C9B0589400A7DCB2B3D768FD46DC4D8296B5E225FFAB766434A05",
+            "selector": ".method-steps__list-item",
+            "selector_index_zero_based": 7,
+            "heading": "step 8",
+            "content_scope": ".editor-content",
+            "text_length": 236
+          },
+          {
+            "index": 9,
+            "snapshot": "results/b2_0_sources/source_18.html",
+            "snapshot_sha256": "94355B2B6E2C9B0589400A7DCB2B3D768FD46DC4D8296B5E225FFAB766434A05",
+            "selector": ".method-steps__list-item",
+            "selector_index_zero_based": 8,
+            "heading": "step 9",
+            "content_scope": ".editor-content",
+            "text_length": 110
+          },
+          {
+            "index": 10,
+            "snapshot": "results/b2_0_sources/source_18.html",
+            "snapshot_sha256": "94355B2B6E2C9B0589400A7DCB2B3D768FD46DC4D8296B5E225FFAB766434A05",
+            "selector": ".method-steps__list-item",
+            "selector_index_zero_based": 9,
+            "heading": "step 10",
+            "content_scope": ".editor-content",
+            "text_length": 178
+          },
+          {
+            "index": 11,
+            "snapshot": "results/b2_0_sources/source_18.html",
+            "snapshot_sha256": "94355B2B6E2C9B0589400A7DCB2B3D768FD46DC4D8296B5E225FFAB766434A05",
+            "selector": ".method-steps__list-item",
+            "selector_index_zero_based": 10,
+            "heading": "step 11",
+            "content_scope": ".editor-content",
+            "text_length": 174
+          },
+          {
+            "index": 12,
+            "snapshot": "results/b2_0_sources/source_18.html",
+            "snapshot_sha256": "94355B2B6E2C9B0589400A7DCB2B3D768FD46DC4D8296B5E225FFAB766434A05",
+            "selector": ".method-steps__list-item",
+            "selector_index_zero_based": 11,
+            "heading": "step 12",
+            "content_scope": ".editor-content",
+            "text_length": 305
+          },
+          {
+            "index": 13,
+            "snapshot": "results/b2_0_sources/source_18.html",
+            "snapshot_sha256": "94355B2B6E2C9B0589400A7DCB2B3D768FD46DC4D8296B5E225FFAB766434A05",
+            "selector": ".method-steps__list-item",
+            "selector_index_zero_based": 12,
+            "heading": "step 13",
+            "content_scope": ".editor-content",
+            "text_length": 223
+          },
+          {
+            "index": 14,
+            "snapshot": "results/b2_0_sources/source_18.html",
+            "snapshot_sha256": "94355B2B6E2C9B0589400A7DCB2B3D768FD46DC4D8296B5E225FFAB766434A05",
+            "selector": ".method-steps__list-item",
+            "selector_index_zero_based": 13,
+            "heading": "step 14",
+            "content_scope": ".editor-content",
+            "text_length": 96
+          },
+          {
+            "index": 15,
+            "snapshot": "results/b2_0_sources/source_18.html",
+            "snapshot_sha256": "94355B2B6E2C9B0589400A7DCB2B3D768FD46DC4D8296B5E225FFAB766434A05",
+            "selector": ".method-steps__list-item",
+            "selector_index_zero_based": 14,
+            "heading": "step 15",
+            "content_scope": ".editor-content",
+            "text_length": 162
+          },
+          {
+            "index": 16,
+            "snapshot": "results/b2_0_sources/source_18.html",
+            "snapshot_sha256": "94355B2B6E2C9B0589400A7DCB2B3D768FD46DC4D8296B5E225FFAB766434A05",
+            "selector": ".method-steps__list-item",
+            "selector_index_zero_based": 15,
+            "heading": "step 16",
+            "content_scope": ".editor-content",
+            "text_length": 57
+          }
+        ]
+      },
+      "extractor_evidence": {
+        "ingredients": {
+          "expected_count": 16,
+          "actual_count": 16,
+          "lost": 0,
+          "added": 0,
+          "modified_positions": [],
+          "order_error": false,
+          "exact_ordered_equality": true
+        },
+        "instructions": {
+          "expected_count": 16,
+          "actual_count": 16,
+          "lost": 0,
+          "added": 0,
+          "modified_positions": [],
+          "order_error": false,
+          "exact_ordered_equality": true
+        },
+        "title_mutation": false,
+        "raw_ingredients_preserved": true,
+        "raw_instructions_preserved": true,
+        "candidate_selection_problem": false
+      },
+      "source_quality": "GOOD",
+      "extractor_verdict": "LOSSLESS"
+    },
+    {
+      "id": "19",
+      "url": "https://www.bbcgoodfood.com/recipes/chicken-tikka-masala",
+      "domain": "www.bbcgoodfood.com",
+      "snapshot": {
+        "verdict": "UNCHANGED_RECIPE_CONTENT",
+        "html_changed": true,
+        "fields_equal": {
+          "title": true,
+          "ingredients": true,
+          "ingredient_groups": true,
+          "steps": true,
+          "instruction_selector": true,
+          "servings": true
+        },
+        "servings_before": [
+          "Serves 10"
+        ],
+        "servings_after": [
+          "Serves 10"
+        ],
+        "b2_0": "b2_0_sources/source_19.html",
+        "b2_1": "b2_1_html/source_19.html",
+        "quantity_unit_notes_check": "Full ingredient strings compared without conversions; unchanged.",
+        "reference": "Existing B2.0 reference valid; no replacement created."
+      },
+      "reference_check": {
+        "resolved_visible_references": 5,
+        "exact_text_match": true,
+        "ground_truth_ingredients_match": true
+      },
+      "title": {
+        "visible": "Chicken tikka masala",
+        "json_ld": "Chicken tikka masala",
+        "verdict": "CLEAN"
+      },
+      "ingredients": [
+        {
+          "source_order": 1,
+          "visible_text": "4 tbsp vegetable oil",
+          "json_ld_text": "4 tbsp vegetable oil",
+          "source_verdict": "MATCH",
+          "note": null
+        },
+        {
+          "source_order": 2,
+          "visible_text": "25g butter",
+          "json_ld_text": "25g butter",
+          "source_verdict": "MATCH",
+          "note": null
+        },
+        {
+          "source_order": 3,
+          "visible_text": "4 onions roughly chopped",
+          "json_ld_text": "4 onions roughly chopped",
+          "source_verdict": "MATCH",
+          "note": null
+        },
+        {
+          "source_order": 4,
+          "visible_text": "6 tbsp chicken tikka masala paste (use shop-bought or make your own – see recipe, below)",
+          "json_ld_text": "6 tbsp chicken tikka masala paste (use shop-bought or make your own – see recipe, below)",
+          "source_verdict": "MATCH",
+          "note": null
+        },
+        {
+          "source_order": 5,
+          "visible_text": "2 red peppers deseeded and cut into chunks",
+          "json_ld_text": "2 red peppers deseeded and cut into chunks",
+          "source_verdict": "MATCH",
+          "note": null
+        },
+        {
+          "source_order": 6,
+          "visible_text": "8 boneless, skinless chicken breasts cut into 2.5cm cubes",
+          "json_ld_text": "8 boneless, skinless chicken breasts cut into 2.5cm cubes",
+          "source_verdict": "MATCH",
+          "note": null
+        },
+        {
+          "source_order": 7,
+          "visible_text": "2 x 400g cans chopped tomatoes",
+          "json_ld_text": "2 x 400g cans  chopped tomatoes",
+          "source_verdict": "FORMAT_DIFFERENCE",
+          "note": null
+        },
+        {
+          "source_order": 8,
+          "visible_text": "4 tbsp tomato purée",
+          "json_ld_text": "4 tbsp tomato purée",
+          "source_verdict": "MATCH",
+          "note": null
+        },
+        {
+          "source_order": 9,
+          "visible_text": "2-3 tbsp mango chutney",
+          "json_ld_text": "2-3 tbsp  mango chutney",
+          "source_verdict": "FORMAT_DIFFERENCE",
+          "note": null
+        },
+        {
+          "source_order": 10,
+          "visible_text": "150ml double cream",
+          "json_ld_text": "150ml double cream",
+          "source_verdict": "MATCH",
+          "note": null
+        },
+        {
+          "source_order": 11,
+          "visible_text": "150ml natural yogurt",
+          "json_ld_text": "150ml natural  yogurt",
+          "source_verdict": "FORMAT_DIFFERENCE",
+          "note": null
+        },
+        {
+          "source_order": 12,
+          "visible_text": "chopped coriander leaves, to serve",
+          "json_ld_text": "chopped  coriander leaves, to serve",
+          "source_verdict": "FORMAT_DIFFERENCE",
+          "note": null
+        }
+      ],
+      "visible_ingredient_count": 12,
+      "json_ld_ingredient_count": 12,
+      "ingredient_order_preserved": true,
+      "missing_ingredient_rows": 0,
+      "extra_ingredient_rows": 0,
+      "group_heading_differences": [],
+      "instructions": {
+        "verdict": "COMPLETE",
+        "visible_actual_blocks": 5,
+        "json_ld_step_count": 5,
+        "extracted_entry_count": 5,
+        "json_ld_heading_count": 0,
+        "visible_step_headings": [
+          "step 1",
+          "step 2",
+          "step 3",
+          "step 4",
+          "step 5"
+        ],
+        "json_ld_headings": [],
+        "visible_text_lengths": [
+          158,
+          104,
+          248,
+          234,
+          82
+        ],
+        "json_ld_text_lengths": [
+          158,
+          104,
+          248,
+          234,
+          82
+        ],
+        "ordered_full_text_equal_after_whitespace_collapse": true,
+        "missing_steps": 0,
+        "extra_steps": 0,
+        "order_errors": 0,
+        "content_omissions": 0,
+        "extra_content": 0,
+        "note": "Step bodies equal in source order. Ordinal step labels are presentation, not extra cooking steps.",
+        "references": [
+          {
+            "index": 1,
+            "snapshot": "results/b2_0_sources/source_19.html",
+            "snapshot_sha256": "B3F2250DD5AFC894882294F32280039C50E0BD14D5C18599CF456621250B554F",
+            "selector": ".method-steps__list-item",
+            "selector_index_zero_based": 0,
+            "heading": "step 1",
+            "content_scope": ".editor-content",
+            "text_length": 158
+          },
+          {
+            "index": 2,
+            "snapshot": "results/b2_0_sources/source_19.html",
+            "snapshot_sha256": "B3F2250DD5AFC894882294F32280039C50E0BD14D5C18599CF456621250B554F",
+            "selector": ".method-steps__list-item",
+            "selector_index_zero_based": 1,
+            "heading": "step 2",
+            "content_scope": ".editor-content",
+            "text_length": 104
+          },
+          {
+            "index": 3,
+            "snapshot": "results/b2_0_sources/source_19.html",
+            "snapshot_sha256": "B3F2250DD5AFC894882294F32280039C50E0BD14D5C18599CF456621250B554F",
+            "selector": ".method-steps__list-item",
+            "selector_index_zero_based": 2,
+            "heading": "step 3",
+            "content_scope": ".editor-content",
+            "text_length": 248
+          },
+          {
+            "index": 4,
+            "snapshot": "results/b2_0_sources/source_19.html",
+            "snapshot_sha256": "B3F2250DD5AFC894882294F32280039C50E0BD14D5C18599CF456621250B554F",
+            "selector": ".method-steps__list-item",
+            "selector_index_zero_based": 3,
+            "heading": "step 4",
+            "content_scope": ".editor-content",
+            "text_length": 234
+          },
+          {
+            "index": 5,
+            "snapshot": "results/b2_0_sources/source_19.html",
+            "snapshot_sha256": "B3F2250DD5AFC894882294F32280039C50E0BD14D5C18599CF456621250B554F",
+            "selector": ".method-steps__list-item",
+            "selector_index_zero_based": 4,
+            "heading": "step 5",
+            "content_scope": ".editor-content",
+            "text_length": 82
+          }
+        ]
+      },
+      "extractor_evidence": {
+        "ingredients": {
+          "expected_count": 12,
+          "actual_count": 12,
+          "lost": 0,
+          "added": 0,
+          "modified_positions": [],
+          "order_error": false,
+          "exact_ordered_equality": true
+        },
+        "instructions": {
+          "expected_count": 5,
+          "actual_count": 5,
+          "lost": 0,
+          "added": 0,
+          "modified_positions": [],
+          "order_error": false,
+          "exact_ordered_equality": true
+        },
+        "title_mutation": false,
+        "raw_ingredients_preserved": true,
+        "raw_instructions_preserved": true,
+        "candidate_selection_problem": false
+      },
+      "source_quality": "GOOD",
+      "extractor_verdict": "LOSSLESS"
+    },
+    {
+      "id": "20",
+      "url": "https://www.bbcgoodfood.com/recipes/classic-lasagne",
+      "domain": "www.bbcgoodfood.com",
+      "snapshot": {
+        "verdict": "UNCHANGED_RECIPE_CONTENT",
+        "html_changed": false,
+        "fields_equal": {
+          "title": true,
+          "ingredients": true,
+          "ingredient_groups": true,
+          "steps": true,
+          "instruction_selector": true,
+          "servings": true
+        },
+        "servings_before": [
+          "Serves 4 - 6"
+        ],
+        "servings_after": [
+          "Serves 4 - 6"
+        ],
+        "b2_0": "b2_0_sources/source_20.html",
+        "b2_1": "b2_1_html/source_20.html",
+        "quantity_unit_notes_check": "Full ingredient strings compared without conversions; unchanged.",
+        "reference": "Existing B2.0 reference valid; no replacement created."
+      },
+      "reference_check": {
+        "resolved_visible_references": 5,
+        "exact_text_match": true,
+        "ground_truth_ingredients_match": true
+      },
+      "title": {
+        "visible": "Easy classic lasagne",
+        "json_ld": "Easy classic lasagne",
+        "verdict": "CLEAN"
+      },
+      "ingredients": [
+        {
+          "source_order": 1,
+          "visible_text": "1 tbsp olive oil",
+          "json_ld_text": "1 tbsp olive oil",
+          "source_verdict": "MATCH",
+          "note": null
+        },
+        {
+          "source_order": 2,
+          "visible_text": "2 rashers smoked streaky bacon",
+          "json_ld_text": "2 rashers smoked streaky bacon",
+          "source_verdict": "MATCH",
+          "note": null
+        },
+        {
+          "source_order": 3,
+          "visible_text": "1 onion finely chopped",
+          "json_ld_text": "1 onion finely chopped",
+          "source_verdict": "MATCH",
+          "note": null
+        },
+        {
+          "source_order": 4,
+          "visible_text": "1 celery stick, finely chopped",
+          "json_ld_text": "1 celery stick, finely chopped",
+          "source_verdict": "MATCH",
+          "note": null
+        },
+        {
+          "source_order": 5,
+          "visible_text": "1 medium carrot grated",
+          "json_ld_text": "1 medium carrot grated",
+          "source_verdict": "MATCH",
+          "note": null
+        },
+        {
+          "source_order": 6,
+          "visible_text": "2 garlic cloves finely chopped",
+          "json_ld_text": "2 garlic cloves finely chopped",
+          "source_verdict": "MATCH",
+          "note": null
+        },
+        {
+          "source_order": 7,
+          "visible_text": "500g beef mince",
+          "json_ld_text": "500g beef mince",
+          "source_verdict": "MATCH",
+          "note": null
+        },
+        {
+          "source_order": 8,
+          "visible_text": "1 tbsp tomato purée",
+          "json_ld_text": "1 tbsp tomato purée",
+          "source_verdict": "MATCH",
+          "note": null
+        },
+        {
+          "source_order": 9,
+          "visible_text": "2 x 400g cans chopped tomatoes",
+          "json_ld_text": "2 x 400g cans chopped tomatoes",
+          "source_verdict": "MATCH",
+          "note": null
+        },
+        {
+          "source_order": 10,
+          "visible_text": "1 tbsp clear honey",
+          "json_ld_text": "1 tbsp clear honey",
+          "source_verdict": "MATCH",
+          "note": null
+        },
+        {
+          "source_order": 11,
+          "visible_text": "500g pack fresh egg lasagne sheets",
+          "json_ld_text": "500g pack fresh egg lasagne sheets",
+          "source_verdict": "MATCH",
+          "note": null
+        },
+        {
+          "source_order": 12,
+          "visible_text": "400ml crème fraîche",
+          "json_ld_text": "400ml crème fraîche",
+          "source_verdict": "MATCH",
+          "note": null
+        },
+        {
+          "source_order": 13,
+          "visible_text": "125g ball mozzarella roughly torn",
+          "json_ld_text": "125g ball mozzarella roughly torn",
+          "source_verdict": "MATCH",
+          "note": null
+        },
+        {
+          "source_order": 14,
+          "visible_text": "50g freshly grated parmesan",
+          "json_ld_text": "50g freshly grated parmesan",
+          "source_verdict": "MATCH",
+          "note": null
+        },
+        {
+          "source_order": 15,
+          "visible_text": "large handful basil leaves torn (optional)",
+          "json_ld_text": "large handful basil leaves torn (optional)",
+          "source_verdict": "MATCH",
+          "note": null
+        }
+      ],
+      "visible_ingredient_count": 15,
+      "json_ld_ingredient_count": 15,
+      "ingredient_order_preserved": true,
+      "missing_ingredient_rows": 0,
+      "extra_ingredient_rows": 0,
+      "group_heading_differences": [],
+      "instructions": {
+        "verdict": "COMPLETE",
+        "visible_actual_blocks": 5,
+        "json_ld_step_count": 5,
+        "extracted_entry_count": 5,
+        "json_ld_heading_count": 0,
+        "visible_step_headings": [
+          "step 1",
+          "step 2",
+          "step 3",
+          "step 4",
+          "step 5"
+        ],
+        "json_ld_headings": [],
+        "visible_text_lengths": [
+          342,
+          156,
+          271,
+          399,
+          294
+        ],
+        "json_ld_text_lengths": [
+          342,
+          156,
+          271,
+          399,
+          294
+        ],
+        "ordered_full_text_equal_after_whitespace_collapse": true,
+        "missing_steps": 0,
+        "extra_steps": 0,
+        "order_errors": 0,
+        "content_omissions": 0,
+        "extra_content": 0,
+        "note": "Step bodies equal in source order. Ordinal step labels are presentation, not extra cooking steps.",
+        "references": [
+          {
+            "index": 1,
+            "snapshot": "results/b2_0_sources/source_20.html",
+            "snapshot_sha256": "FA75490B2DBEB81B556A0264C64F09995561A359CBE631D9344AE47B5B98A449",
+            "selector": ".method-steps__list-item",
+            "selector_index_zero_based": 0,
+            "heading": "step 1",
+            "content_scope": ".editor-content",
+            "text_length": 342
+          },
+          {
+            "index": 2,
+            "snapshot": "results/b2_0_sources/source_20.html",
+            "snapshot_sha256": "FA75490B2DBEB81B556A0264C64F09995561A359CBE631D9344AE47B5B98A449",
+            "selector": ".method-steps__list-item",
+            "selector_index_zero_based": 1,
+            "heading": "step 2",
+            "content_scope": ".editor-content",
+            "text_length": 156
+          },
+          {
+            "index": 3,
+            "snapshot": "results/b2_0_sources/source_20.html",
+            "snapshot_sha256": "FA75490B2DBEB81B556A0264C64F09995561A359CBE631D9344AE47B5B98A449",
+            "selector": ".method-steps__list-item",
+            "selector_index_zero_based": 2,
+            "heading": "step 3",
+            "content_scope": ".editor-content",
+            "text_length": 271
+          },
+          {
+            "index": 4,
+            "snapshot": "results/b2_0_sources/source_20.html",
+            "snapshot_sha256": "FA75490B2DBEB81B556A0264C64F09995561A359CBE631D9344AE47B5B98A449",
+            "selector": ".method-steps__list-item",
+            "selector_index_zero_based": 3,
+            "heading": "step 4",
+            "content_scope": ".editor-content",
+            "text_length": 399
+          },
+          {
+            "index": 5,
+            "snapshot": "results/b2_0_sources/source_20.html",
+            "snapshot_sha256": "FA75490B2DBEB81B556A0264C64F09995561A359CBE631D9344AE47B5B98A449",
+            "selector": ".method-steps__list-item",
+            "selector_index_zero_based": 4,
+            "heading": "step 5",
+            "content_scope": ".editor-content",
+            "text_length": 294
+          }
+        ]
+      },
+      "extractor_evidence": {
+        "ingredients": {
+          "expected_count": 15,
+          "actual_count": 15,
+          "lost": 0,
+          "added": 0,
+          "modified_positions": [],
+          "order_error": false,
+          "exact_ordered_equality": true
+        },
+        "instructions": {
+          "expected_count": 5,
+          "actual_count": 5,
+          "lost": 0,
+          "added": 0,
+          "modified_positions": [],
+          "order_error": false,
+          "exact_ordered_equality": true
+        },
+        "title_mutation": false,
+        "raw_ingredients_preserved": true,
+        "raw_instructions_preserved": true,
+        "candidate_selection_problem": false
+      },
+      "source_quality": "GOOD",
+      "extractor_verdict": "LOSSLESS"
+    }
+  ]
+}

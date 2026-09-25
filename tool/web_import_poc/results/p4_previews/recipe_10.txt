@@ -1,0 +1,41 @@
+RECEPT: Sajtos pogácsa
+
+HOZZÁVALÓK:
+200.0 g Vaj
+400.0 g Finomliszt
+2.0 db Tojás
+200.0 ml Tejföl
+20.0 g Friss élesztő
+100.0 ml Tej langyos
+1.0 db Cukor
+1.0 db kávéskanál Só
+150.0 g Sajt
+1.0 db Tojás a kenéshez
+
+WARNING (POC auditjelölések, nem általános automatikus felismerés):
+5. sor: SOURCE_WARNING
+7. sor: unknownUnit, UNSUPPORTED_UNIT
+8. sor: UNSUPPORTED_UNIT
+
+ELKÉSZÍTÉS:
+Készítsük el a kovászt. Ehhez az élesztőt a langyos tejbe morzsoljuk el. Szórjuk meg egy csipet cukorral és egy kis liszttel, majd tegyük félre meleg helyre kb. 10 percre. Akkor jó, ha az élesztő szépen felhólyagosodik.
+
+A lisztet a vajjal és egy csipet sóval morzsoljuk el. A tejfölt keverjük el a tojással.
+
+A lisztbe beletesszük a felfuttatott élesztőt és a tejfölös tojást, majd jól összedolgozzuk. Könnyű tésztát kell kapjunk.
+
+Takarjuk le, és hagyjuk kelni meleg helyen. Körülbelül 30 perc után nyújtsuk ki nagyjából 1,5 centire, összehajtogatjuk. Tíz perc múlva megint kinyújtjuk és összehajtogatjuk. Ezt háromszor ismételjük meg.
+
+Megint kinyújtjuk kb 1,5 centi vastagra. Megkenjük tojással, sózzuk, majd megszórjuk reszelt sajttal.
+
+Pogácsaszaggatóval szaggassuk ki, és kezünkkel kicsit formázzuk, sodorjuk meg. Így a sütőben felfele fog nőni a pogácsánk, nem fog elfolyni, és nem lesz lapos.
+
+Lehetőség szerint magas falú tepsibe pakoljuk őket egymástól kb. 2 centire, hogy ne nőjenek össze.
+
+180 fokos sütőben 25 perc alatt készre sütjük.
+
+FŰSZEREK: üres
+
+VERDICT: REVIEW
+A draft teljes, de parser/source/unsupported figyelmeztetés miatt ellenőrzés szükséges.
+Bizonyított mezőjavítás minimum: 1. Az unsupported egységek átváltása nincs találgatva; további user-döntést igényelhet.

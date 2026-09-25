@@ -1,0 +1,1428 @@
+{
+  "phase": "P5",
+  "scope": "Frozen reports only; no new fetch/extraction/parser benchmark. Harmonized usability below is arithmetic over saved annotations, not a new measured run.",
+  "evidence": [
+    {
+      "file": "p1_batch_01-10.json",
+      "sha256": "e4b49057db6985f7c5ab0f13f8b57c9ed954bce4dc7e2d2e956ffd17b2da08db"
+    },
+    {
+      "file": "p2_5_source_truth_audit.json",
+      "sha256": "03715a0259cb9ebfafe29def628f05d56fe03ad7ccc7f7f16b205d04ac256cd9"
+    },
+    {
+      "file": "p2_corrected_batch_01-10.json",
+      "sha256": "a1130edce9fe1d7efaf74b738cf07b6d784c392a448f9cfd66d176fb918acc89"
+    },
+    {
+      "file": "p3_parser_batch_01-10.json",
+      "sha256": "3641e3ac5314e459ac821b9d9d3ea1299132293c5d06765031cb7291562c233a"
+    },
+    {
+      "file": "p4_e2e_batch_01-10.json",
+      "sha256": "d4a19b550dcff9748049e3e1856b80e887410554cfd8f6d1bb028739e992ea33"
+    },
+    {
+      "file": "b2_1_batch_11-20.json",
+      "sha256": "a30e5a3347bee1a2eed65f4cfce7c3f959a08c3b9514abdd73ea5ab6389823b7"
+    },
+    {
+      "file": "b2_2_content_source_quality.json",
+      "sha256": "b8d8ab50de90ffc654c6acf614cb720d03a54f216f40105f68afbc3ff1a8775e"
+    },
+    {
+      "file": "b2_3_parser_batch_11-20.json",
+      "sha256": "d16a38bdf33e535b2c8fe042f804b166e5cd50c1d82537269446b18748f4bff3"
+    },
+    {
+      "file": "b2_4_e2e_batch_11-20.json",
+      "sha256": "3f9d73e8f8375b987a24874bdd0e6584ce334a85965738bd2c3b12a17ac6ca1b"
+    },
+    {
+      "file": "b3_1_batch_21-30.json",
+      "sha256": "66c4359e541ef64dda5decf6e54444d4f4c0dafc9346b1f0ad18e57adbc20870"
+    },
+    {
+      "file": "b3_2_content_source_quality.json",
+      "sha256": "1dd66ea139fd036aa6cdedaca60e1b0657e557f1bd77050769088282dc668137"
+    },
+    {
+      "file": "b3_3_parser_batch_21-28.json",
+      "sha256": "b1b7f297d9c8dd5a761fa62fe4786b3b9233837a7b123e1103355a0d1931c2a8"
+    },
+    {
+      "file": "b3_4_e2e_batch_21-28.json",
+      "sha256": "89f6c137739671a68c4d9957e41b9d7d33f18e87bd2680d0cf8b6ec078971a61"
+    }
+  ],
+  "consistency": {
+    "30_unique_ids": true,
+    "28_drafts": true,
+    "292_input_rows": true,
+    "24_source_errors_excluded": true,
+    "parser_partition": true,
+    "draft_fields_equal_saved_parser": true,
+    "b2_b3_harmonized_equal_original": true
+  },
+  "methodology_caveats": [
+    "Batch 1 original P4 verdict thresholds and field-edit counting differ from B2/B3. Original verdicts retained; comparable P5 usability is explicitly harmonized from saved source/unsupported/parser labels.",
+    "Harmonized corrections: one action per source-error/unsupported/parser-error row, plus one per missing group heading. Review-only = remaining production-warning rows. POOR >=4 actions or >=40%; READY zero actions. Estimates are not observed user effort.",
+    "Batch 1 source instruction audit reports no observed loss; some original GT instructions remained paraphrased. Do not claim uniform literal visible-page equality for all 28.",
+    "Step bodies and instruction entries differ: entries include headings. Preservation uses saved input/output entries, not sum of dissimilar step summaries.",
+    "A POC oracle knows source discrepancies; production cannot detect all JSON-LD omissions or positive truncated numbers from JSON-LD alone."
+  ],
+  "technical": {
+    "total": 30,
+    "statuses": {
+      "SUCCESS": 28,
+      "HTTP_ERROR": 2,
+      "FETCH_ERROR": 0,
+      "NO_JSON_LD": 0,
+      "NO_RECIPE": 0,
+      "INVALID_JSON_LD": 0,
+      "MULTIPLE_RECIPES": 0,
+      "INVALID_RECIPE": 0
+    },
+    "success_rate": 93.33333333333333,
+    "access_block": 2,
+    "retry": 0,
+    "fallback": 0,
+    "domains": {
+      "www.bbcgoodfood.com": {
+        "urls": 13,
+        "success": 13,
+        "success_rate": 100.0
+      },
+      "www.foodnetwork.com": {
+        "urls": 2,
+        "success": 0,
+        "success_rate": 0.0
+      },
+      "www.mindmegette.hu": {
+        "urls": 10,
+        "success": 10,
+        "success_rate": 100.0
+      },
+      "www.nosalty.hu": {
+        "urls": 5,
+        "success": 5,
+        "success_rate": 100.0
+      }
+    }
+  },
+  "extractor": {
+    "verdict": "PASS",
+    "recipes": 28,
+    "ingredient_input": 292,
+    "ingredient_output": 292,
+    "instruction_entries_input": 205,
+    "instruction_entries_output": 205,
+    "step_body_count": 162,
+    "lost": 0,
+    "added": 0,
+    "modified": 0,
+    "order_errors": 0,
+    "title_mutations": 0,
+    "candidate_errors": 0,
+    "scope": "Measured accessible inputs only; not a claim about all websites."
+  },
+  "source_quality_by_domain": {
+    "www.bbcgoodfood.com": {
+      "recipes": 13,
+      "ingredient_rows": 144,
+      "ingredient_matches": 144,
+      "ingredient_mismatches": 0,
+      "quantity_differences": 0,
+      "missing_notes": 0,
+      "group_heading_loss": 5,
+      "instruction_content_loss_observed": 0,
+      "title_decoration": 0,
+      "structure_notes": []
+    },
+    "www.mindmegette.hu": {
+      "recipes": 10,
+      "ingredient_rows": 106,
+      "ingredient_matches": 97,
+      "ingredient_mismatches": 9,
+      "quantity_differences": 0,
+      "missing_notes": 9,
+      "group_heading_loss": 0,
+      "instruction_content_loss_observed": 0,
+      "title_decoration": 10,
+      "structure_notes": [
+        {
+          "id": "01",
+          "step_headings": 11
+        },
+        {
+          "id": "02",
+          "step_headings": 4
+        },
+        {
+          "id": "03",
+          "step_headings": 7
+        },
+        {
+          "id": "04",
+          "step_headings": 6
+        },
+        {
+          "id": "05",
+          "step_headings": 4
+        },
+        {
+          "id": "12",
+          "instruction_verdict": "COMPLETE_WITH_STRUCTURE_DIFFERENCE"
+        }
+      ]
+    },
+    "www.nosalty.hu": {
+      "recipes": 5,
+      "ingredient_rows": 42,
+      "ingredient_matches": 27,
+      "ingredient_mismatches": 15,
+      "quantity_differences": 15,
+      "missing_notes": 0,
+      "group_heading_loss": 0,
+      "instruction_content_loss_observed": 0,
+      "title_decoration": 0,
+      "structure_notes": []
+    }
+  },
+  "parser": {
+    "total": 292,
+    "source_errors": 24,
+    "valid": 268,
+    "supported": 193,
+    "correct_supported": 191,
+    "parser_errors": 2,
+    "unsupported_valid": 75,
+    "supported_accuracy": 98.96373056994818,
+    "overall_valid_success": 71.26865671641791,
+    "quantity": {
+      "correct": 251,
+      "denominator": 253
+    },
+    "supported_unit": {
+      "correct": 193,
+      "denominator": 193
+    },
+    "name": {
+      "correct": 193,
+      "denominator": 268
+    },
+    "explicit_quantity": {
+      "correct": 223,
+      "denominator": 225,
+      "percent": 99.11111111111111
+    }
+  },
+  "parser_by_language": {
+    "hu": {
+      "total": 148,
+      "source_errors": 24,
+      "valid": 124,
+      "supported": 106,
+      "correct_supported": 104,
+      "parser_errors": 2,
+      "unsupported_valid": 18,
+      "supported_accuracy": 98.11320754716981,
+      "overall_valid_success": 83.87096774193549,
+      "quantity": {
+        "correct": 124,
+        "denominator": 124
+      },
+      "supported_unit": {
+        "correct": 106,
+        "denominator": 106
+      },
+      "name": {
+        "correct": 106,
+        "denominator": 124
+      }
+    },
+    "en": {
+      "total": 144,
+      "source_errors": 0,
+      "valid": 144,
+      "supported": 87,
+      "correct_supported": 87,
+      "parser_errors": 0,
+      "unsupported_valid": 57,
+      "supported_accuracy": 100.0,
+      "overall_valid_success": 60.416666666666664,
+      "quantity": {
+        "correct": 127,
+        "denominator": 129
+      },
+      "supported_unit": {
+        "correct": 87,
+        "denominator": 87
+      },
+      "name": {
+        "correct": 87,
+        "denominator": 144
+      }
+    }
+  },
+  "unsupported": {
+    "all_source_rows": 79,
+    "valid_source_rows": 75,
+    "affected_recipes": 22,
+    "categories": {
+      "SEMANTIC_DECISION": 34,
+      "SIMPLE_ALIAS_CANDIDATE": 34,
+      "QUANTITY_GRAMMAR": 11
+    },
+    "phrases": {
+      "fej": 6,
+      "gerezd": 5,
+      "kis kanál": 1,
+      "szem": 1,
+      "csapott mokkáskanál": 1,
+      "csokor": 1,
+      "mokkáskanál": 2,
+      "csipet": 2,
+      "kávéskanál": 2,
+      "kis fej": 1,
+      "cloves": 6,
+      "tsp": 5,
+      "tbsp": 23,
+      "drop": 1,
+      "half a … jar": 1,
+      "heaped tsp; alternative level tbsp": 1,
+      "2 x 400g cans": 2,
+      "range tbsp": 1,
+      "rashers": 1,
+      "stick": 3,
+      "large handful": 1,
+      "thumb-sized piece": 1,
+      "small bunch": 3,
+      "pinch": 2,
+      "range + kg/lb/oz compound quantity": 1,
+      "squirts + alternative tsp": 1,
+      "good pinch": 1,
+      "litres/pints + alternative stock quantities": 1,
+      "handful": 1,
+      "range tsp": 1
+    },
+    "language": {
+      "hu": {
+        "all": 22,
+        "valid": 18
+      },
+      "en": {
+        "all": 57,
+        "valid": 57
+      }
+    }
+  },
+  "silent_fallback": {
+    "rows": 56,
+    "affected_recipes": 21,
+    "definition": "Valid source + unsupported + no production warning + positive numeric quantity + db. Source errors excluded from this specific metric, not from release risk.",
+    "by_domain": {
+      "www.bbcgoodfood.com": {
+        "rows": 40,
+        "affected_recipes": 11
+      },
+      "www.mindmegette.hu": {
+        "rows": 14,
+        "affected_recipes": 8
+      },
+      "www.nosalty.hu": {
+        "rows": 2,
+        "affected_recipes": 2
+      }
+    },
+    "by_language": {
+      "hu": {
+        "rows": 16,
+        "affected_recipes": 10
+      },
+      "en": {
+        "rows": 40,
+        "affected_recipes": 11
+      }
+    },
+    "evidence": [
+      {
+        "id": "02",
+        "row": 5,
+        "raw": "3 gerezd Fokhagyma",
+        "name": "gerezd Fokhagyma",
+        "quantity": 3.0,
+        "unit": "db",
+        "warnings": []
+      },
+      {
+        "id": "02",
+        "row": 7,
+        "raw": "1 kis kanál Majoránna",
+        "name": "kis kanál Majoránna",
+        "quantity": 1.0,
+        "unit": "db",
+        "warnings": []
+      },
+      {
+        "id": "03",
+        "row": 5,
+        "raw": "2 gerezd Fokhagyma",
+        "name": "gerezd Fokhagyma",
+        "quantity": 2.0,
+        "unit": "db",
+        "warnings": []
+      },
+      {
+        "id": "03",
+        "row": 6,
+        "raw": "10 szem Bors",
+        "name": "szem Bors",
+        "quantity": 10.0,
+        "unit": "db",
+        "warnings": []
+      },
+      {
+        "id": "03",
+        "row": 9,
+        "raw": "1 csokor Petrezselyem",
+        "name": "csokor Petrezselyem",
+        "quantity": 1.0,
+        "unit": "db",
+        "warnings": []
+      },
+      {
+        "id": "05",
+        "row": 11,
+        "raw": "1 mokkáskanál Szódabikarbóna",
+        "name": "mokkáskanál Szódabikarbóna",
+        "quantity": 1.0,
+        "unit": "db",
+        "warnings": []
+      },
+      {
+        "id": "09",
+        "row": 5,
+        "raw": "8 gerezd Fokhagyma",
+        "name": "gerezd Fokhagyma",
+        "quantity": 8.0,
+        "unit": "db",
+        "warnings": []
+      },
+      {
+        "id": "10",
+        "row": 8,
+        "raw": "1 kávéskanál Só",
+        "name": "kávéskanál Só",
+        "quantity": 1.0,
+        "unit": "db",
+        "warnings": []
+      },
+      {
+        "id": "11",
+        "row": 3,
+        "raw": "2 fej Hagyma",
+        "name": "fej Hagyma",
+        "quantity": 2.0,
+        "unit": "db",
+        "warnings": []
+      },
+      {
+        "id": "12",
+        "row": 3,
+        "raw": "2 fej Hagyma",
+        "name": "fej Hagyma",
+        "quantity": 2.0,
+        "unit": "db",
+        "warnings": []
+      },
+      {
+        "id": "12",
+        "row": 4,
+        "raw": "1 gerezd Fokhagyma",
+        "name": "gerezd Fokhagyma",
+        "quantity": 1.0,
+        "unit": "db",
+        "warnings": []
+      },
+      {
+        "id": "12",
+        "row": 7,
+        "raw": "2 kávéskanál édesnemes pirospaprika",
+        "name": "kávéskanál édesnemes pirospaprika",
+        "quantity": 2.0,
+        "unit": "db",
+        "warnings": []
+      },
+      {
+        "id": "12",
+        "row": 11,
+        "raw": "1 mokkáskanál Majoránna",
+        "name": "mokkáskanál Majoránna",
+        "quantity": 1.0,
+        "unit": "db",
+        "warnings": []
+      },
+      {
+        "id": "13",
+        "row": 5,
+        "raw": "2 gerezd Fokhagyma",
+        "name": "gerezd Fokhagyma",
+        "quantity": 2.0,
+        "unit": "db",
+        "warnings": []
+      },
+      {
+        "id": "14",
+        "row": 1,
+        "raw": "1 kis fej Hagyma",
+        "name": "kis fej Hagyma",
+        "quantity": 1.0,
+        "unit": "db",
+        "warnings": []
+      },
+      {
+        "id": "15",
+        "row": 2,
+        "raw": "1 fej Vöröshagyma",
+        "name": "fej Vöröshagyma",
+        "quantity": 1.0,
+        "unit": "db",
+        "warnings": []
+      },
+      {
+        "id": "16",
+        "row": 6,
+        "raw": "2 plump garlic cloves peeled and left whole",
+        "name": "plump garlic cloves peeled and left whole",
+        "quantity": 2.0,
+        "unit": "db",
+        "warnings": []
+      },
+      {
+        "id": "17",
+        "row": 5,
+        "raw": "1 tsp  baking powder",
+        "name": "tsp baking powder",
+        "quantity": 1.0,
+        "unit": "db",
+        "warnings": []
+      },
+      {
+        "id": "17",
+        "row": 6,
+        "raw": "2 tbsp milk",
+        "name": "tbsp milk",
+        "quantity": 2.0,
+        "unit": "db",
+        "warnings": []
+      },
+      {
+        "id": "18",
+        "row": 3,
+        "raw": "2 garlic cloves",
+        "name": "garlic cloves",
+        "quantity": 2.0,
+        "unit": "db",
+        "warnings": []
+      },
+      {
+        "id": "18",
+        "row": 4,
+        "raw": "1 tbsp oil",
+        "name": "tbsp oil",
+        "quantity": 1.0,
+        "unit": "db",
+        "warnings": []
+      },
+      {
+        "id": "18",
+        "row": 6,
+        "raw": "1 tsp paprika",
+        "name": "tsp paprika",
+        "quantity": 1.0,
+        "unit": "db",
+        "warnings": []
+      },
+      {
+        "id": "18",
+        "row": 7,
+        "raw": "1 tsp ground cumin",
+        "name": "tsp ground cumin",
+        "quantity": 1.0,
+        "unit": "db",
+        "warnings": []
+      },
+      {
+        "id": "18",
+        "row": 11,
+        "raw": "½ tsp dried marjoram",
+        "name": "tsp dried marjoram",
+        "quantity": 0.5,
+        "unit": "db",
+        "warnings": []
+      },
+      {
+        "id": "18",
+        "row": 12,
+        "raw": "1 tsp sugar (or add a thumbnail-sized piece of dark chocolate along with the beans instead, see tip)",
+        "name": "tsp sugar (or add a thumbnail-sized piece of dark chocolate along with the beans instead, see tip)",
+        "quantity": 1.0,
+        "unit": "db",
+        "warnings": []
+      },
+      {
+        "id": "18",
+        "row": 13,
+        "raw": "2 tbsp tomato purée",
+        "name": "tbsp tomato purée",
+        "quantity": 2.0,
+        "unit": "db",
+        "warnings": []
+      },
+      {
+        "id": "19",
+        "row": 1,
+        "raw": "4 tbsp vegetable oil",
+        "name": "tbsp vegetable oil",
+        "quantity": 4.0,
+        "unit": "db",
+        "warnings": []
+      },
+      {
+        "id": "19",
+        "row": 4,
+        "raw": "6 tbsp chicken tikka masala paste (use shop-bought or make your own – see recipe, below)",
+        "name": "tbsp chicken tikka masala paste (use shop-bought or make your own – see recipe, below)",
+        "quantity": 6.0,
+        "unit": "db",
+        "warnings": []
+      },
+      {
+        "id": "19",
+        "row": 8,
+        "raw": "4 tbsp tomato purée",
+        "name": "tbsp tomato purée",
+        "quantity": 4.0,
+        "unit": "db",
+        "warnings": []
+      },
+      {
+        "id": "20",
+        "row": 1,
+        "raw": "1 tbsp olive oil",
+        "name": "tbsp olive oil",
+        "quantity": 1.0,
+        "unit": "db",
+        "warnings": []
+      },
+      {
+        "id": "20",
+        "row": 2,
+        "raw": "2 rashers smoked streaky bacon",
+        "name": "rashers smoked streaky bacon",
+        "quantity": 2.0,
+        "unit": "db",
+        "warnings": []
+      },
+      {
+        "id": "20",
+        "row": 4,
+        "raw": "1 celery stick, finely chopped",
+        "name": "celery stick, finely chopped",
+        "quantity": 1.0,
+        "unit": "db",
+        "warnings": []
+      },
+      {
+        "id": "20",
+        "row": 6,
+        "raw": "2 garlic cloves finely chopped",
+        "name": "garlic cloves finely chopped",
+        "quantity": 2.0,
+        "unit": "db",
+        "warnings": []
+      },
+      {
+        "id": "20",
+        "row": 8,
+        "raw": "1 tbsp tomato purée",
+        "name": "tbsp tomato purée",
+        "quantity": 1.0,
+        "unit": "db",
+        "warnings": []
+      },
+      {
+        "id": "20",
+        "row": 10,
+        "raw": "1 tbsp clear honey",
+        "name": "tbsp clear honey",
+        "quantity": 1.0,
+        "unit": "db",
+        "warnings": []
+      },
+      {
+        "id": "21",
+        "row": 1,
+        "raw": "2 tbsp sunflower oil",
+        "name": "tbsp sunflower oil",
+        "quantity": 2.0,
+        "unit": "db",
+        "warnings": []
+      },
+      {
+        "id": "21",
+        "row": 3,
+        "raw": "2 garlic cloves crushed",
+        "name": "garlic cloves crushed",
+        "quantity": 2.0,
+        "unit": "db",
+        "warnings": []
+      },
+      {
+        "id": "21",
+        "row": 6,
+        "raw": "3 tbsp medium spice paste (tikka works well)",
+        "name": "tbsp medium spice paste (tikka works well)",
+        "quantity": 3.0,
+        "unit": "db",
+        "warnings": []
+      },
+      {
+        "id": "21",
+        "row": 9,
+        "raw": "1 small bunch of coriander leaves chopped",
+        "name": "small bunch of coriander leaves chopped",
+        "quantity": 1.0,
+        "unit": "db",
+        "warnings": []
+      },
+      {
+        "id": "22",
+        "row": 4,
+        "raw": "1 tbsp sunflower or vegetable oil plus a little extra for frying",
+        "name": "tbsp sunflower or vegetable oil plus a little extra for frying",
+        "quantity": 1.0,
+        "unit": "db",
+        "warnings": []
+      },
+      {
+        "id": "25",
+        "row": 2,
+        "raw": "2 tbsp golden caster sugar",
+        "name": "tbsp golden caster sugar",
+        "quantity": 2.0,
+        "unit": "db",
+        "warnings": []
+      },
+      {
+        "id": "25",
+        "row": 6,
+        "raw": "1 tbsp rolled oats",
+        "name": "tbsp rolled oats",
+        "quantity": 1.0,
+        "unit": "db",
+        "warnings": []
+      },
+      {
+        "id": "25",
+        "row": 7,
+        "raw": "1 tbsp demerara sugar",
+        "name": "tbsp demerara sugar",
+        "quantity": 1.0,
+        "unit": "db",
+        "warnings": []
+      },
+      {
+        "id": "26",
+        "row": 4,
+        "raw": "1 celery stick",
+        "name": "celery stick",
+        "quantity": 1.0,
+        "unit": "db",
+        "warnings": []
+      },
+      {
+        "id": "26",
+        "row": 5,
+        "raw": "2 tbsp olive oil",
+        "name": "tbsp olive oil",
+        "quantity": 2.0,
+        "unit": "db",
+        "warnings": []
+      },
+      {
+        "id": "27",
+        "row": 1,
+        "raw": "2 tbsp olive oil",
+        "name": "tbsp olive oil",
+        "quantity": 2.0,
+        "unit": "db",
+        "warnings": []
+      },
+      {
+        "id": "27",
+        "row": 3,
+        "raw": "1 garlic clove finely chopped",
+        "name": "garlic clove finely chopped",
+        "quantity": 1.0,
+        "unit": "db",
+        "warnings": []
+      },
+      {
+        "id": "27",
+        "row": 4,
+        "raw": "1 tbsp tomato purée",
+        "name": "tbsp tomato purée",
+        "quantity": 1.0,
+        "unit": "db",
+        "warnings": []
+      },
+      {
+        "id": "28",
+        "row": 1,
+        "raw": "2 tbsp olive oil",
+        "name": "tbsp olive oil",
+        "quantity": 2.0,
+        "unit": "db",
+        "warnings": []
+      },
+      {
+        "id": "28",
+        "row": 4,
+        "raw": "2 large garlic cloves crushed",
+        "name": "large garlic cloves crushed",
+        "quantity": 2.0,
+        "unit": "db",
+        "warnings": []
+      },
+      {
+        "id": "28",
+        "row": 5,
+        "raw": "1 small bunch of coriander stalks finely chopped and leaves roughly chopped",
+        "name": "small bunch of coriander stalks finely chopped and leaves roughly chopped",
+        "quantity": 1.0,
+        "unit": "db",
+        "warnings": []
+      },
+      {
+        "id": "28",
+        "row": 6,
+        "raw": "½ tbsp ground coriander",
+        "name": "tbsp ground coriander",
+        "quantity": 0.5,
+        "unit": "db",
+        "warnings": []
+      },
+      {
+        "id": "28",
+        "row": 7,
+        "raw": "1 tbsp ground cumin",
+        "name": "tbsp ground cumin",
+        "quantity": 1.0,
+        "unit": "db",
+        "warnings": []
+      },
+      {
+        "id": "28",
+        "row": 10,
+        "raw": "1 tbsp tomato purée",
+        "name": "tbsp tomato purée",
+        "quantity": 1.0,
+        "unit": "db",
+        "warnings": []
+      },
+      {
+        "id": "28",
+        "row": 12,
+        "raw": "1 small cinnamon stick",
+        "name": "small cinnamon stick",
+        "quantity": 1.0,
+        "unit": "db",
+        "warnings": []
+      },
+      {
+        "id": "28",
+        "row": 16,
+        "raw": "1 tbsp red wine vinegar",
+        "name": "tbsp red wine vinegar",
+        "quantity": 1.0,
+        "unit": "db",
+        "warnings": []
+      }
+    ],
+    "source_errors_without_warning": 12
+  },
+  "usability": {
+    "recipes": 28,
+    "original_verdicts": {
+      "REVIEW": 14,
+      "POOR": 13,
+      "READY": 1,
+      "BROKEN": 0
+    },
+    "harmonized_verdicts": {
+      "READY": 3,
+      "POOR": 15,
+      "REVIEW": 10,
+      "BROKEN": 0
+    },
+    "required_actions": 106,
+    "avg_required": 3.7857142857142856,
+    "review_only": 28,
+    "avg_review_only": 1.0
+  },
+  "usability_by_language": {
+    "hu": {
+      "recipes": 15,
+      "original_verdicts": {
+        "REVIEW": 11,
+        "POOR": 4,
+        "READY": 0,
+        "BROKEN": 0
+      },
+      "harmonized_verdicts": {
+        "READY": 2,
+        "POOR": 6,
+        "REVIEW": 7,
+        "BROKEN": 0
+      },
+      "required_actions": 44,
+      "avg_required": 2.933333333333333,
+      "review_only": 17,
+      "avg_review_only": 1.1333333333333333
+    },
+    "en": {
+      "recipes": 13,
+      "original_verdicts": {
+        "REVIEW": 3,
+        "POOR": 9,
+        "READY": 1,
+        "BROKEN": 0
+      },
+      "harmonized_verdicts": {
+        "REVIEW": 3,
+        "POOR": 9,
+        "READY": 1,
+        "BROKEN": 0
+      },
+      "required_actions": 62,
+      "avg_required": 4.769230769230769,
+      "review_only": 11,
+      "avg_review_only": 0.8461538461538461
+    }
+  },
+  "recipes": [
+    {
+      "id": "01",
+      "language": "hu",
+      "domain": "www.mindmegette.hu",
+      "batch": 1,
+      "rows": 8,
+      "original_verdict": "REVIEW",
+      "harmonized_verdict": "READY",
+      "required_row_actions": 0,
+      "structural_actions": 0,
+      "required_actions": 0,
+      "review_only": 1,
+      "silent": 0
+    },
+    {
+      "id": "02",
+      "language": "hu",
+      "domain": "www.mindmegette.hu",
+      "batch": 1,
+      "rows": 12,
+      "original_verdict": "REVIEW",
+      "harmonized_verdict": "POOR",
+      "required_row_actions": 5,
+      "structural_actions": 0,
+      "required_actions": 5,
+      "review_only": 3,
+      "silent": 2
+    },
+    {
+      "id": "03",
+      "language": "hu",
+      "domain": "www.mindmegette.hu",
+      "batch": 1,
+      "rows": 14,
+      "original_verdict": "REVIEW",
+      "harmonized_verdict": "POOR",
+      "required_row_actions": 7,
+      "structural_actions": 0,
+      "required_actions": 7,
+      "review_only": 1,
+      "silent": 3
+    },
+    {
+      "id": "04",
+      "language": "hu",
+      "domain": "www.mindmegette.hu",
+      "batch": 1,
+      "rows": 7,
+      "original_verdict": "REVIEW",
+      "harmonized_verdict": "READY",
+      "required_row_actions": 0,
+      "structural_actions": 0,
+      "required_actions": 0,
+      "review_only": 1,
+      "silent": 0
+    },
+    {
+      "id": "05",
+      "language": "hu",
+      "domain": "www.mindmegette.hu",
+      "batch": 1,
+      "rows": 17,
+      "original_verdict": "REVIEW",
+      "harmonized_verdict": "REVIEW",
+      "required_row_actions": 1,
+      "structural_actions": 0,
+      "required_actions": 1,
+      "review_only": 0,
+      "silent": 1
+    },
+    {
+      "id": "06",
+      "language": "hu",
+      "domain": "www.nosalty.hu",
+      "batch": 1,
+      "rows": 10,
+      "original_verdict": "POOR",
+      "harmonized_verdict": "POOR",
+      "required_row_actions": 7,
+      "structural_actions": 0,
+      "required_actions": 7,
+      "review_only": 0,
+      "silent": 0
+    },
+    {
+      "id": "07",
+      "language": "hu",
+      "domain": "www.nosalty.hu",
+      "batch": 1,
+      "rows": 7,
+      "original_verdict": "REVIEW",
+      "harmonized_verdict": "REVIEW",
+      "required_row_actions": 1,
+      "structural_actions": 0,
+      "required_actions": 1,
+      "review_only": 0,
+      "silent": 0
+    },
+    {
+      "id": "08",
+      "language": "hu",
+      "domain": "www.nosalty.hu",
+      "batch": 1,
+      "rows": 6,
+      "original_verdict": "POOR",
+      "harmonized_verdict": "POOR",
+      "required_row_actions": 3,
+      "structural_actions": 0,
+      "required_actions": 3,
+      "review_only": 0,
+      "silent": 0
+    },
+    {
+      "id": "09",
+      "language": "hu",
+      "domain": "www.nosalty.hu",
+      "batch": 1,
+      "rows": 9,
+      "original_verdict": "POOR",
+      "harmonized_verdict": "POOR",
+      "required_row_actions": 6,
+      "structural_actions": 0,
+      "required_actions": 6,
+      "review_only": 0,
+      "silent": 1
+    },
+    {
+      "id": "10",
+      "language": "hu",
+      "domain": "www.nosalty.hu",
+      "batch": 1,
+      "rows": 10,
+      "original_verdict": "REVIEW",
+      "harmonized_verdict": "REVIEW",
+      "required_row_actions": 3,
+      "structural_actions": 0,
+      "required_actions": 3,
+      "review_only": 0,
+      "silent": 1
+    },
+    {
+      "id": "11",
+      "language": "hu",
+      "domain": "www.mindmegette.hu",
+      "batch": 2,
+      "rows": 7,
+      "original_verdict": "REVIEW",
+      "harmonized_verdict": "REVIEW",
+      "required_row_actions": 1,
+      "structural_actions": 0,
+      "required_actions": 1,
+      "review_only": 1,
+      "silent": 1
+    },
+    {
+      "id": "12",
+      "language": "hu",
+      "domain": "www.mindmegette.hu",
+      "batch": 2,
+      "rows": 14,
+      "original_verdict": "POOR",
+      "harmonized_verdict": "POOR",
+      "required_row_actions": 5,
+      "structural_actions": 0,
+      "required_actions": 5,
+      "review_only": 0,
+      "silent": 4
+    },
+    {
+      "id": "13",
+      "language": "hu",
+      "domain": "www.mindmegette.hu",
+      "batch": 2,
+      "rows": 9,
+      "original_verdict": "REVIEW",
+      "harmonized_verdict": "REVIEW",
+      "required_row_actions": 1,
+      "structural_actions": 0,
+      "required_actions": 1,
+      "review_only": 3,
+      "silent": 1
+    },
+    {
+      "id": "14",
+      "language": "hu",
+      "domain": "www.mindmegette.hu",
+      "batch": 2,
+      "rows": 10,
+      "original_verdict": "REVIEW",
+      "harmonized_verdict": "REVIEW",
+      "required_row_actions": 3,
+      "structural_actions": 0,
+      "required_actions": 3,
+      "review_only": 2,
+      "silent": 1
+    },
+    {
+      "id": "15",
+      "language": "hu",
+      "domain": "www.mindmegette.hu",
+      "batch": 2,
+      "rows": 8,
+      "original_verdict": "REVIEW",
+      "harmonized_verdict": "REVIEW",
+      "required_row_actions": 1,
+      "structural_actions": 0,
+      "required_actions": 1,
+      "review_only": 5,
+      "silent": 1
+    },
+    {
+      "id": "16",
+      "language": "en",
+      "domain": "www.bbcgoodfood.com",
+      "batch": 2,
+      "rows": 8,
+      "original_verdict": "REVIEW",
+      "harmonized_verdict": "REVIEW",
+      "required_row_actions": 1,
+      "structural_actions": 0,
+      "required_actions": 1,
+      "review_only": 1,
+      "silent": 1
+    },
+    {
+      "id": "17",
+      "language": "en",
+      "domain": "www.bbcgoodfood.com",
+      "batch": 2,
+      "rows": 11,
+      "original_verdict": "POOR",
+      "harmonized_verdict": "POOR",
+      "required_row_actions": 4,
+      "structural_actions": 1,
+      "required_actions": 5,
+      "review_only": 1,
+      "silent": 2
+    },
+    {
+      "id": "18",
+      "language": "en",
+      "domain": "www.bbcgoodfood.com",
+      "batch": 2,
+      "rows": 16,
+      "original_verdict": "POOR",
+      "harmonized_verdict": "POOR",
+      "required_row_actions": 8,
+      "structural_actions": 0,
+      "required_actions": 8,
+      "review_only": 2,
+      "silent": 7
+    },
+    {
+      "id": "19",
+      "language": "en",
+      "domain": "www.bbcgoodfood.com",
+      "batch": 2,
+      "rows": 12,
+      "original_verdict": "POOR",
+      "harmonized_verdict": "POOR",
+      "required_row_actions": 5,
+      "structural_actions": 0,
+      "required_actions": 5,
+      "review_only": 1,
+      "silent": 3
+    },
+    {
+      "id": "20",
+      "language": "en",
+      "domain": "www.bbcgoodfood.com",
+      "batch": 2,
+      "rows": 15,
+      "original_verdict": "POOR",
+      "harmonized_verdict": "POOR",
+      "required_row_actions": 8,
+      "structural_actions": 0,
+      "required_actions": 8,
+      "review_only": 0,
+      "silent": 6
+    },
+    {
+      "id": "21",
+      "language": "en",
+      "domain": "www.bbcgoodfood.com",
+      "batch": 3,
+      "rows": 11,
+      "original_verdict": "POOR",
+      "harmonized_verdict": "POOR",
+      "required_row_actions": 5,
+      "structural_actions": 0,
+      "required_actions": 5,
+      "review_only": 1,
+      "silent": 4
+    },
+    {
+      "id": "22",
+      "language": "en",
+      "domain": "www.bbcgoodfood.com",
+      "batch": 3,
+      "rows": 6,
+      "original_verdict": "REVIEW",
+      "harmonized_verdict": "REVIEW",
+      "required_row_actions": 1,
+      "structural_actions": 0,
+      "required_actions": 1,
+      "review_only": 2,
+      "silent": 1
+    },
+    {
+      "id": "23",
+      "language": "en",
+      "domain": "www.bbcgoodfood.com",
+      "batch": 3,
+      "rows": 13,
+      "original_verdict": "REVIEW",
+      "harmonized_verdict": "REVIEW",
+      "required_row_actions": 2,
+      "structural_actions": 0,
+      "required_actions": 2,
+      "review_only": 0,
+      "silent": 0
+    },
+    {
+      "id": "24",
+      "language": "en",
+      "domain": "www.bbcgoodfood.com",
+      "batch": 3,
+      "rows": 8,
+      "original_verdict": "READY",
+      "harmonized_verdict": "READY",
+      "required_row_actions": 0,
+      "structural_actions": 0,
+      "required_actions": 0,
+      "review_only": 0,
+      "silent": 0
+    },
+    {
+      "id": "25",
+      "language": "en",
+      "domain": "www.bbcgoodfood.com",
+      "batch": 3,
+      "rows": 8,
+      "original_verdict": "POOR",
+      "harmonized_verdict": "POOR",
+      "required_row_actions": 3,
+      "structural_actions": 3,
+      "required_actions": 6,
+      "review_only": 1,
+      "silent": 3
+    },
+    {
+      "id": "26",
+      "language": "en",
+      "domain": "www.bbcgoodfood.com",
+      "batch": 3,
+      "rows": 9,
+      "original_verdict": "POOR",
+      "harmonized_verdict": "POOR",
+      "required_row_actions": 6,
+      "structural_actions": 0,
+      "required_actions": 6,
+      "review_only": 0,
+      "silent": 2
+    },
+    {
+      "id": "27",
+      "language": "en",
+      "domain": "www.bbcgoodfood.com",
+      "batch": 3,
+      "rows": 8,
+      "original_verdict": "POOR",
+      "harmonized_verdict": "POOR",
+      "required_row_actions": 5,
+      "structural_actions": 0,
+      "required_actions": 5,
+      "review_only": 0,
+      "silent": 3
+    },
+    {
+      "id": "28",
+      "language": "en",
+      "domain": "www.bbcgoodfood.com",
+      "batch": 3,
+      "rows": 19,
+      "original_verdict": "POOR",
+      "harmonized_verdict": "POOR",
+      "required_row_actions": 9,
+      "structural_actions": 1,
+      "required_actions": 10,
+      "review_only": 2,
+      "silent": 8
+    }
+  ],
+  "no_draft": {
+    "29": "ACCESS_LIMITATION / NO_DRAFT_DUE_TO_ACCESS_BLOCK",
+    "30": "ACCESS_LIMITATION / NO_DRAFT_DUE_TO_ACCESS_BLOCK"
+  },
+  "go": {
+    "TECHNICAL_GO": "YES",
+    "HUNGARIAN_PRODUCTION_GO": "CONDITIONAL",
+    "CURRENT_INTERNATIONAL_GO": "NO"
+  },
+  "feasibility": {
+    "HUNGARIAN_MARKET_FEASIBILITY": "CONDITIONAL",
+    "CURRENT_INTERNATIONAL_FEASIBILITY": "FAIL"
+  },
+  "production_planning_blocker": false,
+  "release_ready_now": false,
+  "p6_started": false,
+  "warning_strategy": [
+    {
+      "case": "invalid quantity",
+      "action": "Keep raw line and row warning; require valid user correction before save under existing validation. Never invent 1 or 0."
+    },
+    {
+      "case": "unsupported/unknown measure or compound grammar",
+      "action": "Row-level review metadata preserving raw text; warning even when current parser leaves token in name with db. No guessed conversion. Scope detector to audited patterns and test false positives such as cloves as spice."
+    },
+    {
+      "case": "silent db fallback risk",
+      "action": "Highlight quantity/unit/name and require explicit review acknowledgement or correction. This is new production detection work; POC audit labels are not deployable runtime detection."
+    },
+    {
+      "case": "ambiguous ingredient",
+      "action": "Keep whole raw line, highlight unresolved fields; do not auto-save ambiguous/null quantities."
+    },
+    {
+      "case": "fetch/access/no Recipe/multiple Recipe",
+      "action": "Short Hungarian actionable message; retain URL/text; allow cancel/retry for transient failures or manual text paste. No 403 bypass; no arbitrary candidate selection."
+    },
+    {
+      "case": "source structure",
+      "action": "Preserve available heading metadata. Warn for detected loss/unsupported structure; JSON-LD alone cannot prove an absent visible-page heading. Always provide source link and general source verification notice; do not inject benchmark ground truth."
+    },
+    {
+      "case": "source numeric corruption",
+      "action": "Known Nosalty domain requires prominent quantity verification notice and explicit confirmation; offer manual source-text paste. A positive truncated value cannot be reconstructed from JSON-LD. If review safeguard is insufficient in QA, hold this domain out of the initial supported scope."
+    }
+  ],
+  "priorities": {
+    "MUST_HAVE_BEFORE_RELEASE": [
+      "Shared deterministic URL/text dispatch with editable preview and explicit Save; preserve text import behavior.",
+      "Raw source/provenance and separate warning metadata for audited Hungarian unsupported, ambiguous and silent fallback cases; no fake values or speculative repairs.",
+      "Known source-quality risk handling, especially Nosalty positive truncation; source-link review and no claim of verified quantities.",
+      "Resolve or explicitly flag two observed supported-input name errors: adjective between numeric quantity and db.",
+      "Bounded cancellable HTTP operation: timeout/body/redirect limits, only public http(s) targets, validate redirects, no script execution, no bypass. These are engineering requirements, not capabilities proven by desktop benchmark.",
+      "Fetch/access/multiple-candidate error UX preserves input; no autosave, duplicate-name/account isolation/save validation maintained.",
+      "Android real-device network and end-to-end QA on proposed supported domains; desktop sample does not establish mobile reliability."
+    ],
+    "SHOULD_HAVE_SOON": [
+      "Monitor user-confirmed failures without logging full recipes or private URLs by default.",
+      "Improve low-risk Hungarian alias/descriptor coverage only after semantic decision and targeted tests.",
+      "Broaden source snapshots and missing-heading tests; keep domain capability expectations explicit."
+    ],
+    "LATER_INTERNATIONAL": [
+      "tsp/tbsp aliases require deliberate quantity/unit semantics and testing, not just label substitution.",
+      "cloves/rashers/sticks/bunches need semantic decisions; range/multiplier/mixed/compound quantities need separate grammar.",
+      "Additional domains, JS/HTML fallback or backend only if separately justified; no evidence requires AI.",
+      "Photo import remains a future slot only."
+    ]
+  },
+  "minimal_scope": "Android-first client-side JSON-LD web adapter for observed Hungarian domains, conservative availability messaging and Nosalty source-risk gate; existing parser + small review/normalization layer + existing editor. No new backend, DOM fallback, AI/OCR, new canonical units or schema migration in initial scope. Validate device/network behavior before release; cloud sync stays unchanged.",
+  "roadmap": [
+    {
+      "phase": "P6.0",
+      "task": "Plan domain/data boundaries, safe URL handling, source risk policy, DTO and warning provenance; decide exact launch-domain scope."
+    },
+    {
+      "phase": "P6.1",
+      "task": "Bounded asynchronous web fetch and JSON-LD candidate data layer; cancellable operation, no JavaScript/DOM fallback."
+    },
+    {
+      "phase": "P6.2",
+      "task": "Exact display normalization and lossless instructions; conservative unsupported/silent-risk warning layer, raw text retained."
+    },
+    {
+      "phase": "P6.3",
+      "task": "One Recept importálása field: trimmed entire input consisting of one valid http/https URL takes web path, otherwise existing text path. No photo implementation."
+    },
+    {
+      "phase": "P6.4",
+      "task": "Reuse editable preview/editor; review quantities, preserve spices-empty import rule, explicit Save and existing validation/duplicate/account policies."
+    },
+    {
+      "phase": "P6.5",
+      "task": "Hungarian access/error UX, no-result/multiple candidate/cancel/retry cases, intact user input and source-link checks."
+    },
+    {
+      "phase": "P6.6",
+      "task": "Offline fixtures plus network-layer tests, regression and user-run Android acceptance; test non-silent unsupported warnings and known source-risk scenarios."
+    },
+    {
+      "phase": "P6.7",
+      "task": "Release gate: demonstrated warnings, source limitation messaging, mobile success, no data-loss/autosave, privacy/logging review and supported-domain disclosure."
+    }
+  ],
+  "decision_rationale": {
+    "technical": "YES to architecture/integration planning based on observed 28/30; not universal fetch support or current release readiness.",
+    "hungarian": "CONDITIONAL: 15/15 fetch, 104/106 supported parser success, but 24 source errors and 16 silent fallback rows; preview + credible warnings + source checks + QA are release gates.",
+    "international": "NO for current broad production offering: 57/144 valid unsupported, 9/13 POOR drafts and Food Network blocked. Supervised experiments may continue; no claim of permanent infeasibility."
+  },
+  "verification": {
+    "frozen_evidence_hashes": "PASS",
+    "batch_consistency": "PASS",
+    "source_error_exclusion": "PASS (24 rows)",
+    "access_block_exclusion": "PASS (29–30)",
+    "parser_denominators": "PASS",
+    "poc_tests": "62/62 PASS",
+    "poc_dart_analyze": "No issues found",
+    "production_flutter_analyze_no_pub": "No issues found",
+    "git_diff_check": "PASS including both new reports"
+  }
+}

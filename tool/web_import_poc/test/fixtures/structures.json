@@ -1,0 +1,8 @@
+[
+  {"case":"direct string", "document":{"@type":"Recipe","name":"Áfonyás","recipeIngredient":[" 2 dl tej ","1½ cup flour","salt to taste"],"recipeInstructions":"Keverd.\nSüsd."},"instructions":["Keverd.\nSüsd."]},
+  {"case":"graph and type array", "document":{"@graph":[{"@type":"WebPage"},{"@type":["Thing","Recipe"],"name":"Leves","recipeIngredient":["2 dl tej"],"recipeInstructions":["Első","Második"]}]},"instructions":["Első","Második"]},
+  {"case":"steps", "document":[{"@type":"Recipe","name":"Tészta","recipeIngredient":["100 g liszt"],"recipeInstructions":[{"@type":"HowToStep","text":"Keverés"},{"@type":"HowToStep","name":"Sütés","text":"Süsd meg."}]}],"instructions":["Keverés","Sütés","Süsd meg."]},
+  {"case":"nested sections", "document":{"@type":"https://schema.org/Recipe","name":"Torta","recipeIngredient":["2 tojás"],"recipeInstructions":[{"@type":"HowToSection","name":"Tészta","itemListElement":[{"@type":"HowToStep","text":"Keverd."},{"@type":"HowToSection","name":"Sütés","itemListElement":[{"@type":"HowToStep","text":"Süsd."}]}]},{"@type":"HowToStep","text":"Tálald."}]},"instructions":["Tészta","Keverd.","Sütés","Süsd.","Tálald."]},
+  {"case":"single step", "document":{"@type":"http://schema.org/Recipe","name":"Tea","recipeIngredient":"2 dl víz","recipeInstructions":{"@type":"HowToStep","text":"Forrald."}},"instructions":["Forrald."]},
+  {"case":"repeat is not deduplicated", "document":{"@type":"Recipe","name":"Réteges","recipeIngredient":["1 db alma","1 db alma"],"recipeInstructions":["Rétegezd.","Rétegezd."]},"instructions":["Rétegezd.","Rétegezd."]}
+]

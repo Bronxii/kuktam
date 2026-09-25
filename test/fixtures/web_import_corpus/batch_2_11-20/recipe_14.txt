@@ -1,0 +1,23 @@
+CÍM:
+Hagyományos szatmári töltött káposzta
+
+HOZZÁVALÓK:
+1 kis fej hagyma
+5 dkg sertészsír
+50 dkg darált sertéshús
+25 dkg rizs
+só
+bors
+1 ek pirospaprika
+1 fej édes káposzta (1,5 kg)
+3 dl paradicsomlé (házi)
+2 dl tejföl
+
+ELKÉSZÍTÉS:
+# VISIBLE_SOURCE_REFERENCE_V1: teljes szöveg a mentett HTML-ben, nem összefoglaló.
+# Snapshot: tool/web_import_poc/results/b2_0_sources/source_14.html
+# SHA256: 101CB422D31FC7AB661B0F2D6B30B89178D7A79CD6CE551BC9E4FEA278B39B7B
+1. @VISIBLE .block-content ol > li | index=0 | content=entire element
+2. @VISIBLE .block-content ol > li | index=1 | content=entire element
+3. @VISIBLE .block-content ol > li | index=2 | content=entire element
+4. @VISIBLE .block-content ol > li | index=3 | content=entire element

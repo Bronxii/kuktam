@@ -1,0 +1,43 @@
+RECEPT: Rakott krumpli
+
+HOZZÁVALÓK:
+1.0 kg Burgonya
+6.0 db Tojás
+1.0 db Só
+100.0 g Kolbász
+500.0 ml Tejföl
+2.0 db Tojássárgája
+2.0 tk Vaj
+100.0 g Bacon
+
+WARNING (POC auditjelölések, nem általános automatikus felismerés):
+3. sor: missingQuantity
+
+ELKÉSZÍTÉS:
+1. lépés: A rakott krumpli elkészítését azzal kezdjük, hogy a krumplikat 10-15 percre beáztatjuk hideg vízbe, majd alaposan megsikáljuk és leöblítjük. A tojásokat megmossuk.
+
+2. lépés: A krumplit felöntjük annyi hideg vízzel, hogy bőven ellepje.
+
+3. lépés: Hozzáadjuk a sót, és a forrástól számított 20 percig, fedő alatt puhára főzzük.
+
+4. lépés: A tojásokat sós, hideg vízben feltesszük főni, és a forrástól számított 8 percig főzzük, majd hideg vízbe merítve azonnal lehűtjük.
+
+5. lépés: A krumpliról leöntjük a vizet, még melegen lehúzzuk a héját, és hűlni hagyjuk. A kihűlt tojásokat is meghámozzuk, elnegyedeljük vagy felkarikázzuk.
+
+6. lépés: A kolbászt meleg vízzel leöblítjük, így könnyen lehúzhatjuk a héját, aztán vékonyan felkarikázzuk.
+
+7. lépés: A tejfölt egy kis tálba tesszük és elkeverjük benne a tojássárgákat.
+
+8. lépés: A sütőt 180 fokra (gázsütő 3. fokozat) előmelegítjük.
+
+9. lépés: A vajjal kikenünk egy lapos, tűzálló tálat, és hozzálátunk a hagyományos rakott krumpli rétegezéséhez.
+
+10. lépés: Az aljára karikázzuk a krumpli felét, kissé megsózzuk, lazán összekeverjük, és elsimítjuk. Arányosan elosztva a tetejére rendezzük a tojást és a kolbászkarikákat, majd megkenjük a tejföl felével. A maradék krumplit felkarikázzuk, és kissé egymásra csúsztatva a tetejére rendezzük. Egyenletesen bevonjuk a maradék tejföllel, végül a tetejére göndörítjük a szalonnaszeleteket.
+
+11. lépés: A sütőben addig sütjük, amíg a tejföl és a szalonna aranybarnára pirul (35-40 perc). Az elkészült rakott krumplit vegyes idénysalátával vagy ecetes savanyúsággal, kovászos uborkával tálaljuk.
+
+FŰSZEREK: üres
+
+VERDICT: REVIEW
+A draft teljes, de parser/source/unsupported figyelmeztetés miatt ellenőrzés szükséges.
+Bizonyított mezőjavítás minimum: 0. Az unsupported egységek átváltása nincs találgatva; további user-döntést igényelhet.

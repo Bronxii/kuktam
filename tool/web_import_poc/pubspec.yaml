@@ -1,0 +1,11 @@
+name: kuktam_web_import_poc
+description: Isolated offline-tested JSON-LD recipe extraction experiment.
+publish_to: none
+environment:
+  sdk: ^3.12.2
+dependencies:
+  recipe_json_ld_core:
+    path: ../../packages/recipe_json_ld_core
+  html: ^0.15.7
+dev_dependencies:
+  test: ^1.26.0

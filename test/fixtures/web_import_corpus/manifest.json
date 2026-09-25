@@ -1,0 +1,182 @@
+[
+  {
+    "id": "01",
+    "batch": "batch_1_01-10",
+    "url": "https://www.mindmegette.hu/recept/rakott-krumpli",
+    "title": "Rakott krumpli"
+  },
+  {
+    "id": "02",
+    "batch": "batch_1_01-10",
+    "url": "https://www.mindmegette.hu/recept/fasirt",
+    "title": "Fasírt"
+  },
+  {
+    "id": "03",
+    "batch": "batch_1_01-10",
+    "url": "https://www.mindmegette.hu/recept/husleves",
+    "title": "Húsleves"
+  },
+  {
+    "id": "04",
+    "batch": "batch_1_01-10",
+    "url": "https://www.mindmegette.hu/recept/eredeti-tiramisu",
+    "title": "Eredeti tiramisu"
+  },
+  {
+    "id": "05",
+    "batch": "batch_1_01-10",
+    "url": "https://www.mindmegette.hu/recept/zserbo-alaprecept",
+    "title": "Zserbó alaprecept"
+  },
+  {
+    "id": "06",
+    "batch": "batch_1_01-10",
+    "url": "https://www.nosalty.hu/recept/csirkepaprikas",
+    "title": "Csirkepaprikás"
+  },
+  {
+    "id": "07",
+    "batch": "batch_1_01-10",
+    "url": "https://www.nosalty.hu/recept/palacsinta-alaprecept",
+    "title": "Palacsinta alaprecept"
+  },
+  {
+    "id": "08",
+    "batch": "batch_1_01-10",
+    "url": "https://www.nosalty.hu/recept/turos-csusza",
+    "title": "Túrós csusza"
+  },
+  {
+    "id": "09",
+    "batch": "batch_1_01-10",
+    "url": "https://www.nosalty.hu/recept/eredeti-brassoi-apropecsenye",
+    "title": "Eredeti brassói aprópecsenye"
+  },
+  {
+    "id": "10",
+    "batch": "batch_1_01-10",
+    "url": "https://www.nosalty.hu/recept/sajtos-pogacsa",
+    "title": "Sajtos pogácsa"
+  },
+  {
+    "id": "11",
+    "batch": "batch_2_11-20",
+    "url": "https://www.mindmegette.hu/recept/lecso",
+    "title": "Lecsó"
+  },
+  {
+    "id": "12",
+    "batch": "batch_2_11-20",
+    "url": "https://www.mindmegette.hu/recept/toltott-kaposzta",
+    "title": "Töltött káposzta"
+  },
+  {
+    "id": "13",
+    "batch": "batch_2_11-20",
+    "url": "https://www.mindmegette.hu/recept/klasszikus-paprikas-krumpli",
+    "title": "Klasszikus paprikás krumpli"
+  },
+  {
+    "id": "14",
+    "batch": "batch_2_11-20",
+    "url": "https://www.mindmegette.hu/recept/hagyomanyos-szatmari-toltott-kaposzta",
+    "title": "Hagyományos szatmári töltött káposzta"
+  },
+  {
+    "id": "15",
+    "batch": "batch_2_11-20",
+    "url": "https://www.mindmegette.hu/recept/rakott-krumpli-magyarosan",
+    "title": "Rakott krumpli magyarosan"
+  },
+  {
+    "id": "16",
+    "batch": "batch_2_11-20",
+    "url": "https://www.bbcgoodfood.com/recipes/ultimate-spaghetti-carbonara-recipe",
+    "title": "Ultimate spaghetti carbonara recipe"
+  },
+  {
+    "id": "17",
+    "batch": "batch_2_11-20",
+    "url": "https://www.bbcgoodfood.com/recipes/classic-victoria-sandwich-recipe",
+    "title": "Classic Victoria sandwich recipe"
+  },
+  {
+    "id": "18",
+    "batch": "batch_2_11-20",
+    "url": "https://www.bbcgoodfood.com/recipes/chilli-con-carne-recipe",
+    "title": "Chilli con carne recipe"
+  },
+  {
+    "id": "19",
+    "batch": "batch_2_11-20",
+    "url": "https://www.bbcgoodfood.com/recipes/chicken-tikka-masala",
+    "title": "Chicken tikka masala"
+  },
+  {
+    "id": "20",
+    "batch": "batch_2_11-20",
+    "url": "https://www.bbcgoodfood.com/recipes/classic-lasagne",
+    "title": "Easy classic lasagne"
+  },
+  {
+    "id": "21",
+    "batch": "batch_3_21-30",
+    "url": "https://www.bbcgoodfood.com/recipes/easy-chicken-curry",
+    "title": "Easy chicken curry"
+  },
+  {
+    "id": "22",
+    "batch": "batch_3_21-30",
+    "url": "https://www.bbcgoodfood.com/recipes/easy-pancakes",
+    "title": "Easy pancakes"
+  },
+  {
+    "id": "23",
+    "batch": "batch_3_21-30",
+    "url": "https://www.bbcgoodfood.com/recipes/fish-pie-four-steps",
+    "title": "Fish pie - in four steps"
+  },
+  {
+    "id": "24",
+    "batch": "batch_3_21-30",
+    "url": "https://www.bbcgoodfood.com/recipes/best-ever-chocolate-brownies-recipe",
+    "title": "Best ever chocolate brownies recipe"
+  },
+  {
+    "id": "25",
+    "batch": "batch_3_21-30",
+    "url": "https://www.bbcgoodfood.com/recipes/best-apple-crumble",
+    "title": "Easy apple crumble recipe"
+  },
+  {
+    "id": "26",
+    "batch": "batch_3_21-30",
+    "url": "https://www.bbcgoodfood.com/recipes/tomato-soup",
+    "title": "Tomato soup"
+  },
+  {
+    "id": "27",
+    "batch": "batch_3_21-30",
+    "url": "https://www.bbcgoodfood.com/recipes/real-tomato-soup",
+    "title": "Real tomato soup"
+  },
+  {
+    "id": "28",
+    "batch": "batch_3_21-30",
+    "url": "https://www.bbcgoodfood.com/recipes/chicken-chilli-con-carne",
+    "title": "Chicken chilli con carne"
+  },
+  {
+    "id": "29",
+    "batch": "batch_3_21-30",
+    "url": "https://www.foodnetwork.com/recipes/food-network-kitchen/classic-meatloaf-5484735",
+    "title": "Classic Meatloaf"
+  },
+  {
+    "id": "30",
+    "batch": "batch_3_21-30",
+    "url": "https://www.foodnetwork.com/recipes/guacamole-recipe2-1956046",
+    "title": "Guacamole"
+  }
+]

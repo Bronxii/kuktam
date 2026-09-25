@@ -1,0 +1,574 @@
+{
+  "phase": "B3.5",
+  "scope": "Summary of frozen B3.0–B3.4 only. No new fetch or benchmark; no P5 aggregation.",
+  "evidence_files": [
+    {
+      "file": "b3_0_source_truth_audit.json",
+      "sha256": "e2099810d89efe35551c7e93ed140386eb64292ed0c8ab5b3cda1b8bc69e4d06"
+    },
+    {
+      "file": "b3_1_batch_21-30.json",
+      "sha256": "66c4359e541ef64dda5decf6e54444d4f4c0dafc9346b1f0ad18e57adbc20870"
+    },
+    {
+      "file": "b3_2_content_source_quality.json",
+      "sha256": "1dd66ea139fd036aa6cdedaca60e1b0657e557f1bd77050769088282dc668137"
+    },
+    {
+      "file": "b3_3_parser_batch_21-28.json",
+      "sha256": "b1b7f297d9c8dd5a761fa62fe4786b3b9233837a7b123e1103355a0d1931c2a8"
+    },
+    {
+      "file": "b3_4_e2e_batch_21-28.json",
+      "sha256": "89f6c137739671a68c4d9957e41b9d7d33f18e87bd2680d0cf8b6ec078971a61"
+    }
+  ],
+  "consistency_checks": {
+    "ids": true,
+    "ingredient_counts": true,
+    "instruction_counts": true,
+    "source_parser_denominators": true,
+    "b3_3_vs_b3_4_fields": true,
+    "overlap_accounting": true,
+    "access_exclusions": true
+  },
+  "denominators": {
+    "technical_urls": 10,
+    "verified_content_recipes": 8,
+    "parser_recipes": 8,
+    "usability_recipes": 8,
+    "ingredient_rows": 82,
+    "supported_parser_rows": 51,
+    "instruction_entries": 47,
+    "excluded_content_ids": [
+      "29",
+      "30"
+    ]
+  },
+  "ground_truth": {
+    "already_correct_files": 0,
+    "corrected_files": 8,
+    "title_corrections": 0,
+    "ingredient_line_edit_operations": 38,
+    "instruction_references_corrected": 8,
+    "ingredient_group_headings_restored": 4,
+    "source_jsonld_difference_observations": 4,
+    "format_only_ingredient_edits": 1,
+    "content_ingredient_edits": 37,
+    "instruction_reference_entries": 47,
+    "unresolved": 2,
+    "total_recipes": 10,
+    "audited_recipes": 8
+  },
+  "technical": {
+    "total_urls": 10,
+    "domains": {
+      "www.bbcgoodfood.com": {
+        "total": 8,
+        "success_rate_percent": 100.0,
+        "status_counts": {
+          "SUCCESS": 8,
+          "MULTIPLE_RECIPES": 0,
+          "NO_RECIPE": 0,
+          "NO_JSON_LD": 0,
+          "HTTP_ERROR": 0,
+          "FETCH_ERROR": 0,
+          "INVALID_JSON_LD": 0,
+          "INVALID_RECIPE": 0
+        }
+      },
+      "www.foodnetwork.com": {
+        "total": 2,
+        "success_rate_percent": 0.0,
+        "status_counts": {
+          "SUCCESS": 0,
+          "MULTIPLE_RECIPES": 0,
+          "NO_RECIPE": 0,
+          "NO_JSON_LD": 0,
+          "HTTP_ERROR": 2,
+          "FETCH_ERROR": 0,
+          "INVALID_JSON_LD": 0,
+          "INVALID_RECIPE": 0
+        }
+      }
+    },
+    "status_counts": {
+      "SUCCESS": 8,
+      "MULTIPLE_RECIPES": 0,
+      "NO_RECIPE": 0,
+      "NO_JSON_LD": 0,
+      "HTTP_ERROR": 2,
+      "FETCH_ERROR": 0,
+      "INVALID_JSON_LD": 0,
+      "INVALID_RECIPE": 0
+    },
+    "downloaded_2xx": 8,
+    "urls_with_recipe": 8,
+    "success_rate_percent": 80,
+    "fetch_ms": {
+      "average": 105.99525,
+      "median": 93.4635,
+      "min": 89.977,
+      "max": 189.488
+    },
+    "extract_ms": {
+      "average": 26.475749999999998,
+      "median": 16.0045,
+      "min": 14.068,
+      "max": 92.506
+    },
+    "total_ms": {
+      "average": 132.4745,
+      "median": 110.56,
+      "min": 104.246,
+      "max": 282.005
+    },
+    "http_error_timings": [
+      {
+        "id": "29",
+        "http_status": 403,
+        "fetch_ms": 96.183,
+        "extract_ms": 0.0,
+        "total_ms": 96.184
+      },
+      {
+        "id": "30",
+        "http_status": 403,
+        "fetch_ms": 74.162,
+        "extract_ms": 0.0,
+        "total_ms": 74.163
+      }
+    ],
+    "success_21_28_percent": 100.0,
+    "success_29_30_percent": 0.0,
+    "fastest": {
+      "id": "28",
+      "url": "https://www.bbcgoodfood.com/recipes/chicken-chilli-con-carne"
+    },
+    "slowest": {
+      "id": "21",
+      "url": "https://www.bbcgoodfood.com/recipes/easy-chicken-curry"
+    }
+  },
+  "retry_count_b3_1": 0,
+  "fallback_count": 0,
+  "access_limitation": {
+    "ids": [
+      "29",
+      "30"
+    ],
+    "http_status": 403,
+    "status": "ACCESS_BLOCKED",
+    "content": "UNRESOLVED_CONTENT",
+    "usable_recipe_snapshot": false,
+    "verified_ground_truth": false,
+    "parser": "NOT_TESTED_DUE_TO_ACCESS_BLOCK",
+    "draft": "NO_DRAFT_DUE_TO_ACCESS_BLOCK",
+    "cause": "FETCH / ACCESS LIMITATION, not extractor/parser/source-quality error. HTTP 403 proves access denial; specific anti-bot mechanism is unverified. Earlier B3.0 attempts are separate from the single-attempt B3.1 benchmark."
+  },
+  "snapshot_stability": {
+    "unchanged_recipe_content": 8,
+    "technical_html_changes_only": 2,
+    "identical_html": 6,
+    "changed_recipe_content": 0,
+    "format_only_change": 0,
+    "unresolved": 0
+  },
+  "extractor": {
+    "verdict": "STRONG",
+    "lossless_recipes": 8,
+    "ingredient_rows": 82,
+    "instruction_entries": 47,
+    "lost_ingredient_rows": 0,
+    "added_ingredient_rows": 0,
+    "modified_ingredient_rows": 0,
+    "order_errors": 0,
+    "lost_instruction_entries": 0,
+    "added_instruction_entries": 0,
+    "title_mutations": 0,
+    "candidate_selection_problems": 0
+  },
+  "source_quality": {
+    "verdict": "CONDITIONAL",
+    "reason": "All ingredient/step contents preserved, but four logical group headings omitted in recipes 25 and 28.",
+    "ingredients": {
+      "total_visible": 82,
+      "total_json_ld": 82,
+      "exact_matches": 81,
+      "format_only_matches": 1,
+      "exact_or_normalized_matches": 82,
+      "quantity_differences": 0,
+      "unit_differences": 0,
+      "missing_notes": 0,
+      "missing_rows": 0,
+      "extra_rows": 0,
+      "order_errors": 0,
+      "group_heading_differences": 4
+    },
+    "instructions": {
+      "complete": 8,
+      "structure_only_differences": 0,
+      "content_omissions": 0,
+      "extra_content": 0,
+      "order_errors": 0
+    },
+    "titles": {
+      "clean": 8,
+      "decorated": 0,
+      "wrong": 0,
+      "missing": 0
+    }
+  },
+  "parser": {
+    "total": 82,
+    "valid_source": 82,
+    "source_errors": 0,
+    "supported": 51,
+    "correct_supported": 51,
+    "parser_errors": 0,
+    "unsupported_rows": 31,
+    "unsupported_unit_rows": 27,
+    "parser_limitation_rows": 4,
+    "overall_valid_input_success_percent": 62.19512195121951,
+    "supported_input_accuracy_percent": 100.0,
+    "quantity_accuracy": {
+      "correct": 72,
+      "denominator": 73,
+      "percent": 98.63013698630137,
+      "not_applicable": 9
+    },
+    "explicit_quantity_accuracy": {
+      "correct": 66,
+      "denominator": 67,
+      "percent": 98.50746268656717,
+      "not_applicable": 9
+    },
+    "supported_unit_accuracy": {
+      "correct": 51,
+      "denominator": 51,
+      "percent": 100.0,
+      "not_applicable": 0
+    },
+    "explicit_supported_unit_accuracy": {
+      "correct": 30,
+      "denominator": 30,
+      "percent": 100.0,
+      "not_applicable": 0
+    },
+    "name_accuracy": {
+      "correct": 51,
+      "denominator": 82,
+      "percent": 62.19512195121951,
+      "not_applicable": 0
+    },
+    "supported_name_accuracy": {
+      "correct": 51,
+      "denominator": 51,
+      "percent": 100.0,
+      "not_applicable": 0
+    },
+    "silent_fallback_rows": 21,
+    "silent_fallback_rate_percent": 25.609756097560975,
+    "silent_fallback_affected_recipes": 6,
+    "supported_quantity_accuracy": {
+      "correct": 51,
+      "denominator": 51,
+      "percent": 100.0,
+      "not_applicable": 0
+    },
+    "quantity_forms": {
+      "integer": {
+        "count": 66,
+        "accuracy": {
+          "correct": 65,
+          "denominator": 66,
+          "percent": 98.48484848484848,
+          "not_applicable": 0
+        }
+      },
+      "decimal": {
+        "count": 0,
+        "accuracy": {
+          "correct": 0,
+          "denominator": 0,
+          "percent": null,
+          "not_applicable": 0
+        }
+      },
+      "comma_decimal": {
+        "count": 0,
+        "accuracy": {
+          "correct": 0,
+          "denominator": 0,
+          "percent": null,
+          "not_applicable": 0
+        }
+      },
+      "slash_fraction": {
+        "count": 0,
+        "accuracy": {
+          "correct": 0,
+          "denominator": 0,
+          "percent": null,
+          "not_applicable": 0
+        }
+      },
+      "unicode_fraction": {
+        "count": 1,
+        "accuracy": {
+          "correct": 1,
+          "denominator": 1,
+          "percent": 100.0,
+          "not_applicable": 0
+        }
+      },
+      "mixed_fraction": {
+        "count": 0,
+        "accuracy": {
+          "correct": 0,
+          "denominator": 0,
+          "percent": null,
+          "not_applicable": 0
+        }
+      },
+      "range": {
+        "count": 2,
+        "accuracy": {
+          "correct": 0,
+          "denominator": 0,
+          "percent": null,
+          "not_applicable": 2
+        }
+      },
+      "multiplier": {
+        "count": 0,
+        "accuracy": {
+          "correct": 0,
+          "denominator": 0,
+          "percent": null,
+          "not_applicable": 0
+        }
+      },
+      "textual": {
+        "count": 6,
+        "accuracy": {
+          "correct": 0,
+          "denominator": 0,
+          "percent": null,
+          "not_applicable": 6
+        }
+      },
+      "missing": {
+        "count": 6,
+        "accuracy": {
+          "correct": 6,
+          "denominator": 6,
+          "percent": 100.0,
+          "not_applicable": 0
+        }
+      },
+      "compound_alternative": {
+        "count": 1,
+        "accuracy": {
+          "correct": 0,
+          "denominator": 0,
+          "percent": null,
+          "not_applicable": 1
+        }
+      }
+    },
+    "warning_rows": 16,
+    "unknown_unit_warning_rows": 0,
+    "timing": {
+      "avg_parser_ms_per_row": 0.0494390243902439,
+      "avg_parser_ms_per_recipe": 1.077125,
+      "batch_recipe_parser_ms": 8.617,
+      "row_pass_parser_ms": 4.054,
+      "method": "DESKTOP Dart JIT; one recipe pass plus independent row pass. Stopwatch excludes IO. First recipe includes cold/JIT cost. The two timings are separate, not interchangeable."
+    }
+  },
+  "unsupported_categories": {
+    "SIMPLE_ALIAS_CANDIDATE": 14,
+    "SEMANTIC_DECISION": 13,
+    "QUANTITY_GRAMMAR": 4
+  },
+  "unsupported_phrases": [
+    {
+      "phrase": "cloves",
+      "count": 3,
+      "category": "SEMANTIC_DECISION",
+      "warning_rows": 0,
+      "silent_rows": 3
+    },
+    {
+      "phrase": "good pinch",
+      "count": 1,
+      "category": "SEMANTIC_DECISION",
+      "warning_rows": 1,
+      "silent_rows": 0
+    },
+    {
+      "phrase": "handful",
+      "count": 1,
+      "category": "SEMANTIC_DECISION",
+      "warning_rows": 1,
+      "silent_rows": 0
+    },
+    {
+      "phrase": "litres/pints + alternative stock quantities",
+      "count": 1,
+      "category": "QUANTITY_GRAMMAR",
+      "warning_rows": 1,
+      "silent_rows": 0
+    },
+    {
+      "phrase": "pinch",
+      "count": 2,
+      "category": "SEMANTIC_DECISION",
+      "warning_rows": 2,
+      "silent_rows": 0
+    },
+    {
+      "phrase": "range + kg/lb/oz compound quantity",
+      "count": 1,
+      "category": "QUANTITY_GRAMMAR",
+      "warning_rows": 1,
+      "silent_rows": 0
+    },
+    {
+      "phrase": "range tsp",
+      "count": 1,
+      "category": "QUANTITY_GRAMMAR",
+      "warning_rows": 1,
+      "silent_rows": 0
+    },
+    {
+      "phrase": "small bunch",
+      "count": 3,
+      "category": "SEMANTIC_DECISION",
+      "warning_rows": 1,
+      "silent_rows": 2
+    },
+    {
+      "phrase": "squirts + alternative tsp",
+      "count": 1,
+      "category": "QUANTITY_GRAMMAR",
+      "warning_rows": 1,
+      "silent_rows": 0
+    },
+    {
+      "phrase": "stick",
+      "count": 2,
+      "category": "SEMANTIC_DECISION",
+      "warning_rows": 0,
+      "silent_rows": 2
+    },
+    {
+      "phrase": "tbsp",
+      "count": 14,
+      "category": "SIMPLE_ALIAS_CANDIDATE",
+      "warning_rows": 0,
+      "silent_rows": 14
+    },
+    {
+      "phrase": "thumb-sized piece",
+      "count": 1,
+      "category": "SEMANTIC_DECISION",
+      "warning_rows": 1,
+      "silent_rows": 0
+    }
+  ],
+  "usability": {
+    "recipes": 8,
+    "verdicts": {
+      "READY": 1,
+      "REVIEW": 2,
+      "POOR": 5,
+      "BROKEN": 0
+    },
+    "total_rows": 82,
+    "clean_rows": 45,
+    "source_error_rows": 0,
+    "unsupported_rows": 31,
+    "parser_error_rows": 0,
+    "warning_rows": 37,
+    "production_warning_rows": 16,
+    "silent_fallback_risk_rows": 21,
+    "silent_fallback_affected_recipes": 6,
+    "required_correction_rows": 31,
+    "review_only_rows": 6,
+    "source_structure_warning_rows": 0,
+    "source_structure_warning_count": 4,
+    "source_structure_affected_recipes": 2,
+    "instruction_entries_preserved": 47,
+    "required_correction_actions": 35,
+    "avg_required_corrections": 4.375,
+    "avg_review_only": 0.75
+  },
+  "local_timing": {
+    "normalization_ms": {
+      "total": 11.404000000000002,
+      "average": 1.4255000000000002,
+      "max": 8.641
+    },
+    "parser_ms": {
+      "total": 9.700000000000001,
+      "average": 1.2125000000000001,
+      "max": 5.54
+    },
+    "draft_build_ms": {
+      "total": 0.30400000000000005,
+      "average": 0.038000000000000006,
+      "max": 0.169
+    },
+    "total_local_ms": {
+      "total": 21.435000000000002,
+      "average": 2.6793750000000003,
+      "max": 14.358
+    }
+  },
+  "comparison_b2_4": {
+    "recipes": 10,
+    "verdicts": {
+      "READY": 0,
+      "REVIEW": 5,
+      "POOR": 5,
+      "BROKEN": 0
+    },
+    "avg_required_corrections": 3.8,
+    "silent_fallback_rows": 27,
+    "note": "10 vs 8 recipes; B2 mixed Hungarian/English, B3 accessible sample English only. Raw risk counts are not directly comparable rates."
+  },
+  "verdicts": {
+    "TECHNICAL_FEASIBILITY": "CONDITIONAL",
+    "SOURCE_QUALITY": "CONDITIONAL",
+    "PARSER_FEASIBILITY": "CONDITIONAL",
+    "END_TO_END_USABILITY": "CONDITIONAL"
+  },
+  "pre_p5_changes_required": {
+    "extractor": false,
+    "parser": false,
+    "benchmark_tool": false,
+    "ground_truth_methodology": false
+  },
+  "readiness": {
+    "batch_3_closable": true,
+    "p5_can_start_after_separate_approval": true,
+    "p5_started": false,
+    "constraints": [
+      "Food Network technical failures remain in total URL denominator but excluded from content/parser/usability denominators.",
+      "Separate source quality and extractor preservation.",
+      "Separate supported parser performance from unsupported English input.",
+      "Silent fallback is audit metadata, not a production detection feature.",
+      "Keep Hungarian and English usability separate; no generalized international readiness claim."
+    ]
+  },
+  "verification": {
+    "report_consistency": "PASS",
+    "denominators": "PASS",
+    "poc_tests": "62/62 PASS",
+    "poc_dart_analyze": "No issues found",
+    "production_flutter_analyze_no_pub": "No issues found",
+    "git_diff_check": "PASS including new reports"
+  }
+}

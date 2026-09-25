@@ -1,0 +1,24 @@
+CÍM:
+Easy chicken curry
+
+HOZZÁVALÓK:
+2 tbsp sunflower oil
+1 onion thinly sliced
+2 garlic cloves crushed
+thumb-sized piece of ginger grated
+6 chicken thighs boneless and skinless
+3 tbsp medium spice paste (tikka works well)
+400g can chopped tomatoes
+100g Greek yogurt
+1 small bunch of coriander leaves chopped
+50g ground almonds
+naan breads or cooked basmati rice, to serve
+
+ELKÉSZÍTÉS:
+# VISIBLE_SOURCE_REFERENCE_V1: teljes szöveg a mentett HTML-ben, nem összefoglaló.
+# Snapshot: tool/web_import_poc/results/b3_0_sources/source_21.html
+# SHA256: B4D6F70B796D381AADB6E0C1F8D0481FC48041E5A8B31436627539FF0CF57003
+1. @VISIBLE .method-steps__list-item | index=0 | content=.editor-content | heading=step 1
+2. @VISIBLE .method-steps__list-item | index=1 | content=.editor-content | heading=step 2
+3. @VISIBLE .method-steps__list-item | index=2 | content=.editor-content | heading=step 3
+4. @VISIBLE .method-steps__list-item | index=3 | content=.editor-content | heading=step 4

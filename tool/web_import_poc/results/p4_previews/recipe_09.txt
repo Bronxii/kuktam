@@ -1,0 +1,37 @@
+RECEPT: Eredeti brassói aprópecsenye
+
+HOZZÁVALÓK:
+1.0 kg Sertéshús az eredeti recept bélszínt ír
+150.0 g Füstölt szalonna ízlés szerint
+1.0 kg Burgonya
+2.0 db Vöröshagyma
+8.0 db gerezd Fokhagyma
+[JAVÍTANDÓ] db ízlés szerint Só
+[JAVÍTANDÓ] db ízlés szerint Bors
+[JAVÍTANDÓ] db ízlés szerint Majoranna
+[JAVÍTANDÓ] db ízlés szerint Kakukkfű
+
+WARNING (POC auditjelölések, nem általános automatikus felismerés):
+3. sor: SOURCE_WARNING
+5. sor: UNSUPPORTED_UNIT
+6. sor: invalidQuantity, SOURCE_WARNING
+7. sor: invalidQuantity, SOURCE_WARNING
+8. sor: invalidQuantity, SOURCE_WARNING
+9. sor: invalidQuantity, SOURCE_WARNING
+
+ELKÉSZÍTÉS:
+A megmosott, meghámozott burgonyát apró kockákra vágjuk, zsírban megsütjük.
+
+A sertéshúst is kockákra vágjuk, majd nagyon kevés zsíron pirítani kezdjük.
+
+A meghámozott vöröshagymát felaprítjuk, vagy lereszeljük. A fokhagymát szintén felaprítjuk.
+
+Hozzáadjuk a húshoz, majd fűszerezzük.
+
+A burgonyát és a húst az eredeti recept szerint összekeverjük, de ez a lépés elhagyható.
+
+FŰSZEREK: üres
+
+VERDICT: POOR
+Legalább 3 sor és a sorok legalább fele bizonyított mezőjavítást igényel (előre rögzített POC-küszöb).
+Bizonyított mezőjavítás minimum: 5. Az unsupported egységek átváltása nincs találgatva; további user-döntést igényelhet.

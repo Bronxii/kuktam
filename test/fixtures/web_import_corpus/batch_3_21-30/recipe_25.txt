@@ -1,0 +1,28 @@
+CÍM:
+Easy apple crumble recipe
+
+HOZZÁVALÓK:
+[For the filling]
+575g Bramley apple (3 medium apples), peeled, cored and sliced to 1cm thick
+2 tbsp golden caster sugar
+[For the crumble]
+175g plain flour
+110g golden caster sugar
+110g cold butter
+[For the topping (optional)]
+1 tbsp rolled oats
+1 tbsp demerara sugar
+double cream clotted cream or custard, to serve
+
+ELKÉSZÍTÉS:
+# VISIBLE_SOURCE_REFERENCE_V1: teljes szöveg a mentett HTML-ben, nem összefoglaló.
+# Snapshot: tool/web_import_poc/results/b3_0_sources/source_25.html
+# SHA256: 92681788A6D6DB71430738D4181295FA2844AF9833114C4A54EB988B7798CDE8
+1. @VISIBLE .method-steps__list-item | index=0 | content=.editor-content | heading=step 1
+2. @VISIBLE .method-steps__list-item | index=1 | content=.editor-content | heading=step 2
+3. @VISIBLE .method-steps__list-item | index=2 | content=.editor-content | heading=step 3
+4. @VISIBLE .method-steps__list-item | index=3 | content=.editor-content | heading=step 4
+5. @VISIBLE .method-steps__list-item | index=4 | content=.editor-content | heading=step 5
+6. @VISIBLE .method-steps__list-item | index=5 | content=.editor-content | heading=step 6
+7. @VISIBLE .method-steps__list-item | index=6 | content=.editor-content | heading=step 7
+8. @VISIBLE .method-steps__list-item | index=7 | content=.editor-content | heading=step 8

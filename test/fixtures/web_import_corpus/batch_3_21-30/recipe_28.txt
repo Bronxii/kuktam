@@ -1,0 +1,32 @@
+CÍM:
+Chicken chilli con carne
+
+HOZZÁVALÓK:
+2 tbsp olive oil
+1 onion sliced
+2 mixed peppers sliced (use red, yellow or orange peppers)
+2 large garlic cloves crushed
+1 small bunch of coriander stalks finely chopped and leaves roughly chopped
+½ tbsp ground coriander
+1 tbsp ground cumin
+1-2 tsp chipotle paste
+400g can chopped tomatoes
+1 tbsp tomato purée
+300ml chicken stock
+1 small cinnamon stick
+4 skinless chicken thighs bone-in
+400g can black beans
+400g can kidney beans drained
+1 tbsp red wine vinegar
+20g dark chocolate (at least 70% cocoa solids)
+[To serve]
+cooked rice or tortilla chips
+guacamole and soured cream (optional)
+
+ELKÉSZÍTÉS:
+# VISIBLE_SOURCE_REFERENCE_V1: teljes szöveg a mentett HTML-ben, nem összefoglaló.
+# Snapshot: tool/web_import_poc/results/b3_0_sources/source_28.html
+# SHA256: 8EC49DF4E37E0990867181D0388A22FD85E987DC45EC9EE4321A0F5A012D586A
+1. @VISIBLE .method-steps__list-item | index=0 | content=.editor-content | heading=step 1
+2. @VISIBLE .method-steps__list-item | index=1 | content=.editor-content | heading=step 2
+3. @VISIBLE .method-steps__list-item | index=2 | content=.editor-content | heading=step 3

@@ -1,0 +1,29 @@
+CÍM:
+Classic Victoria sandwich recipe
+
+HOZZÁVALÓK:
+200g caster sugar
+200g softened butter
+4 eggs beaten
+200g self-raising flour
+1 tsp baking powder
+2 tbsp milk
+[For the filling]
+100g butter softened
+140g icing sugar sifted
+drop vanilla extract (optional)
+half a 340g jar good-quality strawberry jam
+icing sugar to decorate
+
+ELKÉSZÍTÉS:
+# VISIBLE_SOURCE_REFERENCE_V1: teljes szöveg a mentett HTML-ben, nem összefoglaló.
+# Snapshot: tool/web_import_poc/results/b2_0_sources/source_17.html
+# SHA256: 222C023C2BF7A9CE20E21B6D70F296EFB2FC2F6B7007F4610298FE642EF78D58
+1. @VISIBLE .method-steps__list-item | index=0 | content=.editor-content | heading=step 1
+2. @VISIBLE .method-steps__list-item | index=1 | content=.editor-content | heading=step 2
+3. @VISIBLE .method-steps__list-item | index=2 | content=.editor-content | heading=step 3
+4. @VISIBLE .method-steps__list-item | index=3 | content=.editor-content | heading=step 4
+5. @VISIBLE .method-steps__list-item | index=4 | content=.editor-content | heading=step 5
+6. @VISIBLE .method-steps__list-item | index=5 | content=.editor-content | heading=step 6
+7. @VISIBLE .method-steps__list-item | index=6 | content=.editor-content | heading=step 7
+8. @VISIBLE .method-steps__list-item | index=7 | content=.editor-content | heading=step 8
