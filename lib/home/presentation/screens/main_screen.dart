@@ -1,3 +1,5 @@
+import '../../../recipes/data/services/web_recipe_fetcher.dart';
+import '../../../recipes/domain/models/web_recipe_import_handoff.dart';
 import 'package:flutter/material.dart';
 import 'package:share_plus/share_plus.dart';
 import '../../../shopping/domain/shopping_quantity_formatter.dart';
@@ -15,11 +17,12 @@ import '../../../recipes/data/repositories/recipe_repository.dart';
 import '../../../recipes/domain/models/recipe.dart';
 
 class MainScreen extends StatefulWidget {
-  const MainScreen({super.key, this.tabBodies, this.recipeRepository, this.shoppingRepository})
+  const MainScreen({super.key, this.tabBodies, this.recipeRepository, this.shoppingRepository, this.importWeb})
       : assert(tabBodies == null || tabBodies.length == 3);
 
   // Optional dependencies keep navigation tests independent of Firebase.
   final List<Widget>? tabBodies;
+  final WebImportAction? importWeb;
   final RecipeRepository? recipeRepository;
   final ShoppingRepository? shoppingRepository;
 
@@ -40,17 +43,24 @@ class _MainScreenState extends State<MainScreen> {
 
   int _recipesVersion = 0;
   bool _importingRecipe = false;
+  final _importLifetime = WebImportCancellation();
+  @override
+  void dispose() {
+    _importLifetime.cancel();
+    super.dispose();
+  }
 
   Future<void> _importRecipe() async {
     if (_importingRecipe) return;
     _importingRecipe = true;
     try {
-      final draft = await showRecipeImportDialog(context);
+      final draft = await showRecipeImportDialog(context, lifetime: _importLifetime, importWeb: widget.importWeb);
       if (!mounted || draft == null) return;
       final saved = await Navigator.of(context).push<Recipe>(
         MaterialPageRoute<Recipe>(
           builder: (_) => AddRecipeScreen(
             initialImport: draft,
+            webImport: draft is WebRecipeImportHandoff ? draft : null,
             recipeRepository: widget.recipeRepository,
           ),
         ),

@@ -1,3 +1,4 @@
+import '../../domain/models/web_recipe_import_handoff.dart';
 import 'package:flutter/material.dart';
 import 'package:kuktam/core/domain/measurement_units.dart';
 import 'package:kuktam/core/domain/services/import_quantity_parser.dart';
@@ -12,12 +13,15 @@ class AddRecipeScreen extends StatefulWidget {
   const AddRecipeScreen({
     this.recipe,
     this.initialImport,
+    this.webImport,
     this.recipeRepository,
     super.key,
   }) : assert(recipe == null || initialImport == null);
 
   final Recipe? recipe;
   final RecipeImportDraft? initialImport;
+  /// P6.3 plumbing only; review UI/acceptance belongs to P6.4.
+  final WebRecipeImportHandoff? webImport;
   final RecipeRepository? recipeRepository;
 
   @override

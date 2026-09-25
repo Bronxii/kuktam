@@ -74,3 +74,74 @@ usable-draft checks. Preserve raw source, do not invent missing quantities.
 Later UI: keep input on failure, offer text import, never auto-save, cancel stale
 requests on route/account changes. Live-device TLS/HTTP/cancellation validation
 and pathological HTML resource/performance checks remain release QA work.
+
+
+## P6.2 implementation
+The pure offline WebRecipeImportService accepts extraction plus final source URL
+and a caller-owned import-session ID. WebRecipeNormalizer retains raw title and
+rows, normalizes entities/whitespace and joins step headings to their bodies.
+Only the exact Mindmegette suffix is removed on known Mindmegette hosts.
+RecipeTextParser is invoked unchanged once per normalized ingredient using an
+explicit ingredient section; JSON-LD title/preparation bypass free-text guessing.
+Unrecognized/skipped parser rows remain as blocking repairable rows, never vanish.
+
+WebImportWarningDetector audits existing output; its bounded risk vocabulary is
+NOT a canonical unit dictionary. Specific range/multiplier/fraction/textual
+quantity evidence and existing parser warnings drive issues. Ordinary Hungarian
+size adjectives do not trigger unknown-unit guesses. This detector cannot promise
+to recognize every unfamiliar unit or detect hidden visible-page/JSON-LD changes.
+Nosalty always gets recipe-level KNOWN_SOURCE_RISK; generic sources receive
+UNVERIFIED_SOURCE. No source scraping or automatic quantity repair is performed.
+
+WebRecipeImportResult wraps the existing RecipeImportDraft plus immutable review
+metadata; RecipeImportDraft itself and editor/text-import behavior are unchanged.
+Rows have import-session/source-index IDs, original parser evidence, current
+values, issue origin/field/evidence/message key and value-bound acceptance.
+Editing re-audits the row and revokes acceptance; deletion drops row review state.
+Recipe-level acceptance is bound to title, preparation, row values and issues.
+BLOCKING issues cannot be dismissed by acceptance. canSave is additional review
+readiness, never a substitute for the editor's validation/name uniqueness rules.
+
+Gate: empty title/preparation, zero usable rows or recipe-level blocking issues
+FAIL. A mixture of usable and blocking repairable rows yields REVIEW and may be
+edited; it cannot be saved until repaired. Any number of unsupported REVIEW rows
+remains REVIEW. INFO does not block. No runtime accuracy/ratio claim is made.
+Structural P6.1 checks still precede parser adaptation. No UI/fetch orchestration
+is added, and no metadata is written to Firestore.
+
+Next P6.3: shared text/URL input, cancellable loading/error state and retained
+input, dispatch to existing text flow or web pipeline. Review-aware editor handoff
+must carry the wrapper metadata; do not discard it and allow blind saving.
+The editor's visual warning/acceptance work requires its separately approved phase.
+
+
+## P6.3 shared dialog and async orchestration
+RecipeImportDialog remains the single multiline entry point. The existing
+classifier selects exactly-one-URL versus unchanged text parsing, retaining the
+20,000-code-point input limit (downloaded HTML uses the fetcher's separate cap).
+WebRecipeImportLoader composes the cancellable fetcher with the shared extractor
+and P6.2 service. No allowlist/Pro gate, retries or browser fallback is introduced.
+
+During a request, input and processing are disabled and a live-region loading
+indicator is shown. Each operation has a session/operation ID and cancellation
+token. Cancel/Back immediately cancels I/O before the existing discard confirmation;
+keeping the dialog afterward permits retry. Dispose and MainScreen account-subtree
+replacement invalidate the operation. Late success/error cannot pop or hand off.
+The parent lifetime token also removes a surviving root-navigator dialog route.
+
+PASS hands off once. REVIEW displays a recipe-level notice and a Continue-to-editor
+button; it does NOT accept or resolve any review issue. Nosalty explicitly asks
+for quantity checking. FAIL/error keeps the URL and dialog open with a short
+Hungarian message, allowing retry or pasted text instead. Raw errors are hidden.
+
+WebRecipeImportHandoff extends the old RecipeImportDraft route contract and retains
+WebRecipeImportResult, original URL, final URL and source metadata. MainScreen
+passes the same object as initialImport and webImport to AddRecipeScreen. The latter
+is plumbing only: there is no editor review UI or acceptance enforcement yet.
+This intermediate P6.3 state is NOT release-ready for review enforcement; P6.4 must
+bind metadata to edits/deletions and Save validation before production release.
+The existing text branch, parser, editor controls and Firestore schema are unchanged.
+
+Next P6.4: row-level warning presentation, recipe/source notices, explicit review
+acceptance, re-audit after edits/deletions and Save readiness integration. No AI,
+monetization, candidate chooser or source scraping belongs to that work.
