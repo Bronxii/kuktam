@@ -14,22 +14,45 @@ class WebIngredientReview {
     required this.value,
     required Iterable<WebImportIssue> issues,
     this.acceptedRevision,
-  }) : issues = List.unmodifiable(issues);
+    Iterable<String> acceptedIssues = const [],
+  }) : issues = List.unmodifiable(issues),
+       acceptedIssues = Set.unmodifiable(acceptedIssues);
   final String id;
   final RecipeImportIngredientDraft original, value;
   final List<WebImportIssue> issues;
   final String? acceptedRevision;
+  final Set<String> acceptedIssues;
   String get revision => jsonEncode([
     id,
     ingredientRevision(value),
     original.rawText,
     issues.map((i) => [i.identity, i.severity.name, i.evidence]).toList(),
   ]);
-  bool get accepted => acceptedRevision == revision;
+  bool isAccepted(WebImportIssue issue) =>
+      issue.severity == WebImportSeverity.review &&
+      acceptedRevision == revision &&
+      acceptedIssues.contains(issue.identity);
+  bool get accepted =>
+      issues
+          .where((i) => i.severity == WebImportSeverity.review)
+          .every(isAccepted) &&
+      acceptedRevision == revision;
+  WebIngredientReview acceptIssue(WebImportIssue issue) => WebIngredientReview(
+    id: id,
+    original: original,
+    value: value,
+    issues: issues,
+    acceptedRevision: revision,
+    acceptedIssues: {
+      ...(acceptedRevision == revision ? acceptedIssues : <String>{}),
+      if (issue.severity == WebImportSeverity.review && issues.contains(issue))
+        issue.identity,
+    },
+  );
   Iterable<WebImportIssue> get unresolved => issues.where(
     (i) =>
         i.severity == WebImportSeverity.blocking ||
-        i.severity == WebImportSeverity.review && !accepted,
+        i.severity == WebImportSeverity.review && !isAccepted(i),
   );
   WebIngredientReview accept() => WebIngredientReview(
     id: id,
@@ -37,6 +60,9 @@ class WebIngredientReview {
     value: value,
     issues: issues,
     acceptedRevision: revision,
+    acceptedIssues: issues
+        .where((i) => i.severity == WebImportSeverity.review)
+        .map((i) => i.identity),
   );
 }
 
@@ -47,8 +73,10 @@ class RecipeImportReviewMetadata {
     required Iterable<WebIngredientReview> rows,
     Iterable<WebImportIssue> issues = const [],
     this.acceptedRecipeRevision,
+    Iterable<String> acceptedRecipeIssues = const [],
   }) : rows = List.unmodifiable(rows),
-       issues = List.unmodifiable(issues) {
+       issues = List.unmodifiable(issues),
+       acceptedRecipeIssues = Set.unmodifiable(acceptedRecipeIssues) {
     if (this.rows.map((r) => r.id).toSet().length != this.rows.length) {
       throw ArgumentError('Duplicate review row id');
     }
@@ -57,6 +85,36 @@ class RecipeImportReviewMetadata {
   final List<WebIngredientReview> rows;
   final List<WebImportIssue> issues;
   final String? acceptedRecipeRevision;
+  final Set<String> acceptedRecipeIssues;
+  bool isRecipeIssueAccepted(WebImportIssue issue) =>
+      issue.severity == WebImportSeverity.review &&
+      acceptedRecipeRevision == revision &&
+      acceptedRecipeIssues.contains(issue.identity);
+  RecipeImportReviewMetadata acceptRecipeIssue(WebImportIssue issue) =>
+      RecipeImportReviewMetadata(
+        title: title,
+        preparation: preparation,
+        rows: rows,
+        issues: issues,
+        acceptedRecipeRevision: revision,
+        acceptedRecipeIssues: {
+          ...(acceptedRecipeRevision == revision
+              ? acceptedRecipeIssues
+              : <String>{}),
+          if (issue.severity == WebImportSeverity.review &&
+              issues.contains(issue))
+            issue.identity,
+        },
+      );
+  RecipeImportReviewMetadata acceptRowIssue(String id, WebImportIssue issue) =>
+      RecipeImportReviewMetadata(
+        title: title,
+        preparation: preparation,
+        rows: rows.map((r) => r.id == id ? r.acceptIssue(issue) : r),
+        issues: issues,
+        acceptedRecipeRevision: acceptedRecipeRevision,
+        acceptedRecipeIssues: acceptedRecipeIssues,
+      );
   String get revision => jsonEncode([
     title,
     preparation,
@@ -67,7 +125,7 @@ class RecipeImportReviewMetadata {
     for (final issue in issues) {
       if (issue.severity == WebImportSeverity.blocking ||
           issue.severity == WebImportSeverity.review &&
-              acceptedRecipeRevision != revision) {
+              !isRecipeIssueAccepted(issue)) {
         yield issue;
       }
     }
@@ -96,6 +154,9 @@ class RecipeImportReviewMetadata {
     rows: rows,
     issues: issues,
     acceptedRecipeRevision: revision,
+    acceptedRecipeIssues: issues
+        .where((i) => i.severity == WebImportSeverity.review)
+        .map((i) => i.identity),
   );
   RecipeImportReviewMetadata acceptRow(String id) => RecipeImportReviewMetadata(
     title: title,
@@ -103,6 +164,7 @@ class RecipeImportReviewMetadata {
     rows: rows.map((r) => r.id == id ? r.accept() : r),
     issues: issues,
     acceptedRecipeRevision: acceptedRecipeRevision,
+    acceptedRecipeIssues: acceptedRecipeIssues,
   );
   RecipeImportReviewMetadata withRows(Iterable<WebIngredientReview> values) =>
       RecipeImportReviewMetadata(

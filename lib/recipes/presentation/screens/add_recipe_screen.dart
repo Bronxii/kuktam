@@ -1,3 +1,5 @@
+import '../widgets/web_import_review.dart';
+import '../widgets/web_import_review_controller.dart';
 import '../../domain/models/web_recipe_import_handoff.dart';
 import 'package:flutter/material.dart';
 import 'package:kuktam/core/domain/measurement_units.dart';
@@ -20,7 +22,7 @@ class AddRecipeScreen extends StatefulWidget {
 
   final Recipe? recipe;
   final RecipeImportDraft? initialImport;
-  /// P6.3 plumbing only; review UI/acceptance belongs to P6.4.
+  /// Temporary web review metadata; never persisted as recipe data.
   final WebRecipeImportHandoff? webImport;
   final RecipeRepository? recipeRepository;
 
@@ -49,6 +51,7 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
   bool _allowPop = false;
   bool _saving = false;
   bool _confirmingLeave = false;
+  WebImportReviewController? _webReview;
 
   static const List<String> _units = MeasurementUnits.values;
 
@@ -118,8 +121,20 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
       _spices.clear();
     }
 
+    final review = widget.webImport?.result.review;
+    if (review != null) {
+      _webReview = WebImportReviewController(review);
+      for (var i = 0; i < _ingredients.length; i++) {
+        _webReview!.watch(_ingredients[i], id: review.rows[i].id);
+      }
+      _recipeNameController.addListener(_reviewContentChanged);
+      _preparationController.addListener(_reviewContentChanged);
+    }
     _initialFormState = _createFormStateSnapshot();
   }
+
+  void _reviewContentChanged() => _webReview?.contentChanged(
+    _recipeNameController.text, _preparationController.text);
 
   String _importQuantityText(RecipeImportIngredientDraft draft) {
     final quantity = draft.quantity;
@@ -136,6 +151,7 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
 
   @override
   void dispose() {
+    _webReview?.dispose();
     _recipeNameController.dispose();
     _preparationController.dispose();
 
@@ -150,7 +166,9 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
 
   void _addIngredient() {
     setState(() {
-      _ingredients.add(IngredientRowData());
+      final row = IngredientRowData();
+      _ingredients.add(row);
+      _webReview?.added(row);
     });
   }
 
@@ -163,8 +181,10 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
   void _removeIngredient(int index) {
     if (_ingredients.length == 1 && widget.initialImport != null) {
       setState(() {
+        _webReview?.remove(_ingredients.single);
         _ingredients.single.dispose();
         _ingredients[0] = IngredientRowData();
+        _webReview?.added(_ingredients[0]);
       });
       return;
     }
@@ -178,6 +198,7 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
     }
 
     setState(() {
+      _webReview?.remove(_ingredients[index]);
       _ingredients[index].dispose();
       _ingredients.removeAt(index);
     });
@@ -217,6 +238,7 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
       ingredientState,
       spiceState,
       _preparationController.text.trim(),
+      if (_webReview != null) _webReview!.revision.toString(),
     ].join('###');
   }
 
@@ -242,7 +264,20 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
       units: _units,
       suggestions: const [],
       onRemove: () => _removeIngredient(index),
+      onUnitChanged: _webReview == null ? null : () => _webReview!.update(ingredient),
     );
+    final reviewId = _webReview?.idFor(ingredient);
+    if (reviewId != null) {
+      return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        row,
+        ValueListenableBuilder(
+          valueListenable: _webReview!.signal(reviewId),
+          builder: (context, review, _) => IngredientImportWarning(
+            key: ValueKey('web-review-$reviewId'), review: review,
+            onAccept: (issue) => _webReview!.acceptRow(reviewId, issue)),
+        ),
+      ]);
+    }
     final draft = ingredient.importDraft;
     if (draft == null || draft.warnings.isEmpty) return row;
     return Column(
@@ -366,6 +401,13 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
       }
       quantities.add(quantity);
     }
+    final reviewMessage = _webReview?.saveBlockMessage;
+    if (reviewMessage != null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(reviewMessage)),
+      );
+      return;
+    }
     final recipe = _buildRecipe(quantities);
 
     FocusManager.instance.primaryFocus?.unfocus();
@@ -454,6 +496,10 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
                 child: ListView(
                 padding: const EdgeInsets.all(20),
                 children: [
+                if (_webReview != null) ValueListenableBuilder(
+                  valueListenable: _webReview!.metadata,
+                  builder: (context, review, _) => WebImportReviewBanner(
+                    review: review, onAccept: _webReview!.acceptRecipe)),
                 TextField(
                 controller: _recipeNameController,
                 decoration: const InputDecoration(
