@@ -109,6 +109,25 @@ void main() {
     await tester.pumpAndSettle();
   }
 
+  testWidgets('single URL is processed only as recipe text', (tester) async {
+    const url = 'https://example.com/recept';
+    String? parsedInput;
+    RecipeImportDraft? result;
+    await dialog(
+      tester,
+      parse: (text) {
+        parsedInput = text;
+        return const RecipeTextParser().parse(text);
+      },
+      onResult: (draft) => result = draft,
+    );
+    await enter(tester, url);
+    await submit(tester);
+    expect(parsedInput, url);
+    expect(result!.originalText, url);
+    expect(find.byType(LinearProgressIndicator), findsNothing);
+  });
+
   testWidgets('empty whitespace and multiline enabled state', (tester) async {
     await dialog(tester);
     expect(tester.widget<FilledButton>(process).onPressed, isNull);

@@ -1,3 +1,10 @@
+# CANCELLED / ARCHIVED — 2026-09-26
+
+A webimport termékdöntéssel végleg elvetve; production implementáció eltávolítva.
+Az alábbi dokumentum történeti referencia, nem aktív roadmap vagy release terv.
+
+---
+
 # Web import P6 architecture update (P6.1)
 
 ## Final product decisions

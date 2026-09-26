@@ -28,7 +28,6 @@ class IngredientRow extends StatefulWidget {
     required this.units,
     required this.suggestions,
     required this.onRemove,
-    this.onUnitChanged,
     super.key,
   });
 
@@ -36,7 +35,6 @@ class IngredientRow extends StatefulWidget {
   final List<String> units;
   final List<String> suggestions;
   final VoidCallback onRemove;
-  final VoidCallback? onUnitChanged;
 
   @override
   State<IngredientRow> createState() => _IngredientRowState();
@@ -129,7 +127,6 @@ class _IngredientRowState extends State<IngredientRow> {
               setState(() {
                 widget.data.selectedUnit = value;
               });
-              widget.onUnitChanged?.call();
             },
           ),
         ),

@@ -1,3 +1,13 @@
+# ARCHIVED — webimport cancelled
+
+The web import feature was rejected on 2026-09-26. This tool, corpus and reports
+are historical research only, not an upcoming product feature. The application
+has no dependency on this tool or packages/recipe_json_ld_core. Later benchmark
+phases may read the unchanged text parser; this dependency is tool-to-app only.
+The instructions below are historical; do not start further benchmarks implicitly.
+
+---
+
 # Web import POC — P0
 
 Izolált Dart CLI, nem Flutter feature. Nincs production import, Firebase, AI,

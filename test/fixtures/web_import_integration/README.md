@@ -1,3 +1,11 @@
+# ARCHIVED — production webimport removed
+
+The integration tests were removed after the feature was cancelled on 2026-09-26.
+These fixtures and hashes remain historical evidence only. The Flutter command
+below is historical and no longer runnable; no production dependency exists.
+
+---
+
 # P6.6 offline integration fixtures
 
 The tests use unchanged P1 HTML snapshots 01, 03 and 07 directly.
