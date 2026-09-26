@@ -1,0 +1,20 @@
+[
+  {
+    "id": "01",
+    "path": "tool/web_import_poc/results/html/p1_01.html",
+    "sha256": "c5300ccdb488cb4b3c9acdcced74699fc7fbfcd9e8b33b127243a32b23d5da18",
+    "url": "https://www.mindmegette.hu/recept/rakott-krumpli"
+  },
+  {
+    "id": "03",
+    "path": "tool/web_import_poc/results/html/p1_03.html",
+    "sha256": "f5c44512b32a9102d1f4fe337bfa955a35701aaf20686b977a8e4f6eb221af90",
+    "url": "https://www.mindmegette.hu/recept/husleves"
+  },
+  {
+    "id": "07",
+    "path": "tool/web_import_poc/results/html/p1_07.html",
+    "sha256": "b25e1cf6e7b1f56ec5b618d48d3e789e5159c0d2405c4888450e140ba2874dbc",
+    "url": "https://www.nosalty.hu/recept/palacsinta-alaprecept"
+  }
+]

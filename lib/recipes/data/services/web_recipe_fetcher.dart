@@ -101,6 +101,8 @@ class IoWebFetchTransport implements WebFetchTransport {
       for (final name in [
         HttpHeaders.locationHeader,
         HttpHeaders.contentTypeHeader,
+        HttpHeaders.contentLengthHeader,
+        HttpHeaders.contentEncodingHeader,
       ])
         if (response.headers.value(name) != null)
           name: response.headers.value(name)!,
@@ -170,6 +172,10 @@ class WebRecipeFetcher {
       rethrow;
     } on TimeoutException {
       throw const WebImportFailure(WebImportIssueCode.timeout);
+    } on SocketException {
+      throw const WebImportFailure(WebImportIssueCode.connectionFailure);
+    } on HandshakeException {
+      throw const WebImportFailure(WebImportIssueCode.connectionFailure);
     } on FormatException {
       throw const WebImportFailure(WebImportIssueCode.invalidContentType);
     } catch (_) {
@@ -189,9 +195,23 @@ class WebRecipeFetcher {
     WebImportCancellation token,
   ) async {
     var redirects = 0;
+    final visited = <Uri>{};
     while (true) {
       token.check();
-      final addresses = await _resolve(uri.host);
+      if (!visited.add(uri)) {
+        throw const WebImportFailure(WebImportIssueCode.redirectLoop);
+      }
+      List<InternetAddress> addresses;
+      try {
+        addresses = await _resolve(uri.host);
+      } on TimeoutException {
+        rethrow;
+      } on SocketException {
+        throw const WebImportFailure(WebImportIssueCode.dnsFailure);
+      }
+      if (addresses.isEmpty) {
+        throw const WebImportFailure(WebImportIssueCode.dnsFailure);
+      }
       token.check();
       _validator.validateAddresses(addresses);
       final response = await io.get(uri, addresses.first, token);
@@ -234,13 +254,33 @@ class WebRecipeFetcher {
           ].contains(type.mimeType.toLowerCase())) {
         throw const WebImportFailure(WebImportIssueCode.invalidContentType);
       }
+      final length = int.tryParse(
+        response.headers[HttpHeaders.contentLengthHeader] ?? '',
+      );
+      final encoding = response.headers[HttpHeaders.contentEncodingHeader];
+      // Compressed Content-Length is not the decompressed body size.
+      if ((encoding == null || encoding.toLowerCase() == 'identity') &&
+          length != null &&
+          length > maxBytes) {
+        throw const WebImportFailure(WebImportIssueCode.tooLarge);
+      }
       final bytes = <int>[];
-      await for (final chunk in response.body) {
-        token.check();
-        if (bytes.length + chunk.length > maxBytes) {
-          throw const WebImportFailure(WebImportIssueCode.tooLarge);
+      final chunks = StreamIterator<List<int>>(response.body);
+      final removeBodyCancellation = token.listen(() {
+        unawaited(chunks.cancel());
+      });
+      try {
+        while (await chunks.moveNext()) {
+          token.check();
+          final chunk = chunks.current;
+          if (bytes.length + chunk.length > maxBytes) {
+            throw const WebImportFailure(WebImportIssueCode.tooLarge);
+          }
+          bytes.addAll(chunk);
         }
-        bytes.addAll(chunk);
+      } finally {
+        removeBodyCancellation();
+        await chunks.cancel();
       }
       token.check();
       final html = decodeHtml(bytes, type.charset);

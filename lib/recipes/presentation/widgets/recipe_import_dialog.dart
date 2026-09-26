@@ -98,6 +98,7 @@ class _RecipeImportDialogState extends State<RecipeImportDialog> {
       return;
     }
     _finished = true;
+    _invalidate();
     Navigator.of(context).pop(draft);
   }
 
@@ -133,8 +134,11 @@ class _RecipeImportDialogState extends State<RecipeImportDialog> {
     } finally {
       if (_active(operation)) {
         setState(() => _loading = false);
+      }
+      if (identical(_cancellation, cancellation)) {
         _cancellation = null;
       }
+      cancellation.cancel();
     }
   }
 

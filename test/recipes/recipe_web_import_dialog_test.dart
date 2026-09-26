@@ -232,6 +232,16 @@ void main() {
     WebImportIssueCode.tooLarge,
     WebImportIssueCode.invalidEncoding,
     WebImportIssueCode.fetchError,
+    WebImportIssueCode.dnsFailure,
+    WebImportIssueCode.connectionFailure,
+    WebImportIssueCode.redirectLoop,
+    WebImportIssueCode.tooManyRedirects,
+    WebImportIssueCode.noJsonLd,
+    WebImportIssueCode.invalidJsonLd,
+    WebImportIssueCode.internalFailure,
+    WebImportIssueCode.invalidUrl,
+    WebImportIssueCode.unsafeTarget,
+    WebImportIssueCode.invalidContentType,
   ]) {
     testWidgets('$failure retains URL and dialog, no handoff, retry succeeds', (
       t,
@@ -516,6 +526,133 @@ void main() {
         'https://unknown.example',
       );
       expect(t.takeException(), isNull);
+    },
+  );
+  testWidgets(
+    '404 retry has new identity; cached action spam starts one request; success releases token',
+    (t) async {
+      final attempts = <Completer<WebRecipeImportHandoff>>[];
+      final ids = <String>[];
+      final tokens = <WebImportCancellation>[];
+      var returns = 0;
+      await open(
+        t,
+        (u, {required cancellation, required importId}) {
+          ids.add(importId);
+          tokens.add(cancellation);
+          final c = Completer<WebRecipeImportHandoff>();
+          attempts.add(c);
+          return c.future;
+        },
+        done: (r) {
+          if (r != null) returns++;
+        },
+      );
+      await t.enterText(input, 'https://unknown.example');
+      await t.pump();
+      final submitAction = t.widget<FilledButton>(process).onPressed!;
+      for (var i = 0; i < 10; i++) {
+        submitAction();
+      }
+      await t.pump();
+      expect(attempts.length, 1);
+      attempts[0].completeError(
+        const WebImportFailure(WebImportIssueCode.httpError, httpStatus: 404),
+      );
+      await t.pumpAndSettle();
+      expect(
+        find.text('A megadott receptoldal nem található. Ellenőrizd a linket.'),
+        findsOneWidget,
+      );
+      expect(
+        t.widget<TextField>(input).controller!.text,
+        'https://unknown.example',
+      );
+      expect(tokens[0].isCancelled, true);
+      final retry = t.widget<FilledButton>(process).onPressed!;
+      for (var i = 0; i < 10; i++) {
+        retry();
+      }
+      await t.pump();
+      expect(attempts.length, 2);
+      expect(ids.toSet().length, 2);
+      expect(t.widget<TextField>(input).decoration!.errorText, isNull);
+      attempts[1].complete(handoff());
+      await t.pumpAndSettle();
+      expect(returns, 1);
+      expect(tokens[1].isCancelled, true);
+      await t.tap(find.text('Open'));
+      await t.pumpAndSettle();
+      expect(t.widget<TextField>(input).controller!.text, isEmpty);
+      expect(find.byType(LinearProgressIndicator), findsNothing);
+      expect(t.widget<TextField>(input).decoration!.errorText, isNull);
+    },
+  );
+
+  testWidgets(
+    'late success after confirmed close cannot pop parent or hand off',
+    (t) async {
+      final pending = Completer<WebRecipeImportHandoff>();
+      var returns = 0;
+      await open(
+        t,
+        (u, {required cancellation, required importId}) => pending.future,
+        done: (r) {
+          if (r != null) returns++;
+        },
+      );
+      await submit(t, 'https://unknown.example');
+      await t.tap(find.byTooltip('Bezárás'));
+      await t.pumpAndSettle();
+      await t.tap(find.text('Kilépés'));
+      await t.pumpAndSettle();
+      pending.complete(handoff());
+      await t.pumpAndSettle();
+      expect(returns, 0);
+      expect(find.byType(RecipeImportDialog), findsNothing);
+      expect(find.text('Open'), findsOneWidget);
+      expect(t.takeException(), isNull);
+    },
+  );
+
+  testWidgets(
+    'real loader source failures preserve input; corrected source retries',
+    (t) async {
+      for (final body in [
+        '<html>broken',
+        '<script type="application/ld+json">{broken</script>',
+        '<script type="application/ld+json">{"@type":"Person"}</script>',
+        '<script type="application/ld+json">{"@type":"Recipe"}</script>',
+        htmlRecipe() + htmlRecipe(),
+      ]) {
+        final fetch = Fetch()..body = body;
+        var returned = 0;
+        await open(
+          t,
+          WebRecipeImportLoader(fetcher: fetch).load,
+          done: (r) {
+            if (r != null) returned++;
+          },
+        );
+        await submit(t, 'https://unknown.example');
+        await t.pumpAndSettle();
+        expect(returned, 0);
+        expect(
+          t.widget<TextField>(input).controller!.text,
+          'https://unknown.example',
+        );
+        expect(t.widget<TextField>(input).decoration!.errorText, isNotNull);
+        fetch.body = htmlRecipe();
+        await t.ensureVisible(process);
+        await t.tap(process);
+        await t.pumpAndSettle();
+        expect(t.widget<TextField>(input).decoration!.errorText, isNull);
+        final next = find.widgetWithText(FilledButton, 'Tovább a szerkesztőbe');
+        await t.ensureVisible(next);
+        await t.tap(next);
+        await t.pumpAndSettle();
+        expect(returned, 1);
+      }
     },
   );
 }

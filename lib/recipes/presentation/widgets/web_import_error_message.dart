@@ -1,6 +1,9 @@
 import '../../domain/models/web_import_issue.dart';
 
 String webImportErrorMessage(Object error) {
+  if (error is WebImportFailure && error.httpStatus == 404) {
+    return 'A megadott receptoldal nem található. Ellenőrizd a linket.';
+  }
   final code = error is WebImportFailure
       ? error.code
       : WebImportIssueCode.fetchError;
@@ -13,6 +16,8 @@ String webImportErrorMessage(Object error) {
       'Az oldal túl lassan válaszolt. Próbáld újra, vagy másold be a recept szövegét.',
     WebImportIssueCode.multipleRecipes =>
       'Az oldalon több receptet találtunk. Másold be a kívánt recept szövegét.',
+    WebImportIssueCode.noJsonLd ||
+    WebImportIssueCode.invalidJsonLd ||
     WebImportIssueCode.noRecipe ||
     WebImportIssueCode.invalidRecipe ||
     WebImportIssueCode.missingTitle ||
@@ -25,6 +30,10 @@ String webImportErrorMessage(Object error) {
       'Az oldal szövegét nem sikerült beolvasni. Másold be a recept szövegét.',
     WebImportIssueCode.invalidUrl || WebImportIssueCode.unsafeTarget =>
       'Ez a link nem használható biztonságos webimporthoz. Ellenőrizd, vagy másold be a recept szövegét.',
+    WebImportIssueCode.redirectLoop || WebImportIssueCode.tooManyRedirects =>
+      'Az oldal átirányításai miatt nem sikerült beolvasni a receptet. Másold be a recept szövegét.',
+    WebImportIssueCode.dnsFailure || WebImportIssueCode.connectionFailure =>
+      'Nem sikerült kapcsolódni a receptoldalhoz. Ellenőrizd az internetkapcsolatot, vagy másold be a recept szövegét.',
     WebImportIssueCode.invalidContentType =>
       'A link nem feldolgozható receptoldalra mutat. Másold be a recept szövegét.',
     _ =>

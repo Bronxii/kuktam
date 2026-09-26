@@ -17,10 +17,33 @@ class WebRecipeImportLoader {
     required WebImportCancellation cancellation,
     required String importId,
   }) async {
+    try {
+      return await _load(input, cancellation: cancellation, importId: importId);
+    } on WebImportFailure {
+      rethrow;
+    } catch (_) {
+      cancellation.check();
+      throw const WebImportFailure(WebImportIssueCode.internalFailure);
+    }
+  }
+
+  Future<WebRecipeImportHandoff> _load(
+    String input, {
+    required WebImportCancellation cancellation,
+    required String importId,
+  }) async {
+    cancellation.check();
     final fetched = await fetcher.fetch(input, cancellation: cancellation);
     cancellation.check();
     final extraction = extractRecipes(fetched.html);
     cancellation.check();
+    final extractionFailure = switch (extraction.status) {
+      Status.noJsonLd => WebImportIssueCode.noJsonLd,
+      Status.invalidJsonLd => WebImportIssueCode.invalidJsonLd,
+      Status.noRecipe => WebImportIssueCode.noRecipe,
+      _ => null,
+    };
+    if (extractionFailure != null) throw WebImportFailure(extractionFailure);
     final result = service.prepare(
       extraction,
       sourceUrl: fetched.finalUrl,

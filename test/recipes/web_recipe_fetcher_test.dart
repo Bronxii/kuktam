@@ -108,7 +108,10 @@ void main() {
     expect(r.redirectCount, 1);
     expect(r.finalUrl.host, 'b.example');
     final loop = FakeTransport(
-      (_) async => html(status: 302, headers: {'location': '/again'}),
+      (u) async => html(
+        status: 302,
+        headers: {'location': '/again${u.path.length}x${u.path}'},
+      ),
     );
     await expectLater(
       fetcher(loop).fetch('https://a.example'),
@@ -261,7 +264,7 @@ void main() {
       );
       await expectLater(
         fetcher(t).fetch('https://a.example'),
-        failure(WebImportIssueCode.fetchError),
+        failure(WebImportIssueCode.connectionFailure),
       );
       expect(t.closed, true);
     },
