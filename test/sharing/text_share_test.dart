@@ -138,6 +138,26 @@ void main() {
     await tester.pumpAndSettle();
   }
 
+  testWidgets('split shared text is normalized before editable prefill', (
+    tester,
+  ) async {
+    final shares = TextShareController()
+      ..accept({'id': 'split', 'text': '1\ndb\ntojás\n\n20\ndkg\nporcukor'});
+    await mount(tester, shares, TextShareNavigationObserver());
+    expect(
+      tester.widget<TextField>(input).controller!.text,
+      '1 db tojás\n\n20 dkg porcukor',
+    );
+    expect(find.byType(AddRecipeScreen), findsNothing);
+  });
+  testWidgets('manual prefill remains raw without share preprocessing', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      const MaterialApp(home: RecipeImportDialog(initialText: '1\ndb\ntojás')),
+    );
+    expect(tester.widget<TextField>(input).controller!.text, '1\ndb\ntojás');
+  });
   for (final status in [
     ClientEntitlementStatus.free,
     ClientEntitlementStatus.unknown,

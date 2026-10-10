@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../sharing/text_share_controller.dart';
+import '../../../sharing/shared_recipe_text_normalizer.dart';
 import '../../../pro/feature_gate.dart';
 import 'package:share_plus/share_plus.dart';
 import '../../../shopping/domain/shopping_quantity_formatter.dart';
@@ -95,7 +96,9 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
         _scheduleShare();
         return;
       }
-      _importRecipe(initialText: text);
+      _importRecipe(
+        initialText: const SharedRecipeTextNormalizer().normalize(text),
+      );
     });
     WidgetsBinding.instance.ensureVisualUpdate();
   }
