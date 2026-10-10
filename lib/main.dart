@@ -2,6 +2,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
 import 'app/app.dart';
+import 'sharing/text_share_controller.dart';
 import 'firebase_options.dart';
 import 'billing/android_billing_adapter.dart';
 import 'entitlements/data/entitlement_contracts.dart';
@@ -12,6 +13,8 @@ import 'pro/monetization_host.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  await TextShareController.instance.start();
 
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 

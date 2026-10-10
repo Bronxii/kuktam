@@ -3,24 +3,30 @@ import 'package:flutter/material.dart';
 import '../../domain/models/recipe_import_draft.dart';
 import '../../domain/services/recipe_text_parser.dart';
 
-Future<RecipeImportDraft?> showRecipeImportDialog(BuildContext context) async {
+Future<RecipeImportDraft?> showRecipeImportDialog(
+  BuildContext context, {
+  String? initialText,
+}) async {
   return showDialog<RecipeImportDraft>(
     context: context,
     barrierDismissible: false,
-    builder: (_) => const RecipeImportDialog(),
+    builder: (_) => RecipeImportDialog(initialText: initialText),
   );
 }
 
 class RecipeImportDialog extends StatelessWidget {
-  const RecipeImportDialog({super.key, this.parse});
+  const RecipeImportDialog({super.key, this.parse, this.initialText});
+  final String? initialText;
   final RecipeImportDraft Function(String)? parse;
   static const maxCharacters = 20000;
   @override
-  Widget build(BuildContext context) => _RecipeImportBody(parse: parse);
+  Widget build(BuildContext context) =>
+      _RecipeImportBody(parse: parse, initialText: initialText);
 }
 
 class _RecipeImportBody extends StatefulWidget {
-  const _RecipeImportBody({this.parse});
+  const _RecipeImportBody({this.parse, this.initialText});
+  final String? initialText;
 
   /// Optional pure parser dependency for error-path tests.
   final RecipeImportDraft Function(String)? parse;
@@ -31,7 +37,7 @@ class _RecipeImportBody extends StatefulWidget {
 }
 
 class _RecipeImportBodyState extends State<_RecipeImportBody> {
-  final _text = TextEditingController();
+  late final _text = TextEditingController(text: widget.initialText);
   String? _error;
   bool _confirming = false;
   bool _finished = false;

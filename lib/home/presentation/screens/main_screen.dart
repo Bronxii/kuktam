@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../sharing/text_share_controller.dart';
 import '../../../pro/feature_gate.dart';
 import 'package:share_plus/share_plus.dart';
 import '../../../shopping/domain/shopping_quantity_formatter.dart';
@@ -19,12 +20,16 @@ class MainScreen extends StatefulWidget {
   const MainScreen({
     super.key,
     this.tabBodies,
+    this.textShares,
+    this.shareNavigation,
     this.recipeRepository,
     this.shoppingRepository,
   }) : assert(tabBodies == null || tabBodies.length == 3);
 
   // Optional dependencies keep navigation tests independent of Firebase.
   final List<Widget>? tabBodies;
+  final TextShareController? textShares;
+  final TextShareNavigationObserver? shareNavigation;
   final RecipeRepository? recipeRepository;
   final ShoppingRepository? shoppingRepository;
 
@@ -32,7 +37,69 @@ class MainScreen extends StatefulWidget {
   State<MainScreen> createState() => _MainScreenState();
 }
 
-class _MainScreenState extends State<MainScreen> {
+class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
+  late final _textShares = widget.textShares ?? TextShareController.instance;
+  late final _shareNavigation = widget.shareNavigation ?? textShareNavigation;
+  bool _shareScheduled = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _textShares.addListener(_scheduleShare);
+    _shareNavigation.changes.addListener(_scheduleShare);
+    WidgetsBinding.instance.addObserver(this);
+    _scheduleShare();
+  }
+
+  @override
+  void dispose() {
+    _textShares.removeListener(_scheduleShare);
+    _shareNavigation.changes.removeListener(_scheduleShare);
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) _scheduleShare();
+  }
+
+  void _scheduleShare() {
+    if (!mounted || _shareScheduled || !_textShares.hasPending) return;
+    _shareScheduled = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _shareScheduled = false;
+      if (!mounted ||
+          _importingRecipe ||
+          ModalRoute.of(context)?.isCurrent != true) {
+        return;
+      }
+      final lifecycle = WidgetsBinding.instance.lifecycleState;
+      if (lifecycle != null && lifecycle != AppLifecycleState.resumed) return;
+      final notice = _textShares.takeNotice();
+      if (notice != null) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(notice)));
+      }
+      final text = _textShares.take();
+      if (text == null) return;
+      if (TextShareController.isUrlOnly(text)) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              'A Kuktám megosztott szöveget fogad. Jelöld ki és oszd meg a recept szövegét a hivatkozás helyett.',
+            ),
+          ),
+        );
+        _scheduleShare();
+        return;
+      }
+      _importRecipe(initialText: text);
+    });
+    WidgetsBinding.instance.ensureVisualUpdate();
+  }
+
   int _selectedIndex = 0;
 
   late final _shoppingRepository =
@@ -47,11 +114,14 @@ class _MainScreenState extends State<MainScreen> {
   int _recipesVersion = 0;
   bool _importingRecipe = false;
 
-  Future<void> _importRecipe() async {
+  Future<void> _importRecipe({String? initialText}) async {
     if (_importingRecipe) return;
     _importingRecipe = true;
     try {
-      final draft = await showRecipeImportDialog(context);
+      final draft = await showRecipeImportDialog(
+        context,
+        initialText: initialText,
+      );
       if (!mounted || draft == null) return;
       final saved = await Navigator.of(context).push<Recipe>(
         MaterialPageRoute<Recipe>(
@@ -66,6 +136,7 @@ class _MainScreenState extends State<MainScreen> {
       }
     } finally {
       _importingRecipe = false;
+      _scheduleShare();
     }
   }
 

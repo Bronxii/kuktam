@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../sharing/text_share_controller.dart';
 
 import 'package:kuktam/core/theme/app_colors.dart';
 import 'package:kuktam/features/auth/presentation/widgets/auth_gate.dart';
@@ -16,6 +17,7 @@ class KuktamApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Kuktám',
+      navigatorObservers: [textShareNavigation],
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         useMaterial3: true,
