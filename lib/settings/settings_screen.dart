@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../export/presentation/recipe_export_screen.dart';
+import '../export/presentation/recipe_export_controller.dart';
 
 import '../features/auth/data/repositories/auth_repository.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -10,8 +12,9 @@ import '../pro/monetization_host.dart';
 import '../pro/profile_pro_card.dart';
 
 class SettingsScreen extends StatefulWidget {
-  const SettingsScreen({super.key, this.authRepository, this.deletionRepository});
+  const SettingsScreen({super.key, this.authRepository, this.deletionRepository, this.exportControllerFactory});
 
+  final RecipeExportController Function()? exportControllerFactory;
   final AuthRepository? authRepository;
   final AccountDeletionRepository? deletionRepository;
 
@@ -26,6 +29,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   String _appVersion = '';
   bool _deletionDialogOpen = false;
   bool _isSigningOut = false;
+  bool _exportOpen = false;
 
   Future<void> _deleteAccount() async {
     if (_deletionDialogOpen) return;
@@ -118,6 +122,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
         children: [
           const SizedBox(height: 8),
           ProfileProCard(controller: ProScope.maybeOf(context)),
+          ListTile(
+            leading: const Icon(Icons.download_outlined),
+            title: const Text('Saját adatok exportálása'),
+            subtitle: const Text('Összes recept exportálása'),
+            onTap: () async {
+              if (_exportOpen) return;
+              _exportOpen = true;
+              try {
+                await Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => RecipeExportScreen(createController: widget.exportControllerFactory)));
+              } finally { _exportOpen = false; }
+            },
+          ),
 
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),

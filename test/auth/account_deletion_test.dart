@@ -338,7 +338,8 @@ void main() {
       await tester.pumpAndSettle();
       await tester.tap(find.text('Profile'));
       await tester.pumpAndSettle();
-      await tester.ensureVisible(find.text('Fiók törlése'));
+      await tester.scrollUntilVisible(find.text('Fiók törlése'), 200);
+      await tester.pumpAndSettle();
       await tester.tap(find.text('Fiók törlése'));
       await tester.pumpAndSettle();
       await tester.tap(find.widgetWithText(FilledButton, 'Fiók törlése'));

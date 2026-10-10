@@ -14,6 +14,8 @@ class MainActivity : FlutterActivity() {
         private val textShares = TextShareInbox()
     }
     private var shareChannel: MethodChannel? = null
+    private var exportChannel: MethodChannel? = null
+    private var exportWriter: ExportDocumentWriter? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -48,7 +50,16 @@ class MainActivity : FlutterActivity() {
         }
     }
 
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if (exportWriter?.onActivityResult(requestCode, resultCode, data) == true) return
+        super.onActivityResult(requestCode, resultCode, data)
+    }
+
     override fun cleanUpFlutterEngine(flutterEngine: FlutterEngine) {
+        exportWriter?.dispose()
+        exportWriter = null
+        exportChannel?.setMethodCallHandler(null)
+        exportChannel = null
         shareChannel?.setMethodCallHandler(null)
         shareChannel = null
         super.cleanUpFlutterEngine(flutterEngine)
@@ -57,6 +68,10 @@ class MainActivity : FlutterActivity() {
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
         val messenger = flutterEngine.dartExecutor.binaryMessenger
+        exportWriter = ExportDocumentWriter(this)
+        exportChannel = MethodChannel(messenger, "kuktam/export_document").also { channel ->
+            channel.setMethodCallHandler { call, result -> exportWriter!!.handle(call.method, call.arguments, result) }
+        }
         shareChannel = MethodChannel(messenger, "kuktam/text_share").also { channel ->
             channel.setMethodCallHandler { call, result ->
                 if (call.method == "take" && call.arguments == null) {

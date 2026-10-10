@@ -1,4 +1,5 @@
 import 'dart:async';
+import '../../../../core/account_deletion_signal.dart';
 import 'account_deletion_gateway.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -33,6 +34,7 @@ class AccountDeletionRepository {
   Future<void> deleteCurrentAccount({String? password}) async {
     if (_deleting) throw StateError('Deletion already running');
     _deleting = true;
+    AccountDeletionSignal.begin();
     StreamSubscription<User?>? sessionWatch;
     try {
       final user = _auth.currentUser;
@@ -108,6 +110,7 @@ class AccountDeletionRepository {
     } finally {
       unawaited(sessionWatch?.cancel());
       _deleting = false;
+      AccountDeletionSignal.end();
     }
   }
 }
