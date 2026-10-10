@@ -37,8 +37,6 @@ const recipe = Recipe(
   preparation: 'Keverd össze.',
 );
 const released = [
-  ProFeature.recipeTextImport,
-  ProFeature.shoppingTextImport,
   ProFeature.recipeScaling,
   ProFeature.scaledRecipeToShopping,
   ProFeature.whatToCook,
@@ -69,6 +67,56 @@ Future<void> mount(
 }
 
 void main() {
+  for (final status in ClientEntitlementStatus.values) {
+    testWidgets('text imports execute independently of entitlement: $status', (
+      tester,
+    ) async {
+      final repo = AccessRepository(status);
+      var parsed = 0, saved = 0;
+      await mount(
+        tester,
+        repo,
+        RecipeImportDialog(
+          parse: (text) {
+            parsed++;
+            return const RecipeTextParser().parse(text);
+          },
+        ),
+      );
+      await tester.enterText(
+        find.byKey(const ValueKey('recipe-import-text')),
+        'Leves\nHozzávalók:\n1 kg liszt\nElkészítés:\nKeverd össze.',
+      );
+      await tester.pump();
+      await tester.tap(find.text('Feldolgozás'));
+      await tester.pumpAndSettle();
+      expect(parsed, 1);
+      await mount(
+        tester,
+        repo,
+        ShoppingImportDialog(
+          addItems: (items) async {
+            saved += items.length;
+          },
+        ),
+      );
+      await tester.enterText(find.byType(TextField).first, '1 kg liszt');
+      await tester.pump();
+      await tester.tap(find.text('Feldolgozás'));
+      await tester.pumpAndSettle();
+      final shoppingSave = find.widgetWithText(
+        FilledButton,
+        'Hozzáadás a bevásárlólistához',
+      );
+      await tester.ensureVisible(shoppingSave);
+      await tester.tap(shoppingSave);
+      await tester.pumpAndSettle();
+      expect(saved, 1);
+      expect(find.text('Kuktám Pro funkció'), findsNothing);
+      expect(tester.takeException(), isNull);
+    });
+  }
+
   for (final label in ['Átszámítás', 'Bevásárlólistához adás']) {
     testWidgets(
       'account switch during entry await cannot open old recipe: $label',
@@ -88,7 +136,7 @@ void main() {
     );
   }
   testWidgets(
-    'actual main entries remain visible and Free cannot launch imports or cook',
+    'actual main entries remain visible and Free can launch imports but not cook',
     (tester) async {
       final repo = AccessRepository(ClientEntitlementStatus.free);
       await mount(
@@ -102,21 +150,18 @@ void main() {
       );
       await tester.tap(find.byTooltip('Recept importálása'));
       await tester.pumpAndSettle();
-      expect(find.textContaining('A recept szöveges import'), findsOneWidget);
-      expect(find.byType(RecipeImportDialog), findsNothing);
-      await tester.tap(find.text('Mégse'));
+      expect(find.text('Kuktám Pro funkció'), findsNothing);
+      expect(find.byType(RecipeImportDialog), findsOneWidget);
+      await tester.tap(find.byTooltip('Bezárás'));
       await tester.pumpAndSettle();
       await tester.tap(find.text('Lista'));
       await tester.pumpAndSettle();
       expect(find.byType(FloatingActionButton), findsOneWidget);
       await tester.tap(find.byTooltip('Importálás'));
       await tester.pumpAndSettle();
-      expect(
-        find.textContaining('A bevásárlólista szöveges import'),
-        findsOneWidget,
-      );
-      expect(find.byType(ShoppingImportDialog), findsNothing);
-      await tester.tap(find.text('Mégse'));
+      expect(find.text('Kuktám Pro funkció'), findsNothing);
+      expect(find.byType(ShoppingImportDialog), findsOneWidget);
+      await tester.tap(find.byTooltip('Bezárás'));
       await tester.pumpAndSettle();
       await tester.tap(find.text('Mit főzzek?'));
       await tester.pumpAndSettle();
@@ -226,7 +271,11 @@ void main() {
     tester,
   ) async {
     final repo = AccessRepository(ClientEntitlementStatus.checking);
-    await mount(tester, repo, const RecipeImportDialog());
+    await mount(
+      tester,
+      repo,
+      const RecipeScalingDialog(ingredients: ingredients),
+    );
     expect(find.text('Kuktám Pro megtekintése'), findsNothing);
     repo.set(ClientEntitlementStatus.free);
     await tester.pumpAndSettle();
@@ -338,39 +387,27 @@ void main() {
     ClientEntitlementStatus.unknown,
     ClientEntitlementStatus.unavailable,
   ]) {
-    testWidgets(
-      'direct constructors block parser, scaling and matcher: $status',
-      (tester) async {
-        final repo = AccessRepository(status);
-        final cook = CookSpy();
-        var calls = 0;
-        for (final child in <Widget>[
-          RecipeImportDialog(
-            parse: (text) {
-              calls++;
-              return const RecipeTextParser().parse(text);
-            },
-          ),
-          ShoppingImportDialog(
-            addItems: (_) async {
-              calls++;
-            },
-          ),
-          RecipeScalingDialog(
-            ingredients: ingredients,
-            addShoppingItems: (_) async {
-              calls++;
-            },
-          ),
-          WhatToCookScreen(recipeRepository: cook),
-        ]) {
-          await mount(tester, repo, child);
-          expect(find.byType(TextField), findsNothing);
-          expect(calls, 0);
-          expect(cook.subscriptions, 0);
-        }
-      },
-    );
+    testWidgets('direct constructors block scaling and matcher: $status', (
+      tester,
+    ) async {
+      final repo = AccessRepository(status);
+      final cook = CookSpy();
+      var calls = 0;
+      for (final child in <Widget>[
+        RecipeScalingDialog(
+          ingredients: ingredients,
+          addShoppingItems: (_) async {
+            calls++;
+          },
+        ),
+        WhatToCookScreen(recipeRepository: cook),
+      ]) {
+        await mount(tester, repo, child);
+        expect(find.byType(TextField), findsNothing);
+        expect(calls, 0);
+        expect(cook.subscriptions, 0);
+      }
+    });
   }
   for (final status in [
     ClientEntitlementStatus.proOnline,
@@ -449,7 +486,7 @@ void main() {
     });
   }
   testWidgets(
-    'captured recipe parse action rechecks current entitlement before execution',
+    'captured recipe parse action stays available after entitlement loss',
     (tester) async {
       final repo = AccessRepository();
       var calls = 0;
@@ -476,11 +513,13 @@ void main() {
       repo.set(ClientEntitlementStatus.free);
       action();
       await tester.pumpAndSettle();
-      expect(calls, 0);
-      expect(find.textContaining('a Kuktám Pro része.'), findsWidgets);
+      expect(calls, 1);
+      expect(find.textContaining('a Kuktám Pro része.'), findsNothing);
     },
   );
-  testWidgets('shopping preview save guard after revoke', (tester) async {
+  testWidgets('shopping preview save stays available after revoke', (
+    tester,
+  ) async {
     final repo = AccessRepository();
     var calls = 0;
     await mount(
@@ -504,7 +543,7 @@ void main() {
     repo.set(ClientEntitlementStatus.free);
     action();
     await tester.pumpAndSettle();
-    expect(calls, 0);
+    expect(calls, 1);
   });
   for (final newUid in <String?>['user-b', null]) {
     testWidgets('old-session scaled shopping action cannot write: $newUid', (
@@ -542,23 +581,27 @@ void main() {
     tester,
   ) async {
     final repo = AccessRepository();
-    await mount(tester, repo, const RecipeImportDialog());
+    await mount(
+      tester,
+      repo,
+      const RecipeScalingDialog(ingredients: ingredients),
+    );
     await tester.enterText(
-      find.byKey(const ValueKey('recipe-import-text')),
-      'Private draft A',
+      find.byKey(const ValueKey('scaling-quantity-0')),
+      '250',
     );
     repo.set(ClientEntitlementStatus.free);
     await tester.pumpAndSettle();
     expect(find.byType(TextField), findsNothing);
     repo.set(ClientEntitlementStatus.proOnline);
     await tester.pumpAndSettle();
-    expect(find.text('Private draft A'), findsOneWidget);
+    expect(find.text('250'), findsOneWidget);
     repo.set(ClientEntitlementStatus.proOnline, uid: 'B');
     await tester.pumpAndSettle();
-    expect(find.text('Private draft A'), findsNothing);
+    expect(find.text('250'), findsNothing);
     expect(
       tester.widget<TextField>(find.byType(TextField)).controller!.text,
-      isEmpty,
+      '100',
     );
   });
   testWidgets(
@@ -627,7 +670,11 @@ void main() {
     testWidgets('account $failure cannot upsell', (tester) async {
       final repo = AccessRepository();
       repo.set(ClientEntitlementStatus.unavailable, failure: failure);
-      await mount(tester, repo, const RecipeImportDialog());
+      await mount(
+        tester,
+        repo,
+        const RecipeScalingDialog(ingredients: ingredients),
+      );
       expect(find.textContaining('törlés alatt'), findsOneWidget);
       expect(find.text('Kuktám Pro megtekintése'), findsNothing);
     });

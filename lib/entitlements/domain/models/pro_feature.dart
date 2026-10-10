@@ -1,7 +1,5 @@
-/// Convenience features only. Manual CRUD, search and sync are always Free.
+/// Pro automation features. Manual CRUD, text imports, search and sync are Free.
 enum ProFeature {
-  recipeTextImport,
-  shoppingTextImport,
   recipeScaling,
   scaledRecipeToShopping,
   whatToCook,

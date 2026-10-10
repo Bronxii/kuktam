@@ -1,14 +1,9 @@
-import '../../../pro/feature_gate.dart';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import '../../domain/models/recipe_import_draft.dart';
 import '../../domain/services/recipe_text_parser.dart';
 
 Future<RecipeImportDraft?> showRecipeImportDialog(BuildContext context) async {
-  if (!await FeatureGate.request(context, ProFeature.recipeTextImport) ||
-      !context.mounted) {
-    return null;
-  }
   return showDialog<RecipeImportDraft>(
     context: context,
     barrierDismissible: false,
@@ -21,11 +16,7 @@ class RecipeImportDialog extends StatelessWidget {
   final RecipeImportDraft Function(String)? parse;
   static const maxCharacters = 20000;
   @override
-  Widget build(BuildContext context) => FeatureBoundary(
-    feature: ProFeature.recipeTextImport,
-    dialog: true,
-    builder: (_) => _RecipeImportBody(parse: parse),
-  );
+  Widget build(BuildContext context) => _RecipeImportBody(parse: parse);
 }
 
 class _RecipeImportBody extends StatefulWidget {
@@ -52,7 +43,6 @@ class _RecipeImportBodyState extends State<_RecipeImportBody> {
   }
 
   void _process() {
-    if (!FeatureGate.execute(context, ProFeature.recipeTextImport)) return;
     if (_finished || _confirming || _text.text.trim().isEmpty) return;
     // Same Unicode code-point convention as shopping import; never truncate.
     if (_text.text.runes.length > _RecipeImportBody.maxCharacters) {

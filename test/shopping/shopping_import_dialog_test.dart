@@ -13,7 +13,7 @@ void main() {
     Future<void> Function(List<ShoppingItemInput>)? addItems,
   }) async {
     await tester.pumpWidget(
-      withProAccess(
+      withFreeAccess(
         MaterialApp(
           home: Scaffold(
             body: Builder(

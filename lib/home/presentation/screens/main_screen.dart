@@ -51,11 +51,8 @@ class _MainScreenState extends State<MainScreen> {
     if (_importingRecipe) return;
     _importingRecipe = true;
     try {
-      final operationUid = FeatureGate.state(context).uid;
       final draft = await showRecipeImportDialog(context);
-      if (!mounted || FeatureGate.state(context).uid != operationUid) return;
       if (!mounted || draft == null) return;
-      if (!FeatureGate.execute(context, ProFeature.recipeTextImport)) return;
       final saved = await Navigator.of(context).push<Recipe>(
         MaterialPageRoute<Recipe>(
           builder: (_) => AddRecipeScreen(
@@ -185,19 +182,13 @@ class _MainScreenState extends State<MainScreen> {
           if (_selectedIndex == 0)
             IconButton(
               tooltip: 'Recept importálása',
-              icon: const ProFeatureIcon(
-                feature: ProFeature.recipeTextImport,
-                icon: Icons.file_download_outlined,
-              ),
+              icon: const Icon(Icons.file_download_outlined),
               onPressed: _importRecipe,
             ),
           if (_selectedIndex == 1)
             IconButton(
               tooltip: 'Importálás',
-              icon: const ProFeatureIcon(
-                feature: ProFeature.shoppingTextImport,
-                icon: Icons.file_download_outlined,
-              ),
+              icon: const Icon(Icons.file_download_outlined),
               onPressed: () => showShoppingImportDialog(context),
             ),
           if (_selectedIndex == 1)

@@ -58,8 +58,8 @@ void main() {
     const free = EntitlementSnapshot.free();
     expect(unknown.status, isNot(free.status));
     expect(
-      service.evaluate(unknown, ProFeature.recipeTextImport),
-      isNot(service.evaluate(free, ProFeature.recipeTextImport)),
+      service.evaluate(unknown, ProFeature.recipeScaling),
+      isNot(service.evaluate(free, ProFeature.recipeScaling)),
     );
   });
 }

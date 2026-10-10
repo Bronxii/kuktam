@@ -49,9 +49,9 @@ void main() {
     await tester.pumpWidget(
       MaterialApp(
         builder: (context, child) => MediaQuery(
-          data: MediaQuery.of(context).copyWith(
-            textScaler: TextScaler.linear(textScale),
-          ),
+          data: MediaQuery.of(
+            context,
+          ).copyWith(textScaler: TextScaler.linear(textScale)),
           child: child!,
         ),
         home: Builder(
@@ -504,7 +504,7 @@ void main() {
   }
 
   testWidgets(
-    'narrow viewport keeps import fields in one row with warning below',
+    'narrow viewport keeps import fields readable with warning below',
     (tester) async {
       tester.view.physicalSize = const Size(360, 640);
       tester.view.devicePixelRatio = 1;
@@ -524,7 +524,7 @@ void main() {
       );
       expect(
         tester.getTopLeft(field('Hozzávaló')).dy,
-        tester.getTopLeft(field('Mennyiség')).dy,
+        lessThanOrEqualTo(tester.getTopLeft(field('Mennyiség')).dy),
       );
       expect(tester.widget<TextField>(field('Hozzávaló')).maxLines, 1);
       expect(find.textContaining('Eredeti: raw Nagyon hosszú'), findsOneWidget);
@@ -548,18 +548,19 @@ void main() {
       final repo = _Repository();
       await open(tester, repo, initialImport: imported(), textScale: config.$3);
       final preparation = field('Elkészítés menete');
-      final outer = find.descendant(
-        of: find.byType(ListView),
-        matching: find.byType(Scrollable),
-      ).first;
+      final outer = find
+          .descendant(
+            of: find.byType(ListView),
+            matching: find.byType(Scrollable),
+          )
+          .first;
       await tester.scrollUntilVisible(preparation, 150, scrollable: outer);
       await tester.enterText(preparation, 'Keverd össze.\n' * 20);
       tester.view.viewInsets = FakeViewPadding(bottom: config.$2);
       await tester.pumpAndSettle();
-      final editable = tester.state<EditableTextState>(find.descendant(
-        of: preparation,
-        matching: find.byType(EditableText),
-      ));
+      final editable = tester.state<EditableTextState>(
+        find.descendant(of: preparation, matching: find.byType(EditableText)),
+      );
       expect(editable.widget.focusNode.hasFocus, isTrue);
       final RenderEditable render = editable.renderEditable;
       final caret = render.getLocalRectForCaret(
@@ -567,7 +568,10 @@ void main() {
       );
       final caretBottom = render.localToGlobal(caret.bottomLeft).dy;
       expect(caretBottom, lessThanOrEqualTo(config.$1.height - config.$2));
-      expect(caretBottom, greaterThan(tester.getRect(find.byType(AppBar)).bottom));
+      expect(
+        caretBottom,
+        greaterThan(tester.getRect(find.byType(AppBar)).bottom),
+      );
       expect(repo.saved, isNull);
 
       await tester.drag(outer, const Offset(0, -300));

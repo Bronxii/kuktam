@@ -185,14 +185,14 @@ void main() {
       await screen(tester);
       expect(find.text('CHF 7.95'), findsOneWidget);
       for (final title in [
-        'Recept szöveges import',
-        'Bevásárlólista szöveges import',
         'Receptátszámítás',
         'Mit főzzek?',
         'Képes receptimport – hamarosan',
       ]) {
         expect(find.text(title), findsOneWidget);
       }
+      expect(find.text('Recept szöveges import'), findsNothing);
+      expect(find.text('Bevásárlólista szöveges import'), findsNothing);
       expect(find.textContaining('Nincs előfizetés'), findsOneWidget);
       final image = tester.widget<ListTile>(
         find.ancestor(

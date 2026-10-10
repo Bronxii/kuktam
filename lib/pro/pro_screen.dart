@@ -69,16 +69,6 @@ class _ProScreenState extends State<ProScreen> {
             child: Column(
               children: [
                 _Feature(
-                  Icons.text_snippet_outlined,
-                  'Recept szöveges import',
-                  'Illeszd be a recept szövegét, a Kuktám segít feldolgozni.',
-                ),
-                _Feature(
-                  Icons.playlist_add,
-                  'Bevásárlólista szöveges import',
-                  'Másolj be egy listát, ne egyesével add hozzá.',
-                ),
-                _Feature(
                   Icons.calculate_outlined,
                   'Receptátszámítás',
                   'Számold át a mennyiségeket más adagszámra.',

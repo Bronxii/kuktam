@@ -65,7 +65,7 @@ void main() {
     double textScale = 1,
   }) async {
     await tester.pumpWidget(
-      withProAccess(
+      withFreeAccess(
         MaterialApp(
           builder: (context, child) => MediaQuery(
             data: MediaQuery.of(
@@ -97,7 +97,7 @@ void main() {
 
   Future<void> mainScreen(WidgetTester tester, _Recipes repo) async {
     await tester.pumpWidget(
-      withProAccess(
+      withFreeAccess(
         MaterialApp(
           home: MainScreen(
             recipeRepository: repo,
@@ -319,6 +319,8 @@ void main() {
     await tester.tap(find.byType(NavigationDestination).at(2));
     await tester.pumpAndSettle();
     expect(find.byTooltip('Recept importálása'), findsNothing);
+    await tester.tap(find.text('Mégse'));
+    await tester.pumpAndSettle();
     await tester.tap(find.byType(NavigationDestination).first);
     await tester.pumpAndSettle();
     await tester.tap(find.byTooltip('Új recept'));

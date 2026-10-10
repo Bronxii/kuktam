@@ -41,8 +41,6 @@ abstract final class FeatureGate {
   static bool allowed(BuildContext context, ProFeature feature) =>
       check(context, feature) == FeatureAccessDecision.allowed;
   static String title(ProFeature feature) => switch (feature) {
-    ProFeature.recipeTextImport => 'A recept szöveges import',
-    ProFeature.shoppingTextImport => 'A bevásárlólista szöveges import',
     ProFeature.recipeScaling => 'A receptátszámítás',
     ProFeature.scaledRecipeToShopping =>
       'Az átszámított recept bevásárlólistához adása',

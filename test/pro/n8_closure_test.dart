@@ -11,55 +11,56 @@ import 'package:kuktam/pro/profile_pro_card.dart';
 import 'package:kuktam/pro/pro_screen.dart';
 import 'package:kuktam/recipes/domain/services/recipe_text_parser.dart';
 import 'package:kuktam/recipes/presentation/widgets/recipe_import_dialog.dart';
+import 'package:kuktam/recipes/presentation/widgets/recipe_scaling_dialog.dart';
+import 'package:kuktam/recipes/domain/models/recipe.dart';
 import '../billing/fakes.dart' show FakeBilling;
 import '../entitlements/data/entitlement_repository_test.dart'
     show Backend, Clock, Storage, proof;
 import 'pro_ui_test.dart' show UiRepository, PreviewController;
 
 void main() {
-  testWidgets(
-    'real repository expires at execution without stream event or app resume',
-    (tester) async {
-      final clock = Clock();
-      final repo = LocalEntitlementRepository(
-        backend: Backend(),
-        storage: Storage(),
-        clock: clock,
-      );
-      await repo.initializeForUser('a');
-      var parsed = 0;
-      await tester.pumpWidget(
-        FeatureAccessScope(
-          repository: repo,
-          child: MaterialApp(
-            home: Scaffold(
-              body: RecipeImportDialog(
-                parse: (text) {
-                  parsed++;
-                  return const RecipeTextParser().parse(text);
-                },
-              ),
+  testWidgets('text import works after real repository offline grace expires', (
+    tester,
+  ) async {
+    final clock = Clock();
+    final repo = LocalEntitlementRepository(
+      backend: Backend(),
+      storage: Storage(),
+      clock: clock,
+    );
+    await repo.initializeForUser('a');
+    var parsed = 0;
+    await tester.pumpWidget(
+      FeatureAccessScope(
+        repository: repo,
+        child: MaterialApp(
+          home: Scaffold(
+            body: RecipeImportDialog(
+              parse: (text) {
+                parsed++;
+                return const RecipeTextParser().parse(text);
+              },
             ),
           ),
         ),
-      );
-      await tester.pumpAndSettle();
-      await tester.enterText(
-        find.byKey(const ValueKey('recipe-import-text')),
-        'Leves',
-      );
-      await tester.pump();
-      clock.advance(const Duration(days: 30));
-      await tester.tap(find.text('Feldolgozás'));
-      await tester.pumpAndSettle();
-      expect(parsed, 0);
-      expect(find.textContaining('internetkapcsolat szükséges'), findsWidgets);
-      expect(find.text('Kuktám Pro megtekintése'), findsNothing);
-      await tester.pumpWidget(const SizedBox());
-      unawaited(repo.dispose());
-      await tester.pump();
-    },
-  );
+      ),
+    );
+    await tester.pumpAndSettle();
+    await tester.enterText(
+      find.byKey(const ValueKey('recipe-import-text')),
+      'Leves',
+    );
+    await tester.pump();
+    clock.advance(const Duration(days: 30));
+    await tester.tap(find.text('Feldolgozás'));
+    await tester.pumpAndSettle();
+    expect(parsed, 1);
+    expect(find.textContaining('internetkapcsolat szükséges'), findsNothing);
+    expect(find.text('Kuktám Pro megtekintése'), findsNothing);
+    await tester.pumpWidget(const SizedBox());
+    unawaited(repo.dispose());
+    await tester.pump();
+  });
 
   testWidgets(
     'real repository trusted inactive and account switch reach open gate',
@@ -74,11 +75,19 @@ void main() {
       await tester.pumpWidget(
         FeatureAccessScope(
           repository: repo,
-          child: const MaterialApp(home: Scaffold(body: RecipeImportDialog())),
+          child: const MaterialApp(
+            home: Scaffold(
+              body: RecipeScalingDialog(
+                ingredients: [
+                  RecipeIngredient(name: 'Liszt', quantity: 100, unit: 'g'),
+                ],
+              ),
+            ),
+          ),
         ),
       );
       await tester.pumpAndSettle();
-      await tester.enterText(find.byType(TextField), 'A private draft');
+      await tester.enterText(find.byType(TextField), '250');
       backend.reply = (uid) async =>
           proof(uid: uid, active: false, revision: 2);
       await repo.refresh();
@@ -90,7 +99,7 @@ void main() {
       await tester.pumpAndSettle();
       expect(repo.current.uid, 'b');
       expect(repo.current.status, ClientEntitlementStatus.free);
-      expect(find.text('A private draft', skipOffstage: false), findsNothing);
+      expect(find.text('250', skipOffstage: false), findsNothing);
       await tester.pumpWidget(const SizedBox());
       unawaited(repo.dispose());
       await tester.pump();
