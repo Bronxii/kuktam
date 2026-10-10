@@ -1,3 +1,4 @@
+import '../support/feature_access.dart';
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -26,19 +27,21 @@ Future<void> openMultiplier(
   Recipe recipe = original,
 }) async {
   await tester.pumpWidget(
-    MaterialApp(
-      home: Builder(
-        builder: (context) => Scaffold(
-          body: TextButton(
-            onPressed: () => Navigator.of(context).push(
-              MaterialPageRoute<void>(
-                builder: (_) => RecipeDetailsScreen(
-                  recipe: recipe,
-                  addMultiplierShoppingItems: add,
+    withProAccess(
+      MaterialApp(
+        home: Builder(
+          builder: (context) => Scaffold(
+            body: TextButton(
+              onPressed: () => Navigator.of(context).push(
+                MaterialPageRoute<void>(
+                  builder: (_) => RecipeDetailsScreen(
+                    recipe: recipe,
+                    addMultiplierShoppingItems: add,
+                  ),
                 ),
               ),
+              child: const Text('Open'),
             ),
-            child: const Text('Open'),
           ),
         ),
       ),
@@ -215,19 +218,21 @@ void main() {
         'Teszt\nHozzávalók:\n2 bögre liszt\n15 dl tej\nElkészítés:\nAdj hozzá 1/2 dl vizet.',
       );
       await tester.pumpWidget(
-        MaterialApp(
-          home: Builder(
-            builder: (context) => Scaffold(
-              body: TextButton(
-                onPressed: () => Navigator.of(context).push(
-                  MaterialPageRoute<Recipe>(
-                    builder: (_) => AddRecipeScreen(
-                      initialImport: draft,
-                      recipeRepository: repo,
+        withFreeAccess(
+          MaterialApp(
+            home: Builder(
+              builder: (context) => Scaffold(
+                body: TextButton(
+                  onPressed: () => Navigator.of(context).push(
+                    MaterialPageRoute<Recipe>(
+                      builder: (_) => AddRecipeScreen(
+                        initialImport: draft,
+                        recipeRepository: repo,
+                      ),
                     ),
                   ),
+                  child: const Text('Open'),
                 ),
-                child: const Text('Open'),
               ),
             ),
           ),
@@ -258,17 +263,19 @@ void main() {
       expect(saved.preparation, 'Adj hozzá 1/2 dl vizet.');
       final calls = <(String, double, String)>[];
       await tester.pumpWidget(
-        MaterialApp(
-          home: RecipeDetailsScreen(
-            recipe: saved,
-            addScalingShoppingItems: (items) async {
-              for (final item in items) {
-                final name = item.name;
-                final quantity = item.quantity;
-                final unit = item.unit;
-                calls.add((name, quantity, unit));
-              }
-            },
+        withProAccess(
+          MaterialApp(
+            home: RecipeDetailsScreen(
+              recipe: saved,
+              addScalingShoppingItems: (items) async {
+                for (final item in items) {
+                  final name = item.name;
+                  final quantity = item.quantity;
+                  final unit = item.unit;
+                  calls.add((name, quantity, unit));
+                }
+              },
+            ),
           ),
         ),
       );

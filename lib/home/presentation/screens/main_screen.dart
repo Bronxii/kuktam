@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../pro/feature_gate.dart';
 import 'package:share_plus/share_plus.dart';
 import '../../../shopping/domain/shopping_quantity_formatter.dart';
 
@@ -15,8 +16,12 @@ import '../../../recipes/data/repositories/recipe_repository.dart';
 import '../../../recipes/domain/models/recipe.dart';
 
 class MainScreen extends StatefulWidget {
-  const MainScreen({super.key, this.tabBodies, this.recipeRepository, this.shoppingRepository})
-      : assert(tabBodies == null || tabBodies.length == 3);
+  const MainScreen({
+    super.key,
+    this.tabBodies,
+    this.recipeRepository,
+    this.shoppingRepository,
+  }) : assert(tabBodies == null || tabBodies.length == 3);
 
   // Optional dependencies keep navigation tests independent of Firebase.
   final List<Widget>? tabBodies;
@@ -30,7 +35,8 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> {
   int _selectedIndex = 0;
 
-  late final _shoppingRepository = widget.shoppingRepository ?? ShoppingRepository();
+  late final _shoppingRepository =
+      widget.shoppingRepository ?? ShoppingRepository();
 
   static const List<String> _titles = [
     'Receptek',
@@ -45,8 +51,11 @@ class _MainScreenState extends State<MainScreen> {
     if (_importingRecipe) return;
     _importingRecipe = true;
     try {
+      final operationUid = FeatureGate.state(context).uid;
       final draft = await showRecipeImportDialog(context);
+      if (!mounted || FeatureGate.state(context).uid != operationUid) return;
       if (!mounted || draft == null) return;
+      if (!FeatureGate.execute(context, ProFeature.recipeTextImport)) return;
       final saved = await Navigator.of(context).push<Recipe>(
         MaterialPageRoute<Recipe>(
           builder: (_) => AddRecipeScreen(
@@ -63,56 +72,66 @@ class _MainScreenState extends State<MainScreen> {
     }
   }
 
-  List<Widget> get _screens => widget.tabBodies ?? [
-    RecipesScreen(key: ValueKey(_recipesVersion), recipeRepository: widget.recipeRepository),
-    ShoppingListScreen(shoppingRepository: _shoppingRepository),
-    WhatToCookScreen(recipeRepository: widget.recipeRepository),
-  ];
+  List<Widget> get _screens =>
+      widget.tabBodies ??
+      [
+        RecipesScreen(
+          key: ValueKey(_recipesVersion),
+          recipeRepository: widget.recipeRepository,
+        ),
+        ShoppingListScreen(shoppingRepository: _shoppingRepository),
+        WhatToCookScreen(recipeRepository: widget.recipeRepository),
+      ];
   bool _sharingShopping = false;
   Future<void> _shareShoppingList() async {
     if (_sharingShopping) return;
     _sharingShopping = true;
     try {
-    final items = await _shoppingRepository.watchShoppingItems().first;
+      final items = await _shoppingRepository.watchShoppingItems().first;
 
-    if (!mounted) {
-      return;
-    }
+      if (!mounted) {
+        return;
+      }
 
-    if (items.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('A bevásárlólista üres.'),
-        ),
+      if (items.isEmpty) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('A bevásárlólista üres.')));
+        return;
+      }
+
+      final buffer = StringBuffer();
+
+      buffer.writeln('Bevásárlólista:');
+      buffer.writeln();
+
+      for (final item in items) {
+        buffer.writeln(
+          '• ${item.name} – ${formatShoppingAmount(item.quantity, item.unit)}',
+        );
+      }
+      buffer.writeln();
+      buffer.writeln('──────────────');
+      buffer.writeln('Készült a Kuktám alkalmazással');
+
+      await SharePlus.instance.share(
+        ShareParams(text: buffer.toString().trim()),
       );
-      return;
-    }
-
-    final buffer = StringBuffer();
-
-    buffer.writeln('Bevásárlólista:');
-    buffer.writeln();
-
-    for (final item in items) {
-      buffer.writeln('• ${item.name} – ${formatShoppingAmount(item.quantity, item.unit)}');
-    }
-    buffer.writeln();
-    buffer.writeln('──────────────');
-    buffer.writeln('Készült a Kuktám alkalmazással');
-
-    await SharePlus.instance.share(
-      ShareParams(
-        text: buffer.toString().trim(),
-      ),
-    );
     } catch (_) {
-      if (mounted) { ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-        content: Text('Nem sikerült megosztani a bevásárlólistát. Próbáld újra.'),
-      )); }
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              'Nem sikerült megosztani a bevásárlólistát. Próbáld újra.',
+            ),
+          ),
+        );
+      }
     } finally {
       _sharingShopping = false;
     }
   }
+
   Widget? _buildFloatingActionButton(BuildContext context) {
     switch (_selectedIndex) {
       case 0:
@@ -120,7 +139,8 @@ class _MainScreenState extends State<MainScreen> {
           onPressed: () async {
             await Navigator.of(context).push(
               MaterialPageRoute<void>(
-                builder: (context) => AddRecipeScreen(recipeRepository: widget.recipeRepository),
+                builder: (context) =>
+                    AddRecipeScreen(recipeRepository: widget.recipeRepository),
               ),
             );
 
@@ -165,13 +185,19 @@ class _MainScreenState extends State<MainScreen> {
           if (_selectedIndex == 0)
             IconButton(
               tooltip: 'Recept importálása',
-              icon: const Icon(Icons.file_download_outlined),
+              icon: const ProFeatureIcon(
+                feature: ProFeature.recipeTextImport,
+                icon: Icons.file_download_outlined,
+              ),
               onPressed: _importRecipe,
             ),
           if (_selectedIndex == 1)
             IconButton(
               tooltip: 'Importálás',
-              icon: const Icon(Icons.file_download_outlined),
+              icon: const ProFeatureIcon(
+                feature: ProFeature.shoppingTextImport,
+                icon: Icons.file_download_outlined,
+              ),
               onPressed: () => showShoppingImportDialog(context),
             ),
           if (_selectedIndex == 1)
@@ -185,22 +211,22 @@ class _MainScreenState extends State<MainScreen> {
             icon: const Icon(Icons.account_circle_outlined),
             onPressed: () {
               Navigator.of(context).push(
-                MaterialPageRoute<void>(
-                  builder: (context) => SettingsScreen(),
-                ),
+                MaterialPageRoute<void>(builder: (context) => SettingsScreen()),
               );
             },
           ),
         ],
       ),
-      body: IndexedStack(
-        index: _selectedIndex,
-        children: _screens,
-      ),
+      body: IndexedStack(index: _selectedIndex, children: _screens),
       floatingActionButton: _buildFloatingActionButton(context),
       bottomNavigationBar: NavigationBar(
         selectedIndex: _selectedIndex,
-        onDestinationSelected: (int index) {
+        onDestinationSelected: (int index) async {
+          if (index == 2 &&
+              (!await FeatureGate.request(context, ProFeature.whatToCook) ||
+                  !mounted)) {
+            return;
+          }
           setState(() {
             _selectedIndex = index;
           });
@@ -217,7 +243,10 @@ class _MainScreenState extends State<MainScreen> {
             label: 'Lista',
           ),
           NavigationDestination(
-            icon: Icon(Icons.restaurant_menu_outlined),
+            icon: ProFeatureIcon(
+              feature: ProFeature.whatToCook,
+              icon: Icons.restaurant_menu_outlined,
+            ),
             selectedIcon: Icon(Icons.restaurant_menu),
             label: 'Mit főzzek?',
           ),

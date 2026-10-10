@@ -1,27 +1,45 @@
+import '../../../pro/feature_gate.dart';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import '../../domain/models/recipe_import_draft.dart';
 import '../../domain/services/recipe_text_parser.dart';
 
-Future<RecipeImportDraft?> showRecipeImportDialog(BuildContext context) =>
-    showDialog<RecipeImportDraft>(
-      context: context,
-      barrierDismissible: false,
-      builder: (_) => const RecipeImportDialog(),
-    );
+Future<RecipeImportDraft?> showRecipeImportDialog(BuildContext context) async {
+  if (!await FeatureGate.request(context, ProFeature.recipeTextImport) ||
+      !context.mounted) {
+    return null;
+  }
+  return showDialog<RecipeImportDraft>(
+    context: context,
+    barrierDismissible: false,
+    builder: (_) => const RecipeImportDialog(),
+  );
+}
 
-class RecipeImportDialog extends StatefulWidget {
+class RecipeImportDialog extends StatelessWidget {
   const RecipeImportDialog({super.key, this.parse});
+  final RecipeImportDraft Function(String)? parse;
+  static const maxCharacters = 20000;
+  @override
+  Widget build(BuildContext context) => FeatureBoundary(
+    feature: ProFeature.recipeTextImport,
+    dialog: true,
+    builder: (_) => _RecipeImportBody(parse: parse),
+  );
+}
+
+class _RecipeImportBody extends StatefulWidget {
+  const _RecipeImportBody({this.parse});
 
   /// Optional pure parser dependency for error-path tests.
   final RecipeImportDraft Function(String)? parse;
   static const maxCharacters = 20000;
 
   @override
-  State<RecipeImportDialog> createState() => _RecipeImportDialogState();
+  State<_RecipeImportBody> createState() => _RecipeImportBodyState();
 }
 
-class _RecipeImportDialogState extends State<RecipeImportDialog> {
+class _RecipeImportBodyState extends State<_RecipeImportBody> {
   final _text = TextEditingController();
   String? _error;
   bool _confirming = false;
@@ -34,9 +52,10 @@ class _RecipeImportDialogState extends State<RecipeImportDialog> {
   }
 
   void _process() {
+    if (!FeatureGate.execute(context, ProFeature.recipeTextImport)) return;
     if (_finished || _confirming || _text.text.trim().isEmpty) return;
     // Same Unicode code-point convention as shopping import; never truncate.
-    if (_text.text.runes.length > RecipeImportDialog.maxCharacters) {
+    if (_text.text.runes.length > _RecipeImportBody.maxCharacters) {
       setState(
         () => _error =
             'A beillesztett recept túl hosszú. Legfeljebb 20 000 karakter dolgozható fel.',

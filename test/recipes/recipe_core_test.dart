@@ -1,3 +1,4 @@
+import '../support/feature_access.dart';
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -93,17 +94,19 @@ Future<void> openCoreEditor(
   Recipe? recipe,
 }) async {
   await tester.pumpWidget(
-    MaterialApp(
-      home: Builder(
-        builder: (context) => Scaffold(
-          body: TextButton(
-            onPressed: () => Navigator.of(context).push(
-              MaterialPageRoute<Recipe>(
-                builder: (_) =>
-                    AddRecipeScreen(recipe: recipe, recipeRepository: repo),
+    withFreeAccess(
+      MaterialApp(
+        home: Builder(
+          builder: (context) => Scaffold(
+            body: TextButton(
+              onPressed: () => Navigator.of(context).push(
+                MaterialPageRoute<Recipe>(
+                  builder: (_) =>
+                      AddRecipeScreen(recipe: recipe, recipeRepository: repo),
+                ),
               ),
+              child: const Text('Open'),
             ),
-            child: const Text('Open'),
           ),
         ),
       ),
@@ -140,12 +143,14 @@ void main() {
       final b = CoreRepository()
         ..recipes.add(coreRecipe(name: 'B saját recept'));
       await tester.pumpWidget(
-        MaterialApp(
-          home: AuthGate(
-            authRepository: AuthRepository(firebaseAuth: auth),
-            mainBuilder: (_) => Scaffold(
-              body: RecipesScreen(
-                recipeRepository: auth.currentUser!.uid == 'A' ? a : b,
+        withFreeAccess(
+          MaterialApp(
+            home: AuthGate(
+              authRepository: AuthRepository(firebaseAuth: auth),
+              mainBuilder: (_) => Scaffold(
+                body: RecipesScreen(
+                  recipeRepository: auth.currentUser!.uid == 'A' ? a : b,
+                ),
               ),
             ),
           ),
@@ -236,9 +241,11 @@ void main() {
     (tester) async {
       final repo = CoreRepository()..pendingLoad = Completer<List<Recipe>>();
       Future<void> open() => tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: RecipesScreen(key: UniqueKey(), recipeRepository: repo),
+        withFreeAccess(
+          MaterialApp(
+            home: Scaffold(
+              body: RecipesScreen(key: UniqueKey(), recipeRepository: repo),
+            ),
           ),
         ),
       );
@@ -458,8 +465,10 @@ void main() {
     (tester) async {
       final repo = CoreRepository()..recipes.add(coreRecipe());
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(body: RecipesScreen(recipeRepository: repo)),
+        withFreeAccess(
+          MaterialApp(
+            home: Scaffold(body: RecipesScreen(recipeRepository: repo)),
+          ),
         ),
       );
       await tester.pumpAndSettle();
@@ -514,8 +523,10 @@ void main() {
     (tester) async {
       final repo = CoreRepository()..recipes.add(coreRecipe());
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(body: RecipesScreen(recipeRepository: repo)),
+        withFreeAccess(
+          MaterialApp(
+            home: Scaffold(body: RecipesScreen(recipeRepository: repo)),
+          ),
         ),
       );
       await tester.pumpAndSettle();

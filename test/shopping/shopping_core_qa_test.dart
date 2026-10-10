@@ -1,3 +1,4 @@
+import '../support/feature_access.dart';
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -99,15 +100,17 @@ class ShoppingFake implements ShoppingRepository {
 
 Future<void> openItem(WidgetTester tester, ShoppingFake repo) async {
   await tester.pumpWidget(
-    MaterialApp(
-      home: Builder(
-        builder: (context) => Scaffold(
-          body: TextButton(
-            onPressed: () => showShoppingItemDialog(
-              context: context,
-              shoppingRepository: repo,
+    withFreeAccess(
+      MaterialApp(
+        home: Builder(
+          builder: (context) => Scaffold(
+            body: TextButton(
+              onPressed: () => showShoppingItemDialog(
+                context: context,
+                shoppingRepository: repo,
+              ),
+              child: const Text('Open'),
             ),
-            child: const Text('Open'),
           ),
         ),
       ),
@@ -134,18 +137,20 @@ void main() {
       ]
       ..pending = Completer<void>();
     await tester.pumpWidget(
-      MaterialApp(
-        home: Builder(
-          builder: (context) => Scaffold(
-            body: TextButton(
-              onPressed: () => Navigator.of(context).push(
-                MaterialPageRoute<void>(
-                  builder: (_) => Scaffold(
-                    body: ShoppingListScreen(shoppingRepository: repo),
+      withFreeAccess(
+        MaterialApp(
+          home: Builder(
+            builder: (context) => Scaffold(
+              body: TextButton(
+                onPressed: () => Navigator.of(context).push(
+                  MaterialPageRoute<void>(
+                    builder: (_) => Scaffold(
+                      body: ShoppingListScreen(shoppingRepository: repo),
+                    ),
                   ),
                 ),
+                child: const Text('Open list'),
               ),
-              child: const Text('Open list'),
             ),
           ),
         ),
@@ -197,8 +202,10 @@ void main() {
     (tester) async {
       final repo = ShoppingFake()..waitLoad = true;
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(body: ShoppingListScreen(shoppingRepository: repo)),
+        withFreeAccess(
+          MaterialApp(
+            home: Scaffold(body: ShoppingListScreen(shoppingRepository: repo)),
+          ),
         ),
       );
       await tester.pump();
@@ -226,8 +233,10 @@ void main() {
         ..items = [milk]
         ..fail = true;
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(body: ShoppingListScreen(shoppingRepository: repo)),
+        withFreeAccess(
+          MaterialApp(
+            home: Scaffold(body: ShoppingListScreen(shoppingRepository: repo)),
+          ),
         ),
       );
       await tester.pumpAndSettle();
@@ -260,8 +269,10 @@ void main() {
         ..items = [milk]
         ..fail = true;
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(body: ShoppingListScreen(shoppingRepository: repo)),
+        withFreeAccess(
+          MaterialApp(
+            home: Scaffold(body: ShoppingListScreen(shoppingRepository: repo)),
+          ),
         ),
       );
       await tester.pumpAndSettle();
@@ -341,8 +352,10 @@ void main() {
       ..items = [milk]
       ..fail = true;
     await tester.pumpWidget(
-      MaterialApp(
-        home: Scaffold(body: ShoppingListScreen(shoppingRepository: repo)),
+      withFreeAccess(
+        MaterialApp(
+          home: Scaffold(body: ShoppingListScreen(shoppingRepository: repo)),
+        ),
       ),
     );
     await tester.pumpAndSettle();
@@ -384,12 +397,14 @@ void main() {
           ),
         ];
       await tester.pumpWidget(
-        MaterialApp(
-          home: AuthGate(
-            authRepository: AuthRepository(firebaseAuth: auth),
-            mainBuilder: (_) => Scaffold(
-              body: ShoppingListScreen(
-                shoppingRepository: auth.currentUser!.uid == 'A' ? a : b,
+        withFreeAccess(
+          MaterialApp(
+            home: AuthGate(
+              authRepository: AuthRepository(firebaseAuth: auth),
+              mainBuilder: (_) => Scaffold(
+                body: ShoppingListScreen(
+                  shoppingRepository: auth.currentUser!.uid == 'A' ? a : b,
+                ),
               ),
             ),
           ),
@@ -447,10 +462,12 @@ void main() {
         ),
       );
       await tester.pumpWidget(
-        MaterialApp(
-          home: MainScreen(
-            shoppingRepository: repo,
-            tabBodies: const [SizedBox(), SizedBox(), SizedBox()],
+        withFreeAccess(
+          MaterialApp(
+            home: MainScreen(
+              shoppingRepository: repo,
+              tabBodies: const [SizedBox(), SizedBox(), SizedBox()],
+            ),
           ),
         ),
       );

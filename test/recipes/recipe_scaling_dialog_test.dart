@@ -1,3 +1,4 @@
+import '../support/feature_access.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
@@ -8,58 +9,112 @@ import 'package:kuktam/recipes/presentation/widgets/recipe_scaling_dialog.dart';
 import 'package:kuktam/recipes/presentation/widgets/scaling_perf.dart';
 
 void main() {
-  testWidgets('perf: focus and inset sweep do not scale or format', (tester) async {
-    final messages = <Map<String, dynamic>>[];
-    final previousPrint = debugPrint;
-    debugPrint = (String? message, {int? wrapWidth}) {
-      if (message != null && message.startsWith('[SCALING_PERF] ')) {
-        messages.add(jsonDecode(message.substring('[SCALING_PERF] '.length)) as Map<String, dynamic>);
+  testWidgets(
+    'perf: focus and inset sweep do not scale or format',
+    (tester) async {
+      final messages = <Map<String, dynamic>>[];
+      final previousPrint = debugPrint;
+      debugPrint = (String? message, {int? wrapWidth}) {
+        if (message != null && message.startsWith('[SCALING_PERF] ')) {
+          messages.add(
+            jsonDecode(message.substring('[SCALING_PERF] '.length))
+                as Map<String, dynamic>,
+          );
+        }
+      };
+      addTearDown(() => debugPrint = previousPrint);
+      tester.view.physicalSize = const Size(400, 850);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      addTearDown(tester.view.resetViewInsets);
+      final oldBuild = debugProfileBuildsEnabled;
+      for (final count in [3, 60]) {
+        messages.clear();
+        await tester.pumpWidget(
+          withProAccess(
+            MaterialApp(
+              home: Scaffold(
+                body: RecipeScalingDialog(
+                  ingredients: List.generate(
+                    count,
+                    (i) => RecipeIngredient(
+                      name: 'Hozzávaló $i',
+                      quantity: 100,
+                      unit: 'g',
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+        await tester.tap(find.byKey(const ValueKey('scaling-quantity-0')));
+        await tester.pump();
+        for (var step = 1; step <= 15; step++) {
+          tester.view.viewInsets = FakeViewPadding(bottom: step * 20);
+          await tester.pump(const Duration(milliseconds: 16));
+        }
+        await tester.pumpAndSettle();
+        expect(tester.takeException(), isNull);
+        await tester.pumpWidget(const SizedBox());
+        expect(
+          messages.where(
+            (e) => [
+              'input',
+              'scaleAndValidate',
+              'formatOnBlur',
+            ].contains(e['event']),
+          ),
+          isEmpty,
+        );
+        expect(
+          messages.where((e) => e['event'] == 'focus' && e['focused'] == true),
+          isNotEmpty,
+        );
+        expect(messages.where((e) => e['event'] == 'metrics'), isNotEmpty);
+        final builtRows = messages
+            .where((e) => e['event'] == 'row.build')
+            .map((e) => e['row'])
+            .toSet();
+        if (count == 60) expect(builtRows.length, lessThan(count));
+        // A shrinking viewport must not rebuild existing rows on each inset tick.
+        for (final row in builtRows) {
+          expect(
+            messages
+                .where((e) => e['event'] == 'row.build' && e['row'] == row)
+                .length,
+            1,
+          );
+          expect(
+            messages
+                .where(
+                  (e) => e['event'] == 'row.layoutBuilder' && e['row'] == row,
+                )
+                .length,
+            1,
+          );
+        }
+        expect(
+          messages.where((e) => e['event'] == 'dialog.constraints').length,
+          greaterThan(1),
+        );
+        final counts = <String, int>{};
+        for (final event in messages) {
+          final name = event['event'] as String;
+          counts[name] = (counts[name] ?? 0) + 1;
+        }
+        previousPrint(
+          '[SCALING_PERF_TEST] rows=$count events=$counts builtRows=${builtRows.length}',
+        );
+        expect(debugProfileBuildsEnabled, oldBuild);
+        tester.view.resetViewInsets();
       }
-    };
-    addTearDown(() => debugPrint = previousPrint);
-    tester.view.physicalSize = const Size(400, 850);
-    tester.view.devicePixelRatio = 1;
-    addTearDown(tester.view.resetPhysicalSize);
-    addTearDown(tester.view.resetDevicePixelRatio);
-    addTearDown(tester.view.resetViewInsets);
-    final oldBuild = debugProfileBuildsEnabled;
-    for (final count in [3, 60]) {
-      messages.clear();
-      await tester.pumpWidget(MaterialApp(home: Scaffold(body: RecipeScalingDialog(
-        ingredients: List.generate(count, (i) => RecipeIngredient(name: 'Hozzávaló $i', quantity: 100, unit: 'g')),
-      ))));
-      await tester.pumpAndSettle();
-      await tester.tap(find.byKey(const ValueKey('scaling-quantity-0')));
-      await tester.pump();
-      for (var step = 1; step <= 15; step++) {
-        tester.view.viewInsets = FakeViewPadding(bottom: step * 20);
-        await tester.pump(const Duration(milliseconds: 16));
-      }
-      await tester.pumpAndSettle();
-      expect(tester.takeException(), isNull);
-      await tester.pumpWidget(const SizedBox());
-      expect(messages.where((e) => ['input', 'scaleAndValidate', 'formatOnBlur'].contains(e['event'])), isEmpty);
-      expect(messages.where((e) => e['event'] == 'focus' && e['focused'] == true), isNotEmpty);
-      expect(messages.where((e) => e['event'] == 'metrics'), isNotEmpty);
-      final builtRows = messages.where((e) => e['event'] == 'row.build').map((e) => e['row']).toSet();
-      if (count == 60) expect(builtRows.length, lessThan(count));
-      // A shrinking viewport must not rebuild existing rows on each inset tick.
-      for (final row in builtRows) {
-        expect(messages.where((e) => e['event'] == 'row.build' && e['row'] == row).length, 1);
-        expect(messages.where((e) => e['event'] == 'row.layoutBuilder' && e['row'] == row).length, 1);
-      }
-      expect(messages.where((e) => e['event'] == 'dialog.constraints').length, greaterThan(1));
-      final counts = <String, int>{};
-      for (final event in messages) {
-        final name = event['event'] as String;
-        counts[name] = (counts[name] ?? 0) + 1;
-      }
-      previousPrint('[SCALING_PERF_TEST] rows=$count events=$counts builtRows=${builtRows.length}');
-      expect(debugProfileBuildsEnabled, oldBuild);
-      tester.view.resetViewInsets();
-    }
-    debugPrint = previousPrint;
-  }, skip: !scalingPerfEnabled);
+      debugPrint = previousPrint;
+    },
+    skip: !scalingPerfEnabled,
+  );
 
   const ingredients = [
     RecipeIngredient(name: 'Liszt', quantity: 1250, unit: 'g'),
@@ -76,7 +131,9 @@ void main() {
 
   Future<void> openDialog(WidgetTester tester) async {
     await tester.pumpWidget(
-      const MaterialApp(home: RecipeDetailsScreen(recipe: recipe)),
+      withProAccess(
+        const MaterialApp(home: RecipeDetailsScreen(recipe: recipe)),
+      ),
     );
     await tester.tap(find.text('Átszámítás'));
     await tester.pumpAndSettle();
@@ -226,8 +283,10 @@ void main() {
 
   Future<void> openBasic(WidgetTester tester) async {
     await tester.pumpWidget(
-      const MaterialApp(
-        home: Scaffold(body: RecipeScalingDialog(ingredients: basic)),
+      withProAccess(
+        const MaterialApp(
+          home: Scaffold(body: RecipeScalingDialog(ingredients: basic)),
+        ),
       ),
     );
     await tester.pumpAndSettle();
@@ -418,13 +477,15 @@ void main() {
 
   testWidgets('duplicate ingredient names still use row index', (tester) async {
     await tester.pumpWidget(
-      const MaterialApp(
-        home: Scaffold(
-          body: RecipeScalingDialog(
-            ingredients: [
-              RecipeIngredient(name: 'Liszt', quantity: 200, unit: 'g'),
-              RecipeIngredient(name: 'Liszt', quantity: 500, unit: 'g'),
-            ],
+      withProAccess(
+        const MaterialApp(
+          home: Scaffold(
+            body: RecipeScalingDialog(
+              ingredients: [
+                RecipeIngredient(name: 'Liszt', quantity: 200, unit: 'g'),
+                RecipeIngredient(name: 'Liszt', quantity: 500, unit: 'g'),
+              ],
+            ),
           ),
         ),
       ),
@@ -465,24 +526,26 @@ void main() {
     List<RecipeIngredient> items = basic,
   }) async {
     await tester.pumpWidget(
-      MaterialApp(
-        home: Builder(
-          builder: (context) => Scaffold(
-            body: TextButton(
-              onPressed: () => Navigator.of(context).push(
-                MaterialPageRoute<void>(
-                  builder: (_) => RecipeDetailsScreen(
-                    recipe: Recipe(
-                      name: 'Shopping test',
-                      ingredients: items,
-                      spices: const [RecipeSpice(name: 'Só')],
-                      preparation: '',
+      withProAccess(
+        MaterialApp(
+          home: Builder(
+            builder: (context) => Scaffold(
+              body: TextButton(
+                onPressed: () => Navigator.of(context).push(
+                  MaterialPageRoute<void>(
+                    builder: (_) => RecipeDetailsScreen(
+                      recipe: Recipe(
+                        name: 'Shopping test',
+                        ingredients: items,
+                        spices: const [RecipeSpice(name: 'Só')],
+                        preparation: '',
+                      ),
+                      addScalingShoppingItems: add,
                     ),
-                    addScalingShoppingItems: add,
                   ),
                 ),
+                child: const Text('Recept megnyitása'),
               ),
-              child: const Text('Recept megnyitása'),
             ),
           ),
         ),
@@ -651,31 +714,33 @@ void main() {
     (tester) async {
       final calls = <(double, String)>[];
       await tester.pumpWidget(
-        MaterialApp(
-          home: RecipeDetailsScreen(
-            recipe: const Recipe(
-              name: 'Multiplier',
-              ingredients: [
-                RecipeIngredient(name: 'A', quantity: 178.28, unit: 'g'),
-                RecipeIngredient(name: 'B', quantity: 1062.5, unit: 'g'),
-                RecipeIngredient(name: 'C', quantity: 178.28, unit: 'ml'),
-                RecipeIngredient(name: 'D', quantity: 662.5, unit: 'ml'),
-                RecipeIngredient(name: 'E', quantity: 4.41, unit: 'db'),
-                RecipeIngredient(name: 'F', quantity: 2.205, unit: 'db'),
-                RecipeIngredient(name: 'G', quantity: 0.44, unit: 'tk'),
-                RecipeIngredient(name: 'H', quantity: 0.59, unit: 'ek'),
-                RecipeIngredient(name: 'I', quantity: 0.835, unit: 'doboz'),
-              ],
-              spices: [],
-              preparation: '',
+        withProAccess(
+          MaterialApp(
+            home: RecipeDetailsScreen(
+              recipe: const Recipe(
+                name: 'Multiplier',
+                ingredients: [
+                  RecipeIngredient(name: 'A', quantity: 178.28, unit: 'g'),
+                  RecipeIngredient(name: 'B', quantity: 1062.5, unit: 'g'),
+                  RecipeIngredient(name: 'C', quantity: 178.28, unit: 'ml'),
+                  RecipeIngredient(name: 'D', quantity: 662.5, unit: 'ml'),
+                  RecipeIngredient(name: 'E', quantity: 4.41, unit: 'db'),
+                  RecipeIngredient(name: 'F', quantity: 2.205, unit: 'db'),
+                  RecipeIngredient(name: 'G', quantity: 0.44, unit: 'tk'),
+                  RecipeIngredient(name: 'H', quantity: 0.59, unit: 'ek'),
+                  RecipeIngredient(name: 'I', quantity: 0.835, unit: 'doboz'),
+                ],
+                spices: [],
+                preparation: '',
+              ),
+              addMultiplierShoppingItems: (items) async {
+                for (final item in items) {
+                  final quantity = item.quantity;
+                  final unit = item.unit;
+                  calls.add((quantity, unit));
+                }
+              },
             ),
-            addMultiplierShoppingItems: (items) async {
-              for (final item in items) {
-                final quantity = item.quantity;
-                final unit = item.unit;
-                calls.add((quantity, unit));
-              }
-            },
           ),
         ),
       );
@@ -707,7 +772,9 @@ void main() {
     tester,
   ) async {
     await tester.pumpWidget(
-      const MaterialApp(home: RecipeDetailsScreen(recipe: recipe)),
+      withProAccess(
+        const MaterialApp(home: RecipeDetailsScreen(recipe: recipe)),
+      ),
     );
     final button = find.widgetWithText(FilledButton, 'Bevásárlólistához adás');
     await tester.scrollUntilVisible(button, 300);
@@ -748,22 +815,24 @@ void main() {
         ),
       );
       await tester.pumpWidget(
-        MaterialApp(
-          builder: (context, child) => MediaQuery(
-            data: MediaQuery.of(
-              context,
-            ).copyWith(textScaler: TextScaler.linear(scenario.scale)),
-            child: child!,
-          ),
-          home: Scaffold(
-            body: Builder(
-              builder: (context) => TextButton(
-                onPressed: () => showDialog<void>(
-                  context: context,
-                  barrierDismissible: false,
-                  builder: (_) => RecipeScalingDialog(ingredients: many),
+        withProAccess(
+          MaterialApp(
+            builder: (context, child) => MediaQuery(
+              data: MediaQuery.of(
+                context,
+              ).copyWith(textScaler: TextScaler.linear(scenario.scale)),
+              child: child!,
+            ),
+            home: Scaffold(
+              body: Builder(
+                builder: (context) => TextButton(
+                  onPressed: () => showDialog<void>(
+                    context: context,
+                    barrierDismissible: false,
+                    builder: (_) => RecipeScalingDialog(ingredients: many),
+                  ),
+                  child: const Text('Nyitás'),
                 ),
-                child: const Text('Nyitás'),
               ),
             ),
           ),

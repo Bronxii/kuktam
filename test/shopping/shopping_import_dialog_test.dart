@@ -1,3 +1,4 @@
+import '../support/feature_access.dart';
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:kuktam/shopping/data/repositories/shopping_repository.dart';
@@ -12,18 +13,21 @@ void main() {
     Future<void> Function(List<ShoppingItemInput>)? addItems,
   }) async {
     await tester.pumpWidget(
-      MaterialApp(
-        home: Scaffold(
-          body: Builder(
-            builder: (context) => TextButton(
-              onPressed: () => addItems == null
-                  ? showShoppingImportDialog(context)
-                  : showDialog<void>(
-                      context: context,
-                      barrierDismissible: false,
-                      builder: (_) => ShoppingImportDialog(addItems: addItems),
-                    ),
-              child: const Text('Importálás'),
+      withProAccess(
+        MaterialApp(
+          home: Scaffold(
+            body: Builder(
+              builder: (context) => TextButton(
+                onPressed: () => addItems == null
+                    ? showShoppingImportDialog(context)
+                    : showDialog<void>(
+                        context: context,
+                        barrierDismissible: false,
+                        builder: (_) =>
+                            ShoppingImportDialog(addItems: addItems),
+                      ),
+                child: const Text('Importálás'),
+              ),
             ),
           ),
         ),

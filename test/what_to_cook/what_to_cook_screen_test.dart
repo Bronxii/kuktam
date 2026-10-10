@@ -1,3 +1,4 @@
+import '../support/feature_access.dart';
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -38,8 +39,10 @@ void main() {
           recipe('B étel', ['tojás', 'liszt', 'tej']),
         ]);
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(body: WhatToCookScreen(recipeRepository: repo)),
+        withProAccess(
+          MaterialApp(
+            home: Scaffold(body: WhatToCookScreen(recipeRepository: repo)),
+          ),
         ),
       );
       await tester.pumpAndSettle();
@@ -96,8 +99,10 @@ void main() {
     (tester) async {
       final repo = CookRepository()..wait = true;
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(body: WhatToCookScreen(recipeRepository: repo)),
+        withProAccess(
+          MaterialApp(
+            home: Scaffold(body: WhatToCookScreen(recipeRepository: repo)),
+          ),
         ),
       );
       await tester.pump();
@@ -122,12 +127,14 @@ void main() {
       final a = CookRepository()..recipes.add(recipe('A titkos', ['tojás']));
       final b = CookRepository()..recipes.add(recipe('B saját', ['liszt']));
       await tester.pumpWidget(
-        MaterialApp(
-          home: AuthGate(
-            authRepository: AuthRepository(firebaseAuth: auth),
-            mainBuilder: (_) => Scaffold(
-              body: WhatToCookScreen(
-                recipeRepository: auth.currentUser!.uid == 'A' ? a : b,
+        withProAccess(
+          MaterialApp(
+            home: AuthGate(
+              authRepository: AuthRepository(firebaseAuth: auth),
+              mainBuilder: (_) => Scaffold(
+                body: WhatToCookScreen(
+                  recipeRepository: auth.currentUser!.uid == 'A' ? a : b,
+                ),
               ),
             ),
           ),

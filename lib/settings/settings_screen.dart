@@ -6,6 +6,8 @@ import 'package:url_launcher/url_launcher.dart';
 import 'screens/privacy_screen.dart';
 import '../features/auth/data/repositories/account_deletion_repository.dart';
 import '../features/auth/presentation/widgets/account_deletion_dialog.dart';
+import '../pro/monetization_host.dart';
+import '../pro/profile_pro_card.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key, this.authRepository, this.deletionRepository});
@@ -36,6 +38,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         barrierDismissible: false,
         builder: (_) => AccountDeletionDialog(
           repository: repository,
+          hasPro: ProScope.maybeOf(context)?.isPro ?? false,
         ),
       );
       if (deleted == true && navigator.mounted) {
@@ -114,6 +117,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       body: ListView(
         children: [
           const SizedBox(height: 8),
+          ProfileProCard(controller: ProScope.maybeOf(context)),
 
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),

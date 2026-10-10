@@ -1,3 +1,4 @@
+import '../../../pro/feature_gate.dart';
 import 'dart:async';
 import 'dart:math' as math;
 
@@ -8,23 +9,39 @@ import '../../domain/models/recipe.dart';
 import '../../domain/services/recipe_scaler.dart';
 import 'scaling_perf.dart';
 
-typedef AddScalingShoppingItems = Future<void> Function(List<ShoppingItemInput> items);
+typedef AddScalingShoppingItems =
+    Future<void> Function(List<ShoppingItemInput> items);
 
-class RecipeScalingDialog extends StatefulWidget {
+class RecipeScalingDialog extends StatelessWidget {
   const RecipeScalingDialog({
     super.key,
     required this.ingredients,
     this.addShoppingItems,
   });
+  final List<RecipeIngredient> ingredients;
+  final AddScalingShoppingItems? addShoppingItems;
+  @override
+  Widget build(BuildContext context) => FeatureBoundary(
+    feature: ProFeature.recipeScaling,
+    dialog: true,
+    builder: (_) => _RecipeScalingBody(
+      ingredients: ingredients,
+      addShoppingItems: addShoppingItems,
+    ),
+  );
+}
+
+class _RecipeScalingBody extends StatefulWidget {
+  const _RecipeScalingBody({required this.ingredients, this.addShoppingItems});
 
   final List<RecipeIngredient> ingredients;
   final AddScalingShoppingItems? addShoppingItems;
 
   @override
-  State<RecipeScalingDialog> createState() => _RecipeScalingDialogState();
+  State<_RecipeScalingBody> createState() => _RecipeScalingBodyState();
 }
 
-class _RecipeScalingDialogState extends State<RecipeScalingDialog> {
+class _RecipeScalingBodyState extends State<_RecipeScalingBody> {
   static const _scaler = RecipeScaler();
   late final List<RecipeIngredient> _originalIngredients;
   late List<RecipeIngredient> _scaledIngredients;
@@ -38,6 +55,9 @@ class _RecipeScalingDialogState extends State<RecipeScalingDialog> {
   ScalingPerf? _perf;
 
   Future<void> _addToShopping() async {
+    if (!FeatureGate.execute(context, ProFeature.scaledRecipeToShopping)) {
+      return;
+    }
     if (_isAdding || _isConfirmingClose || _rows.isEmpty) return;
     _processPending();
     for (final row in _rows) {
@@ -67,7 +87,8 @@ class _RecipeScalingDialogState extends State<RecipeScalingDialog> {
     });
     FocusScope.of(context).unfocus();
     try {
-      final add = widget.addShoppingItems ?? ShoppingRepository().addOrMergeItems;
+      final add =
+          widget.addShoppingItems ?? ShoppingRepository().addOrMergeItems;
       await add(snapshot);
       if (!mounted) return;
       Navigator.of(context).pop(true);
@@ -93,7 +114,10 @@ class _RecipeScalingDialogState extends State<RecipeScalingDialog> {
     ]);
     for (final row in _rows) {
       row.focusListener = () {
-        _perf?.event('focus', {'row': row.index, 'focused': row.focusNode.hasFocus});
+        _perf?.event('focus', {
+          'row': row.index,
+          'focused': row.focusNode.hasFocus,
+        });
         if (!row.focusNode.hasFocus) _finishEditing(row);
       };
       row.focusNode.addListener(row.focusListener);
@@ -154,6 +178,10 @@ class _RecipeScalingDialogState extends State<RecipeScalingDialog> {
   }
 
   void _processPending() {
+    if (!FeatureGate.allowed(context, ProFeature.recipeScaling)) {
+      _cancelPending();
+      return;
+    }
     final pending = _pending;
     if (pending == null || !mounted) return;
     _perf?.event('scaleAndValidate', {'row': pending.index});
@@ -269,9 +297,7 @@ class _RecipeScalingDialogState extends State<RecipeScalingDialog> {
                   Expanded(
                     child: Text(
                       'Átszámítás',
-                      style: Theme.of(
-                        context,
-                      ).textTheme.headlineSmall,
+                      style: Theme.of(context).textTheme.headlineSmall,
                     ),
                   ),
                   IconButton(
@@ -314,9 +340,7 @@ class _RecipeScalingDialogState extends State<RecipeScalingDialog> {
                   child: const Text('Visszaállítás'),
                 ),
                 FilledButton(
-                  onPressed: _isAdding || _rows.isEmpty
-                      ? null
-                      : _addToShopping,
+                  onPressed: _isAdding || _rows.isEmpty ? null : _addToShopping,
                   child: const Text('Bevásárlólistához adás'),
                 ),
               ],
@@ -324,9 +348,7 @@ class _RecipeScalingDialogState extends State<RecipeScalingDialog> {
             if (_shoppingError != null)
               Text(
                 _shoppingError!,
-                style: TextStyle(
-                  color: Theme.of(context).colorScheme.error,
-                ),
+                style: TextStyle(color: Theme.of(context).colorScheme.error),
               ),
           ],
         );
@@ -344,7 +366,10 @@ class _RecipeScalingDialogState extends State<RecipeScalingDialog> {
         clipBehavior: Clip.antiAlias,
         child: LayoutBuilder(
           builder: (context, constraints) {
-            _perf?.event('dialog.constraints', {'maxHeight': constraints.maxHeight, 'height': math.min(720, constraints.maxHeight * 0.9)});
+            _perf?.event('dialog.constraints', {
+              'maxHeight': constraints.maxHeight,
+              'height': math.min(720, constraints.maxHeight * 0.9),
+            });
             // Dialog already subtracts keyboard viewInsets and safe margins.
             return SizedBox(
               width: constraints.maxWidth,
@@ -382,7 +407,10 @@ class _RecipeScalingDialogState extends State<RecipeScalingDialog> {
     final unit = Text(row.displayUnit);
     return LayoutBuilder(
       builder: (context, constraints) {
-        _perf?.event('row.layoutBuilder', {'row': row.index, 'maxWidth': constraints.maxWidth});
+        _perf?.event('row.layoutBuilder', {
+          'row': row.index,
+          'maxWidth': constraints.maxWidth,
+        });
         final compact =
             constraints.maxWidth < 400 ||
             MediaQuery.textScalerOf(context).scale(16) > 20;

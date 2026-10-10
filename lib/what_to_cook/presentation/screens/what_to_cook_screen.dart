@@ -1,3 +1,4 @@
+import '../../../pro/feature_gate.dart';
 import 'package:flutter/material.dart';
 
 import 'package:kuktam/recipes/data/repositories/recipe_repository.dart';
@@ -9,15 +10,25 @@ import '../widgets/ingredient_input_field.dart';
 import '../widgets/selected_ingredients_box.dart';
 import '../widgets/what_to_cook_recipe_tile.dart';
 
-class WhatToCookScreen extends StatefulWidget {
+class WhatToCookScreen extends StatelessWidget {
   const WhatToCookScreen({super.key, this.recipeRepository});
+  final RecipeRepository? recipeRepository;
+  @override
+  Widget build(BuildContext context) => FeatureBoundary(
+    feature: ProFeature.whatToCook,
+    builder: (_) => _WhatToCookBody(recipeRepository: recipeRepository),
+  );
+}
+
+class _WhatToCookBody extends StatefulWidget {
+  const _WhatToCookBody({this.recipeRepository});
   final RecipeRepository? recipeRepository;
 
   @override
-  State<WhatToCookScreen> createState() => _WhatToCookScreenState();
+  State<_WhatToCookBody> createState() => _WhatToCookBodyState();
 }
 
-class _WhatToCookScreenState extends State<WhatToCookScreen> {
+class _WhatToCookBodyState extends State<_WhatToCookBody> {
   late final RecipeRepository _recipeRepository =
       widget.recipeRepository ?? RecipeRepository();
   final RecipeMatcher _recipeMatcher = const RecipeMatcher();
@@ -34,6 +45,7 @@ class _WhatToCookScreenState extends State<WhatToCookScreen> {
   }
 
   void _addIngredient(String ingredient) {
+    if (!FeatureGate.execute(context, ProFeature.whatToCook)) return;
     final normalizedIngredient = _recipeMatcher.normalizeIngredient(ingredient);
 
     final alreadySelected = _selectedIngredients.any(
@@ -105,6 +117,9 @@ class _WhatToCookScreenState extends State<WhatToCookScreen> {
             child: StreamBuilder<List<Recipe>>(
               stream: _recipesStream,
               builder: (context, snapshot) {
+                if (!FeatureGate.allowed(context, ProFeature.whatToCook)) {
+                  return const SizedBox.shrink();
+                }
                 if (snapshot.connectionState == ConnectionState.waiting &&
                     !snapshot.hasData) {
                   return const Center(child: CircularProgressIndicator());

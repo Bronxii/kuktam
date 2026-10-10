@@ -1,0 +1,28 @@
+{
+  "name": "kuktam-entitlement-contracts",
+  "private": true,
+  "version": "0.0.0",
+  "description": "Kuktam backend contracts and lazy production runtime source; no deployment performed",
+  "scripts": {
+    "build": "tsc",
+    "test:unit": "npm run build && node --test lib/test/models.test.js lib/test/binding.test.js lib/test/lifecycle-core.test.js lib/test/revoke-core.test.js lib/test/rtdn-parser.test.js lib/test/maintenance-policy.test.js lib/test/deletion-core.test.js lib/test/production-adapters.test.js lib/test/runtime.test.js",
+    "test:rules": "npm run build && node scripts/emulator-tests.cjs",
+    "test": "npm run test:unit && npm run test:rules"
+  },
+  "dependencies": {
+    "firebase-admin": "14.5.0",
+    "firebase-functions": "7.4.0",
+    "google-auth-library": "11.1.0"
+  },
+  "devDependencies": {
+    "@firebase/rules-unit-testing": "5.0.2",
+    "@types/node": "24.10.1",
+    "firebase": "12.19.0",
+    "firebase-tools": "15.32.1",
+    "typescript": "5.9.3"
+  },
+  "main": "lib/src/index.js",
+  "engines": {
+    "node": "22"
+  }
+}

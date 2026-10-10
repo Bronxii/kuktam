@@ -1,3 +1,4 @@
+import '../support/feature_access.dart';
 // Test-only SDK doubles; these never enter production or access the network.
 // ignore_for_file: subtype_of_sealed_class
 import 'dart:async';
@@ -233,10 +234,12 @@ void main() {
       final db = _Db()..failQuery = 2;
       final repo = ShoppingRepository(firestore: db, firebaseAuth: _Auth());
       await tester.pumpWidget(
-        MaterialApp(
-          home: RecipeDetailsScreen(
-            recipe: original,
-            addScalingShoppingItems: repo.addOrMergeItems,
+        withProAccess(
+          MaterialApp(
+            home: RecipeDetailsScreen(
+              recipe: original,
+              addScalingShoppingItems: repo.addOrMergeItems,
+            ),
           ),
         ),
       );

@@ -1,3 +1,4 @@
+import '../support/feature_access.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:kuktam/home/presentation/screens/main_screen.dart';
@@ -64,25 +65,27 @@ void main() {
     double textScale = 1,
   }) async {
     await tester.pumpWidget(
-      MaterialApp(
-        builder: (context, child) => MediaQuery(
-          data: MediaQuery.of(context).copyWith(
-            textScaler: TextScaler.linear(textScale),
+      withProAccess(
+        MaterialApp(
+          builder: (context, child) => MediaQuery(
+            data: MediaQuery.of(
+              context,
+            ).copyWith(textScaler: TextScaler.linear(textScale)),
+            child: child!,
           ),
-          child: child!,
-        ),
-        home: Builder(
-          builder: (context) => Scaffold(
-            body: TextButton(
-              onPressed: () async {
-                final result = await showDialog<RecipeImportDraft>(
-                  context: context,
-                  barrierDismissible: false,
-                  builder: (_) => RecipeImportDialog(parse: parse),
-                );
-                onResult?.call(result);
-              },
-              child: const Text('Open'),
+          home: Builder(
+            builder: (context) => Scaffold(
+              body: TextButton(
+                onPressed: () async {
+                  final result = await showDialog<RecipeImportDraft>(
+                    context: context,
+                    barrierDismissible: false,
+                    builder: (_) => RecipeImportDialog(parse: parse),
+                  );
+                  onResult?.call(result);
+                },
+                child: const Text('Open'),
+              ),
             ),
           ),
         ),
@@ -94,15 +97,17 @@ void main() {
 
   Future<void> mainScreen(WidgetTester tester, _Recipes repo) async {
     await tester.pumpWidget(
-      MaterialApp(
-        home: MainScreen(
-          recipeRepository: repo,
-          shoppingRepository: _Shopping(),
-          tabBodies: const [
-            Text('Recipe tab'),
-            Text('Shopping tab'),
-            Text('Cook tab'),
-          ],
+      withProAccess(
+        MaterialApp(
+          home: MainScreen(
+            recipeRepository: repo,
+            shoppingRepository: _Shopping(),
+            tabBodies: const [
+              Text('Recipe tab'),
+              Text('Shopping tab'),
+              Text('Cook tab'),
+            ],
+          ),
         ),
       ),
     );
@@ -272,10 +277,12 @@ void main() {
       tester.view.viewInsets = FakeViewPadding(bottom: config.$2);
       await tester.pumpAndSettle();
 
-      final outer = find.descendant(
-        of: find.byType(RecipeImportDialog),
-        matching: find.byType(Scrollable),
-      ).first;
+      final outer = find
+          .descendant(
+            of: find.byType(RecipeImportDialog),
+            matching: find.byType(Scrollable),
+          )
+          .first;
       final position = tester.state<ScrollableState>(outer).position;
       final viewport = tester.getRect(find.byType(SingleChildScrollView).first);
       final visibleField = tester.getRect(input).intersect(viewport);
@@ -289,8 +296,10 @@ void main() {
       await tester.drag(outer, Offset(0, -position.maxScrollExtent));
       await tester.pumpAndSettle();
       expect(process.hitTestable(), findsOneWidget);
-      expect(tester.getRect(process).bottom,
-          lessThanOrEqualTo(config.$1.height - config.$2));
+      expect(
+        tester.getRect(process).bottom,
+        lessThanOrEqualTo(config.$1.height - config.$2),
+      );
       expect(controller.text, text);
       expect(tester.takeException(), isNull);
       await tester.tap(process);

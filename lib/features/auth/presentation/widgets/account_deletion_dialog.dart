@@ -3,10 +3,16 @@ import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 import '../../data/repositories/account_deletion_repository.dart';
+import '../../../../pro/pro_screen.dart' show proDeletionWarning;
 
 class AccountDeletionDialog extends StatefulWidget {
-  const AccountDeletionDialog({super.key, required this.repository});
+  const AccountDeletionDialog({
+    super.key,
+    required this.repository,
+    this.hasPro = false,
+  });
   final AccountDeletionRepository repository;
+  final bool hasPro;
 
   @override
   State<AccountDeletionDialog> createState() => _AccountDeletionDialogState();
@@ -111,6 +117,10 @@ class _AccountDeletionDialogState extends State<AccountDeletionDialog> {
                 const Text(
                   'A végleges törléshez erősítsd meg a személyazonosságodat a Google-fiókoddal.',
                 ),
+              if (widget.hasPro) ...[
+                const SizedBox(height: 12),
+                const Text(proDeletionWarning),
+              ],
               if (_error != null) ...[
                 const SizedBox(height: 12),
                 Text(_error!, style: TextStyle(color: colors.error)),

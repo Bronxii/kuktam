@@ -1,3 +1,4 @@
+import '../support/feature_access.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:kuktam/core/domain/measurement_units.dart';
@@ -24,45 +25,47 @@ void main() {
         addTearDown(tester.view.resetDevicePixelRatio);
         final data = IngredientRowData(name: 'Liszt', quantity: '1');
         await tester.pumpWidget(
-          MaterialApp(
-            builder: (context, child) => MediaQuery(
-              data: MediaQuery.of(
-                context,
-              ).copyWith(textScaler: TextScaler.linear(config.$2)),
-              child: child!,
-            ),
-            home: Scaffold(
-              body: Builder(
-                builder: (context) {
-                  if (surface == 'recipe') {
-                    return Padding(
-                      padding: const EdgeInsets.all(20),
-                      child: IngredientRow(
-                        data: data,
-                        units: MeasurementUnits.values,
-                        suggestions: const [],
-                        onRemove: () {},
-                      ),
+          (surface == 'shopping import' ? withProAccess : withFreeAccess)(
+            MaterialApp(
+              builder: (context, child) => MediaQuery(
+                data: MediaQuery.of(
+                  context,
+                ).copyWith(textScaler: TextScaler.linear(config.$2)),
+                child: child!,
+              ),
+              home: Scaffold(
+                body: Builder(
+                  builder: (context) {
+                    if (surface == 'recipe') {
+                      return Padding(
+                        padding: const EdgeInsets.all(20),
+                        child: IngredientRow(
+                          data: data,
+                          units: MeasurementUnits.values,
+                          suggestions: const [],
+                          onRemove: () {},
+                        ),
+                      );
+                    }
+                    return TextButton(
+                      onPressed: () {
+                        if (surface == 'shopping item') {
+                          showShoppingItemDialog(
+                            context: context,
+                            shoppingRepository: _UnusedRepository(),
+                          );
+                        } else {
+                          showDialog<void>(
+                            context: context,
+                            builder: (_) =>
+                                ShoppingImportDialog(addItems: (_) async {}),
+                          );
+                        }
+                      },
+                      child: const Text('Open'),
                     );
-                  }
-                  return TextButton(
-                    onPressed: () {
-                      if (surface == 'shopping item') {
-                        showShoppingItemDialog(
-                          context: context,
-                          shoppingRepository: _UnusedRepository(),
-                        );
-                      } else {
-                        showDialog<void>(
-                          context: context,
-                          builder: (_) =>
-                              ShoppingImportDialog(addItems: (_) async {}),
-                        );
-                      }
-                    },
-                    child: const Text('Open'),
-                  );
-                },
+                  },
+                ),
               ),
             ),
           ),

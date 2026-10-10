@@ -1,3 +1,4 @@
+import '../../../pro/feature_gate.dart';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
@@ -7,21 +8,38 @@ import '../../domain/models/shopping_import_draft.dart';
 import '../../domain/services/shopping_text_parser.dart';
 import '../../domain/shopping_units.dart';
 
-Future<void> showShoppingImportDialog(BuildContext context) => showDialog<void>(
-  context: context,
-  barrierDismissible: false,
-  builder: (_) => const ShoppingImportDialog(),
-);
+Future<void> showShoppingImportDialog(BuildContext context) async {
+  if (!await FeatureGate.request(context, ProFeature.shoppingTextImport) ||
+      !context.mounted) {
+    return;
+  }
+  return showDialog<void>(
+    context: context,
+    barrierDismissible: false,
+    builder: (_) => const ShoppingImportDialog(),
+  );
+}
 
-class ShoppingImportDialog extends StatefulWidget {
+class ShoppingImportDialog extends StatelessWidget {
   const ShoppingImportDialog({super.key, this.addItems});
+  final Future<void> Function(List<ShoppingItemInput>)? addItems;
+  @override
+  Widget build(BuildContext context) => FeatureBoundary(
+    feature: ProFeature.shoppingTextImport,
+    dialog: true,
+    builder: (_) => _ShoppingImportBody(addItems: addItems),
+  );
+}
+
+class _ShoppingImportBody extends StatefulWidget {
+  const _ShoppingImportBody({this.addItems});
   final Future<void> Function(List<ShoppingItemInput>)? addItems;
 
   @override
-  State<ShoppingImportDialog> createState() => _ShoppingImportDialogState();
+  State<_ShoppingImportBody> createState() => _ShoppingImportBodyState();
 }
 
-class _ShoppingImportDialogState extends State<ShoppingImportDialog> {
+class _ShoppingImportBodyState extends State<_ShoppingImportBody> {
   final _text = TextEditingController();
   final _rows = <_ImportRow>[];
   bool _preview = false;
@@ -48,6 +66,7 @@ class _ShoppingImportDialogState extends State<ShoppingImportDialog> {
   }
 
   Future<void> _save() async {
+    if (!FeatureGate.execute(context, ProFeature.shoppingTextImport)) return;
     if (!_canSave || _confirming) return;
     final snapshot = List<ShoppingItemInput>.unmodifiable([
       for (final row in _rows)
@@ -93,6 +112,7 @@ class _ShoppingImportDialogState extends State<ShoppingImportDialog> {
   }
 
   void _process() {
+    if (!FeatureGate.execute(context, ProFeature.shoppingTextImport)) return;
     if (_text.text.trim().isEmpty || _preview) return;
     try {
       final drafts = const ShoppingTextParser().parse(_text.text);
