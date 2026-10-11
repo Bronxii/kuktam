@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'recipe_export.dart';
 
-String exportTextFileName(String name, int index, int count) {
+String safeRecipeFileName(String name) {
   var safe = name
       .replaceAll(
         RegExp(
@@ -23,6 +23,11 @@ String exportTextFileName(String name, int index, int count) {
   }
   safe = result.toString().replaceAll(RegExp(r'[. ]+$'), '');
   if (safe.isEmpty) safe = 'Recept';
+  return safe;
+}
+
+String exportTextFileName(String name, int index, int count) {
+  final safe = safeRecipeFileName(name);
   final width = count.toString().length < 6 ? 6 : count.toString().length;
   return 'receptek/${index.toString().padLeft(width, '0')}-$safe.txt';
 }

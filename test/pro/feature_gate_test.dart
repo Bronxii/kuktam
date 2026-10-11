@@ -20,6 +20,15 @@ import '../recipes/recipe_core_test.dart' show CoreRepository;
 import '../shopping/shopping_core_qa_test.dart' show ShoppingFake;
 import '../billing/fakes.dart' show FakeBilling;
 
+class CountingAccessRepository extends AccessRepository {
+  int reads = 0;
+  @override
+  ClientEntitlementState get current {
+    reads++;
+    return super.current;
+  }
+}
+
 class CookSpy extends CoreRepository {
   int subscriptions = 0;
   @override
@@ -36,11 +45,7 @@ const recipe = Recipe(
   spices: [],
   preparation: 'Keverd össze.',
 );
-const released = [
-  ProFeature.recipeScaling,
-  ProFeature.scaledRecipeToShopping,
-  ProFeature.whatToCook,
-];
+const released = [ProFeature.recipeScaling, ProFeature.whatToCook];
 
 Future<void> mount(
   WidgetTester tester,
@@ -67,6 +72,39 @@ Future<void> mount(
 }
 
 void main() {
+  testWidgets('completed scaled result adds without another entitlement read', (
+    tester,
+  ) async {
+    final repo = CountingAccessRepository();
+    var writes = 0;
+    await mount(
+      tester,
+      repo,
+      RecipeScalingDialog(
+        ingredients: ingredients,
+        addShoppingItems: (items) async {
+          writes++;
+          expect(items.single.quantity, 200);
+        },
+      ),
+    );
+    await tester.enterText(
+      find.byKey(const ValueKey('scaling-quantity-0')),
+      '200',
+    );
+    await tester.pump(const Duration(milliseconds: 600));
+    final action = tester
+        .widget<FilledButton>(
+          find.widgetWithText(FilledButton, 'Bevásárlólistához adás'),
+        )
+        .onPressed!;
+    repo.reads = 0;
+    action();
+    expect(repo.reads, 0);
+    await tester.pumpAndSettle();
+    expect(writes, 1);
+  });
+
   for (final status in ClientEntitlementStatus.values) {
     testWidgets('text imports execute independently of entitlement: $status', (
       tester,
@@ -117,7 +155,7 @@ void main() {
     });
   }
 
-  for (final label in ['Átszámítás', 'Bevásárlólistához adás']) {
+  for (final label in ['Átszámítás']) {
     testWidgets(
       'account switch during entry await cannot open old recipe: $label',
       (tester) async {
@@ -239,9 +277,7 @@ void main() {
       await tester.pump();
     },
   );
-  testWidgets('multiplier open before revoke cannot commit shopping write', (
-    tester,
-  ) async {
+  testWidgets('shopping stays Free after entitlement revoke', (tester) async {
     final repo = AccessRepository();
     var writes = 0;
     await mount(
@@ -264,8 +300,8 @@ void main() {
     repo.set(ClientEntitlementStatus.free);
     action();
     await tester.pumpAndSettle();
-    expect(writes, 0);
-    expect(find.textContaining('Az átszámított recept'), findsOneWidget);
+    expect(writes, 1);
+    expect(find.text('Kuktám Pro funkció'), findsNothing);
   });
   testWidgets('checking prompt reacts to Free and Pro without paywall flash', (
     tester,
@@ -572,6 +608,7 @@ void main() {
             : ClientEntitlementStatus.proOnline,
         uid: newUid,
       );
+      await tester.pumpAndSettle();
       action();
       await tester.pumpAndSettle();
       expect(calls, 0);
@@ -604,24 +641,34 @@ void main() {
       '100',
     );
   });
-  testWidgets(
-    'detail multiplier separate entry blocked Free; manual details remain',
-    (tester) async {
-      final repo = AccessRepository(ClientEntitlementStatus.free);
-      await mount(tester, repo, const RecipeDetailsScreen(recipe: recipe));
-      expect(find.text('Teszt'), findsOneWidget);
-      expect(find.byTooltip('Szerkesztés'), findsOneWidget);
-      await tester.ensureVisible(
-        find.widgetWithText(FilledButton, 'Bevásárlólistához adás'),
+  for (final status in ClientEntitlementStatus.values) {
+    testWidgets('normal shopping is Free without entitlement checks: $status', (
+      tester,
+    ) async {
+      final repo = AccessRepository(status);
+      var calls = 0;
+      await mount(
+        tester,
+        repo,
+        RecipeDetailsScreen(
+          recipe: recipe,
+          addMultiplierShoppingItems: (items) async {
+            calls++;
+            expect(items.single.quantity, 100);
+          },
+        ),
       );
-      await tester.tap(
-        find.widgetWithText(FilledButton, 'Bevásárlólistához adás'),
-      );
+      final add = find.widgetWithText(FilledButton, 'Bevásárlólistához adás');
+      await tester.ensureVisible(add);
+      await tester.tap(add);
       await tester.pumpAndSettle();
-      expect(find.textContaining('Az átszámított recept'), findsOneWidget);
-      expect(find.byType(TextField), findsNothing);
-    },
-  );
+      expect(find.text('Kuktám Pro funkció'), findsNothing);
+      expect(find.byType(TextField), findsOneWidget);
+      await tester.tap(find.widgetWithText(FilledButton, 'Hozzáadás'));
+      await tester.pumpAndSettle();
+      expect(calls, 1);
+    });
+  }
   testWidgets('double tap, small viewport, large text, accessible badge', (
     tester,
   ) async {
@@ -637,9 +684,9 @@ void main() {
       Builder(
         builder: (context) => IconButton(
           onPressed: () =>
-              FeatureGate.request(context, ProFeature.scaledRecipeToShopping),
+              FeatureGate.request(context, ProFeature.recipeScaling),
           icon: const ProFeatureIcon(
-            feature: ProFeature.scaledRecipeToShopping,
+            feature: ProFeature.recipeScaling,
             icon: Icons.shopping_cart,
           ),
         ),

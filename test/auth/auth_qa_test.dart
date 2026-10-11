@@ -230,6 +230,7 @@ void main() {
           MaterialApp(home: SettingsScreen(authRepository: repo)),
         );
         await tester.pumpAndSettle();
+        await tester.scrollUntilVisible(find.text('Jelszó módosítása'), 150);
         await tester.tap(find.text('Jelszó módosítása'));
         await tester.pumpAndSettle();
       } else {
@@ -354,6 +355,7 @@ void main() {
         MaterialApp(home: SettingsScreen(authRepository: repo)),
       );
       await tester.pumpAndSettle();
+      await tester.scrollUntilVisible(find.text('Jelszó módosítása'), 150);
       await tester.tap(find.text('Jelszó módosítása'));
       await tester.pumpAndSettle();
       for (final values in [
@@ -445,6 +447,7 @@ void main() {
       await tester.tap(find.text('Profile'));
       await tester.pumpAndSettle();
       expect(find.text('A@example.com'), findsOneWidget);
+      await tester.scrollUntilVisible(find.text('Jelszó módosítása'), 150);
       expect(find.text('Jelszó módosítása'), findsOneWidget);
       await tester.scrollUntilVisible(find.text('Kijelentkezés'), 200);
       await tester.tap(find.text('Kijelentkezés'));
@@ -593,6 +596,7 @@ void main() {
       MaterialApp(home: SettingsScreen(authRepository: repo)),
     );
     await tester.pumpAndSettle();
+    await tester.scrollUntilVisible(find.text('Jelszó módosítása'), 150);
     await tester.tap(find.text('Jelszó módosítása'));
     await tester.pumpAndSettle();
     await fill(tester, [' oldsecret ', ' newsecret ', ' newsecret ']);

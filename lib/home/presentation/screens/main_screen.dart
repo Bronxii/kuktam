@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../sharing/text_share_controller.dart';
+import '../../../sharing/recipe_file_receiver.dart';
 import '../../../sharing/shared_recipe_text_normalizer.dart';
 import '../../../pro/feature_gate.dart';
 import 'package:share_plus/share_plus.dart';
@@ -22,6 +23,7 @@ class MainScreen extends StatefulWidget {
     super.key,
     this.tabBodies,
     this.textShares,
+    this.recipeFiles,
     this.shareNavigation,
     this.recipeRepository,
     this.shoppingRepository,
@@ -30,6 +32,7 @@ class MainScreen extends StatefulWidget {
   // Optional dependencies keep navigation tests independent of Firebase.
   final List<Widget>? tabBodies;
   final TextShareController? textShares;
+  final RecipeFileReceiver? recipeFiles;
   final TextShareNavigationObserver? shareNavigation;
   final RecipeRepository? recipeRepository;
   final ShoppingRepository? shoppingRepository;
@@ -41,12 +44,14 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
   late final _textShares = widget.textShares ?? TextShareController.instance;
   late final _shareNavigation = widget.shareNavigation ?? textShareNavigation;
+  late final _recipeFiles = widget.recipeFiles ?? RecipeFileReceiver.instance;
   bool _shareScheduled = false;
 
   @override
   void initState() {
     super.initState();
     _textShares.addListener(_scheduleShare);
+    _recipeFiles.addListener(_scheduleShare);
     _shareNavigation.changes.addListener(_scheduleShare);
     WidgetsBinding.instance.addObserver(this);
     _scheduleShare();
@@ -55,6 +60,7 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
   @override
   void dispose() {
     _textShares.removeListener(_scheduleShare);
+    _recipeFiles.removeListener(_scheduleShare);
     _shareNavigation.changes.removeListener(_scheduleShare);
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
@@ -66,7 +72,7 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
   }
 
   void _scheduleShare() {
-    if (!mounted || _shareScheduled || !_textShares.hasPending) return;
+    if (!mounted || _shareScheduled || !(_textShares.hasPending || _recipeFiles.hasPending)) return;
     _shareScheduled = true;
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _shareScheduled = false;
@@ -77,6 +83,13 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
       }
       final lifecycle = WidgetsBinding.instance.lifecycleState;
       if (lifecycle != null && lifecycle != AppLifecycleState.resumed) return;
+      if (_recipeFiles.hasPending) {
+        final notice = _recipeFiles.takeNotice();
+        if (notice != null) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(notice)));
+        final recipe = _recipeFiles.take();
+        if (recipe != null) { _importStructured(recipe); } else { _scheduleShare(); }
+        return;
+      }
       final notice = _textShares.takeNotice();
       if (notice != null) {
         ScaffoldMessenger.of(
@@ -101,6 +114,19 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
       );
     });
     WidgetsBinding.instance.ensureVisualUpdate();
+  }
+
+  Future<void> _importStructured(Recipe recipe) async {
+    _importingRecipe = true;
+    final generation = _recipeFiles.generation;
+    try {
+      final saved = await Navigator.of(context).push<Recipe>(MaterialPageRoute<Recipe>(
+        builder: (_) => AddRecipeScreen(initialRecipe: recipe,
+          validateSession: () => _recipeFiles.check(generation),
+          recipeRepository: widget.recipeRepository),
+      ));
+      if (mounted && saved != null) setState(() => _recipesVersion++);
+    } finally { _importingRecipe = false; _scheduleShare(); }
   }
 
   int _selectedIndex = 0;

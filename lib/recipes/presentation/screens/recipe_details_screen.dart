@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import '../../../pro/feature_gate.dart';
 import 'package:flutter/services.dart';
 import 'package:share_plus/share_plus.dart';
+import '../../../sharing/recipe_file_share.dart';
+import '../../../sharing/recipe_share_codec.dart';
 import '../widgets/recipe_scaling_dialog.dart';
 import '../../domain/services/recipe_scaler.dart';
 
@@ -16,10 +18,12 @@ class RecipeDetailsScreen extends StatefulWidget {
     this.addScalingShoppingItems,
     this.addMultiplierShoppingItems,
     this.recipeRepository,
+    this.structuredShare,
     super.key,
   });
 
   final Recipe recipe;
+  final Future<void> Function(Recipe)? structuredShare;
   final AddScalingShoppingItems? addScalingShoppingItems;
   final AddScalingShoppingItems? addMultiplierShoppingItems;
   final RecipeRepository? recipeRepository;
@@ -36,6 +40,7 @@ class _RecipeDetailsScreenState extends State<RecipeDetailsScreen> {
       widget.addMultiplierShoppingItems;
   late final RecipeRepository _repository =
       widget.recipeRepository ?? RecipeRepository();
+  bool _sharingFile = false;
   bool _deleting = false;
   bool _confirmingDelete = false;
   bool _multiplierFlowActive = false;
@@ -147,40 +152,33 @@ class _RecipeDetailsScreenState extends State<RecipeDetailsScreen> {
           appBar: AppBar(
             title: Text(_deleting ? 'Törlés folyamatban…' : recipe.name),
             actions: [
-              IconButton(
-                tooltip: 'Megosztás',
-                icon: const Icon(Icons.share_outlined),
-                onPressed: () async {
-                  await SharePlus.instance.share(
-                    ShareParams(text: _buildRecipeShareText(recipe)),
-                  );
-                },
-              ),
-              IconButton(
-                tooltip: 'Szerkesztés',
-                icon: const Icon(Icons.edit_outlined),
-                onPressed: () async {
-                  final updatedRecipe = await Navigator.of(context)
-                      .push<Recipe>(
-                        MaterialPageRoute<Recipe>(
-                          builder: (context) => AddRecipeScreen(
-                            recipe: recipe,
-                            recipeRepository: _repository,
-                          ),
-                        ),
-                      );
-
-                  if (updatedRecipe == null || !context.mounted) {
+              PopupMenuButton<String>(
+                tooltip: 'Recept műveletek',
+                enabled: !_sharingFile,
+                itemBuilder: (_) => const [
+                  PopupMenuItem(value: 'kuktam', child: Text('Megosztás Kuktámmal')),
+                  PopupMenuItem(value: 'text', child: Text('Megosztás szövegként')),
+                  PopupMenuItem(value: 'edit', child: Text('Szerkesztés')),
+                  PopupMenuItem(value: 'delete', child: Text('Törlés')),
+                ],
+                onSelected: (action) async {
+                  if (action == 'delete') { await _deleteRecipe(); return; }
+                  if (action == 'edit') {
+                    final updated = await Navigator.of(context).push<Recipe>(MaterialPageRoute<Recipe>(
+                      builder: (_) => AddRecipeScreen(recipe: recipe, recipeRepository: _repository),
+                    ));
+                    if (updated != null && context.mounted) Navigator.of(context).pop(true);
                     return;
                   }
-
-                  Navigator.of(context).pop(true);
+                  if (_sharingFile) return;
+                  setState(() => _sharingFile = true);
+                  try {
+                    if (action == 'kuktam') { await (widget.structuredShare ?? shareRecipeFile)(recipe); }
+                    else { await SharePlus.instance.share(ShareParams(text: _buildRecipeShareText(recipe))); }
+                  } catch (e) {
+                    if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e is RecipeShareFailure ? e.message : 'Nem sikerült megosztani a receptet.')));
+                  } finally { if (mounted) setState(() => _sharingFile = false); }
                 },
-              ),
-              IconButton(
-                tooltip: 'Törlés',
-                icon: const Icon(Icons.delete_outline),
-                onPressed: _deleting ? null : _deleteRecipe,
               ),
             ],
           ),
@@ -278,15 +276,9 @@ class _RecipeDetailsScreenState extends State<RecipeDetailsScreen> {
                       ? null
                       : () async {
                           if (_multiplierFlowActive || _deleting) return;
-                          final operationUid = FeatureGate.state(context).uid;
-                          if (!await FeatureGate.request(
-                                context,
-                                ProFeature.scaledRecipeToShopping,
-                              ) ||
-                              !context.mounted ||
-                              FeatureGate.state(context).uid != operationUid) {
-                            return;
-                          }
+                          final shopping = addMultiplierShoppingItems == null
+                              ? ShoppingRepository() : null;
+                          final sessionCurrent = shopping?.captureSessionCheck();
                           _multiplierFlowActive = true;
                           try {
                             final multiplierController = _multiplierController;
@@ -421,18 +413,7 @@ class _RecipeDetailsScreenState extends State<RecipeDetailsScreen> {
                                         ),
                                         FilledButton(
                                           onPressed: () {
-                                            if (submitted) return;
-                                            if (FeatureGate.state(
-                                                      context,
-                                                    ).uid !=
-                                                    operationUid ||
-                                                !FeatureGate.execute(
-                                                  context,
-                                                  ProFeature
-                                                      .scaledRecipeToShopping,
-                                                )) {
-                                              return;
-                                            }
+                                            if (submitted || sessionCurrent?.call() == false) return;
                                             final parsedMultiplier =
                                                 const RecipeScaler()
                                                     .parseQuantity(
@@ -466,14 +447,7 @@ class _RecipeDetailsScreenState extends State<RecipeDetailsScreen> {
                               return;
                             }
 
-                            if (FeatureGate.state(context).uid !=
-                                    operationUid ||
-                                !FeatureGate.execute(
-                                  context,
-                                  ProFeature.scaledRecipeToShopping,
-                                )) {
-                              return;
-                            }
+                            if (sessionCurrent?.call() == false) return;
                             // Validate every scaled value before the first repository write.
                             final items = [
                               for (final ingredient in recipe.ingredients)
@@ -491,7 +465,7 @@ class _RecipeDetailsScreenState extends State<RecipeDetailsScreen> {
                             setState(() => _addingMultiplier = true);
                             final add =
                                 addMultiplierShoppingItems ??
-                                ShoppingRepository().addOrMergeItems;
+                                shopping!.addOrMergeItems;
                             await add(
                               List<ShoppingItemInput>.unmodifiable([
                                 for (final item in items)

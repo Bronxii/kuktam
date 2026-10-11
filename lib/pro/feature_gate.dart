@@ -42,8 +42,6 @@ abstract final class FeatureGate {
       check(context, feature) == FeatureAccessDecision.allowed;
   static String title(ProFeature feature) => switch (feature) {
     ProFeature.recipeScaling => 'A receptátszámítás',
-    ProFeature.scaledRecipeToShopping =>
-      'Az átszámított recept bevásárlólistához adása',
     ProFeature.whatToCook => 'A Mit főzzek?',
     ProFeature.imageImport => 'A képes receptimport',
   };

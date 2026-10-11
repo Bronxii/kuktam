@@ -474,13 +474,17 @@ void main() {
       await tester.pumpAndSettle();
       await tester.tap(find.widgetWithText(ListTile, 'Leves'));
       await tester.pumpAndSettle();
-      await tester.tap(find.byTooltip('Törlés'));
+      await tester.tap(find.byTooltip('Recept műveletek'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Törlés'));
       await tester.pumpAndSettle();
       await tester.tap(find.text('Mégse'));
       await tester.pumpAndSettle();
       expect(repo.deletes, 0);
       repo.failDelete = true;
-      await tester.tap(find.byTooltip('Törlés'));
+      await tester.tap(find.byTooltip('Recept műveletek'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Törlés'));
       await tester.pumpAndSettle();
       await tester.tap(find.widgetWithText(FilledButton, 'Törlés'));
       await tester.pumpAndSettle();
@@ -492,13 +496,10 @@ void main() {
       expect(find.textContaining('private backend'), findsNothing);
       repo.failDelete = false;
       repo.pending = Completer<void>();
-      final action = tester
-          .widget<IconButton>(
-            find.byWidgetPredicate(
-              (w) => w is IconButton && w.tooltip == 'Törlés',
-            ),
-          )
-          .onPressed!;
+      final select = tester
+          .widget<PopupMenuButton<String>>(find.byType(PopupMenuButton<String>))
+          .onSelected!;
+      void action() => select('delete');
       action();
       action();
       await tester.pumpAndSettle();
@@ -538,7 +539,9 @@ void main() {
       await tester.pump();
       await tester.tap(find.widgetWithText(ListTile, 'Leves'));
       await tester.pumpAndSettle();
-      await tester.tap(find.byTooltip('Szerkesztés'));
+      await tester.tap(find.byTooltip('Recept műveletek'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Szerkesztés'));
       await tester.pumpAndSettle();
       await tester.enterText(coreField('Recept neve'), 'Új név');
       (await saveCallback(tester))();

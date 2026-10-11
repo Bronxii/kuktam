@@ -12,11 +12,16 @@ class AddRecipeScreen extends StatefulWidget {
   const AddRecipeScreen({
     this.recipe,
     this.initialImport,
+    this.initialRecipe,
+    this.validateSession,
     this.recipeRepository,
     super.key,
-  }) : assert(recipe == null || initialImport == null);
+  }) : assert(recipe == null || (initialImport == null && initialRecipe == null)),
+       assert(initialImport == null || initialRecipe == null);
 
   final Recipe? recipe;
+  final Recipe? initialRecipe;
+  final void Function()? validateSession;
   final RecipeImportDraft? initialImport;
   final RecipeRepository? recipeRepository;
 
@@ -53,7 +58,7 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
     super.initState();
     _recipeRepository = widget.recipeRepository ?? RecipeRepository();
 
-    final recipe = widget.recipe;
+    final recipe = widget.recipe ?? widget.initialRecipe;
 
     if (recipe != null) {
       _recipeNameController.text = recipe.name;
@@ -312,7 +317,9 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
             ),
       )
           .toList(),
-      preparation: _preparationController.text.trim(),
+      preparation: widget.initialRecipe != null
+          ? _preparationController.text
+          : _preparationController.text.trim(),
     );
   }
 
@@ -367,11 +374,13 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
     FocusManager.instance.primaryFocus?.unfocus();
     setState(() => _saving = true);
     try {
+      widget.validateSession?.call();
       final recipeAlreadyExists = await _recipeRepository.recipeNameExists(
         name: recipe.name,
         excludedRecipeId: widget.recipe?.id,
       );
 
+      widget.validateSession?.call();
       if (recipeAlreadyExists) {
         if (!mounted) return;
 

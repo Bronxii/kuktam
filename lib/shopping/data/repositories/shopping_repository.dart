@@ -16,6 +16,12 @@ class ShoppingRepository {
   final FirebaseFirestore _firestore;
   final FirebaseAuth _firebaseAuth;
 
+  /// Account identity only; shopping writes never depend on Pro status.
+  bool Function() captureSessionCheck() {
+    final uid = _firebaseAuth.currentUser?.uid;
+    return () => uid != null && _firebaseAuth.currentUser?.uid == uid;
+  }
+
   CollectionReference<Map<String, dynamic>> get _shoppingCollection {
     final user = _firebaseAuth.currentUser;
 

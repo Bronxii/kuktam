@@ -55,9 +55,7 @@ class _RecipeScalingBodyState extends State<_RecipeScalingBody> {
   ScalingPerf? _perf;
 
   Future<void> _addToShopping() async {
-    if (!FeatureGate.execute(context, ProFeature.scaledRecipeToShopping)) {
-      return;
-    }
+    if (!mounted) return;
     if (_isAdding || _isConfirmingClose || _rows.isEmpty) return;
     _processPending();
     for (final row in _rows) {
@@ -178,12 +176,12 @@ class _RecipeScalingBodyState extends State<_RecipeScalingBody> {
   }
 
   void _processPending() {
+    final pending = _pending;
+    if (pending == null || !mounted) return;
     if (!FeatureGate.allowed(context, ProFeature.recipeScaling)) {
       _cancelPending();
       return;
     }
-    final pending = _pending;
-    if (pending == null || !mounted) return;
     _perf?.event('scaleAndValidate', {'row': pending.index});
     // Consume before processing: Done followed by blur cannot scale twice.
     _cancelPending();

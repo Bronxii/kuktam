@@ -74,11 +74,6 @@ class _ProScreenState extends State<ProScreen> {
                   'Számold át a mennyiségeket más adagszámra.',
                 ),
                 _Feature(
-                  Icons.shopping_basket_outlined,
-                  'Átszámított recept → bevásárlólista',
-                  'Add a módosított mennyiségeket a listádhoz.',
-                ),
-                _Feature(
                   Icons.restaurant_menu,
                   'Mit főzzek?',
                   'Keress ötletet a kiválasztott alapanyagokból.',

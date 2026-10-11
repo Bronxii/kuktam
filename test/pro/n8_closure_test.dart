@@ -190,10 +190,8 @@ void main() {
             Scaffold(
               body: Builder(
                 builder: (context) => TextButton(
-                  onPressed: () => FeatureGate.request(
-                    context,
-                    ProFeature.scaledRecipeToShopping,
-                  ),
+                  onPressed: () =>
+                      FeatureGate.request(context, ProFeature.recipeScaling),
                   child: const Text('Gate'),
                 ),
               ),

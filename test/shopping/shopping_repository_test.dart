@@ -208,6 +208,16 @@ class _Batch implements WriteBatch {
 }
 
 void main() {
+  test('shopping session identity is independent of entitlement', () {
+    final auth = _Auth();
+    final repo = ShoppingRepository(firestore: _Db(), firebaseAuth: auth);
+    final check = repo.captureSessionCheck();
+    expect(check(), isTrue);
+    auth.uid = 'other';
+    expect(check(), isFalse);
+    auth.signedIn = false;
+    expect(check(), isFalse);
+  });
   for (final factor in ['0.5', '1', '2']) {
     testWidgets(
       'multiplier $factor reaches real repository with one atomic batch',

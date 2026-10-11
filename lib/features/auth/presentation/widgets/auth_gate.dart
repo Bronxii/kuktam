@@ -1,14 +1,16 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import '../../../../sharing/recipe_file_receiver.dart';
 
 import '../../../../home/presentation/screens/main_screen.dart';
 import '../screens/login_screen.dart';
 import '../../data/repositories/auth_repository.dart';
 
 class AuthGate extends StatefulWidget {
-  const AuthGate({super.key, this.authRepository, this.mainBuilder});
+  const AuthGate({super.key, this.authRepository, this.mainBuilder, this.recipeFiles});
   final AuthRepository? authRepository;
   final WidgetBuilder? mainBuilder;
+  final RecipeFileReceiver? recipeFiles;
   @override
   State<AuthGate> createState() => _AuthGateState();
 }
@@ -59,9 +61,16 @@ class _AuthGateState extends State<AuthGate> {
             child: widget.mainBuilder?.call(context) ?? const MainScreen(),
           );
         }
-        return LoginScreen(
-          authRepository: _repository,
-          verificationRequired: _restoredVerificationRequired,
+        final files = widget.recipeFiles ?? RecipeFileReceiver.instance;
+        return ListenableBuilder(
+          listenable: files,
+          builder: (_, _) => LoginScreen(
+            authRepository: _repository,
+            verificationRequired: _restoredVerificationRequired,
+            continuationNotice: files.hasPending
+                ? 'A recept megnyitásához jelentkezz be. Utána folytatjuk az importot.'
+                : null,
+          ),
         );
       },
     );

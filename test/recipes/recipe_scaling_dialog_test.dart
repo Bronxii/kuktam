@@ -773,7 +773,7 @@ void main() {
   ) async {
     await tester.pumpWidget(
       withProAccess(
-        const MaterialApp(home: RecipeDetailsScreen(recipe: recipe)),
+        MaterialApp(home: RecipeDetailsScreen(recipe: recipe, addMultiplierShoppingItems: (_) async {})),
       ),
     );
     final button = find.widgetWithText(FilledButton, 'Bevásárlólistához adás');

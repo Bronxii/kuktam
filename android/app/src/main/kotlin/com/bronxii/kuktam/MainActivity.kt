@@ -12,7 +12,12 @@ class MainActivity : FlutterActivity() {
     companion object {
         // Survives Activity recreation, but deliberately not process death.
         private val textShares = TextShareInbox()
+        private val recipeFiles = RecipeFileInbox()
+        private var recipeActivity = java.lang.ref.WeakReference<MainActivity>(null)
+        private val recipeReader = java.util.concurrent.Executors.newSingleThreadExecutor()
     }
+    private var recipePicker: RecipeDocumentPicker? = null
+    private var recipeChannel: MethodChannel? = null
     private var shareChannel: MethodChannel? = null
     private var exportChannel: MethodChannel? = null
     private var exportWriter: ExportDocumentWriter? = null
@@ -20,13 +25,46 @@ class MainActivity : FlutterActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         // A restored Activity must not replay the launch share.
-        if (savedInstanceState == null) receiveText(intent)
+        if (savedInstanceState == null && !receiveRecipe(intent)) receiveText(intent)
     }
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         setIntent(intent)
-        receiveText(intent)
+        if (!receiveRecipe(intent)) receiveText(intent)
+    }
+
+    private fun receiveRecipe(incoming: Intent): Boolean {
+        if (!RecipeDocumentRead.routes(incoming.action, incoming.type)) return false
+        val mime = incoming.type // Capture before consumption clears data/type.
+        val uri = try {
+            val primary = if (incoming.action == Intent.ACTION_VIEW) incoming.data
+                else incoming.getParcelableExtra<android.net.Uri>(Intent.EXTRA_STREAM)
+            primary ?: incoming.clipData?.let { if (it.itemCount == 1) it.getItemAt(0).uri else null }
+        } catch (_: RuntimeException) { null }
+        // Consume this intent; Activity recreation must not re-enqueue it.
+        incoming.action = Intent.ACTION_MAIN
+        incoming.data = null
+        incoming.removeExtra(Intent.EXTRA_STREAM)
+        val id = recipeFiles.begin()
+        if (id == null) { Toast.makeText(this, "Előbb fejezd be a várakozó receptimportokat.", Toast.LENGTH_LONG).show(); return true }
+        recipeChannel?.invokeMethod("pending", null)
+        if (uri == null || !RecipeFileInbox.validScheme(uri.scheme)) {
+            recipeFiles.finish(id, null, "read")
+            recipeChannel?.invokeMethod("pending", null)
+            return true
+        }
+        val resolver = applicationContext.contentResolver
+        recipeReader.execute {
+            try {
+                val bytes = RecipeUriReader.read(resolver, uri, mime, false)
+                recipeFiles.finish(id, bytes, null)
+            } catch (_: RecipeDocumentRead.WrongFormat) { recipeFiles.finish(id, null, "format") }
+              catch (_: RecipeFileInbox.TooLarge) { recipeFiles.finish(id, null, "size") }
+              catch (_: Exception) { recipeFiles.finish(id, null, "read") }
+            recipeActivity.get()?.let { current -> current.runOnUiThread { current.recipeChannel?.invokeMethod("pending", null) } }
+        }
+        return true
     }
 
     private fun receiveText(incoming: Intent) {
@@ -51,11 +89,17 @@ class MainActivity : FlutterActivity() {
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if (recipePicker?.onActivityResult(requestCode, resultCode, data) == true) return
         if (exportWriter?.onActivityResult(requestCode, resultCode, data) == true) return
         super.onActivityResult(requestCode, resultCode, data)
     }
 
     override fun cleanUpFlutterEngine(flutterEngine: FlutterEngine) {
+        recipePicker?.dispose()
+        recipePicker = null
+        if (recipeActivity.get() === this) recipeActivity.clear()
+        recipeChannel?.setMethodCallHandler(null)
+        recipeChannel = null
         exportWriter?.dispose()
         exportWriter = null
         exportChannel?.setMethodCallHandler(null)
@@ -68,6 +112,15 @@ class MainActivity : FlutterActivity() {
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
         val messenger = flutterEngine.dartExecutor.binaryMessenger
+        recipeActivity = java.lang.ref.WeakReference(this)
+        recipePicker = RecipeDocumentPicker(this)
+        recipeChannel = MethodChannel(messenger, "kuktam/recipe_file").also { channel ->
+            channel.setMethodCallHandler { call, result ->
+                if (call.method == "take" && call.arguments == null) result.success(recipeFiles.take())
+                else if (call.method == "pick" && call.arguments == null) recipePicker!!.open(result)
+                else result.notImplemented()
+            }
+        }
         exportWriter = ExportDocumentWriter(this)
         exportChannel = MethodChannel(messenger, "kuktam/export_document").also { channel ->
             channel.setMethodCallHandler { call, result -> exportWriter!!.handle(call.method, call.arguments, result) }

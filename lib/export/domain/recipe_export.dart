@@ -32,6 +32,9 @@ class ExportRecipe {
   final String preparation;
   Map<String, Object> toJson(String textFile) => {
     'textFile': textFile,
+    ...toContentJson(),
+  };
+  Map<String, Object> toContentJson() => {
     'name': name,
     'ingredients': [
       for (final i in ingredients)

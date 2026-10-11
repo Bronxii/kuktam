@@ -6,10 +6,11 @@ import '../../data/repositories/auth_repository.dart';
 import '../../../../core/theme/app_colors.dart';
 
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key, this.authRepository, this.verificationRequired = false});
+  const LoginScreen({super.key, this.authRepository, this.verificationRequired = false, this.continuationNotice});
 
   final AuthRepository? authRepository;
   final bool verificationRequired;
+  final String? continuationNotice;
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -598,6 +599,10 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 ),
                 const SizedBox(height: 48),
+                if (widget.continuationNotice != null) ...[
+                  Text(widget.continuationNotice!),
+                  const SizedBox(height: 16),
+                ],
                 if (widget.verificationRequired) ...[
                   const Text('A bejelentkezés előtt erősítsd meg az e-mail-címedet. Ellenőrizd a beérkező leveleket és a Spam mappát is.'),
                   const SizedBox(height: 16),

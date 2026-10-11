@@ -1,3 +1,5 @@
+import '../sharing/recipe_file_receiver.dart';
+import '../sharing/recipe_share_codec.dart';
 import 'package:flutter/material.dart';
 import '../export/presentation/recipe_export_screen.dart';
 import '../export/presentation/recipe_export_controller.dart';
@@ -12,8 +14,9 @@ import '../pro/monetization_host.dart';
 import '../pro/profile_pro_card.dart';
 
 class SettingsScreen extends StatefulWidget {
-  const SettingsScreen({super.key, this.authRepository, this.deletionRepository, this.exportControllerFactory});
+  const SettingsScreen({super.key, this.authRepository, this.deletionRepository, this.exportControllerFactory, this.recipeFiles});
 
+  final RecipeFileReceiver? recipeFiles;
   final RecipeExportController Function()? exportControllerFactory;
   final AuthRepository? authRepository;
   final AccountDeletionRepository? deletionRepository;
@@ -30,6 +33,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   bool _deletionDialogOpen = false;
   bool _isSigningOut = false;
   bool _exportOpen = false;
+  bool _pickingRecipe = false;
 
   Future<void> _deleteAccount() async {
     if (_deletionDialogOpen) return;
@@ -122,6 +126,22 @@ class _SettingsScreenState extends State<SettingsScreen> {
         children: [
           const SizedBox(height: 8),
           ProfileProCard(controller: ProScope.maybeOf(context)),
+          ListTile(
+            leading: const Icon(Icons.file_open_outlined),
+            title: const Text('Kuktám recept importálása'),
+            subtitle: const Text('Egy .kuktamrecipe fájl kiválasztása'),
+            enabled: !_pickingRecipe,
+            onTap: () async {
+              if (_pickingRecipe) return;
+              setState(() => _pickingRecipe = true);
+              try {
+                final selected = await (widget.recipeFiles ?? RecipeFileReceiver.instance).pickFile();
+                if (selected && context.mounted) Navigator.of(context).pop();
+              } catch (e) {
+                if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e is RecipeShareFailure ? e.message : 'A recept nem olvasható.')));
+              } finally { if (mounted) setState(() => _pickingRecipe = false); }
+            },
+          ),
           ListTile(
             leading: const Icon(Icons.download_outlined),
             title: const Text('Saját adatok exportálása'),
