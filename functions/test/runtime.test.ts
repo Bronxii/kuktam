@@ -50,3 +50,53 @@ test('root discovery has no secret/credential/Admin/network side effects and onl
  assert.ok(!(root.authUserDeleted as any).__endpoint.callableTrigger);
  }finally{http.request=hr;https.request=hs;globalThis.fetch=fetch;if(project===undefined)delete process.env.GCLOUD_PROJECT;else process.env.GCLOUD_PROJECT=project;}
 });
+
+test('every export has its explicit role identity; runtime options unchanged', async()=>{
+ const project=process.env.GCLOUD_PROJECT;process.env.GCLOUD_PROJECT='demo-kuktam-local';
+ try {
+  const root=await import('../src/index');
+  const mapping={prepareProPurchase:cfg.coreIdentityParameter,getEntitlementProof:cfg.coreIdentityParameter,
+   beginAccountDeletion:cfg.coreIdentityParameter,authUserDeleted:cfg.coreIdentityParameter,
+   verifyProPurchase:cfg.playIdentityParameter,playRtdn:cfg.playIdentityParameter,
+   billingMaintenance:cfg.playIdentityParameter,finalizeAccountDeletion:cfg.deletionIdentityParameter};
+  assert.equal(new Set(Object.values(mapping)).size,3);
+  for(const [name,parameter] of Object.entries(mapping)){
+   const endpoint=(root as any)[name].__endpoint;
+   assert.equal(endpoint.serviceAccountEmail.name,parameter,name);
+   assert.equal(endpoint.serviceAccountEmail.toCEL(),`{{ params.${parameter} }}`,name);
+   assert.deepEqual(endpoint.region,['europe-west1']);assert.equal(endpoint.timeoutSeconds,300);
+   assert.equal(endpoint.maxInstances,name==='billingMaintenance'?1:5);
+   assert.deepEqual(endpoint.secretEnvironmentVariables.map((s:any)=>s.key),['KUKTAM_BINDING_KEYS']);
+  }
+  assert.equal((root.billingMaintenance as any).__endpoint.concurrency,1);
+  assert.deepEqual(JSON.parse(JSON.stringify((root.billingMaintenance as any).__endpoint.scheduleTrigger)),{schedule:'every 5 minutes',retryConfig:{retryCount:0},timeZone:'Etc/UTC'});
+  assert.equal((root.playRtdn as any).__endpoint.eventTrigger.eventFilters.topic,'kuktam-play-rtdn');
+  assert.equal((root.playRtdn as any).__endpoint.eventTrigger.retry,true);
+ } finally {if(project===undefined)delete process.env.GCLOUD_PROJECT;else process.env.GCLOUD_PROJECT=project;}
+});
+
+test('CLI parameter resolution refuses each missing identity, including legacy-only configuration',async()=>{
+ await import('../src/index');
+ const {declaredParams}=require('firebase-functions/params');
+ const {resolveParams}=require('firebase-tools/lib/deploy/functions/params');
+ const names=[cfg.coreIdentityParameter,cfg.playIdentityParameter,cfg.deletionIdentityParameter];
+ const params=declaredParams.map((p:any)=>p.toSpec()).filter((p:any)=>p.type==='string');
+ assert.deepEqual(params.map((p:any)=>p.name).sort(),[...names].sort());
+ for(const p of params)assert.equal(Object.hasOwn(p,'default'),false);
+ const values=Object.fromEntries(names.map((name,i)=>[name,`test-runtime-${i}@demo-kuktam-local.iam.gserviceaccount.com`]));
+ const options={params,firebaseConfig:{projectId:'demo-kuktam-local'},codebase:'monetization',nonInteractive:true};
+ // Only string parameters: no secret resolver, cloud call or credential discovery.
+ const http=require('node:http'),https=require('node:https');const hr=http.request,hs=https.request,fetch=globalThis.fetch;
+ http.request=https.request=globalThis.fetch=()=>{throw new Error('NETWORK_FORBIDDEN');};
+ try {
+  const result=await resolveParams({...options,userEnvs:values});
+  for(const name of names)assert.equal(result.paramValues[name],values[name]);
+  for(const missing of names){
+   const env={...values};delete env[missing];
+   await assert.rejects(resolveParams({...options,userEnvs:env}),new RegExp(`no value.*${missing}`));
+  }
+  for(const env of [{},{KUKTAM_RUNTIME_SERVICE_ACCOUNT:'legacy@demo-kuktam-local.iam.gserviceaccount.com'}]){
+   await assert.rejects(resolveParams({...options,userEnvs:env}),/no value/);
+  }
+ }finally{http.request=hr;https.request=hs;globalThis.fetch=fetch;}
+});
