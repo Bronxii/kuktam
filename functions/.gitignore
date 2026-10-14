@@ -2,3 +2,6 @@ node_modules/
 lib/
 .cache/
 *.log
+
+# Project-specific production runtime configuration (no secrets).
+.env.kuktam-67768
