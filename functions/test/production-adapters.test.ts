@@ -66,7 +66,7 @@ const row={purchaseToken:q.purchaseToken,voidedTimeMillis:String(now-1000)};
 test('voided empty, duplicates, pagination and exact technical window',async()=>{
  const r=new Rest();r.responses=[{}, {voidedPurchases:[row,row,{...row,purchaseToken:'other'}],tokenPagination:{nextPageToken:'next'}},{}];const f=new GoogleVoidedFeed(r,()=>now);
  assert.deepEqual(await f.list(fq),{items:[],nextPageToken:null});const page=await f.list(fq);assert.equal(page.items.length,2);assert.equal(page.nextPageToken,'next');await f.list({...fq,pageToken:page.nextPageToken});
- assert.equal(r.calls[0]!.query!.startTime,String(now-cfg.voidedWindowMs));assert.equal(r.calls[0]!.query!.includeQuantityBasedPartialRefund,'false');assert.equal(r.calls[0]!.query!.type,'0');assert.equal(r.calls[2]!.query!.token,'next');assert.equal(r.calls[2]!.query!.startTime,undefined);
+ assert.equal(r.calls[0]!.query!.startTime,undefined);assert.equal(r.calls[0]!.query!.endTime,undefined);assert.equal(r.calls[0]!.query!.includeQuantityBasedPartialRefund,'false');assert.equal(r.calls[0]!.query!.type,'0');assert.equal(r.calls[2]!.query!.token,'next');assert.equal(r.calls[2]!.query!.startTime,undefined);
 });
 for(const response of [{voidedPurchases:[{purchaseToken:q.purchaseToken}]},{voidedPurchases:'bad'},{voidedPurchases:[{...row,voidedQuantity:2}]},{tokenPagination:{nextPageToken:42}},new AdapterError('rateLimited'),new AdapterError('permissionDenied')])test('voided malformed/error is controlled and private '+JSON.stringify(response).length,async()=>{
  const r=new Rest();r.responses=[response];const events:Diagnostic[]=[];await assert.rejects(new GoogleVoidedFeed(r,()=>now,e=>events.push(e)).list(fq),e=>!String(e).includes(q.purchaseToken));assert.ok(!JSON.stringify(events).includes(q.purchaseToken));
@@ -106,4 +106,35 @@ test('transport rejects path normalization and consume before credential access'
 test('transport bounds response size without exposing response bytes',async()=>{
  const transport=new GooglePlayRest({getAccessToken:async()=> 'fake'},async()=>new Response('x'.repeat(cfg.maxResponseBytes+1)));
  await assert.rejects(transport.request({method:'GET',path:`/androidpublisher/v3/applications/${cfg.packageName}/purchases/productsv2/tokens/test`}),/malformedResponse/);
+});
+
+// Regression: model Google's clock after credential/network delay, not a frozen client clock.
+for(const skew of [-60000,0,60000])test('voided first request uses server window with clock skew '+skew,async()=>{
+ const requests:URL[]=[];
+ const rest=new GooglePlayRest({getAccessToken:async()=> 'synthetic-bearer'},async(input,options)=>{
+  const url=new URL(String(input));requests.push(url);
+  assert.equal(options?.method,'GET');assert.equal(options?.body,undefined);
+  assert.equal(url.pathname,'/androidpublisher/v3/applications/com.bronxii.kuktam/purchases/voidedpurchases');
+  assert.deepEqual(Object.fromEntries(url.searchParams),{type:'0',includeQuantityBasedPartialRefund:'false',maxResults:'50'});
+  const googleNow=now+skew+2000;
+  const start=url.searchParams.get('startTime'),end=url.searchParams.get('endTime');
+  if(start!==null&&Number(start)<googleNow-cfg.voidedWindowMs||end!==null&&Number(end)>googleNow)return new Response('{}',{status:400});
+  return new Response('{}');
+ });
+ assert.deepEqual(await new GoogleVoidedFeed(rest,()=>now).list({...fq,limit:50}),{items:[],nextPageToken:null});assert.equal(requests.length,1);
+});
+test('voided pagination URL roundtrip, maximum page and empty GET body',async()=>{
+ const pageToken='synthetic+/= token';
+ const rest=new GooglePlayRest({getAccessToken:async()=> 'fake'},async(input,options)=>{
+  const url=new URL(String(input));assert.deepEqual(Object.fromEntries(url.searchParams),{type:'0',includeQuantityBasedPartialRefund:'false',maxResults:'1000',token:pageToken});
+  assert.equal(options?.method,'GET');assert.equal(options?.body,undefined);return new Response('{}');
+ });
+ await new GoogleVoidedFeed(rest,()=>now).list({...fq,limit:1000,pageToken});
+});
+for(const limit of [0,1001,1.5])test('voided invalid page limit makes no request '+limit,async()=>{
+ const r=new Rest();await assert.rejects(new GoogleVoidedFeed(r,()=>now).list({...fq,limit}));assert.equal(r.calls.length,0);
+});
+test('explicit old boundary would be rejected after transport delay',()=>{
+ const transmittedStart=now-cfg.voidedWindowMs,googleNow=now+1;
+ assert.ok(transmittedStart<googleNow-cfg.voidedWindowMs);
 });

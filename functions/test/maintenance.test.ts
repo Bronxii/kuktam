@@ -1,3 +1,4 @@
+import { VoidedLookupError } from '../src/billing/voided-purchase-api';
 import { before, beforeEach, after, test } from 'node:test';
 import assert from 'node:assert/strict';
 import { initializeApp, deleteApp, App } from 'firebase-admin/app';
@@ -141,4 +142,22 @@ test('closure: submillisecond clock schedules RTDN retry',async()=>{
  assert.ok(typeof parsed!=='string');await inbox.receive(parsed);const c=await inbox.claim(parsed.key);assert.ok(typeof c!=='string');
  assert.equal(await inbox.finish(c,'RETRY','retryablePlayFailure'),true);
  assert.equal((await s.inboxRef.get()).data()!.nextRetryAt.toMillis(),now.toMillis()+60001);
+});
+
+for(const offset of [-31*86400000,60000])test('server-observed voided result outside local time window remains discovery only '+offset,async()=>{
+ const s=await setup(false);s.play.respond(s.token,{...s.response,obfuscatedExternalAccountId:null});
+ s.feed.handler=async()=>({items:[{purchaseToken:s.token,voidedTimeMs:now.toMillis()+offset}],nextPageToken:null});
+ await s.run(['voided']);
+ const work=(await db.doc('billingMaintenance/'+workKey('feed','voided')).get()).data()!;
+ assert.equal(work.lastOutcome,'success');assert.equal(work.failures,0);
+ const inbox=(await db.collection('rtdnInbox').get()).docs[0]!.data();assert.equal(inbox.status,'UNRESOLVED');
+ assert.equal((await s.ledger.get()).exists,false);assert.equal((await s.effective.get()).exists,false);assert.equal((await s.ackRef.get()).exists,false);
+});
+test('voided configuration OPERATOR hold prevents repeated calls even after nextAt',async()=>{
+ const s=await setup(false);s.feed.handler=async()=>{throw new VoidedLookupError('configuration');};
+ await s.run(['voided']);const ref=db.doc('billingMaintenance/'+workKey('feed','voided'));
+ assert.equal((await ref.get()).data()!.status,'OPERATOR');
+ for(let i=0;i<3;i++){s.advance(86400000);await s.run(['voided']);}
+ assert.equal(s.feed.calls.length,1);assert.equal((await ref.get()).data()!.attempts,1);
+ assert.equal((await s.ledger.get()).exists,false);assert.equal((await s.effective.get()).exists,false);
 });

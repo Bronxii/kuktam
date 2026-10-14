@@ -1,6 +1,8 @@
 import { PACKAGE_NAME } from '../billing/play-purchase-api';
 export interface VoidedFeedQuery { readonly packageName: typeof PACKAGE_NAME; readonly startMs: number; readonly endMs: number; readonly pageToken: string | null; readonly limit: number; }
-/** Discovery only, NEVER evidence to revoke. Fresh per-token lookup is mandatory. */
+/** Discovery only, NEVER evidence to revoke. Fresh per-token lookup is mandatory.
+ * Production uses Google's rolling 30-day defaults; query times are local job metadata.
+ * Returned voidedTimeMillis need not fall within those local checkpoint times. */
 export interface VoidedPurchaseFeed { list(query: VoidedFeedQuery, options?: { signal: AbortSignal }): Promise<unknown>; }
 export interface VoidedFeedPage { readonly items: readonly { readonly purchaseToken: string; readonly voidedTimeMs: number }[]; readonly nextPageToken: string | null; }
 export function parseFeed(value: unknown, limit: number): VoidedFeedPage {

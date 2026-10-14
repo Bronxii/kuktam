@@ -49,7 +49,10 @@ export class GoogleVoidedFeed implements VoidedPurchaseFeed {
   try{
    const now=this.now();if(q.packageName!==cfg.packageName||!Number.isSafeInteger(q.startMs)||!Number.isSafeInteger(q.endMs)||q.startMs<0||q.endMs-q.startMs>cfg.voidedWindowMs||q.endMs<now-cfg.voidedWindowMs||q.endMs>now||q.startMs>q.endMs||!Number.isSafeInteger(q.limit)||q.limit<1||q.limit>1000)throw new AdapterError('invalidArgument');
    if(q.pageToken!==null)token(q.pageToken);
-   const v=object(await this.rest.request({method:'GET',path:`${base}/voidedpurchases`,query:{type:'0',includeQuantityBasedPartialRefund:'false',maxResults:String(q.limit),...(q.pageToken?{token:q.pageToken}:{startTime:String(Math.max(q.startMs,now-cfg.voidedWindowMs)),endTime:String(q.endMs)})}},o?.signal));
+   // Let Google select its documented rolling 30-day window using its own clock.
+   // Explicit now-30d/now boundaries can become invalid during credential/network latency.
+   // startMs/endMs remain local checkpoint metadata; token continues the server snapshot.
+   const v=object(await this.rest.request({method:'GET',path:`${base}/voidedpurchases`,query:{type:'0',includeQuantityBasedPartialRefund:'false',maxResults:String(q.limit),...(q.pageToken?{token:q.pageToken}:{})}},o?.signal));
    const rows=v.voidedPurchases??[];if(!Array.isArray(rows)||rows.length>q.limit)throw new AdapterError('malformedResponse');
    const items=rows.map(r=>{const x=object(r);token(x.purchaseToken);if(typeof x.voidedTimeMillis!=='string'||!/^\d+$/.test(x.voidedTimeMillis)||!Number.isSafeInteger(Number(x.voidedTimeMillis)))throw new AdapterError('malformedResponse');if(x.voidedQuantity!==undefined&&x.voidedQuantity!==1)throw new AdapterError('permanentPurchaseState');return {purchaseToken:x.purchaseToken,voidedTimeMs:Number(x.voidedTimeMillis)};});
    const next=v.tokenPagination===undefined?null:object(v.tokenPagination).nextPageToken??null;if(next!==null)token(next);

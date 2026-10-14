@@ -174,7 +174,8 @@ export class Maintenance {
       if (page.nextPageToken !== null && page.nextPageToken === window.pageToken) throw new VoidedLookupError('configuration');
       const keys: string[] = [];
       for (const item of page.items) {
-        if (item.voidedTimeMs < window.startMs || item.voidedTimeMs > window.endMs) throw new Error('invalidFeedWindow');
+        // Google's window filters when it observed the void, not returned voidedTimeMillis.
+        // The timestamp is validated by parseFeed; discovery still cannot authorize a revoke.
         const hash = tokenHash(item.purchaseToken), source = 'maintenance:voided', messageId = workKey('voided', [hash, item.voidedTimeMs, window.endMs].join(':'));
         const d: ParsedDelivery = {
           key: dedupeKey(source, messageId), source, messageId, publishTimeMillis: window.endMs, fingerprint: messageId,
