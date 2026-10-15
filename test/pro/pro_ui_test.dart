@@ -180,27 +180,20 @@ void main() {
     });
   }
   testWidgets(
-    'Free details offer, features, no invented price, future image inert',
+    'Free details offer, Pro benefits exclude separate AI credits',
     (tester) async {
       await screen(tester);
       expect(find.text('CHF 7.95'), findsOneWidget);
       for (final title in [
         'Receptátszámítás',
         'Mit főzzek?',
-        'Képes receptimport – hamarosan',
       ]) {
         expect(find.text(title), findsOneWidget);
       }
       expect(find.text('Recept szöveges import'), findsNothing);
       expect(find.text('Bevásárlólista szöveges import'), findsNothing);
       expect(find.textContaining('Nincs előfizetés'), findsOneWidget);
-      final image = tester.widget<ListTile>(
-        find.ancestor(
-          of: find.text('Képes receptimport – hamarosan'),
-          matching: find.byType(ListTile),
-        ),
-      );
-      expect(image.onTap, isNull);
+      expect(find.text('Képes receptimport – hamarosan'), findsNothing);
       expect(
         tester.widget<FilledButton>(find.byKey(const Key('pro-buy'))).onPressed,
         isNotNull,

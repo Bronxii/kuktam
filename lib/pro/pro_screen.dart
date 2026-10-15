@@ -16,9 +16,44 @@ class ProScreen extends StatefulWidget {
 }
 
 class _ProScreenState extends State<ProScreen> {
+  final _resultKey = GlobalKey();
+  int _seenRestoreRevision = 0;
+
+  void _restoreChanged() {
+    final c = widget.controller;
+    if (c == null || c.restoreResultRevision == _seenRestoreRevision) return;
+    _seenRestoreRevision = c.restoreResultRevision;
+    if (c.restoreResult == null) return;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || widget.controller != c || c.restoreResult == null) return;
+      final target = _resultKey.currentContext;
+      if (target != null) {
+        Scrollable.ensureVisible(target, alignment: 0.5);
+      }
+    });
+  }
+
+  @override
+  void didUpdateWidget(covariant ProScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.controller != widget.controller) {
+      oldWidget.controller?.removeListener(_restoreChanged);
+      _seenRestoreRevision = widget.controller?.restoreResultRevision ?? 0;
+      widget.controller?.addListener(_restoreChanged);
+    }
+  }
+
+  @override
+  void dispose() {
+    widget.controller?.removeListener(_restoreChanged);
+    super.dispose();
+  }
+
   @override
   void initState() {
     super.initState();
+    _seenRestoreRevision = widget.controller?.restoreResultRevision ?? 0;
+    widget.controller?.addListener(_restoreChanged);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) widget.controller?.load();
     });
@@ -78,11 +113,6 @@ class _ProScreenState extends State<ProScreen> {
                   'Mit főzzek?',
                   'Keress ötletet a kiválasztott alapanyagokból.',
                 ),
-                _Feature(
-                  Icons.photo_camera_outlined,
-                  'Képes receptimport – hamarosan',
-                  'Tervezett funkció, jelenleg még nem használható.',
-                ),
               ],
             ),
           ),
@@ -99,6 +129,7 @@ class _ProScreenState extends State<ProScreen> {
             ),
           if (c?.message != null || c == null) ...[
             Semantics(
+              key: _resultKey,
               liveRegion: true,
               child: Text(
                 c?.message ??

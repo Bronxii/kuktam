@@ -192,6 +192,66 @@ void main() {
     expect(c.isPro, false);
     expect(billing.buys, 0);
   });
+  scenario('explicit empty restore survives proof and offer refresh', (
+    tester,
+  ) async {
+    await open(tester);
+    await tap(tester, 'pro-restore');
+    const message = 'Nem találtunk visszaállítható Kuktám Pro vásárlást.';
+    expect(c.restoreResult, message);
+    await c.refresh();
+    await c.load();
+    await pump(tester);
+    expect(find.text(message), findsOneWidget);
+    expect(c.canBuy, true);
+    expect(c.canRestore, true);
+    expect(billing.buys, 0);
+    expect(backend.calls.contains('verifyProPurchase'), false);
+  });
+  scenario(
+    'second restore clears prior result and preserves rejection across refresh',
+    (tester) async {
+      await open(tester);
+      await tap(tester, 'pro-restore');
+      billing.restoreBarrier = Completer<List<PurchaseEvent>>();
+      await tap(tester, 'pro-restore');
+      expect(c.restoreResult, isNull);
+      expect(find.text('Korábbi vásárlás ellenőrzése…'), findsOneWidget);
+      expect(c.canBuy, false);
+      expect(c.canRestore, false);
+      backend.outcome = 'rejected';
+      billing.restoreBarrier!.complete([event(PurchaseEventKind.restored)]);
+      await pump(tester);
+      const message =
+          'A vásárlást nem sikerült igazolni. Ellenőrizd a korábbi vásárlásaidat.';
+      expect(find.text(message), findsOneWidget);
+      await c.refresh();
+      await pump(tester);
+      expect(find.text(message), findsOneWidget);
+      expect(c.canBuy, false);
+      expect(c.canRestore, true);
+      expect(c.isPro, false);
+    },
+  );
+  scenario('fast empty restore result is visible on small scrolled screen', (
+    tester,
+  ) async {
+    await tester.binding.setSurfaceSize(const Size(320, 480));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+    await open(tester);
+    await tap(tester, 'pro-restore');
+    final result = find.text(
+      'Nem találtunk visszaállítható Kuktám Pro vásárlást.',
+    );
+    expect(result, findsOneWidget);
+    expect(result.hitTestable(), findsOneWidget);
+    final rect = tester.getRect(result);
+    expect(rect.top, greaterThanOrEqualTo(kToolbarHeight));
+    expect(rect.bottom, lessThanOrEqualTo(480));
+    await c.refresh();
+    await pump(tester);
+    expect(result.hitTestable(), findsOneWidget);
+  });
   scenario('already-owned automatically shows recovery, no early Pro', (
     tester,
   ) async {

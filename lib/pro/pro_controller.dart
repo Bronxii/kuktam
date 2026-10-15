@@ -21,6 +21,8 @@ class ProController extends ChangeNotifier {
         _lastAction = null;
         _previousFlow = null;
         noPurchaseFound = false;
+        _restoreResult = null;
+        _explicitRestore = false;
       }
       _notify();
     });
@@ -40,6 +42,19 @@ class ProController extends ChangeNotifier {
         _lastAction = null;
       }
       _previousFlow = state.status;
+      if (_explicitRestore &&
+          !const {
+            PurchaseFlowStatus.restoring,
+            PurchaseFlowStatus.pendingPurchase,
+            PurchaseFlowStatus.verifying,
+            PurchaseFlowStatus.refreshingEntitlement,
+            PurchaseFlowStatus.loadingStore,
+            PurchaseFlowStatus.launchingPurchase,
+          }.contains(state.status)) {
+        _restoreResult = _currentMessage;
+        _explicitRestore = false;
+        restoreResultRevision++;
+      }
       _notify();
       if (_storeRequested &&
           state.status == PurchaseFlowStatus.idle &&
@@ -61,6 +76,10 @@ class ProController extends ChangeNotifier {
   String? _sessionUid;
   int _commandGeneration = 0;
   bool noPurchaseFound = false;
+  bool _explicitRestore = false;
+  String? _restoreResult;
+  String? get restoreResult => _restoreResult;
+  int restoreResultRevision = 0;
   ClientEntitlementState get entitlement => entitlements.current;
   PurchaseFlowState get flow => purchases.current;
   bool get isPro =>
@@ -127,7 +146,11 @@ class ProController extends ChangeNotifier {
     };
   }
 
-  String? get message {
+  String? get message => closed || !paymentsEnabled || processing
+      ? _currentMessage
+      : _restoreResult ?? _currentMessage;
+
+  String? get _currentMessage {
     if (closed) {
       return 'Ehhez a fiókhoz már nem indítható vásárlás vagy visszaállítás.';
     }
@@ -205,12 +228,16 @@ class ProController extends ChangeNotifier {
 
   Future<void> buy() async {
     if (!canBuy) return;
+    _restoreResult = null;
+    _explicitRestore = false;
     _lastAction = _Action.buy;
     await _run(purchases.buyPro);
   }
 
   Future<void> restore() async {
     if (!canRestore) return;
+    _restoreResult = null;
+    _explicitRestore = true;
     _lastAction = _Action.restore;
     await _run(purchases.restore);
   }
