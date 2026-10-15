@@ -68,13 +68,15 @@ export class MonetizationHandlers {
   }
   verifyProPurchase(request: AuthenticatedRequest) {
     return this.run(request, async context => {
-      const data = input(request.data, ['productId', 'purchaseToken']);
+      const restoring = !!request.data && typeof request.data === 'object' && 'intent' in request.data;
+      const data = input(request.data, restoring ? ['productId', 'purchaseToken','intent'] : ['productId', 'purchaseToken']);
+      if (restoring && data.intent !== 'restore') throw new TransportError('invalidArgument');
       if (data.productId !== PRODUCT_ID || typeof data.purchaseToken !== 'string' ||
         !data.purchaseToken || data.purchaseToken.trim() !== data.purchaseToken || data.purchaseToken.length > 4096) {
         throw new TransportError('invalidArgument');
       }
       try {
-        const result = await this.verifier.verify(context, { purchaseToken: data.purchaseToken });
+        const result = await this.verifier.verify(context, { purchaseToken: data.purchaseToken, ...(restoring ? {intent:'restore'} : {}) });
         return { schemaVersion: 1, outcome: result.status === 'granted' ? 'verified' : 'pending' };
       } catch (e) {
         if (e instanceof VerificationError && e.code === 'purchaseNotOwned' ||

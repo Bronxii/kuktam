@@ -10,9 +10,9 @@ const internalRestoreTestEnabled = bool.fromEnvironment(
 );
 
 const proDeletionWarning =
-    'A Kuktám-fiók törlésével a fiókhoz tartozó Pro jogosultság is megszűnik. '
-    'A vásárlás nem vihető át automatikusan egy új Kuktám-fiókba. '
-    'A fióktörlés nem jelent automatikus Google Play-visszatérítést.';
+    'A Kuktám-fiók és tárolt adatai véglegesen törlődnek, a fiók Pro hozzáférése megszűnik. '
+    'Ez nem Google Play-visszatérítés. Az érvényes lifetime vásárlás később egy új '
+    'Kuktám-fiókban visszaállítható a vásárlást birtokló Play-fiókkal.';
 
 class ProScreen extends StatefulWidget {
   const ProScreen({super.key, this.controller});

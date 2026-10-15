@@ -43,9 +43,8 @@ test('modern runtime deletion content barrier and completion; no client evidence
  const s=setup();await s.prepare();await db.doc(`users/${s.uid}/recipes/a`).set({name:'keep until cleanup'});
  assert.equal((await s.h.beginAccountDeletion({auth:s.auth,data:{}}) as any).outcome,'deletionStarted');
  assert.equal((await s.h.finalizeAccountDeletion({auth:s.auth,data:{cleanupComplete:true}}) as any).error,'invalidArgument');
- assert.equal((await s.h.finalizeAccountDeletion({auth:s.auth,data:{}}) as any).outcome,'cleanupIncomplete');assert.equal(s.deletes.length,0);
- await db.doc(`users/${s.uid}/recipes/a`).delete();
- assert.equal((await s.h.finalizeAccountDeletion({auth:s.auth,data:{}}) as any).outcome,'deletionCompleted');assert.deepEqual(s.deletes,[s.uid]);
+ let outcome='';for(let i=0;i<3&&outcome!=='deletionCompleted';i++)outcome=(await s.h.finalizeAccountDeletion({auth:s.auth,data:{}}) as any).outcome;
+ assert.equal(outcome,'deletionCompleted');assert.equal((await db.doc(`users/${s.uid}/recipes/a`).get()).exists,false);assert.deepEqual(s.deletes,[s.uid]);
  assert.equal((await db.doc(`accountLifecycle/${s.uid}`).get()).data()!.state,'DELETED');
 });
 test('trusted fallback replay is idempotent and never invokes modern Auth adapter',async()=>{
@@ -73,4 +72,22 @@ test('dispatcher dependency failure preserves checkpoint until lease recovery',a
  await db.doc('billingRuntime/maintenance').delete();const d=new MaintenanceDispatcher(db,{run:async()=>{throw new Error('failure');}});
  await assert.rejects(d.run());const state=(await db.doc('billingRuntime/maintenance').get()).data()!;assert.ok(state.leaseId);assert.equal(state.nextCategory,'ack');
  await db.doc('billingRuntime/maintenance').delete();
+});
+
+test('real runtime composition explicit Restore after deletion; no second acknowledge/consume',async()=>{
+ const s=setup();await s.prepare();await s.verify();
+ const before=s.calls.filter(c=>c.method==='POST').length;assert.equal(before,1);
+ await s.h.beginAccountDeletion({auth:s.auth,data:{}});
+ let outcome='';for(let i=0;i<5&&outcome!=='deletionCompleted';i++)outcome=(await s.h.finalizeAccountDeletion({auth:s.auth,data:{}}) as any).outcome;
+ assert.equal(outcome,'deletionCompleted');
+ const auth={uid:s.uid+'-new'};
+ const data={productId:cfg.productId,purchaseToken:s.token,intent:'restore'};
+ assert.deepEqual(await s.h.verifyProPurchase({auth,data}),{schemaVersion:1,outcome:'verified'});
+ const first=await s.h.getEntitlementProof({auth,data:{}}) as any;assert.equal(first.active,true);
+ assert.deepEqual(await s.h.verifyProPurchase({auth,data}),{schemaVersion:1,outcome:'verified'});
+ assert.equal((await s.h.getEntitlementProof({auth,data:{}}) as any).revision,first.revision);
+ assert.equal(s.calls.filter(c=>c.method==='POST').length,before);
+ assert.equal(s.calls.some(c=>c.path.includes('consume')),false);
+ assert.equal((await db.doc(`accountLifecycle/${s.uid}`).get()).data()!.state,'DELETED');
+ assert.equal((await db.doc(`billingPurchases/${tokenHash(s.token)}`).get()).data()!.boundUid,auth.uid);
 });

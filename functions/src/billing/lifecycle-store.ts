@@ -25,6 +25,8 @@ import { compareTime, parseGrant } from '../models';
 export interface CommitObservation {
   /** Trusted adapter observation, never client purchase JSON. */
   readonly purchase: unknown;
+  /** Server-resolved local binding for an already recovered ledger only. */
+  readonly recoveredBinding?: string;
   readonly expectedLifecycleRevision: number;
   readonly expectedAccountGeneration: number;
   readonly ackRecovery?: { readonly maxGenerations: number; readonly cooldownMs: number; readonly policy: RetryPolicy };
@@ -42,8 +44,8 @@ export class LifecycleStore {
     if (!Number.isSafeInteger(input.expectedLifecycleRevision) || input.expectedLifecycleRevision < 0 ||
       !Number.isSafeInteger(input.expectedAccountGeneration) || input.expectedAccountGeneration < 1) throw new LifecycleError('invalidTransition');
     const play = parsePlayPurchase(input.purchase);
-    if (play.packageName !== PACKAGE_NAME || play.productId !== PRODUCT_ID || !play.obfuscatedExternalAccountId) throw new LifecycleError('bindingConflict');
-    const opaque = play.obfuscatedExternalAccountId, keyVersion = bindingVersion(opaque);
+    if (play.packageName !== PACKAGE_NAME || play.productId !== PRODUCT_ID || (!play.obfuscatedExternalAccountId && !input.recoveredBinding)) throw new LifecycleError('bindingConflict');
+    const opaque = input.recoveredBinding ?? play.obfuscatedExternalAccountId!, keyVersion = bindingVersion(opaque);
     const hash = tokenHash(play.purchaseToken), ledgerRef = this.db.doc(`billingPurchases/${hash}`);
     const grantsRef = this.db.collection(`users/${uid}/entitlementGrants`), grantRef = grantsRef.doc(playGrantId(hash));
     const effectiveRef = this.db.doc(`users/${uid}/entitlements/pro`);
@@ -55,6 +57,7 @@ export class LifecycleStore {
         const account = readAccount(marker.data());
         const ledgerDoc = await tx.get(ledgerRef), bindingDoc = await tx.get(this.db.doc(`billingAccountBindings/${opaque}`));
         const current = ledgerDoc.exists ? readPurchase(ledgerDoc.data()) : null;
+        if (input.recoveredBinding && (current?.bindingState !== 'BOUND' || !current.recoveredFromDeletion || current.accountBinding !== input.recoveredBinding)) throw new LifecycleError('bindingConflict');
         // Terminal/stale decision precedes owner resolution: retired rows omit UID.
         const observation = play.purchaseState === 'CANCELED' ? 'terminalInvalid' : play.purchaseState === 'PENDING' ? 'pending' :
           play.acknowledgementState === 'ACKNOWLEDGED' ? 'acknowledged' : 'purchased';
@@ -113,6 +116,42 @@ export class LifecycleStore {
         return { outcome: 'committed', lifecycleRevision: ledger.lifecycleRevision, granted: decision.grantRequired };
       });
     } catch (e) { if (e instanceof LifecycleError) throw e; throw new LifecycleError('internalConflict'); }
+  }
+  /** Explicit Restore only. Fresh Play evidence is mandatory; transaction CAS
+   * elects one new owner. The original Play opaque ID is never rebound. */
+  async recoverDeleted(context: AuthContext, input: CommitObservation, localBinding: string): Promise<CommitResult> {
+    const uid = authenticatedUid(context), play = parsePlayPurchase(input.purchase);
+    if (play.packageName !== PACKAGE_NAME || play.productId !== PRODUCT_ID || play.purchaseState !== 'PURCHASED') throw new LifecycleError('verificationRejected');
+    const hash = tokenHash(play.purchaseToken), keyVersion = bindingVersion(localBinding);
+    return this.db.runTransaction(async tx => {
+      await this.writeGuard?.(tx);
+      const ref = this.db.doc(`billingPurchases/${hash}`), marker = this.db.doc(`accountLifecycle/${uid}`);
+      const ledgerDoc = await tx.get(ref), markerDoc = await tx.get(marker);
+      const registry = await tx.get(this.db.doc(`billingAccountBindings/${localBinding}`));
+      if (!ledgerDoc.exists || !markerDoc.exists || !registry.exists) throw new LifecycleError('bindingConflict');
+      const old = readPurchase(ledgerDoc.data()), account = readAccount(markerDoc.data()), binding = readBinding(registry.data());
+      if (old.bindingState !== 'ACCOUNT_DELETED' || old.lifecycleRevision !== input.expectedLifecycleRevision ||
+          old.revokedAt !== null || old.purchaseState === 'CANCELED' || old.packageName !== PACKAGE_NAME || old.productId !== PRODUCT_ID || old.testPurchase !== play.testPurchase ||
+          account.state !== 'ACTIVE' || account.generation !== input.expectedAccountGeneration ||
+          binding.state !== 'ACTIVE' || binding.uid !== uid || binding.keyVersion !== keyVersion) throw new LifecycleError('bindingConflict');
+      if (old.acknowledgementState === 'ACKNOWLEDGED' && play.acknowledgementState !== 'ACKNOWLEDGED') throw new LifecycleError('verificationRejected');
+      const grantsRef = this.db.collection(`users/${uid}/entitlementGrants`), effectiveRef = this.db.doc(`users/${uid}/entitlements/pro`);
+      const grantsDoc = await tx.get(grantsRef), effectiveDoc = await tx.get(effectiveRef);
+      const grantRef = grantsRef.doc(playGrantId(hash));
+      if (grantsDoc.docs.some(d => d.id === grantRef.id)) throw new LifecycleError('bindingConflict');
+      const now = this.clock();
+      const grant = parseGrant({source:'PLAY_PURCHASE',sourceRef:hash,status:'ACTIVE',startsAt:now,createdAt:now,expiresAt:null,revokedAt:null});
+      const next = effectiveUpdate([...grantsDoc.docs.map(d => parseGrant(d.data())),grant],now,effectiveDoc.exists ? readEffective(effectiveDoc.data()) : null);
+      const {reconciliationRequired: unusedReconciliation, ...base} = old;
+      const ledger = readPurchase({...base,bindingState:'BOUND',recoveredFromDeletion:true,purchaseToken:play.purchaseToken,boundUid:uid,accountBinding:localBinding,
+        purchaseState:'PURCHASED',acknowledgementState:play.acknowledgementState,lifecycleRevision:old.lifecycleRevision+1,
+        accountGeneration:account.generation,bindingKeyVersion:keyVersion,lastCheckedAt:now,nextCheckAt:null,operationalError:null,verifiedAt:now,updatedAt:now});
+      // Full replacement drops retired-only state; never reuse the old UID.
+      tx.set(ref, ledger);
+      tx.create(grantRef,grant);
+      if(next) tx.set(effectiveRef,next);
+      return {outcome:'committed',lifecycleRevision:ledger.lifecycleRevision,granted:true};
+    });
   }
   /** Server-only trusted observation. All terminal purchase/grant/effective writes
    * share this transaction with the existing verification/ack writer. */
@@ -381,7 +420,17 @@ export class LifecycleStore {
       const account=readAccount(markerDoc.data()),job=readDeletion(jobDoc.data()),now=this.clock();
       if(account.state==='DELETED'&&job.stage==='DONE')return {kind:'done'};
       if(account.state==='ACTIVE'||account.generation!==job.generation)throw new LifecycleError('staleAccountGeneration');
-      if(!job.authGone && job.cleanupState!=='VERIFIED')return {kind:'cleanupIncomplete'};
+      // Schema-owned content registry: extend here when new personal collections
+      // are introduced. Bounded first-page deletes avoid unbounded recursiveDelete.
+      const rootRef=this.db.doc(`users/${uid}`), root=await tx.get(rootRef);
+      const content=[];
+      for(const name of ['recipes','shopping']) content.push(...(await tx.get(rootRef.collection(name).limit(limit))).docs);
+      if(content.length || root.exists){
+        for(const d of content)tx.delete(d.ref);
+        if(root.exists)tx.delete(rootRef);
+        tx.set(jobRef,readDeletion({...job,cleanupState:'PENDING',updatedAt:now}));
+        return {kind:'continue'};
+      }
       const advance=(stage:typeof job.stage)=>tx.set(jobRef,readDeletion({...job,stage,updatedAt:now,lastOutcome:null}));
       if(job.stage==='BINDINGS_MARK'){
         const page=await tx.get(this.db.collection('billingAccountBindings').where('uid','==',uid).where('state','==','ACTIVE').limit(limit));
@@ -424,24 +473,21 @@ export class LifecycleStore {
         if(page.empty)advance('AUTH');return {kind:'continue'};
       }
       if(job.stage!=='AUTH')throw new LifecycleError('internalConflict');
+      const remainingGrants=await tx.get(this.db.collection(`users/${uid}/entitlementGrants`).limit(1));
+      if(!remainingGrants.empty){advance('GRANTS');return {kind:'continue'};}
+      const entitlements=await tx.get(this.db.collection(`users/${uid}/entitlements`).limit(limit));
+      const removable=entitlements.docs.filter(d=>job.authGone || d.id!=='pro');
+      if(removable.length){for(const d of removable)tx.delete(d.ref);return {kind:'continue'};}
       if(job.authGone){
         tx.delete(this.db.doc(`users/${uid}/entitlements/pro`));
         const completed=account.state==='DELETED'?account:advanceAccount(account,'DELETED',account.generation,now);
         if(completed!==account)tx.set(markerRef,completed);
-        tx.set(jobRef,readDeletion({...job,stage:'DONE',generation:completed.generation,leaseId:null,leaseUntil:null,nextAt:null,lastOutcome:null,updatedAt:now}));
+        tx.set(jobRef,readDeletion({...job,cleanupState:'VERIFIED',stage:'DONE',generation:completed.generation,leaseId:null,leaseUntil:null,nextAt:null,lastOutcome:null,updatedAt:now}));
         return {kind:'done'};
-      }
-      // The billing worker must not delete Auth while client-owned content remains.
-      const root = await tx.get(this.db.doc(`users/${uid}`));
-      const recipes = await tx.get(this.db.collection(`users/${uid}/recipes`).limit(1));
-      const shopping = await tx.get(this.db.collection(`users/${uid}/shopping`).limit(1));
-      if(root.exists || !recipes.empty || !shopping.empty){
-        tx.set(jobRef,readDeletion({...job,cleanupState:'PENDING',leaseId:null,leaseUntil:null,updatedAt:now}));
-        return {kind:'cleanupIncomplete'};
       }
       if(job.lastOutcome==='supportRequired')return {kind:'operator'};
       if(job.leaseUntil&&compareTime(job.leaseUntil, now) > 0||job.nextAt&&compareTime(job.nextAt, now) > 0)return {kind:'busy'};
-      const leaseId=randomUUID();tx.set(jobRef,readDeletion({...job,leaseId,leaseUntil:Timestamp.fromMillis(now.toMillis()+policy.leaseMs),nextAt:null,updatedAt:now}));
+      const leaseId=randomUUID();tx.set(jobRef,readDeletion({...job,cleanupState:'VERIFIED',leaseId,leaseUntil:Timestamp.fromMillis(now.toMillis()+policy.leaseMs),nextAt:null,updatedAt:now}));
       return {kind:'auth',operationId:job.operationId,generation:job.generation,leaseId};
     });
   }

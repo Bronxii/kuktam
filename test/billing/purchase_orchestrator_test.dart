@@ -52,6 +52,14 @@ void main() {
     service.bindSession(session('b'));
   }
 
+  test('only explicit restore opts into deleted-purchase recovery', () async {
+    await send(event());
+    expect(gateway.restoreIntents, [false]);
+    billing.owned = [event(PurchaseEventKind.restored)];
+    await service.restore();
+    expect(gateway.restoreIntents, [false, true]);
+  });
+
   test(
     'offer preserves localized price/product and launch uses opaque binding',
     () async {

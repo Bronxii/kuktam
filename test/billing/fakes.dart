@@ -61,12 +61,17 @@ class FakeBilling implements BillingAdapter {
 }
 
 class FakeGateway implements PurchaseVerificationGateway {
+  final restoreIntents = <bool>[];
   int calls = 0;
   Future<VerificationOutcome> Function(PurchaseEvidence) reply = (_) async =>
       VerificationOutcome.verified;
   @override
-  Future<VerificationOutcome> verify(PurchaseEvidence evidence) {
+  Future<VerificationOutcome> verify(
+    PurchaseEvidence evidence, {
+    bool explicitRestore = false,
+  }) {
     calls++;
+    restoreIntents.add(explicitRestore);
     return reply(evidence);
   }
 }

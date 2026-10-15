@@ -1,6 +1,7 @@
 // Test-only SDK doubles. No Firebase/network access.
 // ignore_for_file: subtype_of_sealed_class
 import 'dart:async';
+import 'package:kuktam/features/auth/data/repositories/account_deletion_gateway.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -75,6 +76,12 @@ class Auth implements FirebaseAuth {
   User? get currentUser => user;
   @override
   Stream<User?> authStateChanges() => events.stream;
+  @override
+  Future<void> signOut() async {
+    user = null;
+    events.add(null);
+  }
+
   @override
   dynamic noSuchMethod(Invocation i) => super.noSuchMethod(i);
 }
@@ -253,6 +260,27 @@ class Batch implements WriteBatch {
   dynamic noSuchMethod(Invocation i) => super.noSuchMethod(i);
 }
 
+class ServerDeletion implements AccountDeletionGateway {
+  ServerDeletion(this.auth);
+  final Auth auth;
+  int begins = 0, finalizes = 0;
+  @override
+  Future<void> begin() async {
+    begins++;
+  }
+
+  @override
+  Future<DeletionCompletion> finalize() async {
+    finalizes++;
+    if (auth.user?.failDelete == true) {
+      throw FirebaseAuthException(code: 'internal-error');
+    }
+    auth.user = null;
+    auth.events.add(null);
+    return DeletionCompletion.completed;
+  }
+}
+
 class Fixture {
   Fixture([List<String> providers = const ['password']]) {
     user = Account(auth, providers);
@@ -268,6 +296,7 @@ class Fixture {
       firebaseAuth: auth,
       firestore: db,
       googleSignIn: google,
+      coordination: ServerDeletion(auth),
     );
     addTearDown(auth.events.close);
   }
@@ -294,7 +323,7 @@ void main() {
         f.db.failCommit = false;
         f.db.failRootDelete = false;
         await f.repo.deleteCurrentAccount(password: 'secret');
-        expect(f.user.deletes, 1);
+        expect(f.user.deletes, 0);
       },
     );
   }
@@ -349,7 +378,7 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.byType(SettingsScreen), findsNothing);
       expect(find.text('Bejelentkezés e-maillel'), findsOneWidget);
-      expect(f.user.deletes, 1);
+      expect(f.user.deletes, 0);
     },
   );
 
@@ -371,7 +400,7 @@ void main() {
       expect((f.user.credential as EmailAuthCredential).password, ' secret ');
       expect(f.db.paths, {'users/other/recipes/r', 'ingredients/salt'});
       expect(f.db.deleted.last, 'users/owner');
-      expect(f.user.deletes, 1);
+      expect(f.user.deletes, 0);
       expect(f.auth.currentUser, isNull);
     },
   );
@@ -398,7 +427,7 @@ void main() {
     f.google.failCleanup = true;
     await f.repo.deleteCurrentAccount();
     expect(f.user.credential?.providerId, 'google.com');
-    expect(f.user.deletes, 1);
+    expect(f.user.deletes, 0);
     expect(f.google.initializes, 1);
     expect(f.google.signouts, 2);
     expect(f.auth.currentUser, isNull);
@@ -421,7 +450,7 @@ void main() {
     expect(f.user.deletes, 0);
     f.db.failCollection = null;
     await f.repo.deleteCurrentAccount(password: 'secret');
-    expect(f.user.deletes, 1);
+    expect(f.user.deletes, 0);
   });
   test(
     'Auth delete failure is not success; retry on empty data works',
@@ -520,7 +549,7 @@ void main() {
       await confirm(tester);
       expect(find.byType(AccountDeletionDialog), findsNothing);
       expect(find.text('Bejelentkezés e-maillel'), findsOneWidget);
-      expect(f.user.deletes, 1);
+      expect(f.user.deletes, 0);
     },
   );
   testWidgets('busy blocks repeated submit, barrier and system back', (
@@ -545,7 +574,7 @@ void main() {
     );
     f.user.hold!.complete();
     await tester.pumpAndSettle();
-    expect(f.user.deletes, 1);
+    expect(f.user.deletes, 0);
   });
   testWidgets(
     'Auth failure is visible; Google cancellation message and no deletion',

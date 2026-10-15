@@ -40,7 +40,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
     _deletionDialogOpen = true;
     final navigator = Navigator.of(context);
     try {
-      final repository = widget.deletionRepository ?? AccountDeletionRepository();
+      final pro = ProScope.maybeOf(context);
+      final repository = widget.deletionRepository ?? AccountDeletionRepository(
+        // Begin is acknowledged before clearing cached local Pro access.
+        // Account switch is fenced by the repository before this callback.
+        onDeletionStarted: () async { await pro?.entitlements.clearForLogout(); },
+      );
       final deleted = await showDialog<bool>(
         context: context,
         barrierDismissible: false,

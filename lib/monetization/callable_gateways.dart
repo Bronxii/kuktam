@@ -123,7 +123,10 @@ final class CallablePurchaseGateway
   }
 
   @override
-  Future<VerificationOutcome> verify(PurchaseEvidence evidence) async {
+  Future<VerificationOutcome> verify(
+    PurchaseEvidence evidence, {
+    bool explicitRestore = false,
+  }) async {
     if (!evidence.valid ||
         evidence.token.length > 4096 ||
         evidence.token.trim() != evidence.token) {
@@ -134,6 +137,7 @@ final class CallablePurchaseGateway
         await transport.call('verifyProPurchase', {
           'productId': ProProduct.id,
           'purchaseToken': evidence.token,
+          if (explicitRestore) 'intent': 'restore',
         }),
         {'schemaVersion', 'outcome'},
       );

@@ -46,6 +46,20 @@ class FunctionsFake implements FirebaseFunctions {
 }
 
 void main() {
+  test('explicit Restore alone sends recovery intent', () async {
+    final functions = FunctionsFake();
+    final gateway = CallablePurchaseGateway(
+      FirebaseCallableTransport(functions: functions, isCurrent: () => true),
+    );
+    await gateway.verify(const PurchaseEvidence('fake'), explicitRestore: true);
+    expect(functions.callable.sent, {
+      'productId': ProProduct.id,
+      'purchaseToken': 'fake',
+      'intent': 'restore',
+    });
+    await gateway.verify(const PurchaseEvidence('fake'));
+    expect(functions.callable.sent!.containsKey('intent'), false);
+  });
   test('Functions adapter carries no UID or package input', () async {
     final functions = FunctionsFake();
     final gateway = CallablePurchaseGateway(

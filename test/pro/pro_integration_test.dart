@@ -566,7 +566,7 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text(proDeletionWarning), findsOneWidget);
     expect(
-      find.textContaining('automatikus Google Play-visszatérítést'),
+      find.textContaining('nem Google Play-visszatérítés'),
       findsOneWidget,
     );
   });

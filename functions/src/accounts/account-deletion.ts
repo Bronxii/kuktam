@@ -3,7 +3,7 @@ import { LifecycleStore } from '../billing/lifecycle-store';
 import { AuthContext, authenticatedUid } from '../billing/account-binding';
 import { AuthUserDeletionApi, DeletionOutcome, DeletionPolicy, defaultDeletionPolicy, validateDeletionPolicy } from './deletion-contract';
 import { bounded } from '../jobs/maintenance-policy';
-/** Billing-only orchestration: no recipes/shopping/root writes and no Play calls. */
+/** Bounded account and billing cleanup; no Play refund/revoke/consume calls. */
 export class AccountDeletionService {
  constructor(db:Firestore,private readonly auth:AuthUserDeletionApi,
  clock:()=>Timestamp=Timestamp.now,private readonly store=new LifecycleStore(db,clock),private readonly policy:DeletionPolicy=defaultDeletionPolicy){validateDeletionPolicy(policy);}
@@ -16,9 +16,6 @@ export class AccountDeletionService {
  }
  async finalizeContent(context:AuthContext):Promise<DeletionOutcome>{
   const uid=authenticatedUid(context);
-  const content=await this.store.verifyDeletionContent(context);
-  if(content==='alreadyDeleted')return 'alreadyDeleted';
-  if(content!=='VERIFIED')return 'cleanupIncomplete';
   return this.resume(uid);
  }
  async resume(uid:string,maxSteps=10,pageSize=50):Promise<DeletionOutcome>{

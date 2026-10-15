@@ -1,6 +1,7 @@
 import 'dart:async';
 import '../../../../core/account_deletion_signal.dart';
 import 'account_deletion_gateway.dart';
+import 'callable_account_deletion_gateway.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -15,6 +16,7 @@ class AccountDeletionRepository {
     FirebaseFirestore? firestore,
     GoogleSignIn? googleSignIn,
     this.coordination,
+    this.onDeletionStarted,
   }) : _auth = firebaseAuth ?? FirebaseAuth.instance,
        _firestore = firestore ?? FirebaseFirestore.instance,
        _authRepository = AuthRepository(
@@ -22,8 +24,9 @@ class AccountDeletionRepository {
          googleSignIn: googleSignIn,
        );
 
-  /// Null preserves the released legacy flow; no undeployed endpoint is called.
+  /// Optional test adapter. Null selects the production coordinated gateway.
   final AccountDeletionGateway? coordination;
+  final Future<void> Function()? onDeletionStarted;
   final FirebaseAuth _auth;
   final FirebaseFirestore _firestore;
   final AuthRepository _authRepository;
@@ -41,11 +44,13 @@ class AccountDeletionRepository {
       if (user == null) throw StateError('No authenticated user');
       final uid = user.uid;
       var sessionChanged = false;
-      if (coordination != null) {
-        sessionWatch = _auth.authStateChanges().listen((current) {
-          if (current?.uid != uid) sessionChanged = true;
-        });
-      }
+      var replacementSeen = false;
+      sessionWatch = _auth.authStateChanges().listen((current) {
+        if (current?.uid != uid) sessionChanged = true;
+        if (current != null && (current.uid != uid || sessionChanged)) {
+          replacementSeen = true;
+        }
+      });
       final hasGoogle = user.providerData.any(
         (p) => p.providerId == 'google.com',
       );
@@ -59,10 +64,19 @@ class AccountDeletionRepository {
       }
 
       checkOwner();
-      if (coordination != null) {
-        await coordination!.begin();
-        checkOwner();
-      }
+      final gateway =
+          coordination ??
+          CallableAccountDeletionGateway.production(
+            canStart: () => !sessionChanged && _auth.currentUser?.uid == uid,
+            canComplete: () =>
+                !replacementSeen &&
+                (_auth.currentUser == null ||
+                    (!sessionChanged && _auth.currentUser?.uid == uid)),
+          );
+      await gateway.begin();
+      checkOwner();
+      await onDeletionStarted?.call();
+      checkOwner();
       final root = _firestore.collection('users').doc(uid);
       for (final name in ['recipes', 'shopping']) {
         // Re-read the first remaining page: no cursor skips after deletion.
@@ -88,19 +102,21 @@ class AccountDeletionRepository {
       checkOwner();
       if (rootSnapshot.exists) await root.delete();
       checkOwner();
-      if (coordination == null) {
-        await user.delete();
-      } else {
-        final result = await coordination!.finalize();
+      {
+        final result = await gateway.finalize();
         // Backend completion may itself remove the current Auth session.
         // Never perform local provider cleanup against a replacement account.
+        if (replacementSeen) throw StateError('Authenticated user changed');
         if (_auth.currentUser != null) checkOwner();
         if (result != DeletionCompletion.completed) {
           throw DeletionResumeRequired(result);
         }
       }
+      if (_auth.currentUser?.uid == uid && !replacementSeen) {
+        await _auth.signOut();
+      }
       // Auth deletion succeeded. Provider cleanup cannot turn it into failure.
-      if (hasGoogle) {
+      if (hasGoogle && _auth.currentUser == null) {
         try {
           await _authRepository.cleanUpGoogleAfterAccountDeletion();
         } catch (_) {

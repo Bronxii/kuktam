@@ -98,7 +98,10 @@ enum VerificationOutcome {
 /// never send a caller-selected UID as authoritative request data.
 /// Revoked sessions must refuse dispatch, including delayed token acquisition.
 abstract interface class PurchaseVerificationGateway {
-  Future<VerificationOutcome> verify(PurchaseEvidence evidence);
+  Future<VerificationOutcome> verify(
+    PurchaseEvidence evidence, {
+    bool explicitRestore = false,
+  });
 }
 
 abstract interface class PurchaseContextGateway {

@@ -4,6 +4,7 @@ import { LifecycleError, record, positive } from './lifecycle-error';
 
 type Versioned<T> = T extends unknown ? Omit<T, 'schemaVersion'> & {
   readonly schemaVersion: 2;
+  readonly recoveredFromDeletion?: true;
   readonly lifecycleRevision: number;
   readonly lastCheckedAt: Timestamp | null;
   readonly nextCheckAt: Timestamp | null;
@@ -25,7 +26,9 @@ export function readPurchase(value: unknown): PurchaseV2 {
       lifecycleRevision: 1, lastCheckedAt: null, nextCheckAt: null, operationalError: null,
       accountGeneration: null, bindingKeyVersion: null }) as PurchaseV2;
     if (extras.some(k => !(k in v))) throw new LifecycleError('invalidSchema');
+    if ('recoveredFromDeletion' in v && v.recoveredFromDeletion !== true) throw new LifecycleError('invalidSchema');
     const base = { ...v, schemaVersion: 1 };
+    delete (base as Record<string, unknown>).recoveredFromDeletion;
     for (const k of extras) delete (base as Record<string, unknown>)[k];
     const parsed = parsePurchase(base);
     if (!positive(v.lifecycleRevision) ||

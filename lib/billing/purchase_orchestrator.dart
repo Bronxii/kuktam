@@ -208,13 +208,13 @@ final class PurchaseOrchestrator {
     if (_action || _inFlight.isNotEmpty) return;
     _action = true;
     try {
-      await _restore(generation);
+      await _restore(generation, allowRecovery: true);
     } finally {
       if (generation == _generation) _action = false;
     }
   }
 
-  Future<void> _restore(int generation) async {
+  Future<void> _restore(int generation, {bool allowRecovery = false}) async {
     _set(PurchaseFlowStatus.restoring);
     try {
       final events = await billing.restore();
@@ -223,7 +223,12 @@ final class PurchaseOrchestrator {
       if (events.isEmpty) _set(PurchaseFlowStatus.idle);
       for (final event in events) {
         if (!_valid(generation)) return;
-        await _accept(event, generation, explicitRestore: true);
+        await _accept(
+          event,
+          generation,
+          explicitRestore: true,
+          allowRecovery: allowRecovery,
+        );
       }
     } catch (error) {
       if (_valid(generation)) _billingError(error);
@@ -238,6 +243,7 @@ final class PurchaseOrchestrator {
     PurchaseEvent event,
     int generation, {
     bool explicitRestore = false,
+    bool allowRecovery = false,
   }) async {
     if (!_valid(generation)) return;
     final evidence = event.evidence;
@@ -291,7 +297,9 @@ final class PurchaseOrchestrator {
       _set(PurchaseFlowStatus.retryableError);
       return;
     }
-    final operation = _tail.then((_) => _verify(evidence, generation));
+    final operation = _tail.then(
+      (_) => _verify(evidence, generation, allowRecovery),
+    );
     _inFlight[key] = operation;
     _tail = operation;
     try {
@@ -301,12 +309,16 @@ final class PurchaseOrchestrator {
     }
   }
 
-  Future<void> _verify(PurchaseEvidence evidence, int generation) async {
+  Future<void> _verify(
+    PurchaseEvidence evidence,
+    int generation,
+    bool allowRecovery,
+  ) async {
     if (!_valid(generation)) return;
     _set(PurchaseFlowStatus.verifying);
     try {
       final result = await _session!.gateway
-          .verify(evidence)
+          .verify(evidence, explicitRestore: allowRecovery)
           .timeout(verificationTimeout);
       _reportAccountClosure(generation);
       if (!_valid(generation)) return;

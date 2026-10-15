@@ -54,16 +54,19 @@ async function reachAuth(s:S){for(let i=0;i<20;i++){if((await s.job.get()).data(
 test('begin atomic barrier immediately inactivates and replay has no generation/revision churn',async()=>{const s=await setup();const a=await s.begin();assert.equal(a.outcome,'deletionStarted');assert.equal((await s.marker.get()).data()!.generation,2);assert.equal((await s.effective.get()).data()!.active,false);const b=await s.begin();assert.equal(b.operationId,a.operationId);assert.equal((await s.effective.get()).data()!.revision,2);assert.equal((await s.marker.get()).data()!.generation,2);});
 test('two concurrent begins create one canonical operation',async()=>{const s=await setup();const [a,b]=await Promise.all([s.begin(),s.begin()]);assert.equal(a.operationId,b.operationId);assert.equal((await s.marker.get()).data()!.generation,2);});
 for(const source of ['PROMO','ADMIN','TEST'] as const)test(`${source} account grants also disabled and removed`,async()=>{const s=await setup(false);await db.doc(`users/${s.uid}/entitlementGrants/other`).set(grant({source}));await s.store.recomputeGrants(s.uid,1);await s.begin();assert.equal((await s.effective.get()).data()!.active,false);await s.finish();await assertClosed(s);});
-test('deletion waits for verified content before billing and Auth cleanup',async()=>{
- const s=await setup();const recipe=db.doc(`users/${s.uid}/recipes/keep`),shopping=db.doc(`users/${s.uid}/shopping/keep`);
- await recipe.set({title:'keep'});await shopping.set({name:'keep'});await s.begin();
- assert.equal(await s.finish(),'cleanupIncomplete');assert.equal(s.auth.calls,0);
- assert.equal((await s.ledger.get()).data()!.bindingState,'BOUND');
- await recipe.delete();await shopping.delete();await s.store.verifyDeletionContent({uid:s.uid});
+test('server finishes content cleanup after client disappears',async()=>{
+ const s=await setup();const other=db.doc('users/control/recipes/keep');await other.set({keep:true});
+ await db.doc(`users/${s.uid}`).set({profile:true});
+ for(let i=0;i<7;i++)await db.doc(`users/${s.uid}/recipes/${i}`).set({title:'private'});
+ await db.doc(`users/${s.uid}/shopping/item`).set({name:'private'});
+ await s.deletion.beginAccountDeletion({uid:s.uid});
+ await s.store.deletionStep(s.uid,2);
+ assert.equal((await db.collection(`users/${s.uid}/recipes`).get()).size,5);assert.equal(s.auth.calls,0);
  assert.equal(await s.finish(),'deletionCompleted');await assertClosed(s);
- assert.equal((await s.registry.get()).data()!.uid,undefined);
- assert.equal((await s.ledger.get()).data()!.purchaseToken,undefined);
- assert.equal(await s.deletion.handleAuthUserDeleted(s.uid),'alreadyDeleted');
+ assert.equal((await db.doc(`users/${s.uid}`).get()).exists,false);
+ assert.equal((await db.collection(`users/${s.uid}/recipes`).get()).size,0);
+ assert.equal((await db.collection(`users/${s.uid}/shopping`).get()).size,0);
+ assert.equal((await other.get()).exists,true);
 });
 
 test('token replay on new UID is rejected even fake Play advertises new binding',async()=>{const s=await setup();await s.begin();await s.finish();const b=await setup(false);b.play.respond(s.token,{...s.response,obfuscatedExternalAccountId:b.response.obfuscatedExternalAccountId});await assert.rejects(new PurchaseVerifier(db,b.play,binding,b.clock).verify({uid:b.uid},{purchaseToken:s.token}),{code:'tokenAlreadyBound'});assert.equal((await b.effective.get()).exists,false);});
@@ -113,45 +116,34 @@ for(const kind of ['grant','ledgerIdentity','inbox','bindingIdentity','ack'] as 
  assert.ok(before.updateTime!.isEqual((await ref.get()).updateTime!));assert.equal(s.auth.calls,0);
  assert.equal((await s.effective.get()).data()!.active,false);
 });
-test('closure: maintenance cannot delete Auth before profile cleanup',async()=>{
- const s=await setup();const root=db.doc(`users/${s.uid}`);await root.set({legacy:true});await s.begin();
- for(let i=0;i<10;i++)await s.maintenance.run({now:s.clock(),only:['deletion']});
- assert.equal(s.auth.calls,0);assert.equal((await s.marker.get()).data()!.state,'DELETING');
- await root.delete();await s.store.verifyDeletionContent({uid:s.uid});await s.finish();await assertClosed(s);
+test('maintenance removes profile before Auth deletion',async()=>{
+ const s=await setup();const root=db.doc(`users/${s.uid}`);await root.set({legacy:true});
+ await s.deletion.beginAccountDeletion({uid:s.uid});
+ s.auth.handler=async()=>{assert.equal((await root.get()).exists,false);return 'deleted';};
+ for(let i=0;i<18;i++)await s.maintenance.run({now:s.clock(),only:['deletion']});
+ await assertClosed(s);assert.equal(s.auth.calls,1);
 });
-
-for(const path of ['recipes/r','shopping/s',''])test(`P0C content barrier: ${path||'root'} independently blocks`,async()=>{
+for(const path of ['recipes/r','shopping/s',''])test(`server cleanup covers ${path||'root'} before DONE`,async()=>{
  const s=await setup();const ref=db.doc(`users/${s.uid}${path?'/'+path:''}`);await ref.set({keep:true});
  await s.deletion.beginAccountDeletion({uid:s.uid});
- assert.equal((await s.job.get()).data()!.cleanupState,'PENDING');
- assert.equal(await s.deletion.finalizeContent({uid:s.uid}),'cleanupIncomplete');
- for(let i=0;i<3;i++){s.advance();await s.maintenance.run({now:s.clock(),only:['deletion']});}
- assert.equal(s.auth.calls,0);assert.equal((await s.marker.get()).data()!.state,'DELETING');
- assert.equal((await s.effective.get()).data()!.active,false);
- await ref.delete();await s.store.verifyDeletionContent({uid:s.uid});await s.finish();await assertClosed(s);
+ await s.deletion.finalizeContent({uid:s.uid});await s.finish();
+ assert.equal((await ref.get()).exists,false);await assertClosed(s);
 });
-test('P0C empty content still needs durable verification; concurrent verify is idempotent',async()=>{
- const s=await setup();await s.deletion.beginAccountDeletion({uid:s.uid});
- assert.equal(await s.finish(),'cleanupIncomplete');assert.equal(s.auth.calls,0);
- assert.deepEqual(await Promise.all([s.store.verifyDeletionContent({uid:s.uid}),s.store.verifyDeletionContent({uid:s.uid})]),['VERIFIED','VERIFIED']);
- const before=await s.job.get();await s.store.verifyDeletionContent({uid:s.uid});
- assert.ok(before.updateTime!.isEqual((await s.job.get()).updateTime!));
- await s.finish();assert.equal(s.auth.calls,1);assert.equal(await s.deletion.finalizeContent({uid:s.uid}),'alreadyDeleted');
-});
-test('P0C legacy operation without evidence and expired lease cannot delete Auth',async()=>{
+test('legacy expired lease is revalidated by server content cleanup',async()=>{
  const s=await setup();await s.begin();await reachAuth(s);const {cleanupState,...old}=(await s.job.get()).data()!;
  await s.job.set({...old,schemaVersion:1,leaseId:'old-worker',leaseUntil:Timestamp.fromMillis(1)});
- assert.equal(await s.finish(),'cleanupIncomplete');assert.equal(s.auth.calls,0);
+ await db.doc(`users/${s.uid}/recipes/late`).set({x:1});
+ assert.equal((await s.store.deletionStep(s.uid,1)).kind,'continue');assert.equal(s.auth.calls,0);
  assert.equal(await s.store.completeDeletionAuth(s.uid,old.operationId,old.generation,'old-worker','deleted'),false);
- await s.store.verifyDeletionContent({uid:s.uid});assert.equal((await s.job.get()).data()!.schemaVersion,2);
  await s.finish();await assertClosed(s);
 });
-test('P0C claim rechecks content even after VERIFIED; no stale evidence bypass',async()=>{
+test('Auth claim rechecks content even after VERIFIED',async()=>{
  const s=await setup();await s.begin();await reachAuth(s);
- await db.doc(`users/${s.uid}/recipes/admin-created`).set({title:'late'});
- assert.equal((await s.store.deletionStep(s.uid,1)).kind,'cleanupIncomplete');
- assert.equal((await s.job.get()).data()!.cleanupState,'PENDING');assert.equal(s.auth.calls,0);
+ const ref=db.doc(`users/${s.uid}/recipes/admin-created`);await ref.set({title:'late'});
+ assert.equal((await s.store.deletionStep(s.uid,1)).kind,'continue');assert.equal((await ref.get()).exists,false);assert.equal(s.auth.calls,0);
+ await s.finish();await assertClosed(s);
 });
+
 test('P0C malformed evidence and changed generation fail closed',async()=>{
  const s=await setup();await s.begin();await s.job.update({cleanupState:'client-true'});
  assert.equal(await s.finish(),'cleanupRetryRequired');assert.equal(s.auth.calls,0);
@@ -165,10 +157,74 @@ test('P0C modern gateway rejects spoofed UID, evidence and fallback flag',async(
  }
  await assert.rejects(gate.begin(null,{}));assert.equal((await s.job.get()).exists,false);
  await gate.begin(auth,{});assert.equal((await s.job.get()).data()!.authGone,false);
- assert.equal(await s.finish(),'cleanupIncomplete');assert.equal(s.auth.calls,0);
+ await s.finish();await assertClosed(s);
 });
-test('P0C legacy external Auth event bypasses only already-gone Auth, not content deletes',async()=>{
+test('P0C external Auth deletion still removes orphan content',async()=>{
  const s=await setup();const ref=db.doc(`users/${s.uid}/recipes/orphan`);await ref.set({x:1});
  await s.deletion.handleAuthUserDeleted(s.uid,50);await assertClosed(s);assert.equal(s.auth.calls,0);
- assert.equal((await ref.get()).exists,true);assert.equal((await s.registry.get()).data()!.state,'TOMBSTONED');
+ assert.equal((await ref.get()).exists,false);assert.equal((await s.registry.get()).data()!.state,'TOMBSTONED');
+});
+
+async function recover(s:S, uid:string){
+ return new PurchaseVerifier(db,s.play,binding,s.clock).verify({uid},{purchaseToken:s.token,intent:'restore'});
+}
+test('deleted active lifetime purchase explicitly recovers on new UID; repeat and RTDN idempotent',async()=>{
+ const s=await setup();await s.acknowledge();await s.begin();await s.finish();await assertClosed(s);
+ const before=(await s.ledger.get()).data()!;assert.equal(before.boundUid,undefined);assert.equal(before.purchaseToken,undefined);
+ s.play.respond(s.token,{...s.response,acknowledgementState:'ACKNOWLEDGED'});
+ const uid='recovered-owner';assert.equal((await recover(s,uid)).status,'granted');
+ let ledger=(await s.ledger.get()).data()!;assert.equal(ledger.boundUid,uid);assert.equal(ledger.bindingState,'BOUND');
+ assert.equal(ledger.accountBinding,binding.forAuthenticatedAccount({uid}));assert.equal(ledger.recoveredFromDeletion,true);
+ assert.equal((await s.registry.get()).data()!.state,'TOMBSTONED');await assertClosed(s);
+ const pro=db.doc(`users/${uid}/entitlements/pro`), prior=(await pro.get()).data()!,rev=ledger.lifecycleRevision;
+ assert.equal(prior.active,true);assert.equal((await db.collection('billingPurchases').get()).size,1);
+ await recover(s,uid);assert.equal((await pro.get()).data()!.revision,prior.revision);
+ assert.equal((await s.ledger.get()).data()!.lifecycleRevision,rev);
+ assert.equal((await db.collection(`users/${uid}/entitlementGrants`).get()).size,1);
+ const calls=s.ack.calls;await s.acknowledge();assert.equal(s.ack.calls,calls);
+ const r=await s.rtdn.handle(delivery(s.token,'after-rebind'));assert.equal(r.outcome,'lifecycleApplied');await assertClosed(s);
+ assert.equal((await pro.get()).data()!.revision,prior.revision);
+ const v=await s.rtdn.handle(delivery(s.token,'revoke-new','voided'));assert.equal(v.outcome,'lifecycleApplied');
+ assert.equal((await pro.get()).data()!.active,false);await assertClosed(s);
+});
+test('simultaneous recoveries elect one owner without duplicate grant',async()=>{
+ const s=await setup();await s.begin();await s.finish();
+ const results=await Promise.allSettled([recover(s,'candidate-a'),recover(s,'candidate-b')]);
+ assert.equal(results.filter(r=>r.status==='fulfilled').length,1);
+ const ledger=(await s.ledger.get()).data()!;assert.ok(['candidate-a','candidate-b'].includes(ledger.boundUid));
+ assert.equal((await db.collectionGroup('entitlementGrants').get()).size,1);
+ assert.equal((await db.collection('billingPurchases').get()).size,1);await assertClosed(s);
+});
+for(const state of ['CANCELED','PENDING','MISSING','WRONG_PRODUCT','WRONG_PACKAGE','WRONG_TOKEN'] as const)test(`deleted recovery rejects fresh Play ${state}`,async()=>{
+ const s=await setup();await s.begin();await s.finish();
+ s.play.respond(s.token,state==='MISSING'?null:{...s.response,
+ ...(state==='CANCELED'||state==='PENDING'?{purchaseState:state}:{}),
+ ...(state==='WRONG_PRODUCT'?{productId:'other'}:{}),...(state==='WRONG_PACKAGE'?{packageName:'other'}:{}),
+ ...(state==='WRONG_TOKEN'?{purchaseToken:'other'}:{})});
+ await assert.rejects(recover(s,'new-owner'));assert.equal((await s.ledger.get()).data()!.bindingState,'ACCOUNT_DELETED');
+ assert.equal((await db.collectionGroup('entitlementGrants').get()).size,0);await assertClosed(s);
+});
+test('revoked tombstone denied even if later Play response claims PURCHASED',async()=>{
+ const s=await setup();await s.revoke();await s.begin();await s.finish();
+ await assert.rejects(recover(s,'new-owner'));assert.equal((await s.ledger.get()).data()!.revokedAt!==null,true);
+});
+test('ordinary BOUND purchase cannot transfer through explicit restore',async()=>{
+ const s=await setup();await assert.rejects(recover(s,'thief'),{code:'tokenAlreadyBound'});
+ assert.equal((await s.ledger.get()).data()!.boundUid,s.uid);
+});
+test('deleted UID cannot recover itself; missing/unknown token cannot recover',async()=>{
+ const s=await setup();await s.begin();await s.finish();await assert.rejects(recover(s,s.uid));
+ await assert.rejects(new PurchaseVerifier(db,s.play,binding,s.clock).verify({uid:'fresh'},{purchaseToken:'unknown',intent:'restore'}));
+ await assertClosed(s);
+});
+test('external Auth deletion cleans all covered user subcollections with bounded continuation',async()=>{
+ const s=await setup();await db.doc(`users/${s.uid}`).set({private:true});
+ for(let i=0;i<6;i++){await db.doc(`users/${s.uid}/recipes/${i}`).set({private:true});await db.doc(`users/${s.uid}/shopping/${i}`).set({private:true});}
+ await db.doc(`users/${s.uid}/entitlements/other`).set({private:true});
+ await s.deletion.handleAuthUserDeleted(s.uid,1);
+ assert.notEqual((await s.job.get()).data()!.stage,'DONE');
+ for(let i=0;i<25;i++)await s.deletion.resume(s.uid,1,2);
+ await assertClosed(s);assert.equal(s.auth.calls,0);
+ for(const name of ['recipes','shopping','entitlements','entitlementGrants'])assert.equal((await db.collection(`users/${s.uid}/${name}`).get()).size,0);
+ assert.equal((await db.doc(`users/${s.uid}`).get()).exists,false);
 });

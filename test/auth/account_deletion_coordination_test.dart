@@ -28,6 +28,57 @@ AccountDeletionRepository modern(Fixture f, Gateway g) =>
       coordination: g,
     );
 void main() {
+  test(
+    'confirmed begin clears local access before cleanup; failed begin does not',
+    () async {
+      final f = Fixture(), g = Gateway();
+      var cleared = 0;
+      final repo = AccountDeletionRepository(
+        firebaseAuth: f.auth,
+        firestore: f.db,
+        googleSignIn: f.google,
+        coordination: g,
+        onDeletionStarted: () async {
+          expect(f.db.deleted, isEmpty);
+          cleared++;
+        },
+      );
+      g.onBegin = () async {
+        throw StateError('offline');
+      };
+      await expectLater(
+        repo.deleteCurrentAccount(password: 'secret'),
+        throwsStateError,
+      );
+      expect(cleared, 0);
+      g.onBegin = null;
+      await repo.deleteCurrentAccount(password: 'secret');
+      expect(cleared, 1);
+      expect(f.user.deletes, 0);
+    },
+  );
+  test(
+    'session logout and replacement during finalize cannot clean provider state',
+    () async {
+      final f = Fixture(), g = Gateway();
+      g.onFinalize = () async {
+        f.auth.user = null;
+        f.auth.events.add(null);
+        await Future<void>.delayed(Duration.zero);
+        f.auth.user = f.user;
+        f.auth.events.add(f.user);
+        await Future<void>.delayed(Duration.zero);
+        return DeletionCompletion.completed;
+      };
+      await expectLater(
+        modern(f, g).deleteCurrentAccount(password: 'secret'),
+        throwsStateError,
+      );
+      expect(f.auth.currentUser, f.user);
+      expect(f.user.deletes, 0);
+    },
+  );
+
   test('reauth failure never begins coordinated deletion', () async {
     final f = Fixture(), g = Gateway();
     f.user.failReauth = true;
@@ -165,13 +216,19 @@ void main() {
       expect(f.user.deletes, 0);
     },
   );
-  test(
-    'default composition remains legacy without missing endpoint dependency',
-    () async {
-      final f = Fixture();
-      expect(f.repo.coordination, isNull);
-      await f.repo.deleteCurrentAccount(password: 'secret');
-      expect(f.user.deletes, 1);
-    },
-  );
+  test('default composition has no direct Auth deletion fallback', () async {
+    final f = Fixture();
+    final repo = AccountDeletionRepository(
+      firebaseAuth: f.auth,
+      firestore: f.db,
+      googleSignIn: f.google,
+    );
+    // No Firebase Functions mock is installed: fail closed at begin, not legacy.
+    await expectLater(
+      repo.deleteCurrentAccount(password: 'secret'),
+      throwsA(anything),
+    );
+    expect(f.db.deleted, isEmpty);
+    expect(f.user.deletes, 0);
+  });
 }
