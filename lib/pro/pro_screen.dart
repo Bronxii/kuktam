@@ -3,6 +3,12 @@ import '../billing/billing_contracts.dart';
 import '../entitlements/domain/repositories/entitlement_repository.dart';
 import 'pro_controller.dart';
 
+/// Internal test artifact opt-in only; does not bypass controller gates.
+const internalRestoreTestEnabled = bool.fromEnvironment(
+  'KUKTAM_INTERNAL_RESTORE_TEST',
+  defaultValue: false,
+);
+
 const proDeletionWarning =
     'A Kuktám-fiók törlésével a fiókhoz tartozó Pro jogosultság is megszűnik. '
     'A vásárlás nem vihető át automatikusan egy új Kuktám-fiókba. '
@@ -159,7 +165,7 @@ class _ProScreenState extends State<ProScreen> {
               textAlign: TextAlign.center,
             ),
           ],
-          if (!pro)
+          if (!pro || internalRestoreTestEnabled)
             TextButton(
               key: const Key('pro-restore'),
               onPressed: c?.canRestore == true ? c!.restore : null,

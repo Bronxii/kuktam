@@ -252,6 +252,61 @@ void main() {
     await pump(tester);
     expect(result.hitTestable(), findsOneWidget);
   });
+  scenario('internal restore flag controls only active Pro visibility', (
+    tester,
+  ) async {
+    activate();
+    await coordinator.entitlements.refresh();
+    await open(tester);
+    expect(c.isPro, true);
+    expect(c.canBuy, false);
+    expect(c.canRestore, true);
+    expect(find.byKey(const Key('pro-buy')), findsNothing);
+    const enabled = bool.fromEnvironment('KUKTAM_INTERNAL_RESTORE_TEST');
+    expect(internalRestoreTestEnabled, enabled);
+    final button = find.byKey(const Key('pro-restore'));
+    if (!enabled) {
+      expect(button, findsNothing);
+      expect(billing.restores, 0);
+      return;
+    }
+    expect(button, findsOneWidget);
+    backend.calls.clear();
+    billing.restoreBarrier = Completer<List<PurchaseEvent>>();
+    await tap(tester, 'pro-restore', twice: true);
+    expect(billing.restores, 1);
+    expect(c.canRestore, false);
+    expect(tester.widget<TextButton>(button).onPressed, isNull);
+    billing.restoreBarrier!.complete([event(PurchaseEventKind.restored)]);
+    await pump(tester);
+    expect(backend.calls, ['verifyProPurchase', 'getEntitlementProof']);
+    expect(c.isPro, true);
+    expect(c.canRestore, true);
+    expect(billing.buys, 0);
+  });
+  scenario('internal restore entry still respects disabled payments', (
+    tester,
+  ) async {
+    activate();
+    await coordinator.entitlements.refresh();
+    c.dispose();
+    c = ProController(
+      entitlements: coordinator.entitlements,
+      purchases: coordinator.purchases,
+      paymentsEnabled: false,
+    );
+    await open(tester);
+    expect(c.canRestore, false);
+    final button = find.byKey(const Key('pro-restore'));
+    if (internalRestoreTestEnabled) {
+      expect(button, findsOneWidget);
+      expect(tester.widget<TextButton>(button).onPressed, isNull);
+    } else {
+      expect(button, findsNothing);
+    }
+    await c.restore();
+    expect(billing.restores, 0);
+  });
   scenario('already-owned automatically shows recovery, no early Pro', (
     tester,
   ) async {
