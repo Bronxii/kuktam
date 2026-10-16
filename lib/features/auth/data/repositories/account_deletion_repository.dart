@@ -39,12 +39,15 @@ class AccountDeletionRepository {
     _deleting = true;
     AccountDeletionSignal.begin();
     StreamSubscription<User?>? sessionWatch;
+    var accepted = false;
+    String? deletingUid;
+    var sessionChanged = false;
+    var replacementSeen = false;
     try {
       final user = _auth.currentUser;
       if (user == null) throw StateError('No authenticated user');
       final uid = user.uid;
-      var sessionChanged = false;
-      var replacementSeen = false;
+      deletingUid = uid;
       sessionWatch = _auth.authStateChanges().listen((current) {
         if (current?.uid != uid) sessionChanged = true;
         if (current != null && (current.uid != uid || sessionChanged)) {
@@ -74,6 +77,7 @@ class AccountDeletionRepository {
                     (!sessionChanged && _auth.currentUser?.uid == uid)),
           );
       await gateway.begin();
+      accepted = true;
       checkOwner();
       await onDeletionStarted?.call();
       checkOwner();
@@ -123,6 +127,25 @@ class AccountDeletionRepository {
           // No automatic/silent Google sign-in exists in this application.
         }
       }
+    } catch (error) {
+      if (!accepted) rethrow;
+      // Once begin is acknowledged, backend work is durable. Never invite a
+      // second delete tap because cleanup/finalize has not converged yet.
+      // A replacement session must never be signed out by this operation.
+      if (!replacementSeen &&
+          !sessionChanged &&
+          _auth.currentUser?.uid == deletingUid) {
+        try {
+          await _auth.signOut();
+        } catch (_) {
+          // A local sign-out failure cannot undo the accepted backend job.
+        }
+      }
+      throw DeletionResumeRequired(
+        error is DeletionResumeRequired
+            ? error.outcome
+            : DeletionCompletion.retryRequired,
+      );
     } finally {
       unawaited(sessionWatch?.cancel());
       _deleting = false;

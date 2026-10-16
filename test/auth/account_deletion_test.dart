@@ -320,10 +320,7 @@ void main() {
           throwsA(anything),
         );
         expect(f.user.deletes, 0);
-        f.db.failCommit = false;
-        f.db.failRootDelete = false;
-        await f.repo.deleteCurrentAccount(password: 'secret');
-        expect(f.user.deletes, 0);
+        expect(f.auth.currentUser, isNull);
       },
     );
   }
@@ -438,36 +435,32 @@ void main() {
     expect(f.user.credential?.providerId, 'password');
     expect(f.google.authentications, 0);
   });
-  test('partial failure prevents Auth delete and permits retry', () async {
-    final f = Fixture();
-    f.db.failCollection = 'users/owner/shopping';
-    await expectLater(
-      f.repo.deleteCurrentAccount(password: 'secret'),
-      throwsA(isA<FirebaseException>()),
-    );
-    expect(f.db.paths.contains('users/owner/recipes/r'), isFalse);
-    expect(f.db.paths.contains('users/owner/shopping/s'), isTrue);
-    expect(f.user.deletes, 0);
-    f.db.failCollection = null;
-    await f.repo.deleteCurrentAccount(password: 'secret');
-    expect(f.user.deletes, 0);
-  });
   test(
-    'Auth delete failure is not success; retry on empty data works',
+    'partial failure leaves backend continuation without client Auth delete',
     () async {
       final f = Fixture();
-      f.user.failDelete = true;
+      f.db.failCollection = 'users/owner/shopping';
       await expectLater(
         f.repo.deleteCurrentAccount(password: 'secret'),
-        throwsA(isA<FirebaseAuthException>()),
+        throwsA(isA<DeletionResumeRequired>()),
       );
-      expect(f.auth.currentUser, f.user);
-      expect(f.db.paths.contains('users/owner'), isFalse);
-      f.user.failDelete = false;
-      await f.repo.deleteCurrentAccount(password: 'secret');
+      expect(f.db.paths.contains('users/owner/recipes/r'), isFalse);
+      expect(f.db.paths.contains('users/owner/shopping/s'), isTrue);
+      expect(f.user.deletes, 0);
       expect(f.auth.currentUser, isNull);
     },
   );
+  test('finalize failure reports durable continuation and signs out', () async {
+    final f = Fixture();
+    f.user.failDelete = true;
+    await expectLater(
+      f.repo.deleteCurrentAccount(password: 'secret'),
+      throwsA(isA<DeletionResumeRequired>()),
+    );
+    expect(f.auth.currentUser, isNull);
+    expect(f.db.paths.contains('users/owner'), isFalse);
+    expect(f.user.deletes, 0);
+  });
   test('duplicate deletion and changed auth identity are rejected', () async {
     final f = Fixture();
     f.user.hold = Completer<void>();
@@ -592,13 +585,11 @@ void main() {
       f.google.cancel = false;
       f.user.failDelete = true;
       await confirm(tester);
-      expect(
-        find.textContaining('A fióktörlés nem fejeződött be'),
-        findsOneWidget,
-      );
+      expect(find.textContaining('automatikusan befejeződik'), findsOneWidget);
       expect(find.byType(AccountDeletionDialog), findsOneWidget);
-      f.user.failDelete = false;
-      await confirm(tester);
+      expect(find.widgetWithText(FilledButton, 'Fiók törlése'), findsNothing);
+      await tester.tap(find.text('Rendben'));
+      await tester.pumpAndSettle();
       expect(find.text('Bejelentkezés e-maillel'), findsOneWidget);
     },
   );

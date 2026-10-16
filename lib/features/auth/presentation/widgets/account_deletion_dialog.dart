@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 import '../../data/repositories/account_deletion_repository.dart';
+import '../../data/repositories/account_deletion_gateway.dart';
 import '../../../../pro/pro_screen.dart' show proDeletionWarning;
 
 class AccountDeletionDialog extends StatefulWidget {
@@ -24,6 +25,7 @@ class _AccountDeletionDialogState extends State<AccountDeletionDialog> {
   bool _busy = false;
   bool _visible = false;
   String? _error;
+  DeletionCompletion? _acceptedOutcome;
 
   @override
   void dispose() {
@@ -50,7 +52,14 @@ class _AccountDeletionDialogState extends State<AccountDeletionDialog> {
       if (!mounted) return;
       setState(() {
         _busy = false;
-        if (error is GoogleSignInException &&
+        if (error is DeletionResumeRequired) {
+          _acceptedOutcome = error.outcome;
+          _error = error.outcome == DeletionCompletion.supportRequired
+              ? 'A törlési kérelmedet elfogadtuk, de a befejezéshez segítség szükséges. '
+                    'Kérjük, írj a kuktam.support@gmail.com címre. Ne indíts újabb törlést.'
+              : 'A törlési kérelmedet elfogadtuk. A fiók törlése folyamatban van, '
+                    'és automatikusan befejeződik. Nem kell újra elindítanod.';
+        } else if (error is GoogleSignInException &&
             error.code == GoogleSignInExceptionCode.canceled) {
           _error =
               'A Google-hitelesítést megszakítottad. A törlés nem indult el.';
@@ -65,8 +74,8 @@ class _AccountDeletionDialogState extends State<AccountDeletionDialog> {
               'Az újrahitelesítés nem sikerült. Ellenőrizd a jelszót vagy a kiválasztott fiókot, és próbáld újra.';
         } else {
           _error =
-              'A fióktörlés nem fejeződött be. Egyes adatok már törlődhettek. '
-              'A fiókod törléséhez próbáld újra a műveletet.';
+              'A törlési kérelem elfogadását nem sikerült megerősíteni. '
+              'Ellenőrizd az internetkapcsolatot, majd próbáld újra.';
         }
       });
     }
@@ -84,7 +93,9 @@ class _AccountDeletionDialogState extends State<AccountDeletionDialog> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              if (!_confirmed)
+              if (_acceptedOutcome != null)
+                const SizedBox.shrink()
+              else if (!_confirmed)
                 const Text(
                   'Biztosan törölni szeretnéd a fiókodat?\n\n'
                   'A fiókod, a receptjeid, a bevásárlólistád és minden kapcsolódó '
@@ -117,13 +128,26 @@ class _AccountDeletionDialogState extends State<AccountDeletionDialog> {
                 const Text(
                   'A végleges törléshez erősítsd meg a személyazonosságodat a Google-fiókoddal.',
                 ),
-              if (widget.hasPro) ...[
+              if (widget.hasPro && _acceptedOutcome == null) ...[
                 const SizedBox(height: 12),
                 const Text(proDeletionWarning),
               ],
               if (_error != null) ...[
                 const SizedBox(height: 12),
-                Text(_error!, style: TextStyle(color: colors.error)),
+                Semantics(
+                  liveRegion: true,
+                  child: Text(
+                    _error!,
+                    style: TextStyle(
+                      color:
+                          _acceptedOutcome != null &&
+                              _acceptedOutcome !=
+                                  DeletionCompletion.supportRequired
+                          ? colors.onSurface
+                          : colors.error,
+                    ),
+                  ),
+                ),
               ],
               if (_busy) ...[
                 const SizedBox(height: 16),
@@ -135,26 +159,33 @@ class _AccountDeletionDialogState extends State<AccountDeletionDialog> {
           ),
         ),
         actions: [
-          TextButton(
-            onPressed: _busy ? null : () => Navigator.of(context).pop(false),
-            child: const Text('Mégse'),
-          ),
-          FilledButton(
-            style: FilledButton.styleFrom(
-              backgroundColor: colors.error,
-              foregroundColor: colors.onError,
+          if (_acceptedOutcome != null)
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              child: const Text('Rendben'),
+            )
+          else ...[
+            TextButton(
+              onPressed: _busy ? null : () => Navigator.of(context).pop(false),
+              child: const Text('Mégse'),
             ),
-            onPressed: _busy
-                ? null
-                : () {
-                    if (!_confirmed) {
-                      setState(() => _confirmed = true);
-                    } else {
-                      _delete();
-                    }
-                  },
-            child: const Text('Fiók törlése'),
-          ),
+            FilledButton(
+              style: FilledButton.styleFrom(
+                backgroundColor: colors.error,
+                foregroundColor: colors.onError,
+              ),
+              onPressed: _busy
+                  ? null
+                  : () {
+                      if (!_confirmed) {
+                        setState(() => _confirmed = true);
+                      } else {
+                        _delete();
+                      }
+                    },
+              child: const Text('Fiók törlése'),
+            ),
+          ],
         ],
       ),
     );

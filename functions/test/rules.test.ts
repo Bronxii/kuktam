@@ -220,3 +220,25 @@ for(const state of ['ACTIVE','DELETING','DELETED'])test(`closure: ${state} conte
 for (const uid of ['alice','bob',undefined]) test(`runtime dispatcher metadata denies ${uid ?? 'anonymous'}`,async()=>{
  const ref=doc(client(uid),'billingRuntime/maintenance');await assertFails(getDoc(ref));await assertFails(setDoc(ref,{nextCategory:'ack'}));
 });
+
+// Normal Free accounts do not need a billing-created lifecycle marker.
+for (const provider of ['password', 'google.com'] as const) {
+  test(`fresh ${provider} Free user first content writes need no billing or lifecycle`, async () => {
+    const uid = `fresh-free-${provider}`;
+    const db = env.authenticatedContext(uid, { firebase: { sign_in_provider: provider }, email_verified: true }).firestore();
+    assert.equal((await admin.doc(`accountLifecycle/${uid}`).get()).exists, false);
+    for (const category of ['recipes', 'shopping']) {
+      await assertSucceeds(setDoc(doc(db, `users/${uid}/${category}/first`), { name: 'first' }));
+      await assertSucceeds(updateDoc(doc(db, `users/${uid}/${category}/first`), { name: 'edited' }));
+    }
+    assert.equal((await admin.doc(`accountLifecycle/${uid}`).get()).exists, false);
+    assert.equal((await admin.collection(`users/${uid}/entitlementGrants`).get()).size, 0);
+    await assertFails(setDoc(doc(db, `accountLifecycle/${uid}`), { state: 'ACTIVE' }));
+    await admin.doc(`accountLifecycle/${uid}`).set({ state: 'DELETED', generation: 3 });
+    for (const category of ['recipes', 'shopping']) {
+      await assertFails(setDoc(doc(db, `users/${uid}/${category}/later`), { name: 'blocked' }));
+      await assertSucceeds(setDoc(doc(client(`${uid}-new`), `users/${uid}-new/${category}/first`), { name: 'new account' }));
+    }
+    await assertFails(setDoc(doc(db, `accountLifecycle/${uid}`), { state: 'ACTIVE' }));
+  });
+}

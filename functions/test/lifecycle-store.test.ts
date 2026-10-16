@@ -158,3 +158,21 @@ test('tombstone on active account cannot be registered or used to grant', async 
   await assert.rejects(s.accounts.register(s.context, 1), LifecycleError);
   await assert.rejects(s.commit(), LifecycleError); assert.equal((await s.grants.get()).size, 0);
 });
+
+test('standalone lifecycle initialization is idempotent, no billing, deleted UID stays deleted', async () => {
+  const accounts = new AccountLifecycleStore(db, binding, () => now);
+  const context = { uid: 'standalone-free-lifecycle' };
+  await accounts.initializeActive(context);
+  const marker = db.doc(`accountLifecycle/${context.uid}`);
+  const first = await marker.get();
+  await accounts.initializeActive(context);
+  assert.deepEqual((await marker.get()).data(), first.data());
+  assert.equal((await db.collection('billingAccountBindings').where('uid', '==', context.uid).get()).size, 0);
+  await accounts.advance(context, 1, 'DELETING');
+  await accounts.advance(context, 2, 'DELETED');
+  await assert.rejects(accounts.initializeActive(context), LifecycleError);
+  const replacement = { uid: 'standalone-free-replacement' };
+  await accounts.initializeActive(replacement);
+  assert.equal((await db.doc(`accountLifecycle/${replacement.uid}`).get()).data()!.state, 'ACTIVE');
+  assert.equal((await marker.get()).data()!.state, 'DELETED');
+});

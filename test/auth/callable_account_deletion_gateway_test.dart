@@ -40,6 +40,20 @@ void main() {
       );
     });
   }
+  for (final entry in {
+    'alreadyDeleted': DeletionCompletion.completed,
+    'cleanupIncomplete': DeletionCompletion.cleanupIncomplete,
+    'supportRequired': DeletionCompletion.supportRequired,
+  }.entries) {
+    test('finalize ${entry.key} keeps distinct outcome', () async {
+      expect(
+        await CallableAccountDeletionGateway(
+          (_) async => {'schemaVersion': 1, 'outcome': entry.key},
+        ).finalize(),
+        entry.value,
+      );
+    });
+  }
   test('malformed and auth errors cannot report success', () async {
     for (final raw in [
       <String, Object?>{},

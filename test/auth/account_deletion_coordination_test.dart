@@ -72,7 +72,7 @@ void main() {
       };
       await expectLater(
         modern(f, g).deleteCurrentAccount(password: 'secret'),
-        throwsStateError,
+        throwsA(isA<DeletionResumeRequired>()),
       );
       expect(f.auth.currentUser, f.user);
       expect(f.user.deletes, 0);
@@ -125,7 +125,7 @@ void main() {
     },
   );
   test(
-    'interrupted content cleanup resumes via idempotent begin, never early finalize',
+    'interrupted accepted cleanup leaves durable continuation and signs out',
     () async {
       final f = Fixture(), g = Gateway(), repo = modern(f, g);
       f.db.failCollection = 'users/owner/shopping';
@@ -135,10 +135,9 @@ void main() {
       );
       expect(g.finalizes, 0);
       expect(f.user.deletes, 0);
-      f.db.failCollection = null;
-      await repo.deleteCurrentAccount(password: 'secret');
-      expect(g.begins, 2);
-      expect(g.finalizes, 1);
+      expect(f.auth.currentUser, isNull);
+      expect(g.begins, 1);
+      expect(g.finalizes, 0);
       expect(f.user.deletes, 0);
     },
   );
@@ -157,15 +156,14 @@ void main() {
           throwsA(isA<DeletionResumeRequired>()),
         );
         expect(f.user.deletes, 0);
-        g.onFinalize = () async => DeletionCompletion.completed;
-        await repo.deleteCurrentAccount(password: 'secret');
-        expect(g.begins, 2);
-        expect(g.finalizes, 2);
+        expect(f.auth.currentUser, isNull);
+        expect(g.begins, 1);
+        expect(g.finalizes, 1);
       },
     );
   }
   test(
-    'finalize network failure can retry without repeating destructive Auth call',
+    'finalize network failure becomes durable continuation without another delete',
     () async {
       final f = Fixture(),
           g = Gateway()
@@ -178,9 +176,8 @@ void main() {
         throwsA(anything),
       );
       expect(f.user.deletes, 0);
-      g.onFinalize = () async => DeletionCompletion.completed;
-      await repo.deleteCurrentAccount(password: 'secret');
-      expect(g.finalizes, 2);
+      expect(f.auth.currentUser, isNull);
+      expect(g.finalizes, 1);
     },
   );
   test(
