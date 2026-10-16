@@ -4,6 +4,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
 import 'app/app.dart';
+import 'app/firebase_startup.dart';
 import 'sharing/text_share_controller.dart';
 import 'sharing/recipe_file_receiver.dart';
 import 'firebase_options.dart';
@@ -21,7 +22,15 @@ Future<void> main() async {
 
   await TextShareController.instance.start();
 
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  await startFirebaseApp(
+    initializeFirebase: () async {
+      await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+    },
+    composeApp: _composeApp,
+  );
+}
+
+Future<void> _composeApp() async {
 
   final auth = AuthRepository();
   RecipeFileReceiver.instance.bindSession(

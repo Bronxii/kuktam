@@ -315,7 +315,14 @@ void main() {
     await tester.enterText(find.byType(TextField), 'secret');
     await tester.tap(find.widgetWithText(FilledButton, 'Fiók törlése'));
     await tester.pumpAndSettle();
-    expect(f.user.deletes, 1);
+    final gateway = f.repo.coordination! as deletion.ServerDeletion;
+    expect(gateway.begins, 1);
+    expect(gateway.finalizes, 1);
+    expect(f.user.deletes, 0); // Auth deletion belongs to the backend.
+    expect(f.auth.currentUser, isNull);
+    expect(f.db.paths.any((path) => path.startsWith('users/owner/')), isFalse);
+    expect(f.db.paths, isNot(contains('users/owner')));
+    expect(f.db.paths, contains('users/other/recipes/r'));
     expect(find.text('Bejelentkezés e-maillel'), findsOneWidget);
     expect(store.completed, isTrue);
     expect(store.writes, 0);
