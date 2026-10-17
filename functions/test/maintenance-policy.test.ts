@@ -10,7 +10,7 @@ test('retry starts at base, grows exponentially, caps',()=>{ assert.equal(nextFa
 test('daily recheck jitter spreads deterministic samples',()=>{assert.equal(nextActiveCheck(0,()=>0.5,p),86400000); assert.ok(nextActiveCheck(0,()=>0,p)<nextActiveCheck(0,()=>0.99,p)); assert.throws(()=>nextActiveCheck(0,()=>1,p));});
 test('voided lookback is bounded technical window',()=>{assert.deepEqual(voidedWindow(40*86400000),{startMs:10*86400000,endMs:40*86400000}); assert.equal(voidedWindow(1).startMs,0);});
 test('unknown completion time never invents deadline',()=>{assert.equal(ackDeadline(null),null);assert.equal(ackDeadline(1),259200001);});
-test('priority is explicit and deterministic',()=>{assert.deepEqual(categories,['ack','expiredInbox','retryInbox','unresolvedInbox','voided','active','grants','tokens','deletion']);});
+test('priority is explicit and deterministic',()=>{assert.deepEqual(categories,['ack','expiredInbox','retryInbox','unresolvedInbox','voided','active','grants','tokens','deletion','family']);});
 test('work identity separates categories and tuple boundaries',()=>{assert.notEqual(workKey('a','b:c'),workKey('a:b','c')); assert.equal(workKey('a','b'),workKey('a','b'));});
 test('strict work reader rejects corrupt state',()=>{assert.throws(()=>readWork({schemaVersion:99}));});
 test('feed bounded parser rejects excess and malformed entries',()=>{assert.throws(()=>parseFeed({items:[{purchaseToken:'x',voidedTimeMs:1}],nextPageToken:null},0));assert.throws(()=>parseFeed({items:[{}],nextPageToken:null},1));});

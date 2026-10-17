@@ -23,6 +23,27 @@ before(async()=>{
  });
 });
 after(()=>env.cleanup());
+test('CREATE reservation fences source and PREPARING destination; operation state is backend-only',async()=>{
+ const uid='creator',p='creator-private',f='creator-family';
+ await env.withSecurityRulesDisabled(async ctx=>{const db=ctx.firestore();
+  await setDoc(doc(db,`accountLifecycle/${uid}`),{state:'ACTIVE'});
+  await setDoc(doc(db,`users/${uid}`),{privateHouseholdId:p,activeHouseholdId:p,familyHouseholdId:null,shoppingMigrationVersion:1});
+  await setDoc(doc(db,`households/${p}`),{schemaVersion:2,kind:'private',state:'ACTIVE',operationId:'create-op',ownerUid:uid});
+  await setDoc(doc(db,`households/${p}/members/${uid}`),{role:'owner'});
+  await setDoc(doc(db,`households/${f}`),{schemaVersion:2,kind:'family',state:'PREPARING',operationId:'create-op',ownerUid:uid});
+  await setDoc(doc(db,`familyMemberships/${uid}`),{householdId:f,role:'owner',state:'RESERVED',operationId:'create-op'});
+ });
+ const db=env.authenticatedContext(uid).firestore();
+ for(const path of [`households/${p}/shoppingItems/a`,`households/${f}/shoppingItems/a`]){
+  await assertFails(setDoc(doc(db,path),{name:'forged'}));await assertFails(getDoc(doc(db,path)));
+ }
+ for(const path of ['familyOperations/create-op','familyOperations/create-op/items/a','familyRuntime/config']){
+  await assertFails(setDoc(doc(db,path),{creationEnabled:true,status:'DONE'}));await assertFails(getDoc(doc(db,path)));
+ }
+ await assertFails(updateDoc(doc(db,`households/${p}`),{operationId:null}));
+ await assertFails(updateDoc(doc(db,`households/${f}`),{state:'ACTIVE',operationId:null}));
+ await assertSucceeds(setDoc(doc(db,`users/${uid}/recipes/own`),{name:'private recipe'}));
+});
 for(const uid of ['owner','member'])test(`${uid} reads and CRUDs household shopping with zero recipes`,async()=>{
  const db=env.authenticatedContext(uid).firestore(),ref=doc(db,`households/home/shoppingItems/${uid}`);
  await assertSucceeds(getDocs(collection(db,'households/home/shoppingItems')));

@@ -6,7 +6,32 @@ import {loadBindingKeys} from '../src/runtime/keys';
 import {runtimeConfig as cfg} from '../src/runtime/config';
 import {parseEnvelope} from '../src/billing/rtdn/notification';
 import {TransportError} from '../src/transport/monetization';
+import {createFamilyHandler} from '../src/households/family-handler';
+import {FamilyCreateStore} from '../src/households/family-create';
 const now=1800000000000;
+test('CREATE callable is CORE, secret-free, default non-enforcing and rejects client identifiers',async()=>{
+ const root=await import('../src/index'), endpoint=(root.createFamilyShare as any).__endpoint;
+ assert.equal(endpoint.platform,'gcfv2');assert.deepEqual(endpoint.region,['europe-west1']);
+ assert.equal(endpoint.serviceAccountEmail.name,cfg.coreIdentityParameter);
+ assert.notEqual(endpoint.callableTrigger.enforceAppCheck,true);assert.ok(!endpoint.secretEnvironmentVariables?.length);
+ assert.equal(endpoint.timeoutSeconds,60);assert.equal(endpoint.maxInstances,5);
+ let obtained=0;const handler=createFamilyHandler(()=>{obtained++;throw new Error('must not initialize');});
+ await assert.rejects(handler({data:{}}),(e:any)=>e.code==='unauthenticated');
+ for(const data of [null,[],{uid:'victim'},{sourceHouseholdId:'source'},{destinationHouseholdId:'target'},{pro:true}])
+  await assert.rejects(handler({auth:{uid:'caller'},data}),(e:any)=>e.code==='invalid-argument');
+ assert.equal(obtained,0);
+});
+test('CREATE forwards authenticated UID only, awaits durable work and sanitizes failures',async()=>{
+ const calls:unknown[]=[];
+ const service={reserve:async(auth:unknown)=>{calls.push(auth);return 'op';},resume:async(id:string)=>{calls.push(id);return 'COPY';}};
+ const handler=createFamilyHandler(()=>service as unknown as FamilyCreateStore);
+ assert.deepEqual(await handler({auth:{uid:'caller'},data:{}}),{schemaVersion:1,operationId:'op',outcome:'COPY'});
+ assert.deepEqual(calls,[{uid:'caller'},'op']);
+ for(const message of ['featureDisabled','proRequired','raw sensitive failure']){
+  service.reserve=async()=>{throw new Error(message);};
+  await assert.rejects(handler({auth:{uid:'caller'},data:{}}),(e:any)=>e.message===(message.startsWith('raw')?'retryableUnavailable':message));
+ }
+});
 const auth={uid:'trusted',token:{auth_time:now/1000}};
 function setup(){
  const calls:unknown[]=[];
@@ -43,7 +68,7 @@ test('root discovery has no secret/credential/Admin/network side effects and onl
  const http=require('node:http'),https=require('node:https');const hr=http.request,hs=https.request,fetch=globalThis.fetch;
  http.request=https.request=globalThis.fetch=()=>{throw new Error('NETWORK_FORBIDDEN');};
  try{const root=await import('../src/index');assert.equal(getApps().length,before);
- assert.deepEqual(Object.keys(root).sort(),['ensurePrivateHousehold','authUserDeleted','beginAccountDeletion','billingMaintenance','finalizeAccountDeletion','getEntitlementProof','playRtdn','prepareProPurchase','verifyProPurchase'].sort());
+ assert.deepEqual(Object.keys(root).sort(),['createFamilyShare','ensurePrivateHousehold','authUserDeleted','beginAccountDeletion','billingMaintenance','finalizeAccountDeletion','getEntitlementProof','playRtdn','prepareProPurchase','verifyProPurchase'].sort());
  assert.equal((root.prepareProPurchase as any).__endpoint.platform,'gcfv2');
  assert.equal((root.authUserDeleted as any).__endpoint.platform,'gcfv1');
  assert.notEqual((root.prepareProPurchase as any).__endpoint.callableTrigger.enforceAppCheck,true);

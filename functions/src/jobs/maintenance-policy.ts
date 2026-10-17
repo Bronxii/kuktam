@@ -1,5 +1,5 @@
 import { RetryPolicy, defaultRetryPolicy, beginAttempt } from '../billing/retry-policy';
-export const categories = ['ack', 'expiredInbox', 'retryInbox', 'unresolvedInbox', 'voided', 'active', 'grants', 'tokens', 'deletion'] as const;
+export const categories = ['ack', 'expiredInbox', 'retryInbox', 'unresolvedInbox', 'voided', 'active', 'grants', 'tokens', 'deletion', 'family'] as const;
 export type Category = typeof categories[number];
 export interface MaintenancePolicy {
   readonly pageSize: number; readonly runBudgetMs: number; readonly leaseMs: number; readonly ioTimeoutMs: number;

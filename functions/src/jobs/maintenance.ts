@@ -1,4 +1,5 @@
 import { compareTime } from '../models';
+import { FamilyCreateStore } from '../households/family-create';
 import { readDeletion } from '../accounts/deletion-contract';
 import { Firestore, Timestamp, FieldPath, Query, QueryDocumentSnapshot } from 'firebase-admin/firestore';
 import { createHash } from 'node:crypto';
@@ -56,6 +57,19 @@ export class Maintenance {
       if (category === 'deletion' && !this.deps.deletion) continue;
       if (!timeLeft()) return { items, cursors, nextCategory, budgetReached: true };
       nextCategory = categories[(categories.indexOf(category)+1)%categories.length]!;
+      if (category === 'family') {
+        // Single-field due query excludes terminal rows (nextAt=null). No user
+        // scan, no new scheduler; isolate failures and use one bounded page/job.
+        try {
+          const page=await this.db.collection('familyOperations').where('nextAt','<=',input.now).orderBy('nextAt').limit(Math.min(5,this.policy.pageSize)).get();
+          for(const doc of page.docs) {
+            if(!timeLeft())break;
+            try { items.push({category,key:doc.id,outcome:await new FamilyCreateStore(this.db,this.clock,this.policy.pageSize>50?50:this.policy.pageSize).resume(doc.id,1)}); }
+            catch {items.push({category,key:doc.id,outcome:'internalConflict'});}
+          }
+        } catch {items.push({category,key:'due',outcome:'queryFailure'});}
+        continue;
+      }
       if (category === 'voided') {
         try { items.push({ category, key: workKey('feed', 'voided'), outcome: await this.catchUp(timeLeft) }); }
         catch { items.push({ category, key: workKey('feed', 'voided'), outcome: 'internalConflict' }); } continue;

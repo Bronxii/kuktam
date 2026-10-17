@@ -93,6 +93,13 @@ service cloud.firestore {
     match /familyMemberships/{uid} {
       allow read, write: if false;
     }
+    match /familyOperations/{operationId} {
+      allow read, write: if false;
+      match /{document=**} { allow read, write: if false; }
+    }
+    match /familyRuntime/{document} {
+      allow read, write: if false;
+    }
     match /billingPurchases/{tokenHash} {
       allow read, write: if false;
     }

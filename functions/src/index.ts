@@ -2,6 +2,8 @@ import { getApps, initializeApp } from 'firebase-admin/app';
 import { getFirestore } from 'firebase-admin/firestore';
 import { HttpsError } from 'firebase-functions/v2/https';
 import { HouseholdStore } from './households/household-store';
+import { FamilyCreateStore } from './households/family-create';
+import { createFamilyHandler } from './households/family-handler';
 import { onCall } from 'firebase-functions/v2/https';
 import { onMessagePublished } from 'firebase-functions/v2/pubsub';
 import { onSchedule } from 'firebase-functions/v2/scheduler';
@@ -16,6 +18,11 @@ const coreIdentity = defineString(config.coreIdentityParameter, {description:'Co
 const playIdentity = defineString(config.playIdentityParameter, {description:'Play/billing runtime service-account email; required, no default.'});
 const deletionIdentity = defineString(config.deletionIdentityParameter, {description:'Account deletion runtime service-account email; required, no default.'});
 const handlers = createRuntimeHandlers(lazyProductionServices(() => keys.value()));
+export const createFamilyShare = onCall({region:config.region, serviceAccount:coreIdentity,
+  timeoutSeconds:60, maxInstances:5, enforceAppCheck:false}, createFamilyHandler(() => {
+    const app=getApps().find(a=>a.name==='[DEFAULT]')??initializeApp();
+    return new FamilyCreateStore(getFirestore(app));
+  }));
 const options = {region:config.region, secrets:[keys], timeoutSeconds:config.timeoutSeconds,
   maxInstances:5, enforceAppCheck:false};
 export const prepareProPurchase = onCall({...options, serviceAccount:coreIdentity}, handlers.prepareProPurchase);
