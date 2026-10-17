@@ -87,6 +87,7 @@ class ShoppingFake implements ShoppingRepository {
     required String name,
     required double quantity,
     required String unit,
+    void Function()? onSyncFailure,
   }) async {
     writes++;
     added.add((name: name, quantity: quantity, unit: unit));

@@ -1,3 +1,4 @@
+import '../../../image_import/image_import_screen.dart';
 import 'package:flutter/material.dart';
 import '../../../sharing/text_share_controller.dart';
 import '../../../sharing/recipe_file_receiver.dart';
@@ -285,6 +286,9 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
               icon: const Icon(Icons.file_download_outlined),
               onPressed: _importRecipe,
             ),
+          if (_selectedIndex == 0)
+            IconButton(tooltip: 'Recept képből', icon: const Icon(Icons.add_photo_alternate_outlined),
+              onPressed: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const ImageImportScreen()))),
           if (_selectedIndex == 1)
             IconButton(
               tooltip: 'Importálás',

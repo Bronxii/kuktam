@@ -16,6 +16,8 @@ class MainActivity : FlutterActivity() {
         private var recipeActivity = java.lang.ref.WeakReference<MainActivity>(null)
         private val recipeReader = java.util.concurrent.Executors.newSingleThreadExecutor()
     }
+    private var imagePicker: ImageImportPicker? = null
+    private var imageChannel: MethodChannel? = null
     private var recipePicker: RecipeDocumentPicker? = null
     private var recipeChannel: MethodChannel? = null
     private var shareChannel: MethodChannel? = null
@@ -89,12 +91,17 @@ class MainActivity : FlutterActivity() {
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if (imagePicker?.onActivityResult(requestCode, resultCode, data) == true) return
         if (recipePicker?.onActivityResult(requestCode, resultCode, data) == true) return
         if (exportWriter?.onActivityResult(requestCode, resultCode, data) == true) return
         super.onActivityResult(requestCode, resultCode, data)
     }
 
     override fun cleanUpFlutterEngine(flutterEngine: FlutterEngine) {
+        imageChannel?.setMethodCallHandler(null)
+        imageChannel = null
+        imagePicker?.dispose()
+        imagePicker = null
         recipePicker?.dispose()
         recipePicker = null
         if (recipeActivity.get() === this) recipeActivity.clear()
@@ -113,6 +120,10 @@ class MainActivity : FlutterActivity() {
         super.configureFlutterEngine(flutterEngine)
         val messenger = flutterEngine.dartExecutor.binaryMessenger
         recipeActivity = java.lang.ref.WeakReference(this)
+        imagePicker = ImageImportPicker(this)
+        imageChannel = MethodChannel(messenger, "kuktam/image_import").also { channel ->
+            channel.setMethodCallHandler { call, result -> imagePicker!!.handle(call.method, call.arguments, result) }
+        }
         recipePicker = RecipeDocumentPicker(this)
         recipeChannel = MethodChannel(messenger, "kuktam/recipe_file").also { channel ->
             channel.setMethodCallHandler { call, result ->

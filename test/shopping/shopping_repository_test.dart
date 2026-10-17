@@ -1,3 +1,4 @@
+import 'package:kuktam/shopping/presentation/widgets/shopping_item_dialog.dart';
 import 'package:kuktam/households/cached_household_gateway.dart';
 import '../households/cached_household_gateway_test.dart'
     show MemoryContexts, Authority, Offline;
@@ -45,6 +46,9 @@ class _Db implements FirebaseFirestore {
   int ids = 0;
   int? failQuery;
   bool failCommit = false;
+  bool queueLocal = false;
+  Completer<void>? remoteAck;
+  final pendingPaths = <String>{};
   @override
   dynamic noSuchMethod(Invocation i) {
     if (i.memberName == #collection) {
@@ -67,6 +71,7 @@ class _Doc implements DocumentReference<Map<String, dynamic>> {
     if (i.memberName == #collection) {
       return _Collection(db, '$path/${i.positionalArguments.single}');
     }
+    if (i.memberName == #snapshots) return _snapshots();
     if (i.memberName == #update || i.memberName == #delete) {
       if (db.failCommit) return Future<void>.error(StateError('write'));
       db.operations.add((
@@ -79,6 +84,21 @@ class _Doc implements DocumentReference<Map<String, dynamic>> {
       return Future<void>.value();
     }
     return super.noSuchMethod(i);
+  }
+
+  Stream<DocumentSnapshot<Map<String, dynamic>>> _snapshots() async* {
+    yield _SnapshotDoc(
+      this,
+      db.records[path] ?? {},
+      db.pendingPaths.contains(path),
+    );
+    await for (final _ in db.events.stream) {
+      yield _SnapshotDoc(
+        this,
+        db.records[path] ?? {},
+        db.pendingPaths.contains(path),
+      );
+    }
   }
 }
 
@@ -167,7 +187,10 @@ class _Snapshot implements QuerySnapshot<Map<String, dynamic>> {
 }
 
 class _SnapshotDoc implements QueryDocumentSnapshot<Map<String, dynamic>> {
-  _SnapshotDoc(this.reference, [this.values = const {}]);
+  _SnapshotDoc(this.reference, [this.values = const {}, this.pending = false]);
+  final bool pending;
+  @override
+  SnapshotMetadata get metadata => _Metadata(pending);
   final Map<String, dynamic> values;
   @override
   String get id => reference.id;
@@ -175,6 +198,16 @@ class _SnapshotDoc implements QueryDocumentSnapshot<Map<String, dynamic>> {
   Map<String, dynamic> data() => values;
   @override
   final DocumentReference<Map<String, dynamic>> reference;
+  @override
+  dynamic noSuchMethod(Invocation i) => super.noSuchMethod(i);
+}
+
+class _Metadata implements SnapshotMetadata {
+  _Metadata(this.hasPendingWrites);
+  @override
+  final bool hasPendingWrites;
+  @override
+  bool get isFromCache => true;
   @override
   dynamic noSuchMethod(Invocation i) => super.noSuchMethod(i);
 }
@@ -205,13 +238,89 @@ class _Batch implements WriteBatch {
       db.commits++;
       if (db.failCommit) return Future<void>.error(StateError('commit'));
       db.operations.addAll(pending);
-      return Future<void>.value();
+      if (db.queueLocal) {
+        for (final op in pending) {
+          db.records[op.path] = Map.of(op.data);
+          db.pendingPaths.add(op.path);
+        }
+        db.events.add(null);
+      }
+      return db.remoteAck?.future ?? Future<void>.value();
     }
     return super.noSuchMethod(i);
   }
 }
 
 void main() {
+  for (final mode in ['online', 'pending', 'failure']) {
+    testWidgets('real repository add dialog $mode releases correctly', (
+      tester,
+    ) async {
+      final db = _Db()..queueLocal = true;
+      if (mode == 'pending') db.remoteAck = Completer<void>();
+      if (mode == 'failure') db.failCommit = true;
+      final repo = _repository(firestore: db, firebaseAuth: _Auth());
+      addTearDown(db.events.close);
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Builder(
+            builder: (context) => Scaffold(
+              body: TextButton(
+                onPressed: () => showShoppingItemDialog(
+                  context: context,
+                  shoppingRepository: repo,
+                ),
+                child: const Text('Open'),
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.tap(find.text('Open'));
+      await tester.pumpAndSettle();
+      await tester.enterText(find.byType(TextField).first, 'offline bread');
+      final submit = tester
+          .widget<FilledButton>(find.widgetWithText(FilledButton, 'Hozzáadás'))
+          .onPressed!;
+      submit();
+      submit();
+      await tester.pumpAndSettle();
+      expect(db.commits, 1);
+      if (mode == 'failure') {
+        expect(find.text('Nem sikerült menteni a tételt.'), findsOneWidget);
+        expect(find.byType(CircularProgressIndicator), findsNothing);
+        expect(db.operations, isEmpty);
+      } else {
+        expect(find.byType(AlertDialog), findsNothing);
+        expect(db.operations, hasLength(1));
+        expect(
+          db.operations.single.path,
+          startsWith('households/home-user-1/shoppingItems/'),
+        );
+        // Recreated repository/listener reads the SDK's queued state, not a UI copy.
+        final restarted = _repository(firestore: db, firebaseAuth: _Auth());
+        expect(
+          (await tester.runAsync(
+            () => restarted.watchShoppingItems().first,
+          ))!.single.name,
+          'offline bread',
+        );
+        if (mode == 'pending') {
+          expect(db.remoteAck!.isCompleted, false);
+          db.remoteAck!.completeError(StateError('server rejected'));
+          await tester.pumpAndSettle();
+          expect(
+            find.text(
+              'A tétel szinkronizálása nem sikerült. Ellenőrizd a bevásárlólistát.',
+            ),
+            findsOneWidget,
+          );
+          expect(db.commits, 1);
+        }
+      }
+    });
+  }
+
   test(
     'offline cached household supports shopping reads and queues writes on the confirmed path',
     () async {

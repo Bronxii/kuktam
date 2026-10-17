@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'shopping_local_submission.dart';
 import '../../../households/household_gateway.dart';
 import '../../../households/production_household_context.dart';
 import '../../../households/switch_household_stream.dart';
@@ -106,11 +107,20 @@ class ShoppingRepository {
     required String name,
     required double quantity,
     required String unit,
-  }) => addOrMergeItems([(name: name, quantity: quantity, unit: unit)]);
+    void Function()? onSyncFailure,
+  }) => _addOrMergeItems([
+    (name: name, quantity: quantity, unit: unit),
+  ], onSyncFailure: onSyncFailure);
 
   /// All import writes commit together. Query-based target discovery retains
   /// the existing cross-client merge race; it is not a transactional lookup.
-  Future<void> addOrMergeItems(List<ShoppingItemInput> items) async {
+  Future<void> addOrMergeItems(List<ShoppingItemInput> items) =>
+      _addOrMergeItems(items);
+
+  Future<void> _addOrMergeItems(
+    List<ShoppingItemInput> items, {
+    void Function()? onSyncFailure,
+  }) async {
     if (items.isEmpty) return;
     if (items.length > 200) {
       throw ArgumentError('Legfeljebb 200 tétel adható hozzá.');
@@ -137,6 +147,8 @@ class ShoppingRepository {
     final session = captureSessionCheck();
     final collection = await _shoppingCollection();
     final batch = _firestore.batch();
+    DocumentReference<Map<String, dynamic>>? localTarget;
+    double? expectedQuantity;
     for (final entry in grouped.entries) {
       final existing = await collection
           .where('name', isEqualTo: entry.key.name)
@@ -144,11 +156,16 @@ class ShoppingRepository {
           .limit(1)
           .get();
       if (existing.docs.isNotEmpty) {
-        batch.update(existing.docs.first.reference, {
+        localTarget = existing.docs.first.reference;
+        final prior = existing.docs.first.data()['quantity'];
+        if (prior is num) expectedQuantity = prior.toDouble() + entry.value;
+        batch.update(localTarget, {
           'quantity': FieldValue.increment(entry.value),
         });
       } else {
-        batch.set(collection.doc(), {
+        localTarget = collection.doc();
+        expectedQuantity = entry.value;
+        batch.set(localTarget, {
           'name': entry.key.name,
           'quantity': entry.value,
           'unit': entry.key.unit,
@@ -158,7 +175,27 @@ class ShoppingRepository {
       }
     }
     if (!session()) throw StateError('Authenticated session changed');
-    await batch.commit();
+    if (onSyncFailure != null &&
+        localTarget != null &&
+        expectedQuantity != null) {
+      final entry = grouped.entries.single;
+      await submitShoppingLocally(
+        commit: batch.commit,
+        localAcceptance: localTarget
+            .snapshots(includeMetadataChanges: true)
+            .map((snapshot) {
+              final data = snapshot.data();
+              return snapshot.metadata.hasPendingWrites &&
+                  data?['name'] == entry.key.name &&
+                  data?['unit'] == entry.key.unit &&
+                  data?['quantity'] == expectedQuantity;
+            }),
+        isCurrent: session,
+        onSyncFailure: onSyncFailure,
+      );
+    } else {
+      await batch.commit();
+    }
   }
 
   String _normalizeName(String name) => name.trim().toLowerCase();
