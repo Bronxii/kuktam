@@ -13,10 +13,17 @@ service cloud.firestore {
         get(/databases/$(database)/documents/accountLifecycle/$(uid)).data.state == 'ACTIVE';
     }
 
-    // Existing account deletion reads and deletes this exact root document.
-    // No client creates/updates a profile here in the current application.
+    // Backend provisions root metadata; client may only select a valid membership.
+    // Coordinated deletion still removes this exact root after its lifecycle barrier.
     match /users/{uid} {
-      allow get, delete: if isOwner(uid);
+      allow get: if isOwner(uid);
+      // Once migrated, an ACTIVE client cannot remove the migration barrier.
+      allow delete: if isOwner(uid) &&
+        (!('activeHouseholdId' in resource.data) || !canEditContent(uid));
+      allow update: if isOwner(uid) && canEditContent(uid) &&
+        resource.data.shoppingMigrationVersion == 1 &&
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['activeHouseholdId']) &&
+        exists(/databases/$(database)/documents/households/$(request.resource.data.activeHouseholdId)/members/$(uid));
 
       match /recipes/{recipeId} {
         allow read, delete: if isOwner(uid);
@@ -24,7 +31,10 @@ service cloud.firestore {
       }
       match /shopping/{itemId} {
         allow read, delete: if isOwner(uid);
-        allow create, update: if isOwner(uid) && canEditContent(uid);
+        // Compatibility only until this user's server-side migration begins.
+        allow create, update: if isOwner(uid) && canEditContent(uid) &&
+          (!exists(/databases/$(database)/documents/users/$(uid)) ||
+           !('activeHouseholdId' in get(/databases/$(database)/documents/users/$(uid)).data));
       }
       match /entitlements/pro {
         allow read: if isOwner(uid);
@@ -35,6 +45,27 @@ service cloud.firestore {
       }
     }
 
+    function householdMember(hid) {
+      return request.auth != null &&
+        exists(/databases/$(database)/documents/households/$(hid)/members/$(request.auth.uid));
+    }
+    function householdWritable(hid) {
+      return householdMember(hid) &&
+        get(/databases/$(database)/documents/accountLifecycle/$(request.auth.uid)).data.state == 'ACTIVE' &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.shoppingMigrationVersion == 1;
+    }
+    match /households/{hid} {
+      allow read: if householdMember(hid);
+      allow write: if false;
+      match /members/{uid} {
+        allow read: if householdMember(hid);
+        allow write: if false;
+      }
+      match /shoppingItems/{itemId} {
+        allow read: if householdMember(hid);
+        allow create, update, delete: if householdWritable(hid);
+      }
+    }
     match /billingPurchases/{tokenHash} {
       allow read, write: if false;
     }

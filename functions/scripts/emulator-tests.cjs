@@ -19,7 +19,7 @@ const result = spawnSync(process.execPath, [
   require.resolve('firebase-tools/lib/bin/firebase.js'),
   'emulators:exec', '--only', 'firestore', '--project', project,
   '--config', path.resolve(__dirname, '../../firebase.emulators.json'),
-  runtimeOnly ? 'node --test --test-concurrency=1 lib/test/runtime-integration.test.js' : deletionOnly ? 'node --test --test-concurrency=1 lib/test/rules.test.js lib/test/deletion.test.js lib/test/maintenance.test.js' : 'node --test --test-concurrency=1 lib/test/rules.test.js lib/test/verification.test.js lib/test/acknowledgment.test.js lib/test/lifecycle-store.test.js lib/test/lifecycle-integration.test.js lib/test/revoke.test.js lib/test/rtdn.test.js lib/test/maintenance.test.js lib/test/deletion.test.js lib/test/transport.test.js lib/test/runtime-integration.test.js',
+  runtimeOnly ? 'node --test --test-concurrency=1 lib/test/runtime-integration.test.js' : deletionOnly ? 'node --test --test-concurrency=1 lib/test/rules.test.js lib/test/deletion.test.js lib/test/maintenance.test.js' : 'node --test --test-concurrency=1 lib/test/household.test.js lib/test/household-rules.test.js lib/test/rules.test.js lib/test/verification.test.js lib/test/acknowledgment.test.js lib/test/lifecycle-store.test.js lib/test/lifecycle-integration.test.js lib/test/revoke.test.js lib/test/rtdn.test.js lib/test/maintenance.test.js lib/test/deletion.test.js lib/test/transport.test.js lib/test/runtime-integration.test.js',
 ], { cwd: path.resolve(__dirname, '..'), env, stdio: 'inherit' });
 if (result.error) throw result.error;
 process.exit(result.status ?? 1);

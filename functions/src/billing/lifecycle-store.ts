@@ -1,3 +1,4 @@
+import { cleanupPrivateHousehold } from '../households/household-store';
 import { readDeletion, AuthUserDeletionApi, DeletionPolicy, defaultDeletionPolicy, validateDeletionPolicy } from '../accounts/deletion-contract';
 import { advanceAccount } from '../accounts/account-lifecycle';
 import { workKey } from '../jobs/maintenance-store';
@@ -402,7 +403,8 @@ export class LifecycleStore {
       const root=await tx.get(this.db.doc(`users/${uid}`));
       const recipes=await tx.get(this.db.collection(`users/${uid}/recipes`).limit(1));
       const shopping=await tx.get(this.db.collection(`users/${uid}/shopping`).limit(1));
-      const cleanupState=root.exists||!recipes.empty||!shopping.empty?'PENDING':'VERIFIED';
+      const homes=await tx.get(this.db.collection('households').where('ownerUid','==',uid).limit(1));
+      const cleanupState=root.exists||!recipes.empty||!shopping.empty||!homes.empty?'PENDING':'VERIFIED';
       if(j.cleanupState!==cleanupState||doc.data()!.schemaVersion!==2)
         tx.set(ref,readDeletion({...j,cleanupState,updatedAt:this.clock()}));
       return cleanupState==='VERIFIED'?'VERIFIED':'cleanupIncomplete';
@@ -420,6 +422,7 @@ export class LifecycleStore {
       const account=readAccount(markerDoc.data()),job=readDeletion(jobDoc.data()),now=this.clock();
       if(account.state==='DELETED'&&job.stage==='DONE')return {kind:'done'};
       if(account.state==='ACTIVE'||account.generation!==job.generation)throw new LifecycleError('staleAccountGeneration');
+      if (await cleanupPrivateHousehold(this.db,tx,uid,limit)) return {kind:'continue'};
       // Schema-owned content registry: extend here when new personal collections
       // are introduced. Bounded first-page deletes avoid unbounded recursiveDelete.
       const rootRef=this.db.doc(`users/${uid}`), root=await tx.get(rootRef);

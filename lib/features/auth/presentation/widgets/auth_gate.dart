@@ -1,3 +1,4 @@
+import '../../../../households/household_gate.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import '../../../../sharing/recipe_file_receiver.dart';
@@ -7,7 +8,12 @@ import '../screens/login_screen.dart';
 import '../../data/repositories/auth_repository.dart';
 
 class AuthGate extends StatefulWidget {
-  const AuthGate({super.key, this.authRepository, this.mainBuilder, this.recipeFiles});
+  const AuthGate({
+    super.key,
+    this.authRepository,
+    this.mainBuilder,
+    this.recipeFiles,
+  });
   final AuthRepository? authRepository;
   final WidgetBuilder? mainBuilder;
   final RecipeFileReceiver? recipeFiles;
@@ -58,7 +64,9 @@ class _AuthGateState extends State<AuthGate> {
         if (user != null && !AuthRepository.requiresEmailVerification(user)) {
           return KeyedSubtree(
             key: ValueKey(user.uid),
-            child: widget.mainBuilder?.call(context) ?? const MainScreen(),
+            child:
+                widget.mainBuilder?.call(context) ??
+                const HouseholdGate(child: MainScreen()),
           );
         }
         final files = widget.recipeFiles ?? RecipeFileReceiver.instance;

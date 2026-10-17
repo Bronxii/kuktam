@@ -1,3 +1,7 @@
+import 'package:kuktam/households/cached_household_gateway.dart';
+import '../households/cached_household_gateway_test.dart'
+    show MemoryContexts, Authority, Offline;
+import 'package:kuktam/households/household_gateway.dart';
 import '../support/feature_access.dart';
 // Test-only SDK doubles; these never enter production or access the network.
 // ignore_for_file: subtype_of_sealed_class
@@ -208,9 +212,52 @@ class _Batch implements WriteBatch {
 }
 
 void main() {
+  test(
+    'offline cached household supports shopping reads and queues writes on the confirmed path',
+    () async {
+      final db = _Db(), auth = _Auth();
+      final storage = MemoryContexts()..seed('user-1', 'confirmed-shared');
+      final authority = Authority()..reply = () async => throw Offline();
+      final context = CachedHouseholdGateway(
+        currentUid: () => auth.currentUser?.uid,
+        sessions: const Stream.empty(),
+        authoritative: authority,
+        storage: storage,
+        isTransient: (e) => e is Offline,
+        serverChanges: (_) => const Stream.empty(),
+      );
+      final repo = ShoppingRepository(
+        firestore: db,
+        firebaseAuth: auth,
+        householdGateway: context,
+      );
+      addTearDown(db.events.close);
+      db.records['households/confirmed-shared/shoppingItems/saved'] = {
+        'name': 'milk',
+        'quantity': 1,
+        'unit': 'db',
+        'isChecked': false,
+      };
+      expect((await repo.getShoppingItems()).single.id, 'saved');
+      expect((await repo.watchShoppingItems().first).single.id, 'saved');
+      await repo.addOrMergeItem(name: 'bread', quantity: 1, unit: 'db');
+      await repo.setItemChecked(id: 'saved', isChecked: true);
+      expect(db.commits, 1);
+      expect(
+        db.operations.every(
+          (o) =>
+              o.path.startsWith('households/confirmed-shared/shoppingItems/'),
+        ),
+        true,
+      );
+      expect(db.paths.any((p) => p.startsWith('users/')), false);
+      // SDK double verifies queued write routing; actual radio-off sync is a later device smoke.
+    },
+  );
+
   test('shopping session identity is independent of entitlement', () {
     final auth = _Auth();
-    final repo = ShoppingRepository(firestore: _Db(), firebaseAuth: auth);
+    final repo = _repository(firestore: _Db(), firebaseAuth: auth);
     final check = repo.captureSessionCheck();
     expect(check(), isTrue);
     auth.uid = 'other';
@@ -223,7 +270,7 @@ void main() {
       'multiplier $factor reaches real repository with one atomic batch',
       (tester) async {
         final db = _Db();
-        final repo = ShoppingRepository(firestore: db, firebaseAuth: _Auth());
+        final repo = _repository(firestore: db, firebaseAuth: _Auth());
         await openMultiplier(tester, repo.addOrMergeItems);
         await tester.enterText(find.byType(TextField), factor);
         await tester.tap(find.text('Hozzáadás'));
@@ -242,7 +289,7 @@ void main() {
     'target scaling batch lookup failure writes nothing; retry commits all once',
     (tester) async {
       final db = _Db()..failQuery = 2;
-      final repo = ShoppingRepository(firestore: db, firebaseAuth: _Auth());
+      final repo = _repository(firestore: db, firebaseAuth: _Auth());
       await tester.pumpWidget(
         withProAccess(
           MaterialApp(
@@ -279,7 +326,7 @@ void main() {
     'manual add uses validated batch merge and retains target checked metadata',
     () async {
       final db = _Db()..existing['tej|ml'] = 'checked';
-      final repo = ShoppingRepository(firestore: db, firebaseAuth: _Auth());
+      final repo = _repository(firestore: db, firebaseAuth: _Auth());
       await repo.addOrMergeItem(name: ' TeJ ', quantity: 1, unit: 'l');
       expect(db.commits, 1);
       expect(db.operations.single.data, {
@@ -300,7 +347,7 @@ void main() {
       final db = _Db()
         ..existing['liszt|g'] = 'target'
         ..failCommit = true;
-      final repo = ShoppingRepository(firestore: db, firebaseAuth: _Auth());
+      final repo = _repository(firestore: db, firebaseAuth: _Auth());
       Future<void> save() => repo.updateItem(
         id: 'source',
         name: ' LISZT ',
@@ -312,8 +359,8 @@ void main() {
       db.failCommit = false;
       await save();
       expect(db.operations.map((o) => o.path), [
-        'users/user-1/shopping/target',
-        'users/user-1/shopping/source',
+        'households/home-user-1/shoppingItems/target',
+        'households/home-user-1/shoppingItems/source',
       ]);
       expect(db.operations.first.data, {
         'quantity': FieldValue.increment(500.0),
@@ -325,7 +372,7 @@ void main() {
     'edit own name preserves id and checked state; invalid update never writes',
     () async {
       final db = _Db()..existing['tej|ml'] = 'self';
-      final repo = ShoppingRepository(firestore: db, firebaseAuth: _Auth());
+      final repo = _repository(firestore: db, firebaseAuth: _Auth());
       await repo.updateItem(id: 'self', name: 'TEJ', quantity: 2, unit: 'l');
       expect(db.operations.single.data, {
         'name': 'tej',
@@ -349,10 +396,10 @@ void main() {
     () async {
       final db = _Db();
       final auth = _Auth();
-      final repo = ShoppingRepository(firestore: db, firebaseAuth: auth);
+      final repo = _repository(firestore: db, firebaseAuth: auth);
       addTearDown(db.events.close);
       for (var i = 0; i < 40; i++) {
-        db.records['users/user-1/shopping/$i'] = {
+        db.records['households/home-user-1/shoppingItems/$i'] = {
           'name': 'Tétel $i',
           'quantity': 1,
           'unit': 'db',
@@ -377,7 +424,9 @@ void main() {
       await repo.setItemChecked(id: 'own', isChecked: true);
       await repo.deleteItem('own');
       expect(
-        db.operations.every((o) => o.path.startsWith('users/B/shopping/')),
+        db.operations.every(
+          (o) => o.path.startsWith('households/home-B/shoppingItems/'),
+        ),
         isTrue,
       );
       auth.uid = 'user-1';
@@ -386,7 +435,8 @@ void main() {
       expect(
         db.operations.where(
           (o) =>
-              o.data['deleted'] == true && o.path.startsWith('users/user-1/'),
+              o.data['deleted'] == true &&
+              o.path.startsWith('households/home-user-1/shoppingItems/'),
         ),
         hasLength(40),
       );
@@ -394,7 +444,7 @@ void main() {
   );
   test('batch cap rejects entire action before lookup or commit', () async {
     final db = _Db();
-    final repo = ShoppingRepository(firestore: db, firebaseAuth: _Auth());
+    final repo = _repository(firestore: db, firebaseAuth: _Auth());
     await expectLater(
       repo.addOrMergeItems(
         List.generate(201, (i) => (name: '$i', quantity: 1.0, unit: 'db')),
@@ -408,7 +458,7 @@ void main() {
     'groups canonical targets, reuses increment and metadata, one commit',
     () async {
       final db = _Db()..existing['alma|g'] = 'apple';
-      final repo = ShoppingRepository(firestore: db, firebaseAuth: _Auth());
+      final repo = _repository(firestore: db, firebaseAuth: _Auth());
       await repo.addOrMergeItems([
         (name: ' Alma ', quantity: 1.0, unit: 'kg'),
         (name: 'alma', quantity: 500.0, unit: 'g'),
@@ -418,9 +468,12 @@ void main() {
       ]);
       expect(db.commits, 1);
       expect(db.queries, ['alma|g', 'tej|ml', 'tej|db']);
-      expect(db.paths.toSet(), {'users/user-1/shopping'});
+      expect(db.paths.toSet(), {'households/home-user-1/shoppingItems'});
       expect(db.operations, hasLength(3));
-      expect(db.operations.first.path, 'users/user-1/shopping/apple');
+      expect(
+        db.operations.first.path,
+        'households/home-user-1/shoppingItems/apple',
+      );
       expect(db.operations.first.data, {
         'quantity': FieldValue.increment(1500.0),
       });
@@ -436,7 +489,7 @@ void main() {
   );
   test('query failure never commits staged earlier writes', () async {
     final db = _Db()..failQuery = 2;
-    final repo = ShoppingRepository(firestore: db, firebaseAuth: _Auth());
+    final repo = _repository(firestore: db, firebaseAuth: _Auth());
     await expectLater(
       repo.addOrMergeItems([
         (name: 'a', quantity: 1.0, unit: 'db'),
@@ -449,7 +502,7 @@ void main() {
   });
   test('commit error propagates, retry builds a fresh batch', () async {
     final db = _Db()..failCommit = true;
-    final repo = ShoppingRepository(firestore: db, firebaseAuth: _Auth());
+    final repo = _repository(firestore: db, firebaseAuth: _Auth());
     final items = [(name: 'a', quantity: 1.0, unit: 'db')];
     await expectLater(repo.addOrMergeItems(items), throwsStateError);
     expect(db.operations, isEmpty);
@@ -462,7 +515,7 @@ void main() {
     'invalid input and normalization overflow reject before writes',
     () async {
       final db = _Db();
-      final repo = ShoppingRepository(firestore: db, firebaseAuth: _Auth());
+      final repo = _repository(firestore: db, firebaseAuth: _Auth());
       for (final item in [
         (name: '', quantity: 1.0, unit: 'db'),
         (name: 'a', quantity: 0.0, unit: 'db'),
@@ -476,9 +529,27 @@ void main() {
       expect(db.queries, isEmpty);
     },
   );
+  test(
+    'session changes while household resolves cannot write or expose old data',
+    () async {
+      final db = _Db(), auth = _Auth();
+      final pending = Completer<String>();
+      final repo = ShoppingRepository(
+        firestore: db,
+        firebaseAuth: auth,
+        householdGateway: _DeferredHome(pending.future),
+      );
+      final result = repo.addOrMergeItem(name: 'milk', quantity: 1, unit: 'l');
+      auth.uid = 'other';
+      pending.complete('old-home');
+      await expectLater(result, throwsStateError);
+      expect(db.operations, isEmpty);
+      expect(db.commits, 0);
+    },
+  );
   test('empty input does nothing and missing user cannot write', () async {
     final db = _Db();
-    final repo = ShoppingRepository(
+    final repo = _repository(
       firestore: db,
       firebaseAuth: _Auth()..signedIn = false,
     );
@@ -489,4 +560,27 @@ void main() {
     );
     expect(db.commits, 0);
   });
+}
+
+class _Homes implements HouseholdGateway {
+  _Homes(this.auth);
+  final FirebaseAuth auth;
+  @override
+  Future<String> ensure() async => 'home-${auth.currentUser!.uid}';
+}
+
+ShoppingRepository _repository({
+  required FirebaseFirestore firestore,
+  required FirebaseAuth firebaseAuth,
+}) => ShoppingRepository(
+  firestore: firestore,
+  firebaseAuth: firebaseAuth,
+  householdGateway: _Homes(firebaseAuth),
+);
+
+class _DeferredHome implements HouseholdGateway {
+  _DeferredHome(this.value);
+  final Future<String> value;
+  @override
+  Future<String> ensure() => value;
 }

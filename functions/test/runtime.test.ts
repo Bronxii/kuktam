@@ -43,7 +43,7 @@ test('root discovery has no secret/credential/Admin/network side effects and onl
  const http=require('node:http'),https=require('node:https');const hr=http.request,hs=https.request,fetch=globalThis.fetch;
  http.request=https.request=globalThis.fetch=()=>{throw new Error('NETWORK_FORBIDDEN');};
  try{const root=await import('../src/index');assert.equal(getApps().length,before);
- assert.deepEqual(Object.keys(root).sort(),['authUserDeleted','beginAccountDeletion','billingMaintenance','finalizeAccountDeletion','getEntitlementProof','playRtdn','prepareProPurchase','verifyProPurchase'].sort());
+ assert.deepEqual(Object.keys(root).sort(),['ensurePrivateHousehold','authUserDeleted','beginAccountDeletion','billingMaintenance','finalizeAccountDeletion','getEntitlementProof','playRtdn','prepareProPurchase','verifyProPurchase'].sort());
  assert.equal((root.prepareProPurchase as any).__endpoint.platform,'gcfv2');
  assert.equal((root.authUserDeleted as any).__endpoint.platform,'gcfv1');
  assert.notEqual((root.prepareProPurchase as any).__endpoint.callableTrigger.enforceAppCheck,true);
@@ -100,3 +100,15 @@ test('CLI parameter resolution refuses each missing identity, including legacy-o
   }
  }finally{http.request=hr;https.request=hs;globalThis.fetch=fetch;}
 });
+
+ test('household callable is CORE, secret-free, non-enforcing and rejects UID injection before initialization',async()=>{
+  const root=await import('../src/index');const endpoint=(root.ensurePrivateHousehold as any).__endpoint;
+  assert.equal(endpoint.platform,'gcfv2');assert.deepEqual(endpoint.region,['europe-west1']);
+  assert.equal(endpoint.serviceAccountEmail.name,cfg.coreIdentityParameter);
+  assert.notEqual(endpoint.callableTrigger.enforceAppCheck,true);
+  assert.ok(!endpoint.secretEnvironmentVariables?.length);
+  for(const data of [{uid:'victim'},{householdId:'victim'},[],null]){
+   await assert.rejects(root.ensurePrivateHousehold.run({auth:{uid:'caller'},data} as any), (e:any)=>e.code==='invalid-argument');
+  }
+  await assert.rejects(root.ensurePrivateHousehold.run({data:{}} as any),(e:any)=>e.code==='unauthenticated');
+ });
