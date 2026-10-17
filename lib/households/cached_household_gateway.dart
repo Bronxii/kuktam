@@ -33,6 +33,29 @@ class CachedHouseholdGateway implements ObservableHouseholdGateway {
   );
   final _flights = <String, Future<String>>{};
   final _blocked = <String>{};
+  final _backgroundChecks = <String>{};
+  String? _lastEnsureUid;
+  final _remoteStreams = <String, Stream<String?>>{};
+
+  // Gate and repository share one native root subscription. Release it when
+  // the last consumer leaves; a later session gets a fresh subscription.
+  Stream<String?> _remoteFor(String uid) => _remoteStreams.putIfAbsent(uid, () {
+    late StreamController<String?> controller;
+    StreamSubscription<String?>? subscription;
+    controller = StreamController<String?>.broadcast(
+      sync: true,
+      onListen: () {
+        subscription = serverChanges(
+          uid,
+        ).listen(controller.add, onError: controller.addError);
+      },
+      onCancel: () {
+        _remoteStreams.remove(uid);
+        unawaited(subscription?.cancel());
+      },
+    );
+    return controller.stream;
+  });
 
   String? _decode(String? raw, String uid) {
     try {
@@ -60,7 +83,10 @@ class CachedHouseholdGateway implements ObservableHouseholdGateway {
     if (uid == null) throw HouseholdSessionChanged();
     var changed = false;
     final sub = sessions.listen((u) {
-      if (u != uid) changed = true;
+      if (u != uid) {
+        changed = true;
+        _backgroundChecks.remove(uid);
+      }
     });
     void check() {
       if (changed || currentUid() != uid) throw HouseholdSessionChanged();
@@ -76,6 +102,10 @@ class CachedHouseholdGateway implements ObservableHouseholdGateway {
 
   @override
   Future<String> ensure() => _session((uid, check) async {
+    if (_lastEnsureUid != uid) {
+      _backgroundChecks.clear();
+      _lastEnsureUid = uid;
+    }
     String? raw;
     try {
       raw = await storage.read(uid);
@@ -86,9 +116,11 @@ class CachedHouseholdGateway implements ObservableHouseholdGateway {
     final cached = _blocked.contains(uid) ? null : _decode(raw, uid);
     if (cached != null) {
       // No network wait on an already verified account; errors handled below.
-      unawaited(
-        refresh().then<void>((_) {}, onError: (Object _, StackTrace _) {}),
-      );
+      if (_backgroundChecks.add(uid)) {
+        unawaited(
+          refresh().then<void>((_) {}, onError: (Object _, StackTrace _) {}),
+        );
+      }
       return cached;
     }
     final result = await refresh();
@@ -129,6 +161,7 @@ class CachedHouseholdGateway implements ObservableHouseholdGateway {
       } catch (_) {}
       check();
       _blocked.remove(uid);
+      _backgroundChecks.add(uid);
       _events.add((uid: uid, id: id));
       return id;
     } catch (error) {
@@ -176,6 +209,7 @@ class CachedHouseholdGateway implements ObservableHouseholdGateway {
         }
         authSub = sessions.listen((u) {
           if (u != uid && !closed) {
+            _backgroundChecks.remove(uid);
             fail(HouseholdSessionChanged());
             closed = true;
             unawaited(remoteSub?.cancel());
@@ -193,7 +227,7 @@ class CachedHouseholdGateway implements ObservableHouseholdGateway {
             emit(event.id!);
           }
         });
-        remoteSub = serverChanges(uid).listen(
+        remoteSub = _remoteFor(uid).listen(
           (id) {
             if (!closed) {
               unawaited(

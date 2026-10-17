@@ -4,9 +4,9 @@ No production rollout or migration has been performed.
 
 ## Schema and authority
 
-- `users/{uid}.activeHouseholdId: string`: selected household, not ownership. Backend creates the root with merge, including when previously absent. Client may change ONLY this field, only after migration, only to a household containing their membership. No switching UI yet.
+- `users/{uid}.activeHouseholdId: string`: selected household, not ownership. Backend creates the root with merge, including when previously absent. All structural pointers are backend-only. There is no client switching capability or selector.
 - `users/{uid}.shoppingMigrationVersion: 0 | 1`: server-owned migration barrier. 0 means pending, 1 means verified empty legacy source. It cannot be reset by a client. An ACTIVE client cannot delete a migrated user root to reopen legacy writes.
-- `households/{id}.schemaVersion: 1`: household schema version.
+- `households/{id}.schemaVersion: 2`: current private-root version; verified legacy v1 remains compatible until lazy normalization.
 - `households/{id}.ownerUid: string`: authoritative owner and deletion discovery key independent of the user root's existence.
 - `households/{id}.createdAt: Timestamp`: creation audit time; not changed on replay.
 - `households/{id}/members/{uid}.role: owner | member`: server-owned membership/role. Initial provisioning creates only the authenticated owner's member record. Client cannot create/update/delete memberships or households.
@@ -22,7 +22,7 @@ Initial private ID = `private_` + SHA-256 of authenticated UID. This is a stable
 
 AuthGate wraps the normal application in HouseholdGate for every verified authenticated session, including email/password and Google. Recipes are not prerequisites. The repository also resolves through the same gateway for every read/write, avoiding a global cached household shared across users. Gateway detects account switch (including A→B→A during a call), and the gate is keyed by authenticated UID. Failed provisioning offers retry and does not silently fall back to legacy writes. First provisioning/migration requires connectivity. Subsequent startup uses a UID-scoped, previously server-verified local context without waiting for a network response; see Offline startup below.
 
-Each server transaction:
+Each server transaction (Phase 1 now also validates/normalizes the private root and checks the reverse index):
 1. Reads the lifecycle, root, active household and membership; rejects invalid/deleting/deleted state.
 2. Reads at most 50 legacy `users/{uid}/shopping` documents and all destination IDs before writes.
 3. Creates missing lifecycle/private household/member/root metadata atomically.
@@ -39,7 +39,7 @@ All normal shopping actions (manual CRUD, checks, text import, recipe and scaled
 
 LifecycleStore checks owned households on every nonterminal deletion step BEFORE user root cleanup and before DONE. It deletes a bounded shopping page; only once items are empty does it delete sole membership and household. Owner discovery does not depend on users/{uid} surviving client cleanup. Existing Auth, grant, ledger and recovery stages are unchanged. Content verification includes owned households. Emulator tests cover absent roots, client disappearance and external Auth deletion.
 
-This release provisions ONLY private single-member homes. If an owned home has another member, cleanup fails closed and does not delete shared items or reach DONE. Before invite/join release, extend this isolated cleanup helper to enumerate every membership, remove a departing member, transfer ownership deterministically when required, and preserve nonempty shared homes. Also extend completion verification to non-owner memberships. This is REQUIRED before actual shared membership creation; it is not implemented here. Existing role/path contracts need no rewrite.
+This release provisions ONLY private single-member homes. If an owned home has another member, cleanup fails closed and does not delete shared items or reach DONE. Before invite/join release, extend this isolated cleanup helper to enumerate every membership, remove a departing member and apply the owner-dissolution policy. Ownership transfer is forbidden. Also extend completion verification to non-owner memberships. This is REQUIRED before actual shared membership creation; it is not implemented here. Existing role/path contracts need no rewrite.
 
 ## Proposed rollout (NOT executed)
 
@@ -60,7 +60,7 @@ node .\functions\node_modules\firebase-tools\lib\bin\firebase.js deploy --only "
 
 ## Next Family Share phase
 
-Neutral HTTPS invite link with high-entropy opaque token; store only token hash plus household/expiry/use constraints. Authenticated server-side accept transaction validates invite, ACTIVE lifecycle and member limit, creates member role, and changes activeHouseholdId atomically. Finish the joining user's private migration first; do not silently merge two household shopping lists. Recipes remain private. No recipe existence check. Authorize invite/member management by server-owned role. Define leave/owner-transfer/deletion policy before enabling joins. Listeners must rebind when activeHouseholdId changes; no switch UI is shipped in this foundation.
+Neutral HTTPS invite link with high-entropy opaque token; store only token hash plus household/expiry/use constraints. Authenticated server-side accept transaction validates invite, ACTIVE lifecycle and member limit, creates member role, and changes activeHouseholdId atomically. Finish the joining user's private migration first; do not silently merge two household shopping lists. Recipes remain private. No recipe existence check. Authorize invite/member management by server-owned role. Implement leave, owner-dissolution and deletion policy before enabling joins; ownership transfer is forbidden. Listeners must rebind when activeHouseholdId changes; no switch UI is shipped in this foundation.
 
 Android App Links and later iOS Universal Links deliver the same neutral token to the Dart gateway. Neither domain schema nor backend assumes Android. Invitation UI, token issuer/consumer, member management and live shared cleanup remain next-phase work.
 
@@ -85,8 +85,60 @@ The existing flutter_secure_storage dependency stores one versioned JSON record 
 
 Session listeners fence in-flight A→B and A→B→A responses. Sign-out closes the old observable session; another UID cannot read its context. Verified records may remain encrypted per UID so returning to A can use only A's record. No global unscoped household ID is used. Persistence failure permits the successful online result but does not promise offline readiness on the next startup.
 
-Every server-confirmed root snapshot (including reconnect with the same ID) requests authoritative revalidation. Cached and locally pending snapshots are not confirmations. A hinted new activeHouseholdId is never accepted directly: the callable verifies it before replacing persistence and emitting it. Shopping listeners cancel old delivery and fence late events before rebinding. The repository uses normal Firestore cache reads and write queues on that resolved path; it does not add a second local shopping database.
+Consumers now share one reference-counted server-root subscription per UID. Every server-confirmed root snapshot (including reconnect with the same ID) requests coalesced authoritative revalidation. Cached and locally pending snapshots are not confirmations. A hinted new activeHouseholdId is never accepted directly: the callable verifies it before replacing persistence and emitting it. Shopping listeners cancel old delivery and fence late events before rebinding. The repository uses normal Firestore cache reads and write queues on that resolved path; it does not add a second local shopping database.
 
 First-use offline UI explicitly requests connectivity and offers retry. No sleep, periodic retry loop, connectivity plugin or release debug bypass was added. Full shared invite/member management remains next phase.
 
 Controlled rollout smoke must cover: online first provisioning; force-close and airplane-mode restart; cached list read and a queued edit; reconnect and rule-authorized sync; A/sign-out/B/A isolation; known backend-denied lifecycle invalidation. The local SDK-double test verifies offline routing/commit submission, not physical radio-off behavior or native Firestore queue durability. No production migration was run by these tests.
+
+## Family Share Phase 1 — local only
+
+One user has one visible shopping list, at most one family, and a retained hidden
+private fallback. No ownership transfer, shared recipes or membership Pro grant.
+No family creation/join/leave/dissolution endpoint or UI exists in this phase.
+
+Stable server-owned user metadata:
+- privateHouseholdId: deterministic private_<sha256(uid)> fallback.
+- activeHouseholdId: sole current shopping route.
+- familyHouseholdId: null for standalone; future family ID must equal active ID.
+- shoppingMigrationVersion: existing 0/1 migration barrier, unchanged semantics.
+
+Private roots are lazily upgraded from validated schema 1 to schema 2 with
+kind=private, state=ACTIVE and operationId=null. ownerUid, createdAt and shopping
+items are preserved. No bulk migration or second private household is created.
+Existing v1 private roots remain usable by rules before the next ensure call.
+Missing lifecycle still provisions ACTIVE; DELETING/DELETED never reactivate.
+
+familyMemberships/{uid} is a server-only reverse index contract:
+householdId, role(owner/member), state(RESERVED/ACTIVE), operationId.
+RESERVED requires an operation ID; stable ACTIVE requires null. Phase 1 has no
+index writer. Reserved or inconsistent family relationships make the
+ensure fail closed without resetting any pointers. Consistent server-authored ACTIVE family state resolves read-only, after checking both households, membership, index and pointers. No family activation occurs. Future lifecycle code must
+atomically maintain root, membership and index; Phase 1 does not claim that
+client-deny rules alone enforce Admin-side concurrent join uniqueness.
+
+Future family fixtures require schemaVersion=2, kind=family, state=ACTIVE,
+operationId=null; active/family pointers and ACTIVE reverse index must agree,
+role must match the member document and ownerUid, and the private fallback must
+be private and owned by the UID. Shopping read/write also requires ACTIVE user
+lifecycle and completed migration. PREPARING/DISSOLVING, reserved/stale indexes,
+missing memberships and hidden private shopping are denied. Member documents
+retain the existing role field; active membership state lives in the index.
+Family ownership Pro checks and loss cleanup remain future lifecycle work.
+
+Client structural root writes are denied even when the destination membership
+exists. Household/member/index writes remain denied. Recipes stay user-private;
+legacy shopping writes stay closed after migration. Server/Admin code bypasses
+rules and must maintain these invariants transactionally in later phases.
+
+Deletion remains private-only and safe: reverse index or explicit family pointer
+blocks cleanup even if the user root vanished. Explicit family roots cannot be
+deleted as private homes. Content verification includes the reverse index. Full
+family cleanup is intentionally NOT implemented; no family activation may ship
+until that policy and Pro-loss handling exist.
+
+Context consumers share a single root listener, released with the final consumer.
+Repeated cached ensure calls do not start repeated callable refreshes; one initial
+background validation, server-root events and explicit refresh remain available.
+The UID-scoped secure cache, session fences and offline startup are preserved.
+The context and backend reader can rebind P->F->P for consistent server-authored state. No Phase 1 backend path creates or activates that family state.

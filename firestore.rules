@@ -13,17 +13,14 @@ service cloud.firestore {
         get(/databases/$(database)/documents/accountLifecycle/$(uid)).data.state == 'ACTIVE';
     }
 
-    // Backend provisions root metadata; client may only select a valid membership.
+    // Structural pointers are exclusively server-managed. No client switching.
     // Coordinated deletion still removes this exact root after its lifecycle barrier.
     match /users/{uid} {
       allow get: if isOwner(uid);
       // Once migrated, an ACTIVE client cannot remove the migration barrier.
       allow delete: if isOwner(uid) &&
         (!('activeHouseholdId' in resource.data) || !canEditContent(uid));
-      allow update: if isOwner(uid) && canEditContent(uid) &&
-        resource.data.shoppingMigrationVersion == 1 &&
-        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['activeHouseholdId']) &&
-        exists(/databases/$(database)/documents/households/$(request.resource.data.activeHouseholdId)/members/$(uid));
+      allow create, update: if false;
 
       match /recipes/{recipeId} {
         allow read, delete: if isOwner(uid);
@@ -52,7 +49,34 @@ service cloud.firestore {
     function householdWritable(hid) {
       return householdMember(hid) &&
         get(/databases/$(database)/documents/accountLifecycle/$(request.auth.uid)).data.state == 'ACTIVE' &&
-        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.shoppingMigrationVersion == 1;
+        householdContext(hid);
+    }
+    function householdContext(hid) {
+      let uid = request.auth.uid;
+      let user = get(/databases/$(database)/documents/users/$(uid)).data;
+      let home = get(/databases/$(database)/documents/households/$(hid)).data;
+      return user.shoppingMigrationVersion == 1 && user.activeHouseholdId == hid &&
+        (privateContext(uid, hid, user, home) || familyContext(uid, hid, user, home));
+    }
+    function privateContext(uid, hid, user, home) {
+      return user.get('familyHouseholdId', null) == null &&
+        user.get('privateHouseholdId', hid) == hid && home.ownerUid == uid &&
+        get(/databases/$(database)/documents/households/$(hid)/members/$(uid)).data.role == 'owner' &&
+        !exists(/databases/$(database)/documents/familyMemberships/$(uid)) &&
+        ((home.schemaVersion == 1 && !('kind' in home) && !('state' in home) && !('operationId' in home)) ||
+         (home.schemaVersion == 2 && home.kind == 'private' && home.state == 'ACTIVE' && home.operationId == null));
+    }
+    function familyContext(uid, hid, user, home) {
+      let binding = get(/databases/$(database)/documents/familyMemberships/$(uid)).data;
+      let member = get(/databases/$(database)/documents/households/$(hid)/members/$(uid)).data;
+      let fallback = get(/databases/$(database)/documents/households/$(user.privateHouseholdId)).data;
+      return home.schemaVersion == 2 && home.kind == 'family' && home.state == 'ACTIVE' && home.operationId == null &&
+        user.familyHouseholdId == hid && user.privateHouseholdId != hid &&
+        fallback.schemaVersion == 2 && fallback.kind == 'private' && fallback.state == 'ACTIVE' && fallback.operationId == null && fallback.ownerUid == uid &&
+        get(/databases/$(database)/documents/households/$(user.privateHouseholdId)/members/$(uid)).data.role == 'owner' &&
+        binding.householdId == hid && binding.state == 'ACTIVE' && binding.operationId == null &&
+        binding.role == member.role &&
+        ((member.role == 'owner' && home.ownerUid == uid) || (member.role == 'member' && home.ownerUid != uid));
     }
     match /households/{hid} {
       allow read: if householdMember(hid);
@@ -62,9 +86,12 @@ service cloud.firestore {
         allow write: if false;
       }
       match /shoppingItems/{itemId} {
-        allow read: if householdMember(hid);
+        allow read: if householdWritable(hid);
         allow create, update, delete: if householdWritable(hid);
       }
+    }
+    match /familyMemberships/{uid} {
+      allow read, write: if false;
     }
     match /billingPurchases/{tokenHash} {
       allow read, write: if false;

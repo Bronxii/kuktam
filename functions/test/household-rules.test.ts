@@ -11,11 +11,14 @@ before(async()=>{
  await env.clearFirestore();
  await env.withSecurityRulesDisabled(async ctx=>{const db=ctx.firestore();
   for(const uid of ['owner','member','deleting','deleted','migrating']){
-   await setDoc(doc(db,`users/${uid}`),{activeHouseholdId:'home',shoppingMigrationVersion:uid==='migrating'?0:1});
+   await setDoc(doc(db,`users/${uid}`),{privateHouseholdId:`private-${uid}`,familyHouseholdId:'home',activeHouseholdId:'home',shoppingMigrationVersion:uid==='migrating'?0:1});
+   await setDoc(doc(db,`households/private-${uid}`),{schemaVersion:2,kind:'private',state:'ACTIVE',operationId:null,ownerUid:uid});
+   await setDoc(doc(db,`households/private-${uid}/members/${uid}`),{role:'owner'});
+   await setDoc(doc(db,`familyMemberships/${uid}`),{householdId:'home',role:uid==='owner'?'owner':'member',state:'ACTIVE',operationId:null});
    await setDoc(doc(db,`accountLifecycle/${uid}`),{state:uid==='deleting'?'DELETING':uid==='deleted'?'DELETED':'ACTIVE'});
    await setDoc(doc(db,`households/home/members/${uid}`),{role:uid==='owner'?'owner':'member'});
   }
-  await setDoc(doc(db,'households/home'),{ownerUid:'owner'});
+  await setDoc(doc(db,'households/home'),{schemaVersion:2,kind:'family',state:'ACTIVE',operationId:null,ownerUid:'owner'});
   await setDoc(doc(db,'households/home/shoppingItems/a'),{name:'milk'});
  });
 });
@@ -46,10 +49,52 @@ test('migration barrier cannot be erased by ACTIVE client; legacy cannot be reop
  const db=env.authenticatedContext('owner').firestore();await assertFails(deleteDoc(doc(db,'users/owner')));
  await assertFails(setDoc(doc(db,'users/owner/shopping/new'),{name:'old'}));
 });
-test('active household switching requires membership and preserves other root fields',async()=>{
+test('even valid membership cannot authorize client pointer updates',async()=>{
  const db=env.authenticatedContext('owner').firestore();
- await assertSucceeds(updateDoc(doc(db,'users/owner'),{activeHouseholdId:'home'}));
+ await assertFails(updateDoc(doc(db,'users/owner'),{activeHouseholdId:'private-owner'}));
  await assertFails(updateDoc(doc(db,'users/owner'),{activeHouseholdId:'home',shoppingMigrationVersion:0}));
+});
+
+for(const field of ['privateHouseholdId','activeHouseholdId','familyHouseholdId'])test(`client cannot change ${field}`,async()=>{
+ await assertFails(updateDoc(doc(env.authenticatedContext('owner').firestore(),'users/owner'),{[field]:'private-owner'}));
+});
+test('client cannot read/write reverse index or change any structural household field',async()=>{
+ const db=env.authenticatedContext('owner').firestore(), ref=doc(db,'familyMemberships/owner');
+ await assertFails(getDoc(ref));await assertFails(setDoc(ref,{householdId:'home',role:'owner',state:'ACTIVE',operationId:null}));
+ await assertFails(updateDoc(ref,{role:'member'}));await assertFails(deleteDoc(ref));
+ await assertFails(setDoc(doc(db,'familyMemberships/new'),{householdId:'home'}));
+ for(const field of ['ownerUid','kind','state','operationId'])await assertFails(updateDoc(doc(db,'households/home'),{[field]:'forged'}));
+});
+test('family member cannot read or write hidden private list',async()=>{
+ const db=env.authenticatedContext('member').firestore(), ref=doc(db,'households/private-member/shoppingItems/a');
+ await assertFails(getDoc(ref));await assertFails(setDoc(ref,{name:'hidden'}));await assertFails(deleteDoc(ref));
+});
+for(const variation of ['RESERVED','PREPARING','DISSOLVING','activeMismatch','familyMismatch','indexMismatch','missingIndex','wrongPrivateKind'])test(`family ${variation} fails closed`,async()=>{
+ const uid=`case-${variation}`, hid=`family-${variation}`, p=`private-${variation}`;
+ await env.withSecurityRulesDisabled(async ctx=>{const db=ctx.firestore();
+  await setDoc(doc(db,`users/${uid}`),{activeHouseholdId:variation==='activeMismatch'?p:hid,privateHouseholdId:p,familyHouseholdId:variation==='familyMismatch'?null:hid,shoppingMigrationVersion:1});
+  await setDoc(doc(db,`accountLifecycle/${uid}`),{state:'ACTIVE'});
+  await setDoc(doc(db,`households/${p}`),{schemaVersion:2,state:'ACTIVE',operationId:null,kind:variation==='wrongPrivateKind'?'family':'private',ownerUid:uid});
+  await setDoc(doc(db,`households/${p}/members/${uid}`),{role:'owner'});
+  await setDoc(doc(db,`households/${hid}`),{schemaVersion:2,kind:'family',ownerUid:'owner',state:['PREPARING','DISSOLVING'].includes(variation)?variation:'ACTIVE',operationId:null});
+  await setDoc(doc(db,`households/${hid}/members/${uid}`),{role:'member'});
+  if(variation!=='missingIndex')await setDoc(doc(db,`familyMemberships/${uid}`),{householdId:variation==='indexMismatch'?'other':hid,role:'member',state:variation==='RESERVED'?'RESERVED':'ACTIVE',operationId:variation==='RESERVED'?'op':null});
+ });
+ const db=env.authenticatedContext(uid).firestore(),ref=doc(db,`households/${hid}/shoppingItems/a`);
+ await assertFails(getDoc(ref));await assertFails(setDoc(ref,{name:'bad'}));await assertFails(deleteDoc(ref));
+});
+for(const legacy of [false,true])test(`standalone ${legacy?'v1 compatibility':'v2'} active list CRUD works`,async()=>{
+ const uid=legacy?'legacy':'standalone',hid=`p-${uid}`;
+ await env.withSecurityRulesDisabled(async ctx=>{const db=ctx.firestore();
+  await setDoc(doc(db,`users/${uid}`),{activeHouseholdId:hid,shoppingMigrationVersion:1,...(legacy?{}:{privateHouseholdId:hid,familyHouseholdId:null})});
+  await setDoc(doc(db,`accountLifecycle/${uid}`),{state:'ACTIVE'});
+  await setDoc(doc(db,`households/${hid}`),{schemaVersion:legacy?1:2,ownerUid:uid,...(legacy?{}:{kind:'private',state:'ACTIVE',operationId:null})});
+  await setDoc(doc(db,`households/${hid}/members/${uid}`),{role:'owner'});
+ });
+ const db=env.authenticatedContext(uid).firestore(),ref=doc(db,`households/${hid}/shoppingItems/a`);
+ await assertSucceeds(setDoc(ref,{name:'ok'}));await assertSucceeds(getDoc(ref));await assertSucceeds(updateDoc(ref,{isChecked:true}));await assertSucceeds(deleteDoc(ref));
+ await assertFails(setDoc(doc(db,'households/private-owner/shoppingItems/x'),{name:'bad'}));
+ await assertFails(setDoc(doc(db,`users/${uid}/shopping/x`),{name:'legacy'}));
 });
 test('household membership does not grant access to another members private recipes',async()=>{
  const db=env.authenticatedContext('member').firestore();await assertFails(getDoc(doc(db,'users/owner/recipes/first')));

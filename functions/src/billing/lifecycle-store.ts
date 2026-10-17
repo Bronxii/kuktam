@@ -404,7 +404,8 @@ export class LifecycleStore {
       const recipes=await tx.get(this.db.collection(`users/${uid}/recipes`).limit(1));
       const shopping=await tx.get(this.db.collection(`users/${uid}/shopping`).limit(1));
       const homes=await tx.get(this.db.collection('households').where('ownerUid','==',uid).limit(1));
-      const cleanupState=root.exists||!recipes.empty||!shopping.empty||!homes.empty?'PENDING':'VERIFIED';
+      const family=await tx.get(this.db.doc(`familyMemberships/${uid}`));
+      const cleanupState=root.exists||!recipes.empty||!shopping.empty||!homes.empty||family.exists?'PENDING':'VERIFIED';
       if(j.cleanupState!==cleanupState||doc.data()!.schemaVersion!==2)
         tx.set(ref,readDeletion({...j,cleanupState,updatedAt:this.clock()}));
       return cleanupState==='VERIFIED'?'VERIFIED':'cleanupIncomplete';

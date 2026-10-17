@@ -70,6 +70,92 @@ Future<void> flush() async {
 }
 
 void main() {
+  testWidgets('ordinary gate rebuilds do not recreate the root listener', (
+    tester,
+  ) async {
+    final f = Fixture();
+    addTearDown(f.close);
+    var roots = 0;
+    final gateway = CachedHouseholdGateway(
+      currentUid: () => f.uid,
+      sessions: f.auth.stream,
+      authoritative: f.authority,
+      storage: f.storage,
+      isTransient: (e) => e is Offline,
+      serverChanges: (_) {
+        roots++;
+        return f.remote.stream;
+      },
+    );
+    for (var i = 0; i < 4; i++) {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: HouseholdGate(gateway: gateway, child: Text('Main $i')),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(find.text('Main $i'), findsOneWidget);
+    }
+    expect(roots, 1);
+    expect(f.authority.calls, 1);
+    await tester.pumpWidget(const SizedBox());
+  });
+  test(
+    'gate and repository share one root listener; repeated ensures do not call server',
+    () async {
+      final f = Fixture();
+      addTearDown(f.close);
+      var starts = 0, stops = 0;
+      final remote = StreamController<String?>.broadcast(
+        onListen: () => starts++,
+        onCancel: () => stops++,
+      );
+      addTearDown(remote.close);
+      final gateway = CachedHouseholdGateway(
+        currentUid: () => f.uid,
+        sessions: f.auth.stream,
+        authoritative: f.authority,
+        storage: f.storage,
+        isTransient: (e) => e is Offline,
+        serverChanges: (_) {
+          starts++;
+          return remote.stream;
+        },
+      );
+      await gateway.ensure();
+      final a = <String>[], b = <String>[];
+      final one = gateway.watch().listen(a.add);
+      final two = gateway.watch().listen(b.add);
+      await flush();
+      expect(starts, 2); // one factory call, one native stream subscription
+      final calls = f.authority.calls;
+      for (var i = 0; i < 20; i++) {
+        expect(await gateway.ensure(), 'home-a');
+      }
+      await flush();
+      expect(f.authority.calls, calls);
+      f.authority.reply = () async => 'family';
+      remote.add('family');
+      await flush();
+      expect(a, ['home-a', 'family']);
+      expect(b, a);
+      expect(f.authority.calls, calls + 1);
+      f.authority.reply = () async => 'home-a';
+      remote.add('home-a');
+      await flush();
+      expect(a, ['home-a', 'family', 'home-a']);
+      expect(b, a);
+      await one.cancel();
+      expect(stops, 0);
+      await two.cancel();
+      await flush();
+      expect(stops, 1);
+      final next = gateway.watch().listen((_) {});
+      await flush();
+      expect(starts, 4);
+      await next.cancel();
+    },
+  );
   test(
     'first online use persists only authoritative completed context',
     () async {

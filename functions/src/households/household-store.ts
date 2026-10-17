@@ -2,6 +2,7 @@ import { createHash } from 'node:crypto';
 import { Firestore, Timestamp, Transaction } from 'firebase-admin/firestore';
 import { authenticatedUid, AuthContext } from '../billing/account-binding';
 import { readAccount } from '../accounts/account-lifecycle';
+import { readFamilyMembership, validatePrivateRoot } from './household-contract';
 
 export const privateHouseholdId = (uid: string) => 'private_' + createHash('sha256').update(uid).digest('hex');
 /** Server-owned identity and migration. No client-supplied UID or household ID. */
@@ -24,11 +25,37 @@ export class HouseholdStore {
       const account = await tx.get(accountRef);
       if (account.exists && readAccount(account.data()).state !== 'ACTIVE') throw new Error('accountUnavailable');
       const rootRef = this.db.doc(`users/${uid}`), root = await tx.get(rootRef);
-      const id = root.get('activeHouseholdId') ?? privateHouseholdId(uid);
+      const id = privateHouseholdId(uid);
+      const family = await tx.get(this.db.doc(`familyMemberships/${uid}`));
+      // Read-only compatibility for future server-created family state. This
+      // branch cannot activate, migrate, reserve or repair family membership.
+      if (family.exists || root.get('familyHouseholdId') != null) {
+        if (!family.exists || !account.exists) throw new Error('familyLifecycleUnavailable');
+        const binding = readFamilyMembership(family.data());
+        if (binding.state !== 'ACTIVE' || root.get('familyHouseholdId') !== binding.householdId ||
+            root.get('activeHouseholdId') !== binding.householdId || root.get('privateHouseholdId') !== id ||
+            root.get('shoppingMigrationVersion') !== 1 || binding.householdId === id) throw new Error('familyLifecycleUnavailable');
+        const home = await tx.get(this.db.doc(`households/${binding.householdId}`));
+        const member = await tx.get(home.ref.collection('members').doc(uid));
+        const fallback = await tx.get(this.db.doc(`households/${id}`));
+        const privateMember = await tx.get(fallback.ref.collection('members').doc(uid));
+        if (!fallback.exists) throw new Error('invalidPrivateHousehold');
+        validatePrivateRoot(fallback.data()!, uid);
+        if (fallback.get('schemaVersion') !== 2 || !privateMember.exists || privateMember.get('role') !== 'owner' ||
+            !home.exists || home.get('schemaVersion') !== 2 || home.get('kind') !== 'family' ||
+            home.get('state') !== 'ACTIVE' || home.get('operationId') !== null || !(home.get('createdAt') instanceof Timestamp) ||
+            typeof home.get('ownerUid') !== 'string' || !home.get('ownerUid') ||
+            !member.exists || member.get('role') !== binding.role ||
+            (binding.role === 'owner' ? home.get('ownerUid') !== uid : home.get('ownerUid') === uid)) throw new Error('familyLifecycleUnavailable');
+        return {schemaVersion:1, householdId:binding.householdId, ready:true};
+      }
+      if ((root.get('privateHouseholdId') != null && root.get('privateHouseholdId') !== id) ||
+          (root.get('activeHouseholdId') != null && root.get('activeHouseholdId') !== id)) throw new Error('invalidHousehold');
       if (typeof id !== 'string' || !/^[a-zA-Z0-9_-]{1,128}$/.test(id)) throw new Error('invalidHousehold');
       const householdRef = this.db.doc(`households/${id}`), memberRef = householdRef.collection('members').doc(uid);
       const household = await tx.get(householdRef), member = await tx.get(memberRef);
-      if (household.exists && (!member.exists || !['owner','member'].includes(member.get('role')))) throw new Error('membershipMissing');
+      if (household.exists) validatePrivateRoot(household.data()!, uid);
+      if (household.exists && (!member.exists || member.get('role') !== 'owner')) throw new Error('membershipMissing');
       if (!household.exists && (member.exists || id !== privateHouseholdId(uid))) throw new Error('invalidHousehold');
       const legacy = await tx.get(rootRef.collection('shopping').limit(limit));
       // Version is server-only and prevents legacy clients reopening the old list.
@@ -40,11 +67,13 @@ export class HouseholdStore {
       if (!account.exists) tx.create(accountRef, {schemaVersion:1, state:'ACTIVE', generation:1,
         updatedAt:now, deletionStartedAt:null, deletedAt:null});
       if (!household.exists) {
-        tx.create(householdRef, {schemaVersion:1, ownerUid:uid, createdAt:now});
+        tx.create(householdRef, {schemaVersion:2, kind:'private', state:'ACTIVE', operationId:null, ownerUid:uid, createdAt:now});
         tx.create(memberRef, {role:'owner'});
+      } else if (household.get('schemaVersion') === 1) {
+        tx.update(householdRef, {schemaVersion:2, kind:'private', state:'ACTIVE', operationId:null});
       }
-      if (!root.exists || root.get('activeHouseholdId') !== id || root.get('shoppingMigrationVersion') !== (complete ? 1 : 0)) {
-        tx.set(rootRef, {activeHouseholdId:id, shoppingMigrationVersion:complete ? 1 : 0}, {merge:true});
+      if (!root.exists || root.get('privateHouseholdId') !== id || root.get('familyHouseholdId') !== null || root.get('activeHouseholdId') !== id || root.get('shoppingMigrationVersion') !== (complete ? 1 : 0)) {
+        tx.set(rootRef, {privateHouseholdId:id, activeHouseholdId:id, familyHouseholdId:null, shoppingMigrationVersion:complete ? 1 : 0}, {merge:true});
       }
       legacy.docs.forEach((d,i) => { tx.create(targets[i]!, d.data()); tx.delete(d.ref); });
       return {schemaVersion:1, householdId:id, ready:complete};
@@ -56,9 +85,14 @@ export class HouseholdStore {
  * fenced by the caller's DELETING lifecycle read. Shared ownership policy must
  * be implemented before joins ship: fail closed rather than delete family data. */
 export async function cleanupPrivateHousehold(db: Firestore, tx: Transaction, uid: string, limit: number): Promise<boolean> {
+  const family = await tx.get(db.doc(`familyMemberships/${uid}`));
+  const user = await tx.get(db.doc(`users/${uid}`));
+  if (family.exists || user.get('familyHouseholdId') != null) throw new Error('sharedHouseholdCleanupRequiresPolicy');
   const owned = await tx.get(db.collection('households').where('ownerUid','==',uid).limit(1));
   if (owned.empty) return false;
   const home = owned.docs[0]!;
+  if (home.get('kind') === 'family' || home.get('operationId') != null ||
+      home.get('state') != null && home.get('state') !== 'ACTIVE') throw new Error('sharedHouseholdCleanupRequiresPolicy');
   const members = await tx.get(home.ref.collection('members').limit(2));
   if (members.docs.some(d => d.id !== uid)) throw new Error('sharedHouseholdCleanupRequiresPolicy');
   const items = await tx.get(home.ref.collection('shoppingItems').limit(limit));

@@ -1,7 +1,8 @@
 import { before, beforeEach, after, test } from 'node:test';
 import assert from 'node:assert/strict';
 import { initializeApp, deleteApp } from 'firebase-admin/app';
-import { getFirestore } from 'firebase-admin/firestore';
+import { getFirestore, Timestamp } from 'firebase-admin/firestore';
+import { readFamilyMembership } from '../src/households/household-contract';
 import { requireLocalEmulator } from './emulator-guard';
 import { HouseholdStore, privateHouseholdId } from '../src/households/household-store';
 import { AccountDeletionService } from '../src/accounts/account-deletion';
@@ -50,11 +51,74 @@ test('collision fails atomically without deleting legacy data',async()=>{
  await assert.rejects(store.ensure({uid:'u'}),/migrationCollision/);
  assert.equal((await db.doc('users/u/shopping/a').get()).get('name'),'old');
 });
-test('existing valid active membership resolves existing household, never injects a membership',async()=>{
+test('unsupported family pointer fails closed without resetting it to private',async()=>{
  await store.ensure({uid:'u'});await db.doc('households/shared').set({ownerUid:'other'});
  await db.doc('households/shared/members/u').set({role:'member'});await db.doc('users/u').update({activeHouseholdId:'shared'});
- const r=await store.ensure({uid:'u'});assert.equal('householdId' in r && r.householdId,'shared');
- await db.doc('households/shared/members/u').delete();await assert.rejects(store.ensure({uid:'u'}),/membershipMissing/);
+ await assert.rejects(store.ensure({uid:'u'}),/invalidHousehold/);
+ assert.equal((await db.doc('users/u').get()).get('activeHouseholdId'),'shared');
+});
+
+test('legacy v1 private normalization preserves metadata, items and household identity',async()=>{
+ const id=privateHouseholdId('u'), createdAt=Timestamp.fromMillis(1000);
+ await db.doc('users/u').set({activeHouseholdId:id,shoppingMigrationVersion:1,unrelated:'keep'});
+ await db.doc(`households/${id}`).set({schemaVersion:1,ownerUid:'u',createdAt});
+ await db.doc(`households/${id}/members/u`).set({role:'owner'});
+ await db.doc(`households/${id}/shoppingItems/a`).set({name:'keep',createdAt});
+ await store.ensure({uid:'u'});
+ const root=await db.doc('users/u').get(), home=await db.doc(`households/${id}`).get();
+ assert.deepEqual(root.data(),{privateHouseholdId:id,activeHouseholdId:id,familyHouseholdId:null,shoppingMigrationVersion:1,unrelated:'keep'});
+ assert.equal(home.get('schemaVersion'),2);assert.equal(home.get('kind'),'private');assert.ok(home.get('createdAt').isEqual(createdAt));
+ const before=root.updateTime;await store.ensure({uid:'u'});assert.ok((await db.doc('users/u').get()).updateTime!.isEqual(before!));
+ assert.equal((await db.collection('households').get()).size,1);assert.equal((await db.collection(`households/${id}/shoppingItems`).get()).size,1);
+});
+for(const state of ['RESERVED','ACTIVE'] as const)test(`reverse index ${state} cannot be overwritten by provisioning or deletion`,async()=>{
+ await store.ensure({uid:'u'});
+ const binding={householdId:'family',role:'member',state,operationId:state==='RESERVED'?'op':null};
+ assert.deepEqual(readFamilyMembership(binding),binding);
+ await db.doc('familyMemberships/u').set(binding);
+ await assert.rejects(store.ensure({uid:'u'}),/familyLifecycleUnavailable/);
+ await db.doc('users/u').delete();
+ const deletion=new AccountDeletionService(db,new FakeAuthDeletionApi());await deletion.beginAccountDeletion({uid:'u'});
+ assert.equal(await deletion.resume('u'),'cleanupRetryRequired');
+ assert.notEqual((await db.doc('accountDeletions/u').get()).get('stage'),'DONE');
+ assert.deepEqual((await db.doc('familyMemberships/u').get()).data(),binding);
+});
+test('reverse index contract rejects ambiguous reservation and forged shapes',()=>{
+ for(const patch of [{state:'UNKNOWN'},{state:'RESERVED',operationId:null},{operationId:'op'},{role:'admin'},{householdId:'a/b'},{extra:true}]){
+  assert.throws(()=>readFamilyMembership({householdId:'family',role:'member',state:'ACTIVE',operationId:null,...patch}));
+ }
+});
+for(const patch of [{privateHouseholdId:'wrong'},{familyHouseholdId:'family'},{activeHouseholdId:'family'}])test(`invalid pointers fail without normalization: ${JSON.stringify(patch)}`,async()=>{
+ await store.ensure({uid:'u'});await db.doc('users/u').update(patch);
+ const before=(await db.doc('users/u').get()).data();
+ await assert.rejects(store.ensure({uid:'u'}));
+ assert.deepEqual((await db.doc('users/u').get()).data(),before);
+ assert.equal((await db.collection('households').get()).size,1);
+});
+test('private pointer cannot reinterpret a family root or another owner',async()=>{
+ await store.ensure({uid:'u'});const ref=db.doc(`households/${privateHouseholdId('u')}`);
+ for(const patch of [{kind:'family',ownerUid:'u'},{kind:'private',ownerUid:'other'}]){
+  await ref.update(patch);await assert.rejects(store.ensure({uid:'u'}),/invalidPrivateHousehold/);
+ }
+});
+test('future server-authored family context resolves read-only and can return to private',async()=>{
+ await store.ensure({uid:'u'});
+ await db.doc('households/family').set({schemaVersion:2,kind:'family',state:'ACTIVE',operationId:null,ownerUid:'owner',createdAt:Timestamp.now()});
+ await db.doc('households/family/members/u').set({role:'member'});
+ await db.doc('familyMemberships/u').set({householdId:'family',role:'member',state:'ACTIVE',operationId:null});
+ await db.doc('users/u').update({familyHouseholdId:'family',activeHouseholdId:'family'});
+ const before=(await db.doc('users/u').get()).updateTime!;
+ assert.equal((await store.page('u')).householdId,'family');
+ assert.ok((await db.doc('users/u').get()).updateTime!.isEqual(before));
+ await db.doc('familyMemberships/u').delete();
+ await db.doc('users/u').update({familyHouseholdId:null,activeHouseholdId:privateHouseholdId('u')});
+ assert.equal((await store.page('u')).householdId,privateHouseholdId('u'));
+});
+for(const state of ['DELETING','DELETED'])test(`${state} marker cannot normalize or reactivate`,async()=>{
+ await store.ensure({uid:'u'});const now=Timestamp.now();
+ await db.doc('accountLifecycle/u').update({state,generation:state==='DELETED'?3:2,updatedAt:now,deletionStartedAt:now,deletedAt:state==='DELETED'?now:null});
+ await assert.rejects(store.ensure({uid:'u'}),/accountUnavailable/);
+ assert.equal((await db.doc('accountLifecycle/u').get()).get('state'),state);
 });
 test('private household cleanup is bounded; DONE includes items and membership; other household untouched',async()=>{
  await store.ensure({uid:'u'});await store.ensure({uid:'other'});
