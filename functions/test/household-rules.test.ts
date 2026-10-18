@@ -23,6 +23,15 @@ before(async()=>{
  });
 });
 after(()=>env.cleanup());
+for(const uid of ['owner','member','outsider'])test(`${uid} cannot read/forge invites, slot inventory or member email`,async()=>{
+ const db=env.authenticatedContext(uid).firestore();
+ for(const path of ['familyInvites/hash','familyInviteSlots/home']){
+  await assertFails(getDoc(doc(db,path)));await assertFails(setDoc(doc(db,path),{status:'PENDING',email:'forged@example.test'}));
+  await assertFails(deleteDoc(doc(db,path)));
+ }
+ await assertFails(getDocs(collection(db,'familyInvites')));
+ await assertFails(updateDoc(doc(db,`households/home/members/${uid}`),{email:'forged@example.test'}));
+});
 test('CREATE reservation fences source and PREPARING destination; operation state is backend-only',async()=>{
  const uid='creator',p='creator-private',f='creator-family';
  await env.withSecurityRulesDisabled(async ctx=>{const db=ctx.firestore();

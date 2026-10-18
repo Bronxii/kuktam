@@ -37,7 +37,7 @@ export function readCreateOperation(raw: unknown): CreateOperation {
 
 /** No Play calls, effective-document writes or grant writes. Use the existing
  * complete trusted grant aggregation, including expiry and multiple sources. */
-async function hasPro(db: Firestore, tx: Transaction, uid: string, now: Timestamp): Promise<boolean> {
+export async function hasPro(db: Firestore, tx: Transaction, uid: string, now: Timestamp): Promise<boolean> {
   const grants = await tx.get(db.collection(`users/${uid}/entitlementGrants`).limit(501));
   if (grants.size > 500) throw new Error('grantLimit');
   return aggregateGrants(grants.docs.map(d => parseGrant(d.data())), now, 1).active;

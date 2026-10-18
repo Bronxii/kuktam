@@ -1,5 +1,9 @@
 import { getApps, initializeApp } from 'firebase-admin/app';
 import { getFirestore } from 'firebase-admin/firestore';
+import { getAuth } from 'firebase-admin/auth';
+import { FamilyInviteStore } from './households/family-invites';
+import { AdminMemberEmailResolver } from './households/member-email';
+import { familyInviteHandlers } from './households/invite-handler';
 import { HttpsError } from 'firebase-functions/v2/https';
 import { HouseholdStore } from './households/household-store';
 import { FamilyCreateStore } from './households/family-create';
@@ -18,6 +22,15 @@ const coreIdentity = defineString(config.coreIdentityParameter, {description:'Co
 const playIdentity = defineString(config.playIdentityParameter, {description:'Play/billing runtime service-account email; required, no default.'});
 const deletionIdentity = defineString(config.deletionIdentityParameter, {description:'Account deletion runtime service-account email; required, no default.'});
 const handlers = createRuntimeHandlers(lazyProductionServices(() => keys.value()));
+const invites=familyInviteHandlers(()=>{
+  const app=getApps().find(a=>a.name==='[DEFAULT]')??initializeApp();
+  return new FamilyInviteStore(getFirestore(app),new AdminMemberEmailResolver(getAuth(app)));
+});
+const familyOptions={region:config.region,serviceAccount:coreIdentity,timeoutSeconds:60,maxInstances:5,enforceAppCheck:false};
+export const createFamilyInvite=onCall(familyOptions,invites.create);
+export const revokeFamilyInvite=onCall(familyOptions,invites.revoke);
+export const previewFamilyInvite=onCall(familyOptions,invites.preview);
+export const getFamilyShareState=onCall(familyOptions,invites.state);
 export const createFamilyShare = onCall({region:config.region, serviceAccount:coreIdentity,
   timeoutSeconds:60, maxInstances:5, enforceAppCheck:false}, createFamilyHandler(() => {
     const app=getApps().find(a=>a.name==='[DEFAULT]')??initializeApp();
