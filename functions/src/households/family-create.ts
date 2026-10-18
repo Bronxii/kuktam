@@ -1,3 +1,4 @@
+import { claimFamilyLease } from './operation-lease';
 import { createHash, randomUUID } from 'node:crypto';
 import { isDeepStrictEqual } from 'node:util';
 import { FieldPath, Firestore, Timestamp, Transaction } from 'firebase-admin/firestore';
@@ -88,18 +89,13 @@ export class FamilyCreateStore {
     });
   }
   async claim(operationId: string): Promise<string | null> {
-    if (!idPattern.test(operationId)) throw new Error('invalidOperationId');
-    const leaseId = randomUUID();
-    return this.db.runTransaction(async tx => {
-      const ref=this.db.doc(`familyOperations/${operationId}`), doc=await tx.get(ref);
-      if (!doc.exists) return null;
-      const op=readCreateOperation(doc.data()), now=this.clock();
+    return claimFamilyLease(this.db,operationId,raw=>{
+      const op=readCreateOperation(raw);
       if(operationId!==createOperationId(op.actorUid))throw new Error('operationIdentityMismatch');
-      if (op.status!=='READY' || op.nextAt!.toMillis()>now.toMillis() || op.leaseUntil && op.leaseUntil.toMillis()>now.toMillis()) return null;
-      tx.update(ref,{leaseId,leaseUntil:Timestamp.fromMillis(now.toMillis()+this.leaseMs),updatedAt:now});
-      return leaseId;
-    });
+      return op;
+    },this.clock,this.leaseMs);
   }
+
   /** Every page and its cursor commit together under the persisted lease. The
    * source stays frozen/intact until activation, so no payload journal is needed. */
   async step(operationId: string, leaseId: string): Promise<string> {

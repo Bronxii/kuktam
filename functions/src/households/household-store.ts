@@ -32,6 +32,19 @@ export class HouseholdStore {
       if (family.exists || root.get('familyHouseholdId') != null) {
         if (!family.exists || !account.exists) throw new Error('familyLifecycleUnavailable');
         const binding = readFamilyMembership(family.data());
+        // JOIN reservation grants no family access and does not fence the private list.
+        if(binding.state==='RESERVED' && binding.role==='member') {
+          const operation=await tx.get(this.db.doc(`familyOperations/${binding.operationId}`));
+          const home=await tx.get(this.db.doc(`households/${id}`));
+          const member=await tx.get(home.ref.collection('members').doc(uid));
+          if(operation.get('kind')!=='JOIN'||operation.get('status')!=='READY'||operation.get('actorUid')!==uid||
+            !['RESERVED','READY_FOR_TRANSFER'].includes(operation.get('phase'))||operation.get('sourceHouseholdId')!==id||
+            operation.get('householdId')!==binding.householdId||root.get('privateHouseholdId')!==id||
+            root.get('activeHouseholdId')!==id||root.get('familyHouseholdId')!==null||root.get('shoppingMigrationVersion')!==1||
+            !home.exists||home.get('schemaVersion')!==2||member.get('role')!=='owner')throw new Error('familyLifecycleUnavailable');
+          validatePrivateRoot(home.data()!,uid);
+          return {schemaVersion:1,householdId:id,ready:true};
+        }
         if (binding.state !== 'ACTIVE' || root.get('familyHouseholdId') !== binding.householdId ||
             root.get('activeHouseholdId') !== binding.householdId || root.get('privateHouseholdId') !== id ||
             root.get('shoppingMigrationVersion') !== 1 || binding.householdId === id) throw new Error('familyLifecycleUnavailable');

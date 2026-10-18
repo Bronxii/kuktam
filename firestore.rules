@@ -62,9 +62,17 @@ service cloud.firestore {
       return user.get('familyHouseholdId', null) == null &&
         user.get('privateHouseholdId', hid) == hid && home.ownerUid == uid &&
         get(/databases/$(database)/documents/households/$(hid)/members/$(uid)).data.role == 'owner' &&
-        !exists(/databases/$(database)/documents/familyMemberships/$(uid)) &&
+        (!exists(/databases/$(database)/documents/familyMemberships/$(uid)) || reservedJoinPrivate(uid, hid)) &&
         ((home.schemaVersion == 1 && !('kind' in home) && !('state' in home) && !('operationId' in home)) ||
          (home.schemaVersion == 2 && home.kind == 'private' && home.state == 'ACTIVE' && home.operationId == null));
+    }
+    function reservedJoinPrivate(uid, hid) {
+      let binding = get(/databases/$(database)/documents/familyMemberships/$(uid)).data;
+      let op = get(/databases/$(database)/documents/familyOperations/$(binding.operationId)).data;
+      return binding.state == 'RESERVED' && binding.role == 'member' &&
+        op.kind == 'JOIN' && op.status == 'READY' && op.actorUid == uid &&
+        op.sourceHouseholdId == hid && op.householdId == binding.householdId &&
+        op.phase in ['RESERVED', 'READY_FOR_TRANSFER'];
     }
     function familyContext(uid, hid, user, home) {
       let binding = get(/databases/$(database)/documents/familyMemberships/$(uid)).data;
@@ -96,6 +104,7 @@ service cloud.firestore {
     match /familyInvites/{inviteId} {
       allow read, write: if false;
     }
+    match /familyJoinCapacity/{householdId} { allow read, write: if false; }
     match /familyInviteSlots/{householdId} {
       allow read, write: if false;
     }

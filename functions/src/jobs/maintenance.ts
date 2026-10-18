@@ -1,3 +1,4 @@
+import { FamilyJoinStore } from '../households/family-join';
 import { compareTime } from '../models';
 import { FamilyCreateStore } from '../households/family-create';
 import { readDeletion } from '../accounts/deletion-contract';
@@ -64,7 +65,7 @@ export class Maintenance {
           const page=await this.db.collection('familyOperations').where('nextAt','<=',input.now).orderBy('nextAt').limit(Math.min(5,this.policy.pageSize)).get();
           for(const doc of page.docs) {
             if(!timeLeft())break;
-            try { items.push({category,key:doc.id,outcome:await new FamilyCreateStore(this.db,this.clock,this.policy.pageSize>50?50:this.policy.pageSize).resume(doc.id,1)}); }
+            try { items.push({category,key:doc.id,outcome:doc.get('kind')==='JOIN'?await new FamilyJoinStore(this.db,this.clock).resume(doc.id):await new FamilyCreateStore(this.db,this.clock,this.policy.pageSize>50?50:this.policy.pageSize).resume(doc.id,1)}); }
             catch {items.push({category,key:doc.id,outcome:'internalConflict'});}
           }
         } catch {items.push({category,key:'due',outcome:'queryFailure'});}

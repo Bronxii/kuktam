@@ -23,6 +23,37 @@ before(async()=>{
  });
 });
 after(()=>env.cleanup());
+test('JOIN reservation keeps private CRUD usable, grants no family access and cannot be forged',async()=>{
+ const uid='joining',p='joining-private';
+ await env.withSecurityRulesDisabled(async ctx=>{const db=ctx.firestore();
+  await setDoc(doc(db,`accountLifecycle/${uid}`),{state:'ACTIVE'});
+  await setDoc(doc(db,`users/${uid}`),{privateHouseholdId:p,activeHouseholdId:p,familyHouseholdId:null,shoppingMigrationVersion:1});
+  await setDoc(doc(db,`households/${p}`),{schemaVersion:2,kind:'private',state:'ACTIVE',operationId:null,ownerUid:uid});
+  await setDoc(doc(db,`households/${p}/members/${uid}`),{role:'owner'});
+  await setDoc(doc(db,`familyMemberships/${uid}`),{state:'RESERVED',role:'member',householdId:'home',operationId:'join-op'});
+  await setDoc(doc(db,'familyOperations/join-op'),{kind:'JOIN',status:'READY',phase:'READY_FOR_TRANSFER',actorUid:uid,sourceHouseholdId:p,householdId:'home'});
+ });
+ const db=env.authenticatedContext(uid).firestore(),item=doc(db,`households/${p}/shoppingItems/a`);
+ await assertSucceeds(setDoc(item,{name:'milk'}));await assertSucceeds(getDoc(item));
+ await assertSucceeds(updateDoc(item,{quantity:2}));await assertSucceeds(deleteDoc(item));
+ await assertFails(getDoc(doc(db,'households/home/shoppingItems/a')));
+ await assertFails(setDoc(doc(db,'households/home/shoppingItems/forged'),{name:'x'}));
+ for(const path of ['familyOperations/join-op','familyJoinCapacity/home',`familyMemberships/${uid}`,'familyInvites/hash']) {
+  await assertFails(getDoc(doc(db,path)));await assertFails(setDoc(doc(db,path),{state:'ACTIVE'}));
+ }
+ for(const state of ['DELETING','DELETED']) {
+  await env.withSecurityRulesDisabled(ctx=>setDoc(doc(ctx.firestore(),`accountLifecycle/${uid}`),{state}));
+  await assertFails(setDoc(item,{name:'blocked'}));
+ }
+});
+test('reserved private exception fails closed without matching JOIN operation',async()=>{
+ const uid='joining';
+ await env.withSecurityRulesDisabled(async ctx=>{
+  await setDoc(doc(ctx.firestore(),`accountLifecycle/${uid}`),{state:'ACTIVE'});
+  await updateDoc(doc(ctx.firestore(),'familyOperations/join-op'),{actorUid:'other'});
+ });
+ await assertFails(setDoc(doc(env.authenticatedContext(uid).firestore(),'households/joining-private/shoppingItems/a'),{name:'blocked'}));
+});
 for(const uid of ['owner','member','outsider'])test(`${uid} cannot read/forge invites, slot inventory or member email`,async()=>{
  const db=env.authenticatedContext(uid).firestore();
  for(const path of ['familyInvites/hash','familyInviteSlots/home']){

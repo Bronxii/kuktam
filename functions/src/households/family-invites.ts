@@ -15,7 +15,7 @@ export class FamilyInviteStore {
   constructor(private readonly db:Firestore,private readonly emails:MemberEmailResolver,
     private readonly clock=Timestamp.now,private readonly tokenFactory=newInviteToken) {}
 
-  private async active(tx:Transaction,uid:string):Promise<void> {
+  async active(tx:Transaction,uid:string):Promise<void> {
     const doc=await tx.get(this.db.doc(`accountLifecycle/${uid}`));
     if(!doc.exists)fail('ACCOUNT_UNAVAILABLE');
     try {if(readAccount(doc.data()).state!=='ACTIVE')fail('ACCOUNT_UNAVAILABLE');}
@@ -44,18 +44,18 @@ export class FamilyInviteStore {
     await this.privateHome(tx,uid,p);
     return {householdId:hid,ownerUid:home.get('ownerUid') as string,role:binding.role};
   }
-  private async privateHome(tx:Transaction,uid:string,p:string):Promise<void> {
+  async privateHome(tx:Transaction,uid:string,p:string):Promise<void> {
     const home=await tx.get(this.db.doc(`households/${p}`)), member=await tx.get(home.ref.collection('members').doc(uid));
     try{if(!home.exists)fail('ACCOUNT_NOT_READY');validatePrivateRoot(home.data()!,uid);}
     catch{fail('ACCOUNT_NOT_READY');}
     if(home.get('schemaVersion')!==2 || !member.exists || member.get('role')!=='owner')fail('ACCOUNT_NOT_READY');
   }
-  private async owner(tx:Transaction,uid:string):Promise<FamilyContext> {
+  async owner(tx:Transaction,uid:string):Promise<FamilyContext> {
     const context=await this.context(tx,uid);
     if(!context || context.role!=='owner')return fail('NOT_OWNER');
     return context;
   }
-  private async members(tx:Transaction,family:FamilyContext) {
+  async members(tx:Transaction,family:FamilyContext) {
     const docs=await tx.get(this.db.collection(`households/${family.householdId}/members`).limit(MAX_FAMILY_MEMBERS+1));
     if(docs.size>MAX_FAMILY_MEMBERS)fail('FAMILY_UNAVAILABLE');
     if(!docs.docs.some(d=>d.id===family.ownerUid && d.get('role')==='owner') ||

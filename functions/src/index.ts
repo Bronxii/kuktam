@@ -1,3 +1,5 @@
+import { FamilyJoinStore } from './households/family-join';
+import { acceptFamilyHandler } from './households/join-handler';
 import { getApps, initializeApp } from 'firebase-admin/app';
 import { getFirestore } from 'firebase-admin/firestore';
 import { getAuth } from 'firebase-admin/auth';
@@ -27,6 +29,10 @@ const invites=familyInviteHandlers(()=>{
   return new FamilyInviteStore(getFirestore(app),new AdminMemberEmailResolver(getAuth(app)));
 });
 const familyOptions={region:config.region,serviceAccount:coreIdentity,timeoutSeconds:60,maxInstances:5,enforceAppCheck:false};
+export const acceptFamilyInvite=onCall(familyOptions,acceptFamilyHandler(()=>{
+  const app=getApps().find(a=>a.name==='[DEFAULT]')??initializeApp();
+  return new FamilyJoinStore(getFirestore(app));
+}));
 export const createFamilyInvite=onCall(familyOptions,invites.create);
 export const revokeFamilyInvite=onCall(familyOptions,invites.revoke);
 export const previewFamilyInvite=onCall(familyOptions,invites.preview);
