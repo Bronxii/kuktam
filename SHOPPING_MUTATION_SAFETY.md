@@ -4,6 +4,75 @@ Status: S1A SERVER IMPLEMENTED LOCALLY; full S1 remains incomplete.
 Implementation baseline: cfd3630 (approved design), containing Phase 4A 321a700.
 No production changes. No Flutter writer migration. No Phase 4B transfer.
 
+## S1B work in progress — not a completed client cutover
+
+Baseline checked: `965318d feat(shopping): add safe mutation backend protocol`.
+The worktree was clean before S1B. The following new components are not yet wired
+into ShoppingRepository or the application lifecycle and MUST NOT be described
+as a completed migration:
+
+* Typed Dart requests/children/context/status/result contracts. Secure random
+  256-bit mutation suffix; exact persisted payload bytes; S1A request SHA-256;
+  strict field allowlists; BULK uses the S1A parent ID + child cursor, not invented
+  child Firestore documents.
+* SQLite outbox (`sqflite` on mobile, FFI adapter for desktop tests), FULL
+  synchronous commits. UID + mutation ID unique key, immutable envelope,
+  transactionally bounded 100 nonterminal parent actions per UID, no eviction of
+  accepted work, UID-scoped verified-context storage, durable terminal notices.
+  This is additional local storage because Firestore rollback cannot be the sole
+  record of a rejected offline intention. No token or Firebase credential is
+  stored in the outbox.
+* A dispatcher/Firestore transport prototype: at most ten parent IDs in one
+  result query, no polling, no canonical writes. Authoritative absence precedes
+  first transport creation; cache absence is insufficient. Remote acknowledgement
+  is not awaited by enqueue. UID/generation guards fence old callbacks. Receipts
+  are matched to the original envelope/hash. Duplicate-create permission denial
+  checks the existing receipt before classifying the outcome. Expired absent
+  receipt is RESULT_EXPIRED, never an automatic replacement ID.
+
+Actual process-kill/mobile crash durability, native transport integration,
+dependent-action scheduling and complete reconciliation still need verification.
+Reopening a SQLite file in a unit test alone is not claimed as a device kill test.
+The current dispatcher also needs lifecycle/network-resume integration; its
+existence does not yet prove unattended recovery in the running application.
+
+### Re-audited production write inventory
+
+All canonical writes are currently in `shopping_repository.dart`; **they have
+NOT yet been migrated**. The table specifies the required next implementation:
+
+| Current path | Required protocol | Offline acceptance / result |
+| --- | --- | --- |
+| shopping item dialog -> addOrMergeItem | ADD | durable enqueue, pending delta, receipt |
+| shopping item dialog -> updateItem | EDIT | captured dialog revision/context, conflict rollback |
+| shopping screen -> setItemChecked | SET_CHECKED | explicit boolean + observed revision |
+| shopping screen -> deleteItem | DELETE | capture before confirmation; stale brings row back |
+| shopping screen -> clearShoppingList | BULK DELETE | capture displayed IDs/revisions before confirmation; never fresh destructive scan |
+| shopping text import dialog -> addOrMergeItems | BULK ADD | stable parent/cursor, one aggregate result |
+| recipe details -> addOrMergeItems | BULK ADD | preserve ingredient semantics |
+| recipe scaling dialog -> addOrMergeItems | BULK ADD | preserve exact scaled quantities |
+
+Android share routes recipe input and has no additional direct shopping writer.
+The old ShoppingLocalSubmission helper is still used by the old repository and
+must be removed from the normal write flow during cutover, not kept as fallback.
+
+### Remaining S1B completion gates
+
+1. Shared authenticated session/context/canonical-list coordinator and authoritative
+   epoch initialization/cache. A late context response must not bind a new UID.
+2. Durable dependent-intent scheduling without guessed revisions. In particular,
+   an EDIT that merges into a different canonical row must not cause a queued
+   DELETE to silently delete that different row or unseen contributions.
+3. Pending overlay, persisted aggregate conflict notices and acknowledgement;
+   canonical-before-receipt and receipt-before-canonical ordering tests.
+4. Cut over ALL inventory paths, including destructive confirmations and lists
+   larger than one bounded parent, without a direct-write fallback.
+5. Actual local Flutter/Firestore/backend E2E, original stale races, process death,
+   offline/reconnect and full required regression/build validation.
+
+S1B: INCOMPLETE. S1C: NOT READY. S1 overall: NOT COMPLETE. Phase 4B: NOT READY.
+No production change, deploy, gate enablement, rule cutoff, commit or push.
+
 ## Implemented S1A contract (takes precedence over the historical design below)
 
 Source: `functions/src/shopping/mutation-contract.ts` and `mutation-store.ts`.
