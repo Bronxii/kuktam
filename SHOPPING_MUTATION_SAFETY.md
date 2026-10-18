@@ -1,0 +1,407 @@
+# Shopping Mutation Safety — S1 architecture
+
+Status: ARCHITECTURE ONLY / IMPLEMENTATION NOT COMPLETE. S1 is NOT PASS.
+Audited baseline: 321a7003ec937c73a181c3abe46a9c02823f263e.
+No application, backend, rules, dependency or production configuration changed.
+
+The task's section 38 permits a design-only stop when a larger intentional
+migration is required. That condition applies: the proposed command transport
+replaces the entire current client-write contract, introduces durable local
+storage and asynchronous results, and requires a coordinated rules/client
+cutover. Keeping any old writer enabled would invalidate the safety claim.
+This document is the implementation specification, NOT evidence that protection
+has been implemented. Phase 4B remains blocked.
+
+## Write-path inventory (source audit)
+
+All canonical writes currently originate in ShoppingRepository:
+manual add/dialog -> addOrMergeItem; shopping text import -> addOrMergeItems;
+recipe details and scaled recipe dialog -> addOrMergeItems; item dialog ->
+updateItem; ShoppingListScreen -> setItemChecked/deleteItem/clearShoppingList.
+Android share paths do not write shoppingItems directly. The spinner fix waits
+for local pending snapshots or server acknowledgement; its error callback does
+not survive process death. The shared household gateway caches verified UID-scoped
+routing, not authority or item versions.
+
+## Selected protocol
+
+One immutable mutation request per logical action, transported through Firestore.
+Canonical shoppingItems become backend-only. A durable UID-scoped local outbox
+accepts actions offline before networking and retains failures across process
+death. Firestore persistence alone cannot retain a request that rules reject on
+reconnect, so it is insufficient as the only outbox.
+
+ADD is a semantic delta. EDIT, DELETE and CHECK require the version observed by
+the user, captured before dialog/confirmation, not reread optimistically at submit.
+Bulk actions share one stable parent ID and durable cursor/results. Processing
+an item and advancing its cursor commit in one transaction.
+
+The server validates active UID/lifecycle, household membership, active pointer,
+unlocked household and observed shopping epoch. A household sequence serializes
+logical target resolution and becomes the revision assigned to changed items.
+Legacy items start at revision zero. Recreating a deleted logical row gets a new
+sequence revision, preventing ABA/stale-delete problems.
+
+## Retention proof required before implementation is complete
+
+Mutation IDs must be bound to their immutable shopping epoch. Deleting a receipt
+is safe only when that epoch is irrevocably invalid for CREATE and processing.
+A time-based TTL alone is not idempotency. The final design must specify an
+explicit epoch lifetime/rotation and receipt cleanup policy, with tests proving
+that arbitrarily delayed offline duplicates cannot recreate an applicable request.
+
+## Phase 4B integration
+
+No JOIN transfer is implemented here. Future structural operations must change
+the authoritative epoch as part of acquiring source/destination fences and pointer
+transitions, and use the same serialized shopping writer/revision authority.
+Old-context commands must be rejected even after the fence is released.
+
+No deploy, production mutation, commit or push.
+
+## Exact current failure and alternatives
+
+`shopping_repository.dart` resolves ADD targets with a query before a batch.
+Two clients can both observe no target and allocate different random IDs.
+Its merge-on-edit branch increments a destination and unconditionally deletes
+the source. A newer increment on that source is lost when the delayed delete
+commits. CHECK and ordinary DELETE similarly have no observed-item precondition.
+The rules only check authorization/fence state at commit time: after unlocking,
+the delayed write is authorized again. A fence is not a historical precondition.
+
+The existing offline helper accepts a local pending snapshot and retains an
+in-memory failure callback. Its own contract states that callback disappears
+after restart. Bulk writes, edit and delete also still await remote completion.
+
+Rejected approaches:
+
+* A longer fence or delay: no upper bound on offline replay; still unsafe after
+  unlocking. No arbitrary sleeps.
+* A field-only epoch patch: direct DELETE carries no observed epoch; direct
+  writes also lack durable idempotency receipts and atomic ADD target discovery.
+* Client Firestore transactions alone: they do not supply the required durable
+  offline command queue or post-restart rejection presentation.
+* An in-memory outbox or snackbar callback: loses accepted actions/results at
+  process death.
+* Two simultaneous authoritative writer models: the old one remains a bypass.
+* Receipt TTL alone: deletion allows the same old action to execute again.
+
+## Required implementation boundary
+
+Implement and validate these together before calling S1 complete:
+
+1. Strict command codec and server transactional executor.
+2. Server-owned context epochs, revisions and all structural-writer integration.
+3. Immutable request transport, bounded continuation and safe receipt cleanup.
+4. Durable UID-scoped client outbox, pending overlay and persistent outcomes.
+5. Every repository/UI writer converted, including clear-list confirmation.
+6. Rules deny both direct canonical writes and legacy shopping mutation bypass.
+7. Existing account deletion removes new command payloads and continuation work.
+8. Full race, offline, bulk, rules and regression matrix.
+
+Nothing in this document enables JOIN transfer or changes Phase 4A.
+
+## Proposed schema (not implemented)
+
+### Household authority
+
+`households/{hid}` adds server-owned fields:
+
+* `shoppingEpoch`: random 128-bit hexadecimal identifier, never reused.
+* `shoppingEpochExpiresAt`: server-established validity deadline.
+* `shoppingRevision`: monotonically increasing safe integer for this household.
+
+Existing item documents without `revision` have baseline revision zero. The
+first new-protocol write assigns the next household sequence, never resets an
+item to zero, and preserves unrelated fields. Household sequence initialization
+must exceed any existing item revision, including items copied by CREATE.
+Deleting/recreating an item therefore cannot make an old revision valid again.
+Context initialization is lazy and authoritative; no bulk user migration.
+Missing epoch is a read-only legacy context until initialized, not permission
+to invent client authority. Offline startup may still open cached content.
+
+### Immutable request
+
+Path: `users/{uid}/shoppingMutations/{epoch}_{random256bitHex}`.
+The client generates the random suffix once per logical action, persists it,
+and never regenerates it on retry. Epoch is part of the ID as well as payload.
+
+Client-create fields only:
+
+* `schemaVersion: 1`
+* `actorUid`: must equal authenticated UID and path UID
+* `householdId`, `epoch`: observed authoritative context
+* `kind`: ADD / EDIT / DELETE / CHECK / DELETE_MANY
+* `payloadJson`: strict versioned payload, at most 256 KiB UTF-8
+* `submittedAt`: Firestore server timestamp, not concurrency authority
+
+JSON transport allows one bounded immutable envelope without pretending rules
+can recursively validate 200 arbitrary array entries. Rules validate the
+envelope, size, actor, kind, timestamp, ID/epoch relationship and current
+authorization. The backend strictly validates ALL payload fields and children
+before the first effect. Unknown keys, invalid types, units, non-finite or
+overflowed quantities and invalid revisions fail closed. Limit ADD and
+DELETE_MANY to 200 entries. Limit names to 200 Unicode scalar values and validate
+the encoded envelope size separately. No arbitrary canonical field injection.
+
+Backend fields only:
+
+* `requestHash`: SHA-256 of canonical semantic request (excluding transport time)
+* `status`, `cursor`, `appliedCount`, bounded per-child outcome list
+* `createdAt`, `updatedAt`, `epochExpiresAt`, `purgeAfter`
+
+Status is absent on client creation; the server interprets that as PENDING.
+Terminal receipt retains requestHash, context, outcome and minimal affected
+IDs/revisions, removing shopping names/quantities/payload. No permanent shopping
+snapshot journal. Client cannot update/delete the request or receipt.
+Same ID with different requestHash is a terminal integrity error. Retrying a
+create against an existing document uses the existing receipt; it does not
+replace it. Firestore permission-denied alone is not evidence of a failed effect.
+
+### Continuation
+
+`shoppingMutationWork/{hash(commandPath)}` is backend-only and contains only
+command path plus `nextAt`. Initial document-create trigger processes a bounded
+page; it atomically creates/updates work when more children remain. Existing
+maintenance queries due work with a small limit, not users or shopping lists.
+One work error cannot abort billing/deletion/family categories.
+
+The same executor handles trigger and maintenance. Transactional cursor and
+receipt contention provide mutual exclusion for effects, so a separate lease
+framework is unnecessary for single-transaction pages. Crash before commit has
+no effect; crash after commit resumes at the persisted cursor. No unawaited
+server continuation after a response. A retrying initial trigger covers crashes
+before the first continuation document is committed.
+
+## Transaction semantics
+
+For each child, read command/cursor, current lifecycle, user pointers, household,
+membership and required reverse-index/private-fallback authority. Validate the
+same standalone/family/Phase-4A RESERVED-private eligibility as current rules.
+Validate ACTIVE lifecycle, unlocked context, epoch equality and server expiry.
+Do not trust the command's actor merely because an Admin SDK read returned it;
+the path/actor relationship and immutable rules-mediated creation are mandatory.
+
+Read all necessary item/query data before writes. Write the household sequence
+on EVERY successful mutation together with item effects and command progress.
+Concurrent commands targeting an absent logical row contend on this common
+household document: the retry repeats target discovery, preventing phantom
+duplicate creation. Never suppress transaction retries or reuse old query data.
+
+* ADD: trim/lowercase name; existing unit whitelist; kg -> g and l -> ml;
+  positive finite quantities; group identical normalized keys. Find current
+  matching row and add delta. Preserve existing isChecked/createdAt and unknown
+  fields. New row is unchecked with server createdAt. Distinct action IDs each
+  contribute once; repeated action ID contributes once total.
+* EDIT: compare observed source ID/revision first. If renamed into an existing
+  logical row, transactionally add requested quantity there and delete source,
+  preserving current repository behavior. Both effects share one receipt.
+  Concurrent source change causes REJECTED_STALE, never a merge/delete anyway.
+* DELETE: exact observed ID/revision required; missing target is NOT_FOUND.
+* CHECK: desired boolean, exact observed revision; no blind toggle.
+* DELETE_MANY: explicit IDs/revisions captured when confirmation is shown.
+  Never query a fresh whole list after confirmation and delete unseen new items.
+
+Existing duplicate logical rows require fail-closed handling or a separately
+specified deterministic consolidation; do not silently choose a random row and
+claim the no-duplicates invariant. Detect at least two matching rows and report
+a terminal repair-required result without touching data. New-protocol concurrent
+ADD must never create that condition. Do not run a production repair in S1.
+
+For bulk requests, validate the whole payload first, normalize/group ADD keys
+deterministically and freeze that order. Cursor indexes normalized children.
+Execute bounded pages (initial target: ten children) with atomic per-child
+effects/receipt advancement. Mid-bulk context invalidation preserves prior
+effects and marks remaining children rejected, reporting PARTIAL explicitly.
+No rollback by issuing inverse quantities; no retry of completed children.
+
+Result codes: APPLIED, PARTIAL, REJECTED_STALE, REJECTED_CONTEXT_CHANGED,
+REJECTED_NOT_FOUND, REJECTED_UNAUTHORIZED, FAILED_TERMINAL. Infrastructure
+failures preserve progress and retry the same ID; conflicts never auto-rebase.
+
+## Offline outbox and reconciliation
+
+Use a storage interface with real atomic durable transactions, implemented for
+mobile with a suitable local database. Do not use ordinary preferences as a
+critical mutation journal without proving its crash-durability contract.
+Dependency selection and process-kill durability tests are implementation work
+still required. Keep domain interfaces platform-neutral; no Android-only model.
+
+Persist UID, immutable context, action ID, exact payload and pending result
+before reporting local acceptance. Local storage failure remains an immediate
+submission error. At most ten pending parent actions are actively dispatched
+and observed; additional durable actions can wait locally with bounded storage
+limits and an explicit queue-full error before acceptance. No accepted action
+may be silently evicted. App startup/auth restoration and network/SDK events
+resume dispatch; no polling or timeout-based duplicate submission.
+
+One canonical active shoppingItems listener remains authoritative. Add one
+active household authority listener and at most one bounded query listener for
+the active pending command IDs. Rebind that query when the pending set changes;
+detach it when empty. Do not create a permanent listener per command. Reuse
+services across repository instances to avoid duplicate subscriptions.
+
+Overlay is a separate pending projection, never a fake canonical snapshot:
+
+* New-key ADD can show a pending row. Existing-key ADD shows a pending delta
+  separately from confirmed quantity, avoiding double addition if canonical
+  change arrives before the receipt.
+* Coalesce pending actions for display only; immutable action IDs stay distinct.
+* EDIT/CHECK/DELETE projections apply only to the matching observed revision.
+  If canonical state advances, display that state and pending/conflict status.
+* A newly pending row is not destructively editable until its authoritative ID
+  and revision arrive, unless a separately proven dependency protocol is added.
+* APPLIED removes the pending projection; canonical stream owns confirmed data.
+* Rejection removes the projection and persists a concise conflict message until
+  shown/acknowledged. Restart must not erase that message.
+
+The edit dialog captures the original revision/context when opened. Delete and
+clear confirmations capture them before awaiting user confirmation. It is unsafe
+to fetch a newer revision at submit and attach it to the user's older intent.
+ADD/import captures household context and session before asynchronous work.
+
+On A -> B switch, detach A's subscriptions/overlay and stop dispatching A. A's
+durable records remain namespaced under A. An already queued Firestore request
+cannot execute as B because rules require actor/path/auth equality. Returning
+to A resumes only A's original commands, never rewrites their actor/context.
+
+## Retention and arbitrarily late replay proof
+
+Proposed policy: an epoch is valid at most 30 days from SERVER initialization.
+Structural transitions invalidate it earlier. No client extends its deadline.
+Expired epochs are never accepted even if a maintenance/rotation job is late.
+Online context refresh can create a new epoch atomically; offline users can
+still open cached lists and queue intents, which may later be rejected as old
+context rather than silently rewritten. This is an explicit stale-context
+policy, not an online-only startup gate.
+
+Keep terminal receipts through original epoch expiry plus seven days. A bounded
+cleanup query may delete them only after checking server-owned epoch expiry;
+do not trust a client purgeAfter. Incomplete work is finalized/rejected before
+payload cleanup. Structural invalidation does not shorten the receipt window.
+
+Proof obligations:
+
+1. An original command ID includes its original epoch E.
+2. Rules and executor require ID prefix == request epoch == current valid epoch.
+3. After expiry, E can NEVER become valid again, even if household ID is reused.
+4. Recreating the old ID after receipt cleanup therefore cannot apply.
+5. Changing epoch in payload while preserving ID fails validation. A new random
+   ID represents a new explicit action, never an automatic retry.
+
+If a device returns AFTER receipt retention, it may no longer distinguish an
+old applied request from an old request never received. Expose RESULT_EXPIRED /
+outcome unavailable, stop automatic retry and refresh the canonical list. Never
+claim confirmed success or confirmed failure in that case. This limitation and
+the 30-day/7-day policy must be made explicit in the implemented client contract.
+Exactly-once effect safety is distinct from indefinite historical observability.
+
+## Account deletion and existing structural writers
+
+Current lifecycle-store explicitly verifies recipes, legacy shopping, household
+and family state. It does not know the proposed shoppingMutations subtree or
+shoppingMutationWork collection. Add both to bounded cleanup/verification before
+introducing them. DONE must not leave shopping payloads behind. A late trigger
+must not recreate users/{uid} or reapply a deleted user's request. Lifecycle
+barriers and deletion transaction conflicts must serialize against processing.
+This extends ordinary owned-content cleanup, not final Family deletion semantics.
+
+CREATE currently copies full item documents. Its source fence/pointer changes
+must invalidate old epochs transactionally and its destination revision allocator
+must account for copied revisions. Do not let a newly created family start a
+sequence lower than copied items. Keep Phase 2 lossless-copy behavior and tests.
+Phase 4A remains READY_FOR_TRANSFER, private list writable through the new common
+protocol, with no JOIN item changes or pointer activation.
+
+## Rules and rollout boundary
+
+New rules deny canonical shoppingItems create/update/delete to ALL clients.
+Legacy shopping writes must not remain a mutation bypass. Keep only the precise
+read/deletion compatibility needed by coordinated account cleanup, or route that
+cleanup wholly through its authoritative backend before denying legacy deletes.
+Commands are owner-readable, create-only with strict envelope/context validation.
+Results, work, epoch, revisions, member/index/pointer fields remain backend-only.
+
+A coordinated cutover is necessary. Deploying deny-write rules before replacing
+old clients breaks their writes; leaving direct-write rules enabled after new
+client rollout does not provide S1 safety. Offline old direct batches cannot be
+converted into commands retroactively. They must be rejected after cutover.
+Do not enable Family JOIN until that denial is active and proven.
+
+Proposed later rollout (not authorized here): prepare complete backend and client;
+validate emulator matrix; deploy processors without public activation; distribute
+controlled compatible Internal build; perform explicit rules/client cutover;
+observe queued/rejected outcomes; only later resume Phase 4B development/rollout.
+Rollback must not reopen direct writes while any family transfer can occur.
+
+## Cost model (design estimates, not measured)
+
+Let A be authorization reads per transaction: approximately 4-9 documents,
+depending on standalone/family/RESERVED-private state. One-child transactions
+read one receipt plus A authority documents and 0-2 item documents/queries.
+Empty queries still incur a minimum read. Transaction retries add reads.
+Writes include one receipt progress update, one household sequence update,
+one or two canonical mutations; command creation is one additional client write.
+
+| Operation | Approximate executor reads | Base writes incl. command creation |
+| --- | ---: | ---: |
+| ADD | A + 2 | 4 |
+| EDIT without merge | A + 3 | 4 |
+| EDIT merging another row | A + 3 | 5 |
+| DELETE | A + 2 | 4 |
+| CHECK | A + 2 | 4 |
+| 10 distinct ADD children | 10(A + 2) | 31 |
+| 50 distinct ADD children | 50(A + 2) | 151 |
+| 200 distinct ADD children | 200(A + 2) | 601 |
+
+Bulk figures assume one atomic child effect per transaction and one parent
+creation, without transaction retry, continuation, terminal payload compaction
+or later cleanup. Continuation scheduling and finalization add O(pages) writes
+and reads; terminal receipt query/listener delivery adds client reads. These are
+not quota promises. No O(n squared) whole-list discovery per child. Optimizing
+multi-child transactions is permitted only after proving unchanged semantics.
+Idle: no polling; an unchanged household listener adds no periodic read. Canonical
+stream costs remain, plus authority changes and bounded pending-result updates.
+
+## Required tests and current evidence
+
+The two original counterexamples were rerun locally on this baseline using
+the real Firestore rules emulator, project demo-kuktam-local:
+
+* Fence denied writes while held; delayed ADD after release produced two rows
+  with quantities 500 and 1000 instead of one row 1500.
+* Delayed edit/merge/delete after a newer +500 produced 1001 instead of 1501.
+
+Those are successful reproductions of UNSAFE current behavior, not passing
+protection tests. Runner/test artifacts remain outside the repository.
+
+Implementation release blockers: both races become blocked; all mutation types
+duplicate/concurrent delivery; changed-payload replay; post-GC replay; epoch
+expiry/rotation; ABA deletion/recreation; two-device and two-member ADD; 10/50/200
+bulk interruption; strict malformed-envelope/payload rules; offline process kill;
+outcome persistence; A -> B -> A; no spinner; every repository entry path; deletion
+cleanup; CREATE/invites/Phase 4A/billing regressions. Full required Flutter/backend/
+emulator/analyzer/build validation has NOT been run for an implementation,
+because no implementation is present.
+
+## Phase 4B readiness A-G
+
+| Required proof | Current result |
+| --- | --- |
+| A old-context ADD blocked | NOT PROVEN / current reproduction succeeds |
+| B stale EDIT cannot lose merged quantity | NOT PROVEN / current reproduction succeeds |
+| C stale DELETE blocked | NOT PROVEN / direct unconditional delete remains |
+| D durable offline commands/results | NOT IMPLEMENTED |
+| E exactly-once effects including post-retention replay | DESIGN ONLY |
+| F multi-user semantic ADD cannot lose/duplicate effects | NOT IMPLEMENTED |
+| G canonical direct-write bypass denied | NO; currently allowed |
+
+PHASE 4B READY TO RESUME: NO.
+
+Future integration contract: acquire source AND destination structural fences
+and replace their epochs transactionally before transfer. Every server shopping
+writer, including transfer, uses the same sequence/item revision authority.
+Old commands fail even after unlock. Pointer/member activation is atomic with
+the final context change. Transfer journals remain necessary for transfer
+idempotency but are not a replacement for this mutation protocol. No transfer,
+activation or invite USED implementation is included in this document.
