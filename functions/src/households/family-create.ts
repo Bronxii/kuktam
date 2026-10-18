@@ -1,4 +1,5 @@
 import { claimFamilyLease } from './operation-lease';
+import { advanceShoppingEpoch } from '../shopping/mutation-store';
 import { createHash, randomUUID } from 'node:crypto';
 import { isDeepStrictEqual } from 'node:util';
 import { FieldPath, Firestore, Timestamp, Transaction } from 'firebase-admin/firestore';
@@ -84,7 +85,7 @@ export class FamilyCreateStore {
       tx.set(ref, operation);
       tx.create(destinationRef,{schemaVersion:2,kind:'family',ownerUid:uid,createdAt:now,state:'PREPARING',operationId});
       tx.create(indexRef,{householdId:hid,role:'owner',state:'RESERVED',operationId});
-      tx.update(sourceRef,{operationId});
+      tx.update(sourceRef,{operationId,...advanceShoppingEpoch(now)});
       return operationId;
     });
   }

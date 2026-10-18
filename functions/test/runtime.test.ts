@@ -78,7 +78,7 @@ test('root discovery has no secret/credential/Admin/network side effects and onl
  const http=require('node:http'),https=require('node:https');const hr=http.request,hs=https.request,fetch=globalThis.fetch;
  http.request=https.request=globalThis.fetch=()=>{throw new Error('NETWORK_FORBIDDEN');};
  try{const root=await import('../src/index');assert.equal(getApps().length,before);
- assert.deepEqual(Object.keys(root).sort(),['acceptFamilyInvite','createFamilyInvite','revokeFamilyInvite','previewFamilyInvite','getFamilyShareState','createFamilyShare','ensurePrivateHousehold','authUserDeleted','beginAccountDeletion','billingMaintenance','finalizeAccountDeletion','getEntitlementProof','playRtdn','prepareProPurchase','verifyProPurchase'].sort());
+ assert.deepEqual(Object.keys(root).sort(),['ensureShoppingContext','processShoppingMutation','acceptFamilyInvite','createFamilyInvite','revokeFamilyInvite','previewFamilyInvite','getFamilyShareState','createFamilyShare','ensurePrivateHousehold','authUserDeleted','beginAccountDeletion','billingMaintenance','finalizeAccountDeletion','getEntitlementProof','playRtdn','prepareProPurchase','verifyProPurchase'].sort());
  assert.equal((root.prepareProPurchase as any).__endpoint.platform,'gcfv2');
  assert.equal((root.authUserDeleted as any).__endpoint.platform,'gcfv1');
  assert.notEqual((root.prepareProPurchase as any).__endpoint.callableTrigger.enforceAppCheck,true);
@@ -136,7 +136,15 @@ test('CLI parameter resolution refuses each missing identity, including legacy-o
  }finally{http.request=hr;https.request=hs;globalThis.fetch=fetch;}
 });
 
- test('household callable is CORE, secret-free, non-enforcing and rejects UID injection before initialization',async()=>{
+test('shopping endpoints are lazy CORE, secret-free, retrying and reject UID injection',async()=>{
+ const root=await import('../src/index');
+ const call=(root.ensureShoppingContext as any).__endpoint,trigger=(root.processShoppingMutation as any).__endpoint;
+ for(const e of [call,trigger]){assert.equal(e.platform,'gcfv2');assert.deepEqual(e.region,['europe-west1']);assert.equal(e.serviceAccountEmail.name,cfg.coreIdentityParameter);assert.ok(!e.secretEnvironmentVariables?.length);}
+ assert.notEqual(call.callableTrigger.enforceAppCheck,true);assert.equal(trigger.eventTrigger.retry,true);
+ await assert.rejects(root.ensureShoppingContext.run({data:{}} as any),(e:any)=>e.code==='unauthenticated');
+ await assert.rejects(root.ensureShoppingContext.run({auth:{uid:'u'},data:{uid:'b'}} as any),(e:any)=>e.code==='invalid-argument');
+});
+test('household callable is CORE, secret-free, non-enforcing and rejects UID injection before initialization',async()=>{
   const root=await import('../src/index');const endpoint=(root.ensurePrivateHousehold as any).__endpoint;
   assert.equal(endpoint.platform,'gcfv2');assert.deepEqual(endpoint.region,['europe-west1']);
   assert.equal(endpoint.serviceAccountEmail.name,cfg.coreIdentityParameter);

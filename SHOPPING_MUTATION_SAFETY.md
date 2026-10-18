@@ -1,16 +1,180 @@
 # Shopping Mutation Safety — S1 architecture
 
-Status: ARCHITECTURE ONLY / IMPLEMENTATION NOT COMPLETE. S1 is NOT PASS.
-Audited baseline: 321a7003ec937c73a181c3abe46a9c02823f263e.
-No application, backend, rules, dependency or production configuration changed.
+Status: S1A SERVER IMPLEMENTED LOCALLY; full S1 remains incomplete.
+Implementation baseline: cfd3630 (approved design), containing Phase 4A 321a700.
+No production changes. No Flutter writer migration. No Phase 4B transfer.
 
-The task's section 38 permits a design-only stop when a larger intentional
+## Implemented S1A contract (takes precedence over the historical design below)
+
+Source: `functions/src/shopping/mutation-contract.ts` and `mutation-store.ts`.
+
+* `users/{uid}/shoppingMutations/{mutationId}`: immutable client request containing
+  exactly schemaVersion=1, mutationId, actorUid, householdId, epoch, kind,
+  payloadJson and submittedAt. submittedAt is a server timestamp in Firestore
+  rules. Only the authenticated path UID can create/read; no client update/delete.
+* `kind`: ADD, EDIT, DELETE, SET_CHECKED or BULK. payloadJson is one strict child
+  object (including type), or `{items:[...]}` for BULK. 1-200 children; names at
+  most 200 Unicode scalars; payload at most 256 KiB UTF-8; whitelisted units;
+  finite positive normalized quantity no greater than MAX_SAFE_INTEGER. All
+  children validate before any effect. Unknown child fields are rejected.
+* ADD payload: type/name/quantity/unit. EDIT additionally itemId/expectedRevision.
+  DELETE: type/itemId/expectedRevision. SET_CHECKED additionally isChecked boolean.
+* Epoch: `13-digit-expiryMillis-32-lowercase-hex-random`. Server creates 128 random
+  bits and expiry exactly 30 days ahead. Household stores shoppingEpoch and
+  shoppingEpochExpiresAt. Request ID is `epoch_64-lowercase-hex-random` (256-bit
+  client-generated random suffix). Actor is also bound to document path.
+* Missing legacy epoch is NOT a writable command context. ensureShoppingContext
+  lazily creates one after authoritative checks; legacy item revision is zero.
+  Existing shopping data stays readable. No bulk migration occurs.
+* Household shoppingRevision is the shared transaction contention point and
+  sequence. New item revisions use the next sequence, including deleted/recreated
+  items. Lazy context initialization reads the maximum existing item revision so
+  CREATE-copied revisioned items cannot reset the sequence.
+* Request hash is SHA-256 of fixed envelope identity/context fields and EXACT
+  payloadJson bytes, excluding submittedAt. Same ID with changed payload, even
+  equivalent reformatting, is ID_CONFLICT through the authenticated submit helper;
+  direct Firestore replacement is denied. Terminal receipt retains hash.
+* Each child commits canonical effects, sequence, cursor, bounded results and
+  continuation work atomically. No independent child ID is needed: parent ID and
+  persisted child cursor identify the effect. Maximum 10 child transactions per
+  normal invocation; explicit internal bound 1-20. No lease is necessary because
+  every effect and progress change is a single contended Firestore transaction.
+* Concurrent ADD reads current normalized target INSIDE that transaction. Every
+  successful writer changes the common household sequence. Missing-target races
+  retry discovery rather than create a second row. Existing duplicate rows fail
+  closed. ADD preserves checked/createdAt/unknown fields; EDIT preserves current
+  merge-into-another-row semantics. No arbitrary patch API.
+* EDIT/DELETE/SET_CHECKED compare observed revision before any write. CHECK is an
+  explicit desired boolean. Bulk children may have granular conflicts; completed
+  children never replay. A context/account failure rejects remaining children.
+* Results: APPLIED, PARTIAL, REJECTED_STALE, REJECTED_CONTEXT_CHANGED,
+  REJECTED_NOT_FOUND, REJECTED_UNAUTHORIZED, FAILED_TERMINAL. Missing status is
+  PENDING, intermediate status PROCESSING. Infrastructure failure records
+  FAILED_RETRYABLE with exponential 5-minute to 1-hour backoff, up to eight failures.
+  Exhaustion becomes FAILED_TERMINAL while preserving prior appliedCount/results.
+  Request payload is removed on terminal completion/exhaustion.
+* New exports: ensureShoppingContext (authenticated empty callable, CORE,
+  europe-west1, GEN2, no secrets, App Check false) and processShoppingMutation
+  (GEN2 document-create trigger, CORE, retry enabled, no secrets). Both lazy-init
+  Admin. Trigger errors are sanitized, never include payload.
+* `shoppingRuntime/config.enabled` must be exactly true for context issuance and
+  request creation. Missing/false is OFF. No production gate changed. Already
+  accepted requests can finish after gate closes. KEEP OFF during legacy cutover.
+* `shoppingMutationWork/{sha256(commandPath)}` contains uid, mutationId, nextAt.
+  Existing maintenance has a bounded shopping category (at most five due rows,
+  at most ten children per row), isolated from billing/deletion/family. Failed
+  jobs back off; no full user scan, new scheduler or polling.
+* Terminal work is scheduled for epoch expiry + seven days. Payload disappears
+  immediately; compact receipt/work disappear only after the ID's encoded epoch
+  expiry too. Extremely delayed replay cannot pass executor expiry even before
+  household rotation. Changing the payload epoch cannot preserve the old ID.
+  Missing receipt after retention means RESULT_EXPIRED/unknown historical outcome
+  to a future client, NEVER an instruction to automatically generate a new ID.
+* Ordinary account deletion now verifies/removes shoppingMutations and orphaned
+  shoppingMutationWork in bounded pages. Late trigger does not recreate absent
+  request or user. Family deletion still fails closed as before.
+* CREATE source reservation advances shopping epoch with its fence. New family
+  context is lazily initialized after activation. Phase 4A remains unchanged.
+
+### S1A rules and remaining risk
+
+New command/work/config fields are protected. Clients cannot create or change a
+canonical revision. Existing canonical create/update/delete OTHERWISE REMAIN
+ALLOWED, as expressly required for S1A; legacy repository is unchanged. Therefore
+old writers can still bypass revision advancement or race the new executor.
+New-protocol guarantees are proven for participating new-protocol writers, not
+mixed legacy/new production traffic. No claim that the original production bug
+is fully fixed. Do not enable the protocol publicly while that bypass remains.
+
+Rules validate the envelope and current context, not arbitrary nested JSON. The
+executor strictly validates nested payload before effects; invalid JSON becomes
+a sanitized terminal receipt. Family and RESERVED-private rule access-budget
+paths are covered by dedicated emulator tests.
+
+### Exact Phase 4B primitive
+
+`advanceShoppingEpoch(now)` returns the fresh server epoch/expiry patch. A future
+structural transaction must finish ALL reads first, apply this patch to source
+AND destination alongside their fence/pointer changes, and never restore/reuse
+old epochs. All transfer canonical writes must also use the common revision
+authority. This primitive implements no transfer, JOIN activation or invite USED.
+
+### Cost of implemented executor
+
+Per child, authorization is five document reads for ordinary private context,
+seven for active family, plus one command read and one target query/item read.
+RESERVED-private adds an operation read. EDIT also reads its source separately.
+Firestore query minimum charges, contention retries, trigger delivery and result
+listeners are additional. Values below assume ordinary private / active family,
+no retries, no existing duplicates, one command and no cleanup yet:
+
+| Action | Request writes | Processor reads | Canonical writes | Receipt writes | Work writes |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| ADD | 1 | 7 / 9 | 2 | 1 | 1 |
+| EDIT | 1 | 8 / 10 | 2 (3 when merging) | 1 | 1 |
+| DELETE | 1 | 7 / 9 | 2 | 1 | 1 |
+| SET_CHECKED | 1 | 7 / 9 | 2 | 1 | 1 |
+| 10 ADD bulk | 1 | 70 / 90 | 20 | 10 | 10 |
+| 50 ADD bulk | 1 | 350 / 450 | 100 | 50 | 50 |
+| 200 ADD bulk | 1 | 1400 / 1800 | 400 | 200 | 200 |
+
+Canonical writes include household sequence. Each maintenance continuation adds
+one work-query document read and one receipt read before processing; eventual
+cleanup adds work-query + receipt reads and two deletes. Submission helper adds
+gate/authority/receipt reads when used instead of rules-mediated command creation.
+These are estimates, not measured billing. No realtime listener is added in S1A.
+Rules-mediated creation additionally incurs dependent authorization document
+reads (approximately 6-9 unique documents, with rules caching), separate from
+the executor reads above. Future receipt listeners can observe intermediate
+cursor updates; their reads are not included in these server-only estimates.
+
+### Exact S1B handoff
+
+Implement UID-bound durable outbox and immutable ID/payload retry; call authenticated
+empty ensureShoppingContext when context needs authoritative initialization or
+refresh; observe cached household epoch. Capture item revision/context at the UI
+intent boundary. Submit request with serverTimestamp and never set result fields.
+Reconcile receipts by stable ID/hash with canonical stream, keep failures durable,
+and do not interpret local acceptance as server ACK. Map CHECK to SET_CHECKED;
+clear-list becomes BULK DELETE of observed IDs/revisions, not a fresh list scan.
+Migrate manual, edit, check, delete, clear, import, recipe and scaled-recipe paths.
+Then close canonical/legacy direct writes and validate offline device behavior.
+S1 overall and Phase 4B remain NOT READY until that cutover is proved.
+
+### Local validation — 2026-10-18
+
+S1A SERVER FOUNDATION: PASS. No production execution.
+
+* Backend unit: 237 passed, 0 failed.
+* Full backend/Firestore emulator suite: 651 passed, 0 failed.
+* Final affected shopping/rules/deletion/maintenance rerun after final hardening:
+  197 passed, 0 failed. These overlap the full suite; do not sum them as unique tests.
+* Flutter shopping repository/read compatibility: 21 passed.
+* Full Flutter: 1387 passed, 0 failed, 1 intentional skip.
+* Flutter analyzer, Functions TypeScript build and diff whitespace checks: PASS.
+* No application Dart or native Android changes. Only a Dart read-compatibility
+  test fixture was added. No Android build was needed for this backend phase.
+
+The new executor tests prove semantic exact-once ADD, two-UID/owner-member ADD,
+single logical target, stale EDIT/DELETE/SET_CHECKED rejection, old epoch rejection,
+same-ID altered payload denial, post-retention replay safety, legacy item revision
+zero, bulk 10/50/200 interruption/resume, atomic commit followed by lost response,
+bounded retry exhaustion, granular conflicts, deleted-user cleanup and late trigger
+safety. Family CREATE/invite/JOIN-reservation, billing and deletion regressions pass.
+
+The old direct-write races are intentionally NOT claimed fixed in S1A. S1B client
+migration can start; full S1 and Phase 4B remain blocked on client/rules cutover.
+
+## Historical approved whole-S1 architecture (future client/cutover sections)
+
+The original task's section 38 permitted a design-only stop when a larger intentional
 migration is required. That condition applies: the proposed command transport
 replaces the entire current client-write contract, introduces durable local
 storage and asynchronous results, and requires a coordinated rules/client
 cutover. Keeping any old writer enabled would invalidate the safety claim.
-This document is the implementation specification, NOT evidence that protection
-has been implemented. Phase 4B remains blocked.
+The original sections below described the full migration, not S1A completion.
+The implemented S1A contract above supersedes conflicting proposed field names,
+cost estimates and historical validation status. Phase 4B remains blocked.
 
 ## Write-path inventory (source audit)
 

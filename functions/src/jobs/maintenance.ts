@@ -1,4 +1,5 @@
 import { FamilyJoinStore } from '../households/family-join';
+import { ShoppingMutationStore } from '../shopping/mutation-store';
 import { compareTime } from '../models';
 import { FamilyCreateStore } from '../households/family-create';
 import { readDeletion } from '../accounts/deletion-contract';
@@ -58,6 +59,22 @@ export class Maintenance {
       if (category === 'deletion' && !this.deps.deletion) continue;
       if (!timeLeft()) return { items, cursors, nextCategory, budgetReached: true };
       nextCategory = categories[(categories.indexOf(category)+1)%categories.length]!;
+      if(category==='shopping'){
+        try{
+          const page=await this.db.collection('shoppingMutationWork').where('nextAt','<=',input.now).orderBy('nextAt').limit(Math.min(5,this.policy.pageSize)).get();
+          for(const doc of page.docs){if(!timeLeft())break;
+            try{items.push({category,key:doc.id,outcome:await new ShoppingMutationStore(this.db,this.clock).continueWork(doc.get('uid'),doc.get('mutationId'))});}
+            catch{
+              // A malformed job must not monopolize every due-page forever.
+              // Preserve a processor's longer backoff/terminal cleanup deadline.
+              try{await this.db.runTransaction(async tx=>{const current=await tx.get(doc.ref);const due=current.get('nextAt');
+                if(current.exists&&due instanceof Timestamp&&due.toMillis()<=input.now.toMillis())tx.update(doc.ref,{nextAt:Timestamp.fromMillis(this.clock().toMillis()+300000)});
+              });}catch{/* The independent next work item must still run. */}
+              items.push({category,key:doc.id,outcome:'retryable'});
+            }
+          }
+        }catch{items.push({category,key:'due',outcome:'queryFailure'});}continue;
+      }
       if (category === 'family') {
         // Single-field due query excludes terminal rows (nextAt=null). No user
         // scan, no new scheduler; isolate failures and use one bounded page/job.

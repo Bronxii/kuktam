@@ -1,4 +1,6 @@
 import { FamilyJoinStore } from './households/family-join';
+import { ShoppingMutationStore } from './shopping/mutation-store';
+import { onDocumentCreated } from 'firebase-functions/v2/firestore';
 import { acceptFamilyHandler } from './households/join-handler';
 import { getApps, initializeApp } from 'firebase-admin/app';
 import { getFirestore } from 'firebase-admin/firestore';
@@ -29,6 +31,18 @@ const invites=familyInviteHandlers(()=>{
   return new FamilyInviteStore(getFirestore(app),new AdminMemberEmailResolver(getAuth(app)));
 });
 const familyOptions={region:config.region,serviceAccount:coreIdentity,timeoutSeconds:60,maxInstances:5,enforceAppCheck:false};
+const shoppingStore=()=>new ShoppingMutationStore(getFirestore(getApps().find(a=>a.name==='[DEFAULT]')??initializeApp()));
+export const ensureShoppingContext=onCall(familyOptions,async request=>{
+  if(!request.auth)throw new HttpsError('unauthenticated','Authentication required');
+  if(!request.data||typeof request.data!=='object'||Array.isArray(request.data)||Object.keys(request.data).length)throw new HttpsError('invalid-argument','Empty request required');
+  try{return await shoppingStore().ensureContext({uid:request.auth.uid});}
+  catch{throw new HttpsError('failed-precondition','Shopping context unavailable');}
+});
+export const processShoppingMutation=onDocumentCreated({document:'users/{uid}/shoppingMutations/{mutationId}',region:config.region,
+  serviceAccount:coreIdentity,timeoutSeconds:60,maxInstances:5,retry:true},async event=>{
+  try{await shoppingStore().process(event.params.uid,event.params.mutationId);}
+  catch{throw new Error('shoppingMutationRetryRequired');}
+});
 export const acceptFamilyInvite=onCall(familyOptions,acceptFamilyHandler(()=>{
   const app=getApps().find(a=>a.name==='[DEFAULT]')??initializeApp();
   return new FamilyJoinStore(getFirestore(app));

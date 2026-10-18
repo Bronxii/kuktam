@@ -1,4 +1,5 @@
 import { cleanupPrivateHousehold } from '../households/household-store';
+import { workId as shoppingWorkId } from '../shopping/mutation-store';
 import { readDeletion, AuthUserDeletionApi, DeletionPolicy, defaultDeletionPolicy, validateDeletionPolicy } from '../accounts/deletion-contract';
 import { advanceAccount } from '../accounts/account-lifecycle';
 import { workKey } from '../jobs/maintenance-store';
@@ -403,9 +404,11 @@ export class LifecycleStore {
       const root=await tx.get(this.db.doc(`users/${uid}`));
       const recipes=await tx.get(this.db.collection(`users/${uid}/recipes`).limit(1));
       const shopping=await tx.get(this.db.collection(`users/${uid}/shopping`).limit(1));
+      const mutations=await tx.get(this.db.collection(`users/${uid}/shoppingMutations`).limit(1));
+      const mutationWork=await tx.get(this.db.collection('shoppingMutationWork').where('uid','==',uid).limit(1));
       const homes=await tx.get(this.db.collection('households').where('ownerUid','==',uid).limit(1));
       const family=await tx.get(this.db.doc(`familyMemberships/${uid}`));
-      const cleanupState=root.exists||!recipes.empty||!shopping.empty||!homes.empty||family.exists?'PENDING':'VERIFIED';
+      const cleanupState=root.exists||!recipes.empty||!shopping.empty||!mutations.empty||!mutationWork.empty||!homes.empty||family.exists?'PENDING':'VERIFIED';
       if(j.cleanupState!==cleanupState||doc.data()!.schemaVersion!==2)
         tx.set(ref,readDeletion({...j,cleanupState,updatedAt:this.clock()}));
       return cleanupState==='VERIFIED'?'VERIFIED':'cleanupIncomplete';
@@ -428,9 +431,13 @@ export class LifecycleStore {
       // are introduced. Bounded first-page deletes avoid unbounded recursiveDelete.
       const rootRef=this.db.doc(`users/${uid}`), root=await tx.get(rootRef);
       const content=[];
-      for(const name of ['recipes','shopping']) content.push(...(await tx.get(rootRef.collection(name).limit(limit))).docs);
+      for(const name of ['recipes','shopping','shoppingMutations']) {
+        if(content.length===limit)break;
+        content.push(...(await tx.get(rootRef.collection(name).limit(limit-content.length))).docs);
+      }
+      if(content.length<limit)content.push(...(await tx.get(this.db.collection('shoppingMutationWork').where('uid','==',uid).limit(limit-content.length))).docs);
       if(content.length || root.exists){
-        for(const d of content)tx.delete(d.ref);
+        for(const d of content){tx.delete(d.ref);if(d.ref.parent.id==='shoppingMutations')tx.delete(this.db.doc(`shoppingMutationWork/${shoppingWorkId(d.ref.path)}`));}
         if(root.exists)tx.delete(rootRef);
         tx.set(jobRef,readDeletion({...job,cleanupState:'PENDING',updatedAt:now}));
         return {kind:'continue'};

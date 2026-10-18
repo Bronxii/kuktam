@@ -252,6 +252,29 @@ class _Batch implements WriteBatch {
 }
 
 void main() {
+  test(
+    'shopping reads tolerate server revision and retain legacy decoding',
+    () async {
+      final db = _Db();
+      final repo = _repository(firestore: db, firebaseAuth: _Auth());
+      addTearDown(db.events.close);
+      for (final id in ['legacy', 'revisioned']) {
+        db.records['households/home-user-1/shoppingItems/$id'] = {
+          'name': 'milk',
+          'quantity': 2,
+          'unit': 'db',
+          'isChecked': false,
+          'createdAt': Timestamp.fromMillisecondsSinceEpoch(1),
+          if (id == 'revisioned') 'revision': 123,
+        };
+      }
+      final items = await repo.getShoppingItems();
+      expect(items.map((i) => i.id), containsAll(['legacy', 'revisioned']));
+      expect(items.every((i) => i.quantity == 2 && !i.isChecked), true);
+      expect(await repo.watchShoppingItems().first, hasLength(2));
+      expect(db.operations, isEmpty);
+    },
+  );
   for (final mode in ['online', 'pending', 'failure']) {
     testWidgets('real repository add dialog $mode releases correctly', (
       tester,
