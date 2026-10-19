@@ -34,7 +34,7 @@ class ShoppingOutbox {
     final db = await f.openDatabase(
       location,
       options: OpenDatabaseOptions(
-        version: 1,
+        version: 2,
         onConfigure: (db) async {
           await db.execute('PRAGMA synchronous = FULL');
         },
@@ -56,10 +56,25 @@ class ShoppingOutbox {
             '''CREATE TABLE contexts (
           uid TEXT PRIMARY KEY, householdId TEXT NOT NULL, epoch TEXT NOT NULL)''',
           );
+          await _createIntentTable(db);
+        },
+        onUpgrade: (db, oldVersion, _) async {
+          if (oldVersion < 2) await _createIntentTable(db);
         },
       ),
     );
     return ShoppingOutbox(db);
+  }
+
+  static Future<void> _createIntentTable(DatabaseExecutor db) async {
+    await db.execute('''CREATE TABLE shoppingIntents (
+      sequence INTEGER PRIMARY KEY AUTOINCREMENT,
+      uid TEXT NOT NULL, id TEXT NOT NULL, draft TEXT NOT NULL,
+      dependencies TEXT NOT NULL, materialized INTEGER NOT NULL DEFAULT 0,
+      UNIQUE(uid, id))''');
+    await db.execute(
+      'CREATE INDEX waiting_intents ON shoppingIntents(uid, materialized, sequence)',
+    );
   }
 
   Future<void> enqueue(ShoppingMutationRequest request) async {
@@ -77,10 +92,21 @@ class ShoppingOutbox {
         }
         return;
       }
+      final held = await tx.query(
+        'shoppingIntents',
+        columns: ['id'],
+        where: 'uid = ? AND id = ?',
+        whereArgs: [request.context.uid, request.mutationId],
+      );
+      if (held.isNotEmpty) {
+        throw StateError('Intent is not materialized');
+      }
       final count = Sqflite.firstIntValue(
         await tx.rawQuery(
-          'SELECT COUNT(*) FROM mutations WHERE uid = ? AND terminal = 0',
-          [request.context.uid],
+          '''SELECT
+            (SELECT COUNT(*) FROM mutations WHERE uid = ? AND terminal = 0) +
+            (SELECT COUNT(*) FROM shoppingIntents WHERE uid = ? AND materialized = 0)''',
+          [request.context.uid, request.context.uid],
         ),
       )!;
       if (count >= maxPending) throw StateError('Shopping queue full');
@@ -217,13 +243,31 @@ class ShoppingOutbox {
   /// A missing old receipt is never grounds for generating a replacement action.
   Future<void> prune(String uid, DateTime now) async {
     final cutoff = now.subtract(const Duration(days: 7)).millisecondsSinceEpoch;
-    await database.delete(
-      'mutations',
-      where:
-          'uid = ? AND terminal = 1 AND noticeAcknowledged = 1 '
-          'AND CAST(substr(id, 1, 13) AS INTEGER) <= ?',
-      whereArgs: [uid, cutoff],
-    );
+    await database.transaction((tx) async {
+      // A held descendant still needs its predecessor's receipt to resolve.
+      // First materialize/resolve held work; pruning must not destroy that proof.
+      final waiting = Sqflite.firstIntValue(
+        await tx.rawQuery(
+          'SELECT COUNT(*) FROM shoppingIntents WHERE uid = ? AND materialized = 0',
+          [uid],
+        ),
+      )!;
+      if (waiting != 0) return;
+      await tx.delete(
+        'mutations',
+        where:
+            'uid = ? AND terminal = 1 AND noticeAcknowledged = 1 '
+            'AND CAST(substr(id, 1, 13) AS INTEGER) <= ?',
+        whereArgs: [uid, cutoff],
+      );
+      await tx.rawDelete(
+        '''DELETE FROM shoppingIntents WHERE uid = ?
+        AND materialized = 1 AND NOT EXISTS
+        (SELECT 1 FROM mutations WHERE mutations.uid = shoppingIntents.uid
+          AND mutations.id = shoppingIntents.id)''',
+        [uid],
+      );
+    });
   }
 
   Future<void> close() => database.close();

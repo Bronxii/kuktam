@@ -1,5 +1,49 @@
 # Shopping Mutation Safety — S1 architecture
 
+## S1B continuation, 2026-10-19 — dependency layer only
+
+Starting HEAD: `367ec48 feat(shopping): add mutation client foundation`;
+starting worktree clean. The existing contract, SQLite outbox and bounded receipt
+observer were preserved. **S1B is still incomplete: no application writer cutover.**
+
+SQLite schema version 2 adds `shoppingIntents(sequence, uid, id, draft,
+dependencies, materialized)`. Version-1 journals upgrade in place. A draft has a
+stable preallocated mutation ID but is NOT a submitted immutable command.
+Dependencies identify an earlier action ID and child index, scoped to the same
+UID, household and epoch. References must already be durable, making cycles and
+forward references impossible. The shared limit of 100 pending actions includes
+both held intents and materialized nonterminal requests.
+
+For EDIT/CHECK/DELETE on an established canonical identity, the intent queue
+waits for the predecessor's terminal child result. Only APPLIED with the same
+item ID and a valid server revision can materialize the dependent request.
+Its revision is taken from that receipt, never predicted. Inserting the final
+immutable request and marking the draft materialized share one SQLite transaction.
+An EDIT merge into a different canonical row fails the dependent intent safely
+instead of retargeting a destructive action to unseen quantities. An unsuccessful
+predecessor causes a durable conflict notice; descendants cannot silently rebase.
+A successful child of a PARTIAL bulk receipt can satisfy its own dependency.
+Malformed prerequisite results fail closed.
+
+The dispatcher resolves held work after receipts and on UID binding, with no new
+listener or polling. The ordinary enqueue API cannot bypass a held dependency.
+Pruning retains prerequisite receipts while held intents exist, and removes
+materialized intent payloads with their acknowledged, retention-expired journal
+entries afterward. UID A/B isolation, reopen, duplicate enqueue, chains, schema
+upgrade and retention protection have focused tests.
+
+Still REQUIRED: ADD-to-edit resolution for a not-yet-canonical item (currently
+rejected before local acceptance), application coordinator, UI-observed dependency
+selection, optimistic overlay/reconciliation, Hungarian aggregate conflict UX,
+all repository writers, deletion-time local queue cleanup, and genuine Flutter /
+Firebase emulator E2E. No production app path calls the new intent API yet.
+This dependency layer therefore does NOT establish complete rapid-action or
+offline application behavior. The eight direct canonical write sites remain.
+S1C and Phase 4B remain blocked on completion of S1B.
+
+Current validation and remaining acceptance matrix: `S1B_PROGRESS_REPORT.md`.
+The older sections below retain the prior baseline and approved architecture.
+
 Status: S1A SERVER IMPLEMENTED LOCALLY; full S1 remains incomplete.
 Implementation baseline: cfd3630 (approved design), containing Phase 4A 321a700.
 No production changes. No Flutter writer migration. No Phase 4B transfer.

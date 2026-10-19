@@ -1,4 +1,133 @@
-# 
+# S1B continuation report — 2026-10-19
+
+**PHASE S1B: FAIL / INCOMPLETE. The requested full client migration was not
+completed in this continuation. No external blocker has been established.**
+
+Baseline: `367ec48 feat(shopping): add mutation client foundation`, clean worktree.
+The previous foundation remains intact. This continuation implements and tests
+durable dependent intent sequencing for already-identified canonical items.
+It does not switch the application to the mutation protocol.
+
+## Completed in this continuation
+
+- SQLite v1 -> v2 upgrade preserving accepted immutable requests and contexts.
+- Separate durable drafts and backward dependency references (action + child).
+- Same UID / household / epoch required. No cycles or forward references.
+- EDIT -> CHECK / EDIT / DELETE and CHECK -> CHECK materialize only from the
+  predecessor's actual APPLIED child revision, retaining the allocated action ID.
+- Atomic materialization + immutable outbox insertion. No predicted revisions.
+- Changed merge destination, failed predecessor or malformed receipt resolves
+  fail-closed with a persistent notice, rather than deleting unseen quantities.
+- PARTIAL bulk predecessors resolve dependencies per child.
+- Dispatcher resumes after receipts and session binding. No additional listeners.
+- Shared 100-action limit includes held work; direct enqueue cannot bypass it.
+- Retention preserves prerequisite receipts, then cleans intent payloads alongside
+  eligible journal rows. Schema upgrade, reopen and concurrency tests cover this.
+
+## Acceptance matrix — current state, not historical test claims
+
+PHASE S1B FLUTTER CLIENT MIGRATION: FAIL / INCOMPLETE
+FOUNDATION PRESERVED: YES
+DEPENDENT MUTATION ORDERING: durable backwards action/child dependencies;
+  existing-item paths tested; ADD-before-canonical-identity remains unimplemented.
+DURABLE: YES for the implemented intent queue
+RESTART SAFE: YES for SQLite close/reopen; native process-kill E2E NOT VERIFIED
+APP COORDINATOR: NOT IMPLEMENTED
+UID SCOPED: YES for queue/dispatcher; application-level cutover NOT COMPLETE
+OUTBOX: SQLite v2, FULL synchronous, transactional intent materialization
+OFFLINE DURABLE: local journal tested; complete application flow NOT VERIFIED
+APP RESTART SAFE: complete application flow NOT VERIFIED
+PENDING OVERLAY: NOT READY
+CANONICAL DATA FAKED: NO
+RESULT OBSERVATION: one bounded query of at most 10 materialized parent IDs
+POLLING: NO
+PER-MUTATION PERMANENT LISTENER: NO
+CANONICAL SHOPPING LISTENER COUNT: shared application-level model NOT IMPLEMENTED
+
+MANUAL ADD MIGRATED: NO
+EDIT MIGRATED: NO
+DELETE MIGRATED: NO
+CHECK/UNCHECK MIGRATED: NO
+SHOPPING TEXT IMPORT MIGRATED: NO
+RECIPE -> SHOPPING MIGRATED: NO
+SCALED RECIPE -> SHOPPING MIGRATED: NO
+OTHER PATHS: clearShoppingList remains direct batch delete
+NORMAL FLUTTER DIRECT CANONICAL WRITES: 8, all in
+  lib/shopping/data/repositories/shopping_repository.dart:
+  line 162 batch.update; 168 batch.set; 234 batch.update;
+  237 batch.delete; 243 item.update; 254 checked.update;
+  260 item.delete; 269 clear batch.delete.
+LEGACY FALLBACK: no new fallback introduced; original direct writer still active
+
+STALE ADD FULL E2E: NOT RUN / NOT PROVEN BLOCKED
++500 STALE EDIT FULL E2E: NOT RUN / NOT PROVEN BLOCKED
++500 STALE DELETE FULL E2E: NOT RUN / NOT PROVEN BLOCKED
+OFFLINE ADD/EDIT/DELETE/CHECK/BULK APPLICATION FLOW: NOT VERIFIED
+RESTART/RECONNECT APPLICATION FLOW: NOT VERIFIED
+ACCOUNT SWITCH: queue/dispatcher tests PASS; complete app E2E NOT RUN
+MULTI-CLIENT: full client E2E NOT RUN
+BULK 10/50/200 FULL CLIENT FLOW: NOT RUN
+LISTENER / READ AUDIT: no listener added by sequencing; full app model incomplete
+
+S1A / CREATE / INVITE / JOIN / ACCOUNT DELETION / BILLING:
+  backend and rules unchanged. Backend unit regression rerun: PASS.
+  Full emulator regression NOT RERUN in this continuation.
+
+## Validation actually run on this continuation
+
+- Targeted mutation foundation + sequencing: **62 PASS, 0 FAIL**.
+  This includes the original 39 tests and 23 additional tests.
+- Full Flutter: **1449 PASS, 0 FAIL, 1 intentional SKIP**.
+- Backend unit: **237 PASS, 0 FAIL**.
+- Backend/Firestore emulator: **NOT RERUN**; previously reported baseline 651 PASS
+  is historical, not new execution evidence.
+- Flutter analyzer: **PASS**, no issues.
+- Android debug APK build: **PASS**, no install or upload. Existing FlutterFire
+  Kotlin migration warnings remain; no dependency upgrades made here.
+- Functions TypeScript build: **PASS** (executed by test:unit).
+- Diff check: **PASS** (tracked diff and new source/test files checked).
+- Real Flutter/Firebase emulator E2E: **NOT RUN**.
+
+## Files modified by this continuation only
+
+- SHOPPING_MUTATION_SAFETY.md
+- S1B_PROGRESS_REPORT.md
+- lib/shopping/data/mutations/shopping_outbox.dart
+- lib/shopping/data/mutations/shopping_mutation_dispatcher.dart
+- lib/shopping/data/mutations/shopping_intent_queue.dart (new)
+- test/shopping/shopping_mutation_dispatcher_test.dart
+- test/shopping/shopping_intent_queue_test.dart (new)
+
+## Work still required to finish the user's request
+
+1. Safely resolve ADD -> EDIT for a newly pending logical item; connect observed
+   UI references to dependency selection. Do not silently retarget merged data.
+2. Wire one application/session-owned coordinator, context authority and canonical
+   listener; resume without the shopping screen; complete deletion-time local cleanup.
+3. Implement pending overlay, canonical/receipt ordering and persistent aggregated
+   Hungarian conflict feedback without double counting.
+4. Capture observed context/revision at dialog/confirmation boundaries and migrate
+   every repository/UI write, including clear, text import, recipe and scaling.
+5. Run genuine local Flutter-to-Firebase emulator CRUD/bulk, offline/restart,
+   account-switch/multi-client and both original corruption reproductions.
+6. Run all final regressions and update this report to acceptance only after all
+   criteria are proven. Do not treat these green foundation tests as cutover evidence.
+
+BLOCKERS: no external blocker established; implementation requirements above remain.
+S1C READY: NO
+S1 OVERALL COMPLETE: NO
+PHASE 4B READY: NO
+PRODUCTION CHANGES: NONE
+DEPLOY: NO
+DIRECT-WRITE RULE CUTOFF: NO
+PHASE 4B IMPLEMENTED: NO
+COMMIT: NO
+PUSH: NO
+
+---
+
+## Historical foundation report (2026-10-18, superseded status above)
+
 DEPLOY: NO
 
 DIRECT-WRITE RULE CUTOFF: NO

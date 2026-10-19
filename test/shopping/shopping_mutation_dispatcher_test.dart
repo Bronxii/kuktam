@@ -6,6 +6,7 @@ import 'package:kuktam/shopping/domain/shopping_mutation.dart';
 import 'package:kuktam/shopping/data/mutations/shopping_mutation_dispatcher.dart';
 import 'package:kuktam/shopping/data/mutations/shopping_mutation_transport.dart';
 import 'package:kuktam/shopping/data/mutations/shopping_outbox.dart';
+import 'package:kuktam/shopping/data/mutations/shopping_intent_queue.dart';
 import 'shopping_mutation_contract_test.dart' show testContext;
 
 class _Transport implements ShoppingMutationTransport {
@@ -98,6 +99,88 @@ void main() {
     await transport.events.close();
     await outbox.close();
   });
+  test(
+    'receipt materializes dependent request without another UI visit',
+    () async {
+      final a = ShoppingMutationRequest.create(
+        context: testContext(),
+        children: [
+          ShoppingMutationChild.edit(
+            itemId: 'server-item',
+            expectedRevision: 0,
+            name: 'tea',
+            quantity: 2,
+            unit: 'db',
+          ),
+        ],
+      );
+      final b = ShoppingMutationRequest.create(
+        context: testContext(),
+        children: [
+          ShoppingMutationChild.setChecked(
+            itemId: 'server-item',
+            expectedRevision: 0,
+            isChecked: true,
+          ),
+        ],
+      );
+      await dispatcher.enqueueIntent(a);
+      await dispatcher.enqueueIntent(
+        b,
+        dependencies: {0: ShoppingIntentDependency(a.mutationId)},
+      );
+      await emit({});
+      expect(transport.sent.map((r) => r.mutationId), [a.mutationId]);
+      await emit({a.mutationId: receipt(a)});
+      await emit({});
+      expect(transport.sent.map((r) => r.mutationId), [
+        a.mutationId,
+        b.mutationId,
+      ]);
+      expect(transport.sent.last.children.single.expectedRevision, 4);
+      expect(transport.observed.last.$2, [b.mutationId]);
+    },
+  );
+  test(
+    'session restoration resumes held dependency but B cannot submit A intent',
+    () async {
+      final a = ShoppingMutationRequest.create(
+        context: testContext(),
+        children: [
+          ShoppingMutationChild.setChecked(
+            itemId: 'server-item',
+            expectedRevision: 0,
+            isChecked: true,
+          ),
+        ],
+      );
+      final b = ShoppingMutationRequest.create(
+        context: testContext(),
+        children: [
+          ShoppingMutationChild.setChecked(
+            itemId: 'server-item',
+            expectedRevision: 0,
+            isChecked: false,
+          ),
+        ],
+      );
+      await dispatcher.enqueueIntent(a);
+      await dispatcher.enqueueIntent(
+        b,
+        dependencies: {0: ShoppingIntentDependency(a.mutationId)},
+      );
+      uid = 'b';
+      await dispatcher.bind(uid);
+      await expectLater(dispatcher.enqueueIntent(b), throwsStateError);
+      expect(transport.sent, isEmpty);
+      uid = 'a';
+      await dispatcher.bind(uid);
+      await emit({a.mutationId: receipt(a)});
+      await emit({});
+      expect(transport.sent.single.mutationId, b.mutationId);
+      expect(transport.sent.single.children.single.isChecked, false);
+    },
+  );
   test(
     'observer start failure cannot undo a successfully accepted enqueue',
     () async {

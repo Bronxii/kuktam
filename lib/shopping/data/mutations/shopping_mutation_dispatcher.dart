@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../domain/shopping_mutation.dart';
 import 'shopping_mutation_transport.dart';
 import 'shopping_outbox.dart';
+import 'shopping_intent_queue.dart';
 
 /// The app owns one dispatcher. UID changes invalidate callbacks immediately;
 /// SQLite work remains UID-bound. Network retries keep the original identity.
@@ -47,7 +48,10 @@ class ShoppingMutationDispatcher {
     _observer = null;
     await previous?.cancel();
     if (!_closed) _changes.add(null);
-    if (uid != null) await refresh();
+    if (uid != null) {
+      await ShoppingIntentQueue(outbox).materialize(uid);
+      await refresh();
+    }
   }
 
   Future<void> enqueue(ShoppingMutationRequest request) async {
@@ -75,6 +79,28 @@ class ShoppingMutationDispatcher {
   Future<void> recoverObservation() async {
     _observedKey = '';
     await refresh();
+  }
+
+  Future<void> enqueueIntent(
+    ShoppingMutationRequest draft, {
+    Map<int, ShoppingIntentDependency> dependencies = const {},
+  }) async {
+    final uid = draft.context.uid, generation = _generation;
+    if (!_current(uid, generation)) {
+      throw StateError('Shopping session changed');
+    }
+    await ShoppingIntentQueue(
+      outbox,
+    ).enqueue(draft, dependencies: dependencies);
+    if (!_current(uid, generation)) {
+      throw StateError('Shopping session changed');
+    }
+    _changes.add(null);
+    try {
+      await refresh();
+    } catch (_) {
+      _observedKey = '';
+    }
   }
 
   Future<void> refresh() async {
@@ -180,6 +206,7 @@ class ShoppingMutationDispatcher {
       }
     }
     if (changed && _current(uid, generation)) {
+      await ShoppingIntentQueue(outbox).materialize(uid);
       _changes.add(null);
       await refresh();
     }
@@ -229,6 +256,7 @@ class ShoppingMutationDispatcher {
               ShoppingMutationStatus.rejectedUnauthorized,
             );
             if (_current(uid, generation)) {
+              await ShoppingIntentQueue(outbox).materialize(uid);
               _changes.add(null);
               await refresh();
             }
