@@ -84,6 +84,7 @@ class ShoppingMutationDispatcher {
   Future<void> enqueueIntent(
     ShoppingMutationRequest draft, {
     Map<int, ShoppingIntentDependency> dependencies = const {},
+    List<Map<String, Object?>?> observations = const [],
   }) async {
     final uid = draft.context.uid, generation = _generation;
     if (!_current(uid, generation)) {
@@ -91,7 +92,35 @@ class ShoppingMutationDispatcher {
     }
     await ShoppingIntentQueue(
       outbox,
-    ).enqueue(draft, dependencies: dependencies);
+    ).enqueue(draft, dependencies: dependencies, observations: observations);
+    if (!_current(uid, generation)) {
+      throw StateError('Shopping session changed');
+    }
+    _changes.add(null);
+    try {
+      await refresh();
+    } catch (_) {
+      _observedKey = '';
+    }
+  }
+
+  Future<void> enqueueIntents(
+    List<
+      ({
+        ShoppingMutationRequest draft,
+        Map<int, ShoppingIntentDependency> dependencies,
+        List<Map<String, Object?>?> observations,
+      })
+    >
+    actions,
+  ) async {
+    if (actions.isEmpty) return;
+    final uid = actions.first.draft.context.uid, generation = _generation;
+    if (!_current(uid, generation) ||
+        actions.any((a) => a.draft.context.uid != uid)) {
+      throw StateError('Shopping session changed');
+    }
+    await ShoppingIntentQueue(outbox).enqueueMany(actions);
     if (!_current(uid, generation)) {
       throw StateError('Shopping session changed');
     }
@@ -250,11 +279,15 @@ class ShoppingMutationDispatcher {
               ),
             ], receipt);
           } else {
-            await outbox.recordResult(
-              uid,
-              request.mutationId,
-              ShoppingMutationStatus.rejectedUnauthorized,
-            );
+            var outcome = ShoppingMutationStatus.rejectedUnauthorized;
+            final inspector = transport;
+            if (inspector is ShoppingRejectedContextInspector &&
+                await (inspector as ShoppingRejectedContextInspector)
+                    .contextChanged(request)) {
+              outcome = ShoppingMutationStatus.rejectedContextChanged;
+            }
+            if (!_current(uid, generation)) return;
+            await outbox.recordResult(uid, request.mutationId, outcome);
             if (_current(uid, generation)) {
               await ShoppingIntentQueue(outbox).materialize(uid);
               _changes.add(null);

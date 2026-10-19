@@ -129,7 +129,7 @@ export class ShoppingMutationStore {
       tx.set(work,{uid,mutationId:id,nextAt:complete?purgeAfter:now});return status;
     });
   }
-  private async apply(tx:Transaction,home:DocumentSnapshot,c:Child,now:Timestamp):Promise<{code:Outcome;itemId:string;revision:number}>{
+  private async apply(tx:Transaction,home:DocumentSnapshot,c:Child,now:Timestamp):Promise<{code:Outcome;itemId:string;revision:number;created?:boolean}>{
     const items=home.ref.collection('shoppingItems');
     const source=c.type==='ADD'?null:await tx.get(items.doc(c.itemId));
     if(source&&!source.exists)fail('REJECTED_NOT_FOUND');
@@ -154,7 +154,7 @@ export class ShoppingMutationStore {
     else if(target){tx.update(target.ref,{quantity,revision:seq});if(source)tx.delete(source.ref);}
     else if(source)tx.update(source.ref,{name:c.name,quantity,unit:c.unit,revision:seq});
     else tx.create(destination,{name:c.name,quantity,unit:c.unit,isChecked:false,createdAt:now,revision:seq});
-    return {code:'APPLIED',itemId:destination.id,revision:seq};
+    return {code:'APPLIED',itemId:destination.id,revision:seq,...(c.type==='ADD'?{created:!target}:{})};
   }
   /** Terminal work stays indexed until expiry; no unbounded collection-group scan. */
   async continueWork(uid:string,id:string){

@@ -1,3 +1,11 @@
+# Current S1B worktree checkpoint — 2026-10-19
+
+The uncommitted client cutover is paused, not accepted. Read
+[S1B_CHECKPOINT_2026-10-19.md](S1B_CHECKPOINT_2026-10-19.md) for implemented
+changes, exact validation scope and remaining work. S1C direct-write rule cutoff
+and Phase 4B are NOT implemented. Earlier status statements below remain
+historical unless explicitly superseded by that checkpoint.
+
 # Shopping Mutation Safety — S1 architecture
 
 ## S1B continuation, 2026-10-19 — dependency layer only

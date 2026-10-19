@@ -97,31 +97,19 @@ class _ShoppingItemDialogState extends State<_ShoppingItemDialog> {
       _errorMessage = null;
     });
 
-    // Capture the screen messenger before this dialog may close on local save.
-    final messenger = ScaffoldMessenger.maybeOf(context);
     try {
       final item = widget.item;
 
       if (item != null) {
         await widget.shoppingRepository.updateItem(
           id: item.id,
+          observed: item,
           name: name,
           quantity: quantity,
           unit: _selectedUnit,
         );
       } else {
         await widget.shoppingRepository.addOrMergeItem(
-          onSyncFailure: () {
-            if (messenger?.mounted ?? false) {
-              messenger!.showSnackBar(
-                const SnackBar(
-                  content: Text(
-                    'A tétel szinkronizálása nem sikerült. Ellenőrizd a bevásárlólistát.',
-                  ),
-                ),
-              );
-            }
-          },
           name: name,
           quantity: quantity,
           unit: _selectedUnit,

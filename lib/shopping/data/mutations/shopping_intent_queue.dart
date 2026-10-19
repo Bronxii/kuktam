@@ -6,10 +6,19 @@ import 'shopping_outbox.dart';
 /// A local dependency points backwards to one immutable action/child, never to
 /// an anticipated revision. It cannot cross UID, household or epoch boundaries.
 class ShoppingIntentDependency {
-  const ShoppingIntentDependency(this.mutationId, {this.childIndex = 0});
+  const ShoppingIntentDependency(
+    this.mutationId, {
+    this.childIndex = 0,
+    this.createdAdd = false,
+  });
   final String mutationId;
   final int childIndex;
-  Map<String, Object?> toJson() => {'id': mutationId, 'child': childIndex};
+  final bool createdAdd;
+  Map<String, Object?> toJson() => {
+    'id': mutationId,
+    'child': childIndex,
+    if (createdAdd) 'createdAdd': true,
+  };
 }
 
 /// Durable user intent is distinct from a transport request. A held draft is
@@ -22,9 +31,41 @@ class ShoppingIntentQueue {
   Future<void> enqueue(
     ShoppingMutationRequest draft, {
     Map<int, ShoppingIntentDependency> dependencies = const {},
-  }) => outbox.database.transaction((tx) async {
+    List<Map<String, Object?>?> observations = const [],
+  }) => enqueueMany([
+    (draft: draft, dependencies: dependencies, observations: observations),
+  ]);
+
+  /// One user confirmation may span several bounded server commands. All local
+  /// children are committed together, or none are accepted by the UI.
+  Future<void> enqueueMany(
+    List<
+      ({
+        ShoppingMutationRequest draft,
+        Map<int, ShoppingIntentDependency> dependencies,
+        List<Map<String, Object?>?> observations,
+      })
+    >
+    actions,
+  ) => outbox.database.transaction((tx) async {
+    for (final action in actions) {
+      await _insert(tx, action.draft, action.dependencies, action.observations);
+    }
+  });
+
+  Future<void> _insert(
+    Transaction tx,
+    ShoppingMutationRequest draft,
+    Map<int, ShoppingIntentDependency> dependencies,
+    List<Map<String, Object?>?> observations,
+  ) async {
     final uid = draft.context.uid;
     final encoded = jsonEncode(draft.toJson());
+    if (observations.isNotEmpty &&
+        observations.length != draft.children.length) {
+      throw StateError('Invalid projection observations');
+    }
+    final observed = jsonEncode(observations);
     final keys = dependencies.keys.toList()..sort();
     final encodedDependencies = jsonEncode({
       for (final k in keys) '$k': dependencies[k]!.toJson(),
@@ -38,6 +79,14 @@ class ShoppingIntentQueue {
       if (prior.single['draft'] != encoded ||
           prior.single['dependencies'] != encodedDependencies) {
         throw StateError('Intent identity conflict');
+      }
+      final saved = await tx.query(
+        'shoppingObservations',
+        where: 'uid=? AND id=?',
+        whereArgs: [uid, draft.mutationId],
+      );
+      if (saved.isNotEmpty && saved.single['observed'] != observed) {
+        throw StateError('Intent observation conflict');
       }
       return;
     }
@@ -94,8 +143,10 @@ class ShoppingIntentQueue {
       }
       // Never silently retarget an edit/delete/check to a merge destination.
       // ADD without a canonical identity needs explicit reconciliation first.
-      if (parent.children[d.childIndex].itemId !=
-          draft.children[index].itemId) {
+      if (d.createdAdd
+          ? parent.children[d.childIndex].type != ShoppingMutationType.add
+          : parent.children[d.childIndex].itemId !=
+                draft.children[index].itemId) {
         throw StateError('Intent target requires reconciliation');
       }
     }
@@ -105,8 +156,13 @@ class ShoppingIntentQueue {
       'draft': encoded,
       'dependencies': encodedDependencies,
     });
+    await tx.insert('shoppingObservations', {
+      'uid': uid,
+      'id': draft.mutationId,
+      'observed': observed,
+    });
     await _materialize(tx, uid);
-  });
+  }
 
   /// Called after receipt commits and on session restoration, not on a timer.
   Future<void> materialize(String uid) =>
@@ -155,13 +211,22 @@ class ShoppingIntentQueue {
           continue;
         }
         final revision = result['revision'];
-        if (result['itemId'] != children[i]['itemId'] ||
+        final parentRequest = _request(data['request'] as String);
+        final predecessor = parentRequest.children[index];
+        final createdAdd = dependency['createdAdd'] == true;
+        final validTarget = createdAdd
+            ? predecessor.type == ShoppingMutationType.add &&
+                  result['created'] == true
+            : predecessor.itemId == result['itemId'];
+        if (!validTarget ||
+            result['itemId'] is! String ||
             revision is! int ||
             revision < 0 ||
             revision > 9007199254740991) {
           rejection = ShoppingMutationStatus.rejectedStale;
           continue;
         }
+        children[i]['itemId'] = result['itemId'];
         children[i]['expectedRevision'] = revision;
       }
       if (!ready && rejection == null) continue;

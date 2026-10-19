@@ -23,6 +23,21 @@ async function command(payload:Child|Child[],uid='u'){
 }
 const receipt=(id:string,uid='u')=>db.doc(`users/${uid}/shoppingMutations/${id}`).get();
 const rows=(hid=privateHouseholdId('u'))=>db.collection(`households/${hid}/shoppingItems`).get();
+test('ADD receipt proves creation versus merge for dependent destructive intents',async()=>{
+ await setup();const a=await command(add(2)),b=await command(add(500));
+ await store.process('u',a.mutationId);await store.process('u',b.mutationId);
+ const first=(await receipt(a.mutationId)).get('results')[0],second=(await receipt(b.mutationId)).get('results')[0];
+ assert.equal(first.created,true);assert.equal(second.created,false);
+ assert.equal(first.itemId,second.itemId);assert.equal((await rows()).docs[0]!.get('quantity'),502);
+ await store.process('u',a.mutationId);assert.deepEqual((await receipt(a.mutationId)).get('results')[0],first);
+});
+test('concurrent ADD receipts identify exactly one newly created target',async()=>{
+ await setup();const a=await command(add(2)),b=await command(add(3));
+ await Promise.all([store.process('u',a.mutationId),store.process('u',b.mutationId)]);
+ const results=[(await receipt(a.mutationId)).get('results')[0],(await receipt(b.mutationId)).get('results')[0]];
+ assert.equal(results.filter(r=>r.created===true).length,1);assert.equal(results.filter(r=>r.created===false).length,1);
+ assert.equal(results[0].itemId,results[1].itemId);assert.equal((await rows()).docs[0]!.get('quantity'),5);
+});
 async function seed(){await setup();const r=await command(add(1000));await store.process('u',r.mutationId);return (await rows()).docs[0]!;}
 test('default gate OFF; authenticated context only; initialize legacy lazily',async()=>{
  await db.doc('shoppingRuntime/config').delete();await new HouseholdStore(db).ensure({uid:'u'});await assert.rejects(store.ensureContext({uid:'u'}),/FEATURE_DISABLED/);

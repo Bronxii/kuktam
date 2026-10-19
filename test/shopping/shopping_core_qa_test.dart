@@ -40,13 +40,14 @@ class ShoppingFake implements ShoppingRepository {
     required String name,
     required double quantity,
     required String unit,
+    ShoppingItem? observed,
   }) async {
     added.add((name: name, quantity: quantity, unit: unit));
     await _write();
   }
 
   @override
-  Future<void> deleteItem(String id) async {
+  Future<void> deleteItem(String id, {ShoppingItem? observed}) async {
     await _write();
     items.removeWhere((i) => i.id == id);
     events.add(List.of(items));
@@ -56,6 +57,7 @@ class ShoppingFake implements ShoppingRepository {
   Future<void> setItemChecked({
     required String id,
     required bool isChecked,
+    ShoppingItem? observed,
   }) async {
     await _write();
     items = [
@@ -72,13 +74,17 @@ class ShoppingFake implements ShoppingRepository {
   }
 
   @override
-  Future<void> clearShoppingList() async {
+  Future<void> clearShoppingList({List<ShoppingItem>? observed}) async {
     await _write();
     items.clear();
     events.add([]);
   }
 
   int writes = 0;
+  @override
+  Stream<String?> watchNotices() => Stream.value(null);
+  @override
+  Future<void> acknowledgeNotice() async {}
   Completer<void>? pending;
   bool fail = false;
   List<ShoppingItemInput> added = [];

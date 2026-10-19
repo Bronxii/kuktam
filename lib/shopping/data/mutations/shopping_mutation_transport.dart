@@ -16,11 +16,32 @@ abstract interface class ShoppingMutationTransport {
   Future<ShoppingReceiptSnapshot> lookup(String uid, List<String> ids);
 }
 
+abstract interface class ShoppingRejectedContextInspector {
+  Future<bool> contextChanged(ShoppingMutationRequest request);
+}
+
 /// One bounded receipt query; no per-command listeners and no canonical writes.
-class FirestoreShoppingMutationTransport implements ShoppingMutationTransport {
+class FirestoreShoppingMutationTransport
+    implements ShoppingMutationTransport, ShoppingRejectedContextInspector {
   FirestoreShoppingMutationTransport(this.firestore, this.currentUid);
   final FirebaseFirestore firestore;
   final String? Function() currentUid;
+
+  @override
+  Future<bool> contextChanged(ShoppingMutationRequest request) async {
+    final c = request.context;
+    if (currentUid() != c.uid) throw StateError('Shopping session changed');
+    final user = await firestore
+        .doc('users/${c.uid}')
+        .get(const GetOptions(source: Source.server));
+    if (currentUid() != c.uid) throw StateError('Shopping session changed');
+    if (user.data()?['activeHouseholdId'] != c.householdId) return true;
+    final home = await firestore
+        .doc('households/${c.householdId}')
+        .get(const GetOptions(source: Source.server));
+    if (currentUid() != c.uid) throw StateError('Shopping session changed');
+    return home.data()?['shoppingEpoch'] != c.epoch;
+  }
 
   @override
   Future<ShoppingReceiptSnapshot> lookup(String uid, List<String> ids) async {

@@ -4,4 +4,6 @@
          to allow setting breakpoints, to provide hot reload, etc.
     -->
     <uses-permission android:name="android.permission.INTERNET"/>
+    <!-- Native Firebase emulator tests only; release does not include this. -->
+    <application android:networkSecurityConfig="@xml/emulator_network_security"/>
 </manifest>

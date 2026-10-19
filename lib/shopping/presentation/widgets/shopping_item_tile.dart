@@ -34,14 +34,19 @@ class ShoppingItemTile extends StatelessWidget {
                     Expanded(
                       child: Text(
                         item.name,
-                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          decoration: item.isChecked
-                              ? TextDecoration.lineThrough
-                              : null,
-                        ),
+                        style: Theme.of(context).textTheme.titleMedium
+                            ?.copyWith(
+                              decoration: item.isChecked
+                                  ? TextDecoration.lineThrough
+                                  : null,
+                            ),
                       ),
                     ),
                     const SizedBox(width: 12),
+                    if (item.pending) const Tooltip(
+                      message: 'Szinkronizálásra vár',
+                      child: Icon(Icons.cloud_upload_outlined, size: 16),
+                    ),
                     Text(
                       formatShoppingAmount(item.quantity, item.unit),
                       style: Theme.of(context).textTheme.bodyLarge?.copyWith(
@@ -62,10 +67,7 @@ class ShoppingItemTile extends StatelessWidget {
                 child: IgnorePointer(
                   child: Transform.scale(
                     scale: 1.6,
-                    child: Checkbox(
-                      value: item.isChecked,
-                      onChanged: (_) {},
-                    ),
+                    child: Checkbox(value: item.isChecked, onChanged: (_) {}),
                   ),
                 ),
               ),

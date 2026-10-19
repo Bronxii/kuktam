@@ -34,7 +34,7 @@ class ShoppingOutbox {
     final db = await f.openDatabase(
       location,
       options: OpenDatabaseOptions(
-        version: 2,
+        version: 4,
         onConfigure: (db) async {
           await db.execute('PRAGMA synchronous = FULL');
         },
@@ -57,9 +57,16 @@ class ShoppingOutbox {
           uid TEXT PRIMARY KEY, householdId TEXT NOT NULL, epoch TEXT NOT NULL)''',
           );
           await _createIntentTable(db);
+          await _createObservationTable(db);
         },
         onUpgrade: (db, oldVersion, _) async {
           if (oldVersion < 2) await _createIntentTable(db);
+          if (oldVersion < 3) await _createObservationTable(db);
+          if (oldVersion == 3) {
+            await db.execute(
+              "ALTER TABLE shoppingObservations ADD COLUMN absenceProof TEXT NOT NULL DEFAULT '[]'",
+            );
+          }
         },
       ),
     );
@@ -76,6 +83,40 @@ class ShoppingOutbox {
       'CREATE INDEX waiting_intents ON shoppingIntents(uid, materialized, sequence)',
     );
   }
+
+  static Future<void> _createObservationTable(DatabaseExecutor db) =>
+      db.execute(
+        '''
+    CREATE TABLE shoppingObservations (
+      uid TEXT NOT NULL, id TEXT NOT NULL, observed TEXT NOT NULL,
+      retired INTEGER NOT NULL DEFAULT 0, absenceProof TEXT NOT NULL DEFAULT '[]', PRIMARY KEY(uid,id))''',
+      );
+
+  Future<List<Map<String, Object?>>> projectionRows(String uid) =>
+      database.rawQuery(
+        '''
+    SELECT i.id, i.draft, i.dependencies, o.observed, o.absenceProof, m.request, m.status, m.result
+    FROM shoppingIntents i LEFT JOIN mutations m ON m.uid=i.uid AND m.id=i.id
+    LEFT JOIN shoppingObservations o ON o.uid=i.uid AND o.id=i.id
+    WHERE i.uid=? AND (o.retired=0 OR (o.id IS NULL AND (m.terminal=0 OR m.id IS NULL)))
+    ORDER BY i.sequence LIMIT 200''',
+        [uid],
+      );
+
+  Future<void> retireProjection(String uid, String id) => database.update(
+    'shoppingObservations',
+    {'retired': 1},
+    where: 'uid=? AND id=?',
+    whereArgs: [uid, id],
+  );
+
+  Future<void> confirmAbsent(String uid, String id, Set<String> itemIds) =>
+      database.update(
+        'shoppingObservations',
+        {'absenceProof': jsonEncode(itemIds.toList())},
+        where: 'uid=? AND id=?',
+        whereArgs: [uid, id],
+      );
 
   Future<void> enqueue(ShoppingMutationRequest request) async {
     final encoded = jsonEncode(request.toJson());
@@ -265,6 +306,12 @@ class ShoppingOutbox {
         AND materialized = 1 AND NOT EXISTS
         (SELECT 1 FROM mutations WHERE mutations.uid = shoppingIntents.uid
           AND mutations.id = shoppingIntents.id)''',
+        [uid],
+      );
+      await tx.rawDelete(
+        '''DELETE FROM shoppingObservations WHERE uid=? AND NOT EXISTS
+        (SELECT 1 FROM shoppingIntents WHERE shoppingIntents.uid=shoppingObservations.uid
+          AND shoppingIntents.id=shoppingObservations.id)''',
         [uid],
       );
     });

@@ -1,4 +1,6 @@
 import '../../../../households/household_gate.dart';
+import 'dart:async';
+import '../../../../shopping/data/mutations/production_shopping_coordinator.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import '../../../../sharing/recipe_file_receiver.dart';
@@ -30,6 +32,13 @@ class _AuthGateState extends State<AuthGate> {
   @override
   void initState() {
     super.initState();
+    if (widget.mainBuilder == null) {
+      unawaited(
+        productionShoppingCoordinator()
+            .then<void>((_) {})
+            .catchError((Object _) {}),
+      );
+    }
     _repository = widget.authRepository ?? AuthRepository();
     _users = _repository.authStateChanges().asyncMap((user) async {
       final first = _firstEvent;

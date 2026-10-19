@@ -55,12 +55,142 @@ void main() {
     await box.close();
     await directory.delete(recursive: true);
   });
+  for (final kind in ['edit', 'check', 'delete']) {
+    test(
+      'new ADD then $kind follows only proven newly-created destination',
+      () async {
+        final a = action(
+          ShoppingMutationChild.add(name: 'tea', quantity: 2, unit: 'db'),
+        );
+        final b = action(switch (kind) {
+          'edit' => edit(),
+          'check' => check(true),
+          _ => ShoppingMutationChild.delete(itemId: 'tea', expectedRevision: 0),
+        });
+        await queue.enqueue(a);
+        await queue.enqueue(
+          b,
+          dependencies: {
+            0: ShoppingIntentDependency(a.mutationId, createdAdd: true),
+          },
+        );
+        await reopen();
+        expect(
+          (await box.entries('a')).single.request.mutationId,
+          a.mutationId,
+        );
+        await box.recordResult(
+          'a',
+          a.mutationId,
+          ShoppingMutationStatus.applied,
+          resultJson: jsonEncode([
+            {
+              'code': 'APPLIED',
+              'itemId': 'actual-id',
+              'revision': 17,
+              'created': true,
+            },
+          ]),
+        );
+        await queue.materialize('a');
+        final request = (await box.entries('a')).single.request;
+        expect(request.mutationId, b.mutationId);
+        expect(request.children.single.itemId, 'actual-id');
+        expect(request.children.single.expectedRevision, 17);
+        await reopen();
+        expect(
+          (await box.entries('a')).single.request.toJson(),
+          request.toJson(),
+        );
+      },
+    );
+  }
+  for (final marker in [false, null]) {
+    test(
+      'merged ADD or old receipt without creation proof rejects dependent delete: $marker',
+      () async {
+        final a = action(
+          ShoppingMutationChild.add(name: 'tea', quantity: 2, unit: 'db'),
+        );
+        final b = action(
+          ShoppingMutationChild.delete(itemId: 'tea', expectedRevision: 0),
+        );
+        await queue.enqueue(a);
+        await queue.enqueue(
+          b,
+          dependencies: {
+            0: ShoppingIntentDependency(a.mutationId, createdAdd: true),
+          },
+        );
+        await box.recordResult(
+          'a',
+          a.mutationId,
+          ShoppingMutationStatus.applied,
+          resultJson: jsonEncode([
+            {
+              'code': 'APPLIED',
+              'itemId': 'merged-row',
+              'revision': 18,
+              'created': ?marker,
+            },
+          ]),
+        );
+        await queue.materialize('a');
+        expect(await box.entries('a'), isEmpty);
+        expect(
+          (await box.notices('a')).single.status,
+          ShoppingMutationStatus.rejectedStale,
+        );
+      },
+    );
+  }
+  test(
+    'ADD-edit-check chain preserves actual identity without guessing',
+    () async {
+      final a = action(
+        ShoppingMutationChild.add(name: 'tea', quantity: 2, unit: 'db'),
+      );
+      final b = action(edit()), c = action(check(true));
+      await queue.enqueue(a);
+      await queue.enqueue(
+        b,
+        dependencies: {
+          0: ShoppingIntentDependency(a.mutationId, createdAdd: true),
+        },
+      );
+      await queue.enqueue(
+        c,
+        dependencies: {0: ShoppingIntentDependency(b.mutationId)},
+      );
+      await box.recordResult(
+        'a',
+        a.mutationId,
+        ShoppingMutationStatus.applied,
+        resultJson: jsonEncode([
+          {
+            'code': 'APPLIED',
+            'itemId': 'actual',
+            'revision': 8,
+            'created': true,
+          },
+        ]),
+      );
+      await queue.materialize('a');
+      await applied(b, 9, id: 'actual');
+      await queue.materialize('a');
+      final result = (await box.entries('a')).single.request;
+      expect(result.mutationId, c.mutationId);
+      expect(result.children.single.itemId, 'actual');
+      expect(result.children.single.expectedRevision, 9);
+    },
+  );
   test(
     'version one database upgrades without replacing accepted requests',
     () async {
       final r = action(edit());
       await box.enqueue(r);
       await box.database.execute('DROP TABLE shoppingIntents');
+    await box.database.execute('DROP TABLE shoppingObservations');
       await box.database.setVersion(1);
       await reopen();
       expect((await box.entries('a')).single.request.toJson(), r.toJson());

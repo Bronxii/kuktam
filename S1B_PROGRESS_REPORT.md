@@ -1,5 +1,11 @@
 # S1B continuation report — 2026-10-19
 
+> **Latest checkpoint:** read [S1B_CHECKPOINT_2026-10-19.md](S1B_CHECKPOINT_2026-10-19.md)
+> first. The final continuation added repository cutover, coordinator, overlay,
+> ADD dependencies and two passing native emulator scenarios, but was paused at
+> the user's request before full acceptance. The text below is historical
+> sequencing-phase evidence, not the current implementation inventory.
+
 **PHASE S1B: FAIL / INCOMPLETE. The requested full client migration was not
 completed in this continuation. No external blocker has been established.**
 
