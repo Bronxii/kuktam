@@ -3,6 +3,16 @@
 const http=require('node:http');
 const {spawn}=require('node:child_process');
 const path=require('node:path');
+// Emulator-only Admin SDK must never probe a cloud metadata server.
+process.env.METADATA_SERVER_DETECTION='none';
+const {execFileSync}=require('node:child_process');
+const h2a=process.env.KUKTAM_E2E_SCOPE==='H2A';
+const adb=path.join(process.env.LOCALAPPDATA,'Android/Sdk/platform-tools/adb.exe');
+if(h2a){
+ const avd=execFileSync(adb,['-s','emulator-5580','emu','avd','name'],{encoding:'utf8'});
+ if(!avd.split('\n').map(s=>s.trim()).includes('Kuktam_H2A_Local'))throw Error('Dedicated H2A AVD required');
+}
+let crashReady=null;
 if(process.env.FIRESTORE_EMULATOR_HOST!=='127.0.0.1:8088'||
    process.env.FIREBASE_AUTH_EMULATOR_HOST!=='127.0.0.1:9098'||
    process.env.GCLOUD_PROJECT!=='demo-kuktam-local')throw Error('Local emulators required');
@@ -37,6 +47,9 @@ const server=http.createServer(async(req,res)=>{
   if(!/^client-[ab]$/.test(uid))throw Error('Fixture UID required');
   let result={};
   switch(req.url){
+   case '/crash-ready':
+    if(!h2a||!crashReady)throw Error('Unexpected crash request');
+    crashReady();break;
    case '/setup':
     await db.doc('shoppingRuntime/config').set({enabled:true});
     for(const u of ['client-a','client-b']){
@@ -53,6 +66,16 @@ const server=http.createServer(async(req,res)=>{
    case '/add':{
     const c=await store.ensureContext({uid});const r={schemaVersion:1,actorUid:uid,...c,
       mutationId:newMutationId(c.epoch),kind:'ADD',payloadJson:JSON.stringify({type:'ADD',name:input.name||'tea',quantity:input.quantity||500,unit:'db'}),submittedAt:Timestamp.now()};
+    await store.submit({uid},r);await store.process(uid,r.mutationId);break;
+   }
+   case '/delete':{
+    if(!h2a)throw Error('H2A fixture required');
+    const c=await store.ensureContext({uid});
+    const matches=await db.collection(`households/${c.householdId}/shoppingItems`).where('name','==',input.name).get();
+    if(matches.size!==1)throw Error('One fixture target required');
+    const d=matches.docs[0];
+    const r={schemaVersion:1,actorUid:uid,...c,mutationId:newMutationId(c.epoch),kind:'DELETE',
+     payloadJson:JSON.stringify({type:'DELETE',itemId:d.id,expectedRevision:d.get('revision')??0}),submittedAt:Timestamp.now()};
     await store.submit({uid},r);await store.process(uid,r.mutationId);break;
    }
    case '/family':{
@@ -72,12 +95,34 @@ server.listen(8099,'127.0.0.1',async()=>{
  const flutter=process.env.KUKTAM_TEST_FLUTTER||'D:\\Flutter\\bin\\flutter.bat';
  const root=path.resolve(__dirname,'../..');
  try{
-  for(const phase of ['main','restart']){
+  for(const phase of h2a?['single','death-add','resume-add','death-edit','resume-edit']:['main','restart']){
+   const death=phase.startsWith('death-');
+   let signal;
+   const crash=new Promise(resolve=>{signal=resolve;});
+   crashReady=death?signal:null;
    const code=await new Promise((resolve,reject)=>{
-    const child=spawn('cmd.exe',['/d','/c',flutter,'test','integration_test/shopping_mutation_e2e_test.dart','-d','emulator-5580','--no-uninstall',`--dart-define=SHOPPING_E2E_PHASE=${phase}`],{cwd:root,stdio:'inherit'});
+    const child=spawn('cmd.exe',['/d','/c',flutter,'test',h2a?'integration_test/shopping_h2a_e2e_test.dart':'integration_test/shopping_mutation_e2e_test.dart','-d','emulator-5580','--no-uninstall',`--dart-define=SHOPPING_E2E_PHASE=${phase}`],{cwd:root,stdio:'inherit'});
+    let killed=false,watchdog;
+    if(death)crash.then(()=>{
+     try{
+      const pid=execFileSync(adb,['-s','emulator-5580','shell','pidof','com.bronxii.kuktam'],{encoding:'utf8'}).trim();
+      if(!pid)throw Error('No application process');
+      execFileSync(adb,['-s','emulator-5580','shell','am','force-stop','com.bronxii.kuktam']);
+      let remaining='';
+      try{remaining=execFileSync(adb,['-s','emulator-5580','shell','pidof','com.bronxii.kuktam'],{encoding:'utf8'}).trim();}catch(e){if(e.status!==1)throw e;}
+      if(remaining)throw Error('Application survived force-stop');
+      killed=true;
+      console.log(`H2A ${phase}: abrupt am force-stop verified, prior PID ${pid}; no graceful close`);
+      // Harness watchdog only: the killed Flutter test runner may await VM data.
+      // It does not decide application correctness or retry any mutation.
+      watchdog=setTimeout(()=>{try{execFileSync('taskkill',['/PID',String(child.pid),'/T','/F']);}catch{}},15000);
+     }catch(e){reject(e);}
+    });
     child.on('error',reject);child.on('exit',resolve);
+    child.on('exit',()=>{clearTimeout(watchdog);if(death&&!killed)process.exitCode=1;});
    });
-   if(code!==0)throw Error(`Flutter E2E ${phase} failed (${code})`);
+   crashReady=null;
+   if((!death&&code!==0)||process.exitCode)throw Error(`Flutter E2E ${phase} failed (${code})`);
   }
  }catch(e){console.error(e.message);process.exitCode=1;}
  finally{stop();server.close();await Promise.allSettled([...running.values()]);await deleteApp(app);}

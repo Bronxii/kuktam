@@ -15,6 +15,7 @@ import 'package:kuktam/shopping/data/mutations/shopping_mutation_transport.dart'
 import 'package:kuktam/shopping/data/mutations/shopping_outbox.dart';
 import 'package:kuktam/shopping/data/repositories/shopping_repository.dart';
 import 'package:kuktam/shopping/domain/shopping_mutation.dart';
+import 'package:kuktam/shopping/domain/models/shopping_item.dart';
 
 Future<Map<String, dynamic>> fixture(
   String route, [
@@ -43,9 +44,17 @@ class EmulatorBackend extends FirestoreShoppingCoordinatorBackend {
     super.firestore,
     super.auth,
     super.functions,
-    this.cachedHousehold,
-  );
+    this.cachedHousehold, {
+    this.offlineStartup = false,
+  });
   final String? cachedHousehold;
+  final bool offlineStartup;
+  String? withheldItemName;
+
+  @override
+  Stream<List<ShoppingItem>> items(String uid, String householdId) => super
+      .items(uid, householdId)
+      .where((rows) => !rows.any((row) => row.name == withheldItemName));
   @override
   Stream<String> households(String uid) async* {
     if (cachedHousehold != null) yield cachedHousehold!;
@@ -58,6 +67,9 @@ class EmulatorBackend extends FirestoreShoppingCoordinatorBackend {
 
   @override
   Future<ShoppingMutationContext> ensureContext(String uid) async {
+    if (offlineStartup) {
+      throw FirebaseException(plugin: 'cloud_functions', code: 'unavailable');
+    }
     final data = await fixture('context', {'uid': uid});
     return ShoppingMutationContext(
       uid: uid,
@@ -74,6 +86,7 @@ class DeviceClient {
   late ShoppingOutbox box;
   late ShoppingCoordinator client;
   late ShoppingRepository repository;
+  late EmulatorBackend backend;
   Future<void> open(String name, String uid, {bool offline = false}) async {
     app = await Firebase.initializeApp(
       name: name,
@@ -119,15 +132,17 @@ class DeviceClient {
       ),
       currentUid: () => auth.currentUser?.uid,
     );
+    backend = EmulatorBackend(
+      db,
+      auth,
+      FirebaseFunctions.instanceFor(app: app, region: 'europe-west1'),
+      (await box.readContext(uid))?.householdId,
+      offlineStartup: offline,
+    );
     client = ShoppingCoordinator(
       outbox: box,
       dispatcher: dispatcher,
-      backend: EmulatorBackend(
-        db,
-        auth,
-        FirebaseFunctions.instanceFor(app: app, region: 'europe-west1'),
-        (await box.readContext(uid))?.householdId,
-      ),
+      backend: backend,
       currentUid: () => auth.currentUser?.uid,
     );
     repository = ShoppingRepository(

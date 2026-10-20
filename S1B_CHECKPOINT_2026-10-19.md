@@ -1,3 +1,101 @@
+## H2A single-client native durability — PASS, 2026-10-20
+
+Baseline: clean committed H1, `05310fecb28eb91b45179f11b49001b8b9c1c846`
+(`feat(shopping): complete S1B local hardening`). No application/backend business
+logic, rules, release network configuration or Image Import changes were needed.
+Only native test/harness code and these evidence documents changed.
+
+Environment: dedicated new AVD `Kuktam_H2A_Local`, Android 35 x86_64,
+`emulator-5580`. Existing Pixel_8 and real device data were untouched.
+Project `demo-kuktam-local`; Firestore 127.0.0.1:8088, Auth :9098, fixture
+:8099, hub :4408, logging :4508. Android uses 10.0.2.2 to reach the host.
+Real FlutterFire, real SQLite v6/FULL durability, actual repository/coordinator/
+dispatcher/projection and actual ShoppingMutationStore execute the operations.
+The local fixture substitutes callable/event delivery, not mutation execution.
+Offline means Firestore disableNetwork; offline restart ensure explicitly throws
+unavailable so a network fixture cannot silently establish fresh authority.
+
+Fresh environment: no Firebase emulator import/export; the new dedicated AVD
+starts with no user data. Before the final complete run only that AVD's
+com.bronxii.kuktam test data was cleared. No data clearing/uninstall occurs
+between phases (`--no-uninstall`). No production credentials/config changes.
+Admin metadata probing is disabled; project/emulator guards remain mandatory.
+
+Final run: three completed native test phases PASS, two deliberate interrupted
+process phases independently verified; harness exit 0.
+
+1. `single`: real add dialog closes after offline SQLite acceptance; pending ADD
+   appears and reconnect creates exactly one item. Offline EDIT, CHECK, UNCHECK,
+   DELETE reconcile correctly. ADD→EDIT, ADD→CHECK, ADD→DELETE and
+   ADD→EDIT→CHECK complete without new IDs. Offline stale EDIT/DELETE preserve
+   authoritative +500 (quantity 501), reject STALE and produce a notice.
+   Old-epoch ADD is rejected CONTEXT_CHANGED, no item is created or replayed.
+   In this scenario stale epoch is denied at rules admission and classified by
+   the client's authoritative context check, not manufactured as a server receipt.
+   A paused processor + observed server command gates the online/offline/online
+   flap; same ID completes once. No timing sleep determines correctness.
+2. `death-add` / `resume-add`: ADD→EDIT→CHECK is durably queued offline.
+   Host executes `adb -s emulator-5580 shell am force-stop com.bronxii.kuktam`
+   with coordinator/SQLite open, checks previous PID 6185 then absence of process.
+   Separate APK launch remains offline initially: exact IDs, immutable requests,
+   dependency rows and pending quantity survive. Reconnect produces one item,
+   quantity 9 and checked true.
+3. `death-edit` / `resume-edit`: offline EDIT, CHECK, UNCHECK and DELETE are
+   accepted together; same abrupt mechanism kills PID 6515. Restart while offline
+   verifies all four exact requests (including observed revisions), original IDs,
+   and projected state. Reconnect applies them once. A further local second-actor
+   merge case proves a new pending ADD's dependent DELETE fails closed instead
+   of deleting the authoritative merged quantity 502.
+
+The two force-stopped Flutter runners intentionally report "did not complete"
+and may print a temporary listener-directory finalization error. Those are NOT
+counted as passed tests. Success requires the host's crash-ready/PID evidence
+AND the separate passing resume assertions. Neither coordinator.close nor
+SQLite.close is called before force-stop. A 15s host-runner reap watchdog is
+only test-process cleanup, never application mutation recovery.
+
+H1A native sanity: a test-only delivery barrier suppresses real Firestore query
+snapshots containing `ghost` before they reach the coordinator. Actual S1A ADD
+completes; its APPLIED receipt retires the optimistic row without query observation.
+Actual S1A DELETE then removes the server target. Canonical server query is empty,
+no pending mutation/ghost/replay remains. This deterministically controls delivery,
+not Firestore network packet scheduling; no fake canonical data is injected.
+
+Validation on final H2A code:
+- Native: 3 completed phases PASS / 0 unexpected failures; 2 verified abrupt
+  terminations plus successful resumes. Final harness exit 0.
+- Shopping Flutter: 263 PASS / 0 FAIL (H1A/B/C included).
+- Analyzer PASS, no issues; Android debug test APK builds PASS.
+- Harness JavaScript syntax check PASS; git diff --check PASS.
+- Backend business source untouched: no backend suite/Functions build required.
+- Firebase processes and dedicated AVD stopped; test ports no longer listening.
+
+Reproduction: start ONLY Kuktam_H2A_Local on port 5580, use fresh local Firebase
+state and fresh test app data at the start of the WHOLE run, then:
+
+```powershell
+$env:KUKTAM_E2E_SCOPE='H2A'
+node .\functions\node_modules\firebase-tools\lib\bin\firebase.js emulators:exec --only firestore,auth --project demo-kuktam-local --config firebase.shopping-e2e.json "node functions/scripts/shopping-client-e2e.cjs"
+```
+
+Do not clear app data between death/resume phases. Harness refuses a different
+AVD in H2A mode. Local evidence logs: `%TEMP%\kuktam-h2a-final.log` and
+`%TEMP%\kuktam-h2a-shopping.log` (not committed).
+
+H2A modified files:
+- functions/scripts/shopping-client-e2e.cjs
+- integration_test/shopping_mutation_e2e_test.dart (shared native fixture only)
+- integration_test/shopping_h2a_e2e_test.dart (new)
+- S1B_CHECKPOINT_2026-10-19.md
+- S1B_PROGRESS_REPORT.md
+- SHOPPING_MUTATION_SAFETY.md
+
+Next: H2B 50/200 bulk partial progress/process-death only; then separate H2C
+multi-client/family/account-switch coverage, H3 full regression/audits, and S1C
+rules cutoff/hardened validation. None executed here.
+H2 COMPLETE: NO. S1B ACCEPTED: NO. S1C READY: NO. PHASE 4B READY: NO.
+Production changes/deploy/commit/push: NONE.
+
 ## H1C local hardening — PASS, 2026-10-20
 
 H1A and H1B remain green. H1 local hardening is complete; H2 native E2E is next,

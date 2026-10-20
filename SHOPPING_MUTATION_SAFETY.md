@@ -1,3 +1,17 @@
+## H2A native evidence — PASS, 2026-10-20
+
+Current H1 client protocol now has real single-client native evidence using
+SQLite, local Auth/Firestore and actual S1A execution: offline CRUD, dependent
+ADD operations, abrupt Android process death/restart with unchanged IDs and
+requests, stale +500 protections, old epoch rejection, network flap and receipt
+handoff. Three completed native phases PASS and two verified force-stops with
+passing offline resumes. Shopping 263 PASS; analyzer/debug APK/diff-check PASS.
+No protocol/application/backend/rules changes required. See
+S1B_CHECKPOINT_2026-10-19.md for exact delivery control, failure interpretation,
+environment and test scope. This does not establish H2B bulk, H2C multi-client,
+H3 full acceptance or S1C hardened rules. S1B remains NOT ACCEPTED; production
+direct-write rule cutoff and Family Phase 4B remain separate and unimplemented.
+
 ## H1C update — PASS, 2026-10-20
 
 SQLite v6 backfills old accepted work, uses indexed bounded projection states, and adds UID-specific deletion tombstones/cleanup after backend acceptance. Normal sign-out retains work. Upgrade, history/starvation, dependency, overlay, partial bulk/clear and cleanup tests pass. Shopping: 263 PASS; combined targeted shopping/deletion: 297 PASS; final deletion callback recheck: 13 PASS (overlapping). Analyzer/diff-check PASS. See S1B_CHECKPOINT_2026-10-19.md for exact semantics and evidence. H1 complete; H2 is next and was NOT run. S1B acceptance/S1C/Phase 4B remain NO.

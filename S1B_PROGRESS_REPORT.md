@@ -1,3 +1,23 @@
+## H2A update — PASS, 2026-10-20
+
+Starting committed H1: `05310fecb28eb91b45179f11b49001b8b9c1c846`.
+Current native demo-stack validation passes: offline CRUD/check-uncheck,
+single-client rapid dependencies, stale +500 EDIT/DELETE, old-epoch rejection,
+event-gated network flap and H1A receipt/canonical handoff. Two actual Android
+force-stops (no graceful SQLite close) prove offline restart and original
+request/ID/dependency retention for ADD→EDIT→CHECK and EDIT/CHECK/UNCHECK/DELETE.
+Merged-ADD dependent destructive retarget also fails closed in native E2E.
+
+Final evidence: 3 completed native phases PASS, 2 independently verified intentional
+process terminations plus passing resumes; harness exit 0. Shopping 263 PASS;
+analyzer/debug APK builds/diff-check PASS. Backend business code unchanged.
+Only test harness/tests/docs changed. Local emulators stopped. Exact environment,
+mechanism, limitations and reproduction command are in S1B_CHECKPOINT_2026-10-19.md.
+
+Next H2B (50/200 bulk/restart) only, then H2C, H3 and S1C separately.
+H2 COMPLETE: NO. S1B ACCEPTED: NO. S1C READY: NO. PHASE 4B READY: NO.
+Production changes/deploy/commit/push: NONE.
+
 ## H1C update — PASS, 2026-10-20
 
 SQLite v6 backfills old accepted work, uses indexed bounded projection states, and adds UID-specific deletion tombstones/cleanup after backend acceptance. Normal sign-out retains work. Upgrade, history/starvation, dependency, overlay, partial bulk/clear and cleanup tests pass. Shopping: 263 PASS; combined targeted shopping/deletion: 297 PASS; final deletion callback recheck: 13 PASS (overlapping). Analyzer/diff-check PASS. See S1B_CHECKPOINT_2026-10-19.md for exact semantics and evidence. H1 complete; H2 is next and was NOT run. S1B acceptance/S1C/Phase 4B remain NO.
