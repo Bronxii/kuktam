@@ -1,4 +1,5 @@
 import '../sharing/recipe_file_receiver.dart';
+import '../shopping/data/mutations/production_shopping_coordinator.dart';
 import '../sharing/recipe_share_codec.dart';
 import 'package:flutter/material.dart';
 import '../export/presentation/recipe_export_screen.dart';
@@ -44,6 +45,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
       final repository = widget.deletionRepository ?? AccountDeletionRepository(
         // Begin is acknowledged before clearing cached local Pro access.
         // Account switch is fenced by the repository before this callback.
+        onLocalShoppingDeletionAccepted: (uid) async {
+          final shopping = await productionShoppingCoordinator();
+          await shopping.deleteLocalAccount(uid);
+        },
         onDeletionStarted: () async { await pro?.entitlements.clearForLogout(); },
       );
       final deleted = await showDialog<bool>(

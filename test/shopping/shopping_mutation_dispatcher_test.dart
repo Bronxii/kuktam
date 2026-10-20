@@ -11,6 +11,7 @@ import 'shopping_mutation_contract_test.dart' show testContext;
 
 class _Transport implements ShoppingMutationTransport {
   bool failObserve = false;
+  bool lookupFromServer = true;
   final events = StreamController<ShoppingReceiptSnapshot>.broadcast(
     sync: true,
   );
@@ -18,12 +19,24 @@ class _Transport implements ShoppingMutationTransport {
   final observed = <(String, List<String>)>[];
   final lookups = <String>[];
   final server = <String, Map<String, dynamic>>{};
+  int active = 0, maxActive = 0;
   Future<void> Function(ShoppingMutationRequest)? send;
   @override
   Stream<ShoppingReceiptSnapshot> observe(String uid, List<String> ids) {
     if (failObserve) throw StateError('listener unavailable');
     observed.add((uid, ids));
-    return events.stream;
+    return Stream.multi((sink) {
+      active++;
+      if (active > maxActive) maxActive = active;
+      final sub = events.stream.listen(
+        sink.addSync,
+        onError: sink.addErrorSync,
+      );
+      sink.onCancel = () async {
+        active--;
+        await sub.cancel();
+      };
+    });
   }
 
   @override
@@ -36,7 +49,7 @@ class _Transport implements ShoppingMutationTransport {
   Future<ShoppingReceiptSnapshot> lookup(String uid, List<String> ids) async {
     lookups.addAll(ids);
     return ShoppingReceiptSnapshot(
-      fromServer: true,
+      fromServer: lookupFromServer,
       documents: {
         for (final id in ids)
           if (server.containsKey(id)) id: server[id]!,
@@ -248,6 +261,169 @@ void main() {
     expect(transport.sent, hasLength(2));
     expect(transport.sent[0].toJson(), transport.sent[1].toJson());
   });
+  test(
+    'observer error explicitly recovers one observer without new action',
+    () async {
+      final r = request();
+      await dispatcher.enqueue(r);
+      transport.events.addError(StateError('offline'));
+      await dispatcher.recoverObservation();
+      await emit({r.mutationId: receipt(r, 'PENDING')});
+      expect(transport.active, 1);
+      expect(transport.maxActive, 1);
+      expect(
+        (await outbox.entries('a')).single.request.mutationId,
+        r.mutationId,
+      );
+      expect(transport.sent, isEmpty);
+    },
+  );
+  test(
+    'late create rejection after A B A cannot terminalize returning A',
+    () async {
+      final blocked = Completer<void>();
+      transport.send = (_) => blocked.future;
+      final r = request();
+      await dispatcher.enqueue(r);
+      await emit({});
+      uid = 'b';
+      await dispatcher.bind(uid);
+      uid = 'a';
+      await dispatcher.bind(uid);
+      blocked.completeError(
+        FirebaseException(plugin: 'test', code: 'permission-denied'),
+      );
+      await Future<void>.value();
+      await dispatcher.settled;
+      expect(
+        (await outbox.entries('a')).single.status,
+        ShoppingMutationStatus.pending,
+      );
+      expect(transport.lookups, isEmpty);
+      expect(transport.active, 1);
+    },
+  );
+  test('cache-only lookup cannot prove permission rejection', () async {
+    final r = request();
+    transport.lookupFromServer = false;
+    transport.send = (_) => Future.error(
+      FirebaseException(plugin: 'test', code: 'permission-denied'),
+    );
+    await dispatcher.enqueue(r);
+    await emit({});
+    await Future<void>.value();
+    await Future<void>.value();
+    expect(
+      (await outbox.entries('a')).single.status,
+      ShoppingMutationStatus.pending,
+    );
+    expect(await outbox.notices('a'), isEmpty);
+  });
+  test(
+    'queued old receipt cannot apply after A B A while SQLite is busy',
+    () async {
+      final r = request();
+      await dispatcher.enqueue(r);
+      final entered = Completer<void>(), release = Completer<void>();
+      final lock = outbox.database.transaction((tx) async {
+        entered.complete();
+        await release.future;
+      });
+      await entered.future;
+      transport.events.add(
+        ShoppingReceiptSnapshot(
+          fromServer: true,
+          documents: {r.mutationId: receipt(r)},
+        ),
+      );
+      uid = 'b';
+      final bindB = dispatcher.bind(uid);
+      uid = 'a';
+      final bindA = dispatcher.bind(uid);
+      release.complete();
+      await lock;
+      await bindB;
+      await bindA;
+      await dispatcher.settled;
+      expect(
+        (await outbox.entries('a')).single.request.mutationId,
+        r.mutationId,
+      );
+      expect(transport.active, 1);
+      expect(transport.maxActive, 1);
+      expect(transport.sent, isEmpty);
+    },
+  );
+  test(
+    'recovery while create is live never submits a second request',
+    () async {
+      final blocked = Completer<void>();
+      transport.send = (_) => blocked.future;
+      final r = request();
+      await dispatcher.enqueue(r);
+      await emit({});
+      await dispatcher.recoverObservation();
+      await emit({});
+      expect(transport.sent, hasLength(1));
+      uid = 'b';
+      await dispatcher.bind(uid);
+      uid = 'a';
+      await dispatcher.bind(uid);
+      await emit({});
+      expect(transport.sent, hasLength(1));
+      blocked.complete();
+      await Future<void>.value();
+      transport.server[r.mutationId] = receipt(r, 'PENDING');
+      await dispatcher.recoverObservation();
+      await emit(transport.server);
+      expect(transport.sent, hasLength(1));
+      await emit({r.mutationId: receipt(r)});
+      expect(await outbox.entries('a'), isEmpty);
+    },
+  );
+  test(
+    'permission denied with absent server command is terminal unauthorized',
+    () async {
+      transport.send = (_) => Future.error(
+        FirebaseException(plugin: 'test', code: 'permission-denied'),
+      );
+      final r = request();
+      await dispatcher.enqueue(r);
+      final changed = dispatcher.changes.first;
+      await emit({});
+      await changed;
+      await dispatcher.settled;
+      expect(
+        (await outbox.entries('a', includeTerminal: true)).single.status,
+        ShoppingMutationStatus.rejectedUnauthorized,
+      );
+      expect(transport.lookups, [r.mutationId]);
+      await dispatcher.recoverObservation();
+      await emit({});
+      expect(transport.sent, hasLength(1));
+    },
+  );
+  test(
+    'permission denied duplicate observes existing immutable PENDING command',
+    () async {
+      final r = request();
+      transport.server[r.mutationId] = receipt(r, 'PENDING');
+      transport.send = (_) => Future.error(
+        FirebaseException(plugin: 'test', code: 'permission-denied'),
+      );
+      await dispatcher.enqueue(r);
+      final changed = dispatcher.changes.first;
+      await emit({});
+      await changed;
+      expect(
+        (await outbox.entries('a')).single.status,
+        ShoppingMutationStatus.pending,
+      );
+      await dispatcher.recoverObservation();
+      await emit(transport.server);
+      expect(transport.sent, hasLength(1));
+    },
+  );
   test(
     'offline enqueue returns after durable commit without remote acknowledgement',
     () async {

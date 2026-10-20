@@ -86,13 +86,13 @@ void main() {
     },
   );
   test(
-    'receipt before canonical keeps projection until observation catches up',
+    'receipt before canonical hands off immediately to canonical state',
     () async {
       await f.canonical([canonicalItem()]);
       await f.repository.addOrMergeItem(name: 'tea', quantity: 2, unit: 'db');
       final r = (await f.box.entries('A')).single.request;
       await f.receipt(r, 'APPLIED', itemId: 'tea', revision: 2, created: false);
-      expect(f.client.items.single.quantity, 7);
+      expect(f.client.items.single.quantity, 5);
       await f.canonical([canonicalItem(quantity: 7, revision: 2)]);
       expect(f.client.items.single.quantity, 7);
       expect(f.client.items.single.pending, false);
@@ -201,6 +201,15 @@ void main() {
       final b = (await f.box.entries('A')).single.request;
       expect(b.children.single.itemId, 'actual-id');
       expect(b.children.single.expectedRevision, 9);
+      // The ADD target was deleted before the list ever observed it. Its
+      // dependent operation must consume the rejection, never recreate ADD.
+      await f.receipt(b, 'REJECTED_NOT_FOUND', itemId: 'actual-id');
+      expect(f.client.items, isEmpty);
+      expect(f.client.notice, isNotNull);
+      await f.restart();
+      expect(f.client.items, isEmpty);
+      expect(await f.box.entries('A'), isEmpty);
+      expect(f.transport.sent, isEmpty);
     });
   }
   for (final n in [10, 50, 200]) {

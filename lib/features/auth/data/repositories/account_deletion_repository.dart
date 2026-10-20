@@ -17,6 +17,7 @@ class AccountDeletionRepository {
     GoogleSignIn? googleSignIn,
     this.coordination,
     this.onDeletionStarted,
+    this.onLocalShoppingDeletionAccepted,
   }) : _auth = firebaseAuth ?? FirebaseAuth.instance,
        _firestore = firestore ?? FirebaseFirestore.instance,
        _authRepository = AuthRepository(
@@ -27,6 +28,7 @@ class AccountDeletionRepository {
   /// Optional test adapter. Null selects the production coordinated gateway.
   final AccountDeletionGateway? coordination;
   final Future<void> Function()? onDeletionStarted;
+  final Future<void> Function(String uid)? onLocalShoppingDeletionAccepted;
   final FirebaseAuth _auth;
   final FirebaseFirestore _firestore;
   final AuthRepository _authRepository;
@@ -78,6 +80,8 @@ class AccountDeletionRepository {
           );
       await gateway.begin();
       accepted = true;
+      checkOwner();
+      await onLocalShoppingDeletionAccepted?.call(uid);
       checkOwner();
       await onDeletionStarted?.call();
       checkOwner();

@@ -34,7 +34,7 @@ class ShoppingOutbox {
     final db = await f.openDatabase(
       location,
       options: OpenDatabaseOptions(
-        version: 4,
+        version: 6,
         onConfigure: (db) async {
           await db.execute('PRAGMA synchronous = FULL');
         },
@@ -58,6 +58,7 @@ class ShoppingOutbox {
           );
           await _createIntentTable(db);
           await _createObservationTable(db);
+          await _createLocalSafety(db);
         },
         onUpgrade: (db, oldVersion, _) async {
           if (oldVersion < 2) await _createIntentTable(db);
@@ -67,11 +68,83 @@ class ShoppingOutbox {
               "ALTER TABLE shoppingObservations ADD COLUMN absenceProof TEXT NOT NULL DEFAULT '[]'",
             );
           }
+          if (oldVersion < 5) {
+            await db.execute('''INSERT OR IGNORE INTO shoppingIntents
+              (uid,id,draft,dependencies,materialized)
+              SELECT uid,id,request,'{}',1 FROM mutations ORDER BY sequence''');
+            await db.execute('''INSERT OR IGNORE INTO shoppingObservations
+              (uid,id,observed) SELECT uid,id,'[]' FROM shoppingIntents''');
+          }
+          if (oldVersion < 6) await _createLocalSafety(db);
         },
       ),
     );
     return ShoppingOutbox(db);
   }
+
+  static Future<void> _createLocalSafety(DatabaseExecutor db) async {
+    await db.execute('CREATE TABLE deletedShoppingUids (uid TEXT PRIMARY KEY)');
+    // Also repair accepted requests created without projection rows on v5.
+    await db.execute('''INSERT OR IGNORE INTO shoppingIntents
+      (uid,id,draft,dependencies,materialized)
+      SELECT uid,id,request,'{}',1 FROM mutations ORDER BY sequence''');
+    await db.execute(
+      '''INSERT OR IGNORE INTO shoppingObservations (uid,id,observed)
+      SELECT uid,id,'[]' FROM shoppingIntents''',
+    );
+    await db.execute(
+      'ALTER TABLE shoppingIntents ADD COLUMN projectionState INTEGER NOT NULL DEFAULT 0',
+    );
+    await db.execute(
+      '''UPDATE shoppingIntents SET projectionState=CASE
+      WHEN EXISTS (SELECT 1 FROM shoppingObservations o WHERE o.uid=shoppingIntents.uid AND o.id=shoppingIntents.id AND o.retired=1) THEN 2
+      WHEN EXISTS (SELECT 1 FROM mutations m WHERE m.uid=shoppingIntents.uid AND m.id=shoppingIntents.id AND m.terminal=1) THEN 1 ELSE 0 END''',
+    );
+    await db.execute(
+      'CREATE INDEX projection_work ON shoppingIntents(uid,projectionState,sequence)',
+    );
+    await db.execute(
+      'CREATE INDEX pending_notices ON mutations(uid,terminal,noticeAcknowledged,sequence)',
+    );
+    await db.execute(
+      '''CREATE TRIGGER projection_result AFTER UPDATE OF terminal ON mutations BEGIN
+      UPDATE shoppingIntents SET projectionState=NEW.terminal WHERE uid=NEW.uid AND id=NEW.id AND projectionState<>2; END''',
+    );
+    await db.execute(
+      '''CREATE TRIGGER projection_insert AFTER INSERT ON mutations BEGIN
+      UPDATE shoppingIntents SET projectionState=NEW.terminal WHERE uid=NEW.uid AND id=NEW.id AND projectionState<>2; END''',
+    );
+  }
+
+  static Future<void> requireLiveUid(DatabaseExecutor db, String uid) async {
+    if ((await db.query(
+      'deletedShoppingUids',
+      where: 'uid=?',
+      whereArgs: [uid],
+    )).isNotEmpty) {
+      throw StateError('Shopping account locally deleted');
+    }
+  }
+
+  Future<bool> isDeletedUid(String uid) async => (await database.query(
+    'deletedShoppingUids',
+    where: 'uid=?',
+    whereArgs: [uid],
+  )).isNotEmpty;
+
+  Future<void> deleteUid(String uid) => database.transaction((tx) async {
+    await tx.insert('deletedShoppingUids', {
+      'uid': uid,
+    }, conflictAlgorithm: ConflictAlgorithm.ignore);
+    for (final table in [
+      'shoppingObservations',
+      'shoppingIntents',
+      'mutations',
+      'contexts',
+    ]) {
+      await tx.delete(table, where: 'uid=?', whereArgs: [uid]);
+    }
+  });
 
   static Future<void> _createIntentTable(DatabaseExecutor db) async {
     await db.execute('''CREATE TABLE shoppingIntents (
@@ -95,32 +168,55 @@ class ShoppingOutbox {
   Future<List<Map<String, Object?>>> projectionRows(String uid) =>
       database.rawQuery(
         '''
-    SELECT i.id, i.draft, i.dependencies, o.observed, o.absenceProof, m.request, m.status, m.result
-    FROM shoppingIntents i LEFT JOIN mutations m ON m.uid=i.uid AND m.id=i.id
+    SELECT i.sequence, i.id, i.draft, i.dependencies, o.observed, o.absenceProof, m.request, m.status, m.result
+    FROM (SELECT * FROM shoppingIntents WHERE uid=? AND projectionState=0 ORDER BY sequence LIMIT 100) i LEFT JOIN mutations m ON m.uid=i.uid AND m.id=i.id
     LEFT JOIN shoppingObservations o ON o.uid=i.uid AND o.id=i.id
-    WHERE i.uid=? AND (o.retired=0 OR (o.id IS NULL AND (m.terminal=0 OR m.id IS NULL)))
-    ORDER BY i.sequence LIMIT 200''',
-        [uid],
+    UNION ALL
+    SELECT i.sequence, i.id, i.draft, i.dependencies, o.observed, o.absenceProof, m.request, m.status, m.result
+    FROM (SELECT * FROM shoppingIntents WHERE uid=? AND projectionState=1 ORDER BY sequence LIMIT 100) i LEFT JOIN mutations m ON m.uid=i.uid AND m.id=i.id
+    LEFT JOIN shoppingObservations o ON o.uid=i.uid AND o.id=i.id
+    ORDER BY 1''',
+        [uid, uid],
       );
 
-  Future<void> retireProjection(String uid, String id) => database.update(
-    'shoppingObservations',
-    {'retired': 1},
-    where: 'uid=? AND id=?',
-    whereArgs: [uid, id],
-  );
+  Future<void> retireProjection(String uid, String id) =>
+      database.transaction((tx) async {
+        await tx.update(
+          'shoppingIntents',
+          {'projectionState': 2},
+          where: 'uid=? AND id=?',
+          whereArgs: [uid, id],
+        );
+        await tx.update(
+          'shoppingObservations',
+          {'retired': 1},
+          where: 'uid=? AND id=?',
+          whereArgs: [uid, id],
+        );
+      });
 
   Future<void> confirmAbsent(String uid, String id, Set<String> itemIds) =>
-      database.update(
-        'shoppingObservations',
-        {'absenceProof': jsonEncode(itemIds.toList())},
-        where: 'uid=? AND id=?',
-        whereArgs: [uid, id],
-      );
+      database.transaction((tx) async {
+        await tx.update(
+          'shoppingObservations',
+          {'absenceProof': jsonEncode(itemIds.toList())},
+          where: 'uid=? AND id=?',
+          whereArgs: [uid, id],
+        );
+        if (itemIds.isNotEmpty) {
+          await tx.update(
+            'mutations',
+            {'noticeAcknowledged': 0},
+            where: 'uid=? AND id=? AND terminal=1',
+            whereArgs: [uid, id],
+          );
+        }
+      });
 
   Future<void> enqueue(ShoppingMutationRequest request) async {
     final encoded = jsonEncode(request.toJson());
     await database.transaction((tx) async {
+      await requireLiveUid(tx, request.context.uid);
       final existing = await tx.query(
         'mutations',
         columns: ['request'],
@@ -156,6 +252,18 @@ class ShoppingOutbox {
         'id': request.mutationId,
         'request': encoded,
         'status': 'PENDING',
+      });
+      await tx.insert('shoppingIntents', {
+        'uid': request.context.uid,
+        'id': request.mutationId,
+        'draft': encoded,
+        'dependencies': '{}',
+        'materialized': 1,
+      });
+      await tx.insert('shoppingObservations', {
+        'uid': request.context.uid,
+        'id': request.mutationId,
+        'observed': '[]',
       });
     });
   }
@@ -254,13 +362,15 @@ class ShoppingOutbox {
         .toList();
   }
 
-  Future<void> saveContext(ShoppingMutationContext context) async {
-    await database.insert('contexts', {
-      'uid': context.uid,
-      'householdId': context.householdId,
-      'epoch': context.epoch,
-    }, conflictAlgorithm: ConflictAlgorithm.replace);
-  }
+  Future<void> saveContext(ShoppingMutationContext context) =>
+      database.transaction((tx) async {
+        await requireLiveUid(tx, context.uid);
+        await tx.insert('contexts', {
+          'uid': context.uid,
+          'householdId': context.householdId,
+          'epoch': context.epoch,
+        }, conflictAlgorithm: ConflictAlgorithm.replace);
+      });
 
   Future<ShoppingMutationContext?> readContext(String uid) async {
     final rows = await database.query(

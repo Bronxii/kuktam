@@ -189,8 +189,12 @@ void main() {
     () async {
       final r = action(edit());
       await box.enqueue(r);
+      await box.database.execute('DROP TRIGGER projection_result');
+      await box.database.execute('DROP TRIGGER projection_insert');
+      await box.database.execute('DROP INDEX pending_notices');
+      await box.database.execute('DROP TABLE deletedShoppingUids');
       await box.database.execute('DROP TABLE shoppingIntents');
-    await box.database.execute('DROP TABLE shoppingObservations');
+      await box.database.execute('DROP TABLE shoppingObservations');
       await box.database.setVersion(1);
       await reopen();
       expect((await box.entries('a')).single.request.toJson(), r.toJson());

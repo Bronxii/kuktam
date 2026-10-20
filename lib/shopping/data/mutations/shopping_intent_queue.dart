@@ -60,6 +60,7 @@ class ShoppingIntentQueue {
     List<Map<String, Object?>?> observations,
   ) async {
     final uid = draft.context.uid;
+    await ShoppingOutbox.requireLiveUid(tx, uid);
     final encoded = jsonEncode(draft.toJson());
     if (observations.isNotEmpty &&
         observations.length != draft.children.length) {

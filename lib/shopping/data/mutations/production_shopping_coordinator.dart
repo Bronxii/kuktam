@@ -7,6 +7,7 @@ import '../../../households/production_household_context.dart';
 import '../../domain/models/shopping_item.dart';
 import '../../domain/shopping_mutation.dart';
 import 'shopping_coordinator.dart';
+import 'shopping_coordinator_registry.dart';
 import 'shopping_mutation_dispatcher.dart';
 import 'shopping_mutation_transport.dart';
 import 'shopping_outbox.dart';
@@ -115,12 +116,12 @@ class FirestoreShoppingCoordinatorBackend
   }
 }
 
-final _instances = Expando<Future<ShoppingCoordinator>>();
+final _instances = ShoppingCoordinatorRegistry();
 Future<ShoppingCoordinator> productionShoppingCoordinator({
   FirebaseAuth? auth,
 }) {
   final current = auth ?? FirebaseAuth.instance;
-  return _instances[current] ??= _open(current);
+  return _instances.get(current, () => _open(current));
 }
 
 Future<ShoppingCoordinator> _open(FirebaseAuth auth) async {
@@ -147,17 +148,17 @@ Future<ShoppingCoordinator> _open(FirebaseAuth auth) async {
   auth.authStateChanges().map((u) => u?.uid).distinct().listen((uid) {
     unawaited(coordinator.bind(uid).catchError((Object _) {}));
   });
-  WidgetsBinding.instance.addObserver(_ShoppingResume(dispatcher));
+  WidgetsBinding.instance.addObserver(_ShoppingResume(coordinator));
   return coordinator;
 }
 
 class _ShoppingResume with WidgetsBindingObserver {
-  _ShoppingResume(this.dispatcher);
-  final ShoppingMutationDispatcher dispatcher;
+  _ShoppingResume(this.coordinator);
+  final ShoppingCoordinator coordinator;
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
-      unawaited(dispatcher.recoverObservation().catchError((Object _) {}));
+      unawaited(coordinator.recover().catchError((Object _) {}));
     }
   }
 }

@@ -43,6 +43,11 @@ class ShoppingProjection {
           continue;
         }
         if (applied) {
+          // APPLIED is the durable completion signal for ADD, not observation
+          // of its target. The target may already have been deleted. Hand off
+          // to canonical state even when its query snapshot is still behind.
+          // Keep the receipt itself for dependency identity/revision resolution.
+          if (child.type == ShoppingMutationType.add) continue;
           final id = result!['itemId'] as String?;
           final revision = result['revision'];
           final current = authoritative[id];
@@ -119,6 +124,21 @@ class ShoppingProjection {
         }
         switch (child.type) {
           case ShoppingMutationType.edit:
+            final collision = visible.values.any(
+              (i) =>
+                  i.id != target.id &&
+                  i.name == child.name &&
+                  i.unit == child.unit,
+            );
+            if (collision) {
+              // Do not manufacture a merge target or duplicate logical row.
+              // The server's actual target/revision resolves this operation.
+              visible[target.id] = target.project(
+                actionId: request.mutationId,
+                childIndex: i,
+              );
+              break;
+            }
             visible[target.id] = target.project(
               name: child.name,
               quantity: child.quantity,

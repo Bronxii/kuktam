@@ -33,11 +33,18 @@ void main() {
     () async {
       final f = Fixture(), g = Gateway();
       var cleared = 0;
+      final shoppingUids = <String>[];
       final repo = AccountDeletionRepository(
         firebaseAuth: f.auth,
         firestore: f.db,
         googleSignIn: f.google,
         coordination: g,
+        onLocalShoppingDeletionAccepted: (uid) async {
+          expect(g.begins, 2);
+          expect(uid, f.user.uid);
+          expect(f.db.deleted, isEmpty);
+          shoppingUids.add(uid);
+        },
         onDeletionStarted: () async {
           expect(f.db.deleted, isEmpty);
           cleared++;
@@ -51,9 +58,11 @@ void main() {
         throwsStateError,
       );
       expect(cleared, 0);
+      expect(shoppingUids, isEmpty);
       g.onBegin = null;
       await repo.deleteCurrentAccount(password: 'secret');
       expect(cleared, 1);
+      expect(shoppingUids, [f.user.uid]);
       expect(f.user.deletes, 0);
     },
   );

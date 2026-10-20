@@ -26,6 +26,8 @@ class ShoppingMutationDispatcher {
   int _generation = 0;
   String _observedKey = '';
   final _sending = <String>{};
+  final _inFlight = <String>{};
+  int _observationGeneration = 0;
   Future<void> _tail = Future.value();
   bool _closed = false;
 
@@ -40,16 +42,19 @@ class ShoppingMutationDispatcher {
       currentUid() == uid;
 
   Future<void> bind(String? uid) async {
-    _generation++;
+    final generation = ++_generation;
+    _observationGeneration++;
     _uid = uid;
     _observedKey = '';
     _sending.clear();
     final previous = _observer;
     _observer = null;
     await previous?.cancel();
+    if (_closed || generation != _generation) return;
     if (!_closed) _changes.add(null);
     if (uid != null) {
       await ShoppingIntentQueue(outbox).materialize(uid);
+      if (!_current(uid, generation)) return;
       await refresh();
     }
   }
@@ -77,6 +82,7 @@ class ShoppingMutationDispatcher {
   }
 
   Future<void> recoverObservation() async {
+    _sending.removeWhere((id) => !_inFlight.contains(id));
     _observedKey = '';
     await refresh();
   }
@@ -141,17 +147,28 @@ class ShoppingMutationDispatcher {
     final key = ids.join('/');
     if (key == _observedKey) return;
     _observedKey = key;
+    final observationGeneration = ++_observationGeneration;
     await _observer?.cancel();
-    if (!_current(uid, generation) || key != _observedKey) return;
+    if (!_current(uid, generation) ||
+        observationGeneration != _observationGeneration) {
+      return;
+    }
     _observer = null;
     if (ids.isEmpty) return;
     _observer = transport
         .observe(uid, ids)
         .listen(
           (snapshot) {
+            if (!_current(uid, generation) ||
+                observationGeneration != _observationGeneration) {
+              return;
+            }
             // Serial local receipt commits; listener events never race terminal state.
             _tail = _tail
-                .then((_) => _consume(uid, generation, pending, snapshot))
+                .then((_) async {
+                  if (observationGeneration != _observationGeneration) return;
+                  await _consume(uid, generation, pending, snapshot);
+                })
                 .catchError((Object _) {
                   // Storage/protocol failure leaves immutable work intact for recovery.
                   // No raw Firebase errors or shopping payloads are logged.
@@ -200,6 +217,7 @@ class ShoppingMutationDispatcher {
             r.mutationId,
             ShoppingMutationStatus.failedTerminal,
           );
+          if (!_current(uid, generation)) return;
           _sending.remove(r.mutationId);
         } else {
           ShoppingMutationStatus status;
@@ -216,6 +234,7 @@ class ShoppingMutationDispatcher {
             status,
             resultJson: jsonEncode(data['results'] ?? []),
           );
+          if (!_current(uid, generation)) return;
           if (status.terminal) _sending.remove(r.mutationId);
         }
         changed = true;
@@ -228,7 +247,8 @@ class ShoppingMutationDispatcher {
             ShoppingMutationStatus.resultExpired,
           );
           changed = true;
-        } else if (_sending.add(r.mutationId)) {
+        } else if (!_inFlight.contains(r.mutationId) &&
+            _sending.add(r.mutationId)) {
           // Do not await remote acknowledgement: local enqueue already committed.
           unawaited(_send(uid, generation, r));
         }
@@ -236,6 +256,7 @@ class ShoppingMutationDispatcher {
     }
     if (changed && _current(uid, generation)) {
       await ShoppingIntentQueue(outbox).materialize(uid);
+      if (!_current(uid, generation)) return;
       _changes.add(null);
       await refresh();
     }
@@ -246,6 +267,7 @@ class ShoppingMutationDispatcher {
     int generation,
     ShoppingMutationRequest request,
   ) async {
+    _inFlight.add(request.mutationId);
     try {
       if (!_current(uid, generation)) return;
       await transport.create(request);
@@ -269,6 +291,10 @@ class ShoppingMutationDispatcher {
         try {
           final receipt = await transport.lookup(uid, [request.mutationId]);
           if (!_current(uid, generation)) return;
+          if (!receipt.fromServer) {
+            _sending.remove(request.mutationId);
+            return;
+          }
           if (receipt.documents.containsKey(request.mutationId)) {
             await _consume(uid, generation, [
               ShoppingOutboxEntry(
@@ -290,14 +316,20 @@ class ShoppingMutationDispatcher {
             await outbox.recordResult(uid, request.mutationId, outcome);
             if (_current(uid, generation)) {
               await ShoppingIntentQueue(outbox).materialize(uid);
+              if (!_current(uid, generation)) return;
               _changes.add(null);
               await refresh();
             }
           }
         } catch (_) {
           // Uncertain historical result remains pending; never mint a new ID.
+          if (_current(uid, generation)) _sending.remove(request.mutationId);
         }
+      } else {
+        _sending.remove(request.mutationId);
       }
+    } finally {
+      _inFlight.remove(request.mutationId);
     }
   }
 

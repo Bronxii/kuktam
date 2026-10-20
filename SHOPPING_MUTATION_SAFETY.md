@@ -1,3 +1,19 @@
+## H1C update — PASS, 2026-10-20
+
+SQLite v6 backfills old accepted work, uses indexed bounded projection states, and adds UID-specific deletion tombstones/cleanup after backend acceptance. Normal sign-out retains work. Upgrade, history/starvation, dependency, overlay, partial bulk/clear and cleanup tests pass. Shopping: 263 PASS; combined targeted shopping/deletion: 297 PASS; final deletion callback recheck: 13 PASS (overlapping). Analyzer/diff-check PASS. See S1B_CHECKPOINT_2026-10-19.md for exact semantics and evidence. H1 complete; H2 is next and was NOT run. S1B acceptance/S1C/Phase 4B remain NO.
+
+## H1B update — PASS, 2026-10-19
+
+Session/household/observer fencing, serialized authority persistence, fail-closed ensure classification, offline invalidation persistence and live-send-safe dispatcher recovery are hardened. A testable production session registry preserves rebuild independence. Shopping 245 PASS / 0 FAIL; analyzer/diff-check PASS. No backend or production changes. See S1B_CHECKPOINT_2026-10-19.md for exact model/evidence. H1C remains; H1/S1B are not complete, H2/S1C/Phase 4B not started.
+
+## H1A update — PASS, 2026-10-19
+
+APPLIED ADD receipts now end the optimistic contribution immediately, independent of target query observation. ADD requires no absence lookup. Canonical state takes over (temporarily old/empty snapshots are allowed); no fake canonical state, replay, polling or backend/schema change. Created/merged ordering, delete/update, reopen and dependencies passed in 227 shopping tests; analyzer/diff-check PASS. See S1B_CHECKPOINT_2026-10-19.md for evidence. Earlier ghost-blocker statements below are historical. Remaining H1 is incomplete; H2/S1C/Phase 4B remain blocked.
+
+## H1 status update — 2026-10-19
+
+H1 is NOT accepted: a positive absence lookup followed by deletion before canonical observation can leave a ghost pending row. The deterministic STOP characterization reproduces it. Read S1B_CHECKPOINT_2026-10-19.md for partial fixes, validation and remaining H1 work. Actual baseline is 8b6255ce0ff6d604ff70c85c74ac2e6ac170cdc2; SQLite is now v5 in the uncommitted H1 worktree. Earlier status below is historical. H2/S1C/Phase 4B are not ready.
+
 # Current S1B worktree checkpoint — 2026-10-19
 
 The uncommitted client cutover is paused, not accepted. Read

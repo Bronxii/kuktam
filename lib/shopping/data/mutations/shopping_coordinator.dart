@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:firebase_core/firebase_core.dart';
 import '../../domain/models/shopping_item.dart';
 import '../../domain/shopping_mutation.dart';
 import 'shopping_intent_queue.dart';
@@ -38,9 +39,11 @@ class ShoppingCoordinator {
   final String? Function() currentUid;
   final _changes = StreamController<void>.broadcast();
   Stream<void> get changes => _changes.stream;
-  List<ShoppingItem> get items => List.unmodifiable(_visible);
-  ShoppingMutationContext? get context => _context;
-  String? get notice => _notice;
+  List<ShoppingItem> get items =>
+      currentUid() == _uid ? List.unmodifiable(_visible) : const [];
+  ShoppingMutationContext? get context =>
+      currentUid() == _uid ? _context : null;
+  String? get notice => currentUid() == _uid ? _notice : null;
   StreamSubscription<void>? _receiptChanges;
   StreamSubscription<String>? _households;
   StreamSubscription<ShoppingMutationContext>? _contexts;
@@ -54,6 +57,10 @@ class ShoppingCoordinator {
   bool _closed = false;
   Future<void> _projection = Future.value();
   final _absenceChecked = <String>{};
+  final _absenceInFlight = <String>{};
+  bool _authorityDenied = false;
+  bool _authorityVerified = false;
+  Future<void> _authorityWrites = Future.value();
   Future<void> get settled => _projection;
   bool _current(String uid, int generation) =>
       !_closed &&
@@ -64,6 +71,8 @@ class ShoppingCoordinator {
   Future<void> bind(String? uid) async {
     final generation = ++_generation;
     _uid = uid;
+    _authorityDenied = false;
+    _authorityVerified = false;
     _householdGeneration++;
     _householdId = null;
     _context = null;
@@ -87,6 +96,8 @@ class ShoppingCoordinator {
     if (_closed || generation != _generation) return;
     await dispatcher.bind(uid);
     if (uid == null || !_current(uid, generation)) return;
+    if (await outbox.isDeletedUid(uid)) return;
+    if (!_current(uid, generation)) return;
     _households = backend
         .households(uid)
         .distinct()
@@ -106,6 +117,8 @@ class ShoppingCoordinator {
     final h = ++_householdGeneration;
     bool valid() => _current(uid, generation) && h == _householdGeneration;
     _householdId = id;
+    _authorityDenied = false;
+    _authorityVerified = false;
     _context = null;
     _canonical = [];
     _visible = [];
@@ -120,9 +133,14 @@ class ShoppingCoordinator {
       if (oldContexts != null) oldContexts.cancel(),
     ]);
     if (!valid()) return;
+    await _authorityWrites;
+    if (!valid()) return;
     final cached = await outbox.readContext(uid);
     if (!valid()) return;
-    if (cached?.householdId == id) _context = cached;
+    if (cached?.householdId == id) {
+      _context = cached;
+      _authorityVerified = true;
+    }
     _items = backend
         .items(uid, id)
         .listen(
@@ -135,22 +153,71 @@ class ShoppingCoordinator {
             if (valid()) _scheduleProjection();
           },
         );
-    _contexts = backend.contexts(uid, id).listen((context) {
-      if (valid()) unawaited(_confirmContext(uid, generation, h, context));
-    }, onError: (Object _) {});
+    ShoppingMutationContext? latestStreamContext;
+    _contexts = backend
+        .contexts(uid, id)
+        .listen(
+          (context) {
+            if (!valid()) return;
+            latestStreamContext = context;
+            if (_authorityVerified) {
+              unawaited(_confirmContext(uid, generation, h, context));
+            }
+          },
+          onError: (Object error) {
+            if (valid() && !transientContextFailure(error)) {
+              unawaited(_invalidateAuthority(uid, generation, h));
+            }
+          },
+        );
     _scheduleProjection();
-    final authorityBeforeEnsure = _authorityVersion;
     try {
       final fresh = await backend.ensureContext(uid);
-      if (valid() &&
-          fresh.householdId == id &&
-          authorityBeforeEnsure == _authorityVersion) {
-        await _confirmContext(uid, generation, h, fresh);
+      if (valid() && !_authorityDenied) {
+        if (fresh.uid != uid || fresh.householdId != id) {
+          await _invalidateAuthority(uid, generation, h);
+          return;
+        }
+        _authorityVerified = true;
+        // The ordered server stream may have advanced while ensure was in flight.
+        await _confirmContext(uid, generation, h, latestStreamContext ?? fresh);
       }
-    } catch (_) {
-      // No legacy writer fallback. Previously verified context remains scoped
-      // to its UID/household/epoch and server rules decide reconnection safety.
+    } catch (error) {
+      if (valid() && !transientContextFailure(error)) {
+        await _invalidateAuthority(uid, generation, h);
+      }
     }
+  }
+
+  Future<void> _invalidateAuthority(String uid, int generation, int h) async {
+    if (!_current(uid, generation) || h != _householdGeneration) return;
+    _authorityDenied = true;
+    _authorityVerified = false;
+    _authorityVersion++;
+    _context = null;
+    // Serialize after prior saves, before any returning-session cache read.
+    _authorityWrites = _authorityWrites.then((_) => outbox.clearContext(uid));
+    await _authorityWrites;
+    if (_current(uid, generation) && h == _householdGeneration) {
+      _scheduleProjection();
+    }
+  }
+
+  static bool transientContextFailure(Object error) =>
+      error is TimeoutException ||
+      error is FirebaseException &&
+          const {
+            'unavailable',
+            'deadline-exceeded',
+            'network-request-failed',
+            'resource-exhausted',
+            'aborted',
+          }.contains(error.code);
+
+  Future<void> recover() async {
+    _absenceChecked.removeWhere((id) => !_absenceInFlight.contains(id));
+    await dispatcher.recoverObservation();
+    _scheduleProjection();
   }
 
   Future<void> _confirmContext(
@@ -159,14 +226,24 @@ class ShoppingCoordinator {
     int h,
     ShoppingMutationContext context,
   ) async {
-    if (!_current(uid, generation) ||
+    if (_authorityDenied ||
+        !_current(uid, generation) ||
         h != _householdGeneration ||
         context.uid != uid ||
         context.householdId != _householdId) {
       return;
     }
     final authorityVersion = ++_authorityVersion;
-    await outbox.saveContext(context);
+    _authorityWrites = _authorityWrites.then((_) async {
+      if (_authorityDenied ||
+          !_current(uid, generation) ||
+          h != _householdGeneration ||
+          authorityVersion != _authorityVersion) {
+        return;
+      }
+      await outbox.saveContext(context);
+    });
+    await _authorityWrites;
     if (!_current(uid, generation) ||
         h != _householdGeneration ||
         authorityVersion != _authorityVersion) {
@@ -207,7 +284,11 @@ class ShoppingCoordinator {
       final candidates = <Map<String, Object?>>[];
       for (final row in rows) {
         final id = row['id'] as String;
-        if (_absenceChecked.contains(id) || row['result'] == null) continue;
+        if (_absenceChecked.contains(id) ||
+            _absenceInFlight.contains(id) ||
+            row['result'] == null) {
+          continue;
+        }
         if (!ShoppingMutationStatusContract.parse(
           row['status'] as String?,
         ).terminal) {
@@ -222,6 +303,7 @@ class ShoppingCoordinator {
         final results = jsonDecode(row['result'] as String) as List;
         for (var index = 0; index < results.length; index++) {
           if (index >= request.children.length ||
+              request.children[index].type == ShoppingMutationType.add ||
               request.children[index].type == ShoppingMutationType.delete ||
               results[index] is! Map) {
             continue;
@@ -239,6 +321,7 @@ class ShoppingCoordinator {
       if (missing.isNotEmpty) {
         for (final row in candidates) {
           _absenceChecked.add(row['id'] as String);
+          _absenceInFlight.add(row['id'] as String);
         }
         unawaited(
           _resolveAbsences(
@@ -297,11 +380,9 @@ class ShoppingCoordinator {
     List<Map<String, Object?>> rows,
   ) async {
     try {
-      final absent = await verifier.absentItems(
-        uid,
-        context.householdId,
-        missing.toList(),
-      );
+      final absent = await verifier
+          .absentItems(uid, context.householdId, missing.toList())
+          .timeout(const Duration(seconds: 15));
       for (final row in rows) {
         if (!_current(uid, generation) ||
             h != _householdGeneration ||
@@ -321,6 +402,10 @@ class ShoppingCoordinator {
     } catch (_) {
       // A network lookup never holds local UI acceptance hostage. Unknown
       // absence stays unknown, and the next session may obtain fresh proof.
+    } finally {
+      for (final row in rows) {
+        _absenceInFlight.remove(row['id'] as String);
+      }
     }
   }
 
@@ -335,10 +420,20 @@ class ShoppingCoordinator {
 
   ShoppingMutationContext requireContext() {
     final c = _context;
-    if (c == null || c.uid != currentUid() || c.uid != _uid) {
+    if (_authorityDenied ||
+        c == null ||
+        c.uid != currentUid() ||
+        c.uid != _uid) {
       throw StateError('Shopping context unavailable');
     }
     return c;
+  }
+
+  /// Called only after backend deletion acceptance, never on ordinary sign-out.
+  Future<void> deleteLocalAccount(String uid) async {
+    if (_uid == uid) await bind(null);
+    await _authorityWrites;
+    await outbox.deleteUid(uid);
   }
 
   Future<void> add(List<ShoppingMutationChild> children) async {

@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:kuktam/shopping/data/mutations/shopping_coordinator.dart';
 import 'package:kuktam/shopping/data/mutations/shopping_mutation_dispatcher.dart';
@@ -24,7 +25,7 @@ class ClientBackend implements ShoppingCoordinatorBackend {
       offline ? const Stream.empty() : Stream.value(testContext(uid, hid));
   @override
   Future<ShoppingMutationContext> ensureContext(String uid) async {
-    if (offline) throw StateError('offline');
+    if (offline) throw FirebaseException(plugin: 'test', code: 'unavailable');
     return testContext(uid, 'home-$uid');
   }
 
@@ -65,12 +66,14 @@ class ClientTransport implements ShoppingMutationTransport {
 }
 
 class ClientFixture {
+  ClientFixture({ClientBackend? backend})
+    : backend = backend ?? ClientBackend();
   late Directory directory;
   late ShoppingOutbox box;
   late ShoppingCoordinator client;
   late ShoppingMutationDispatcher dispatcher;
   final auth = RecipeTestAuth();
-  final backend = ClientBackend();
+  final ClientBackend backend;
   final transport = ClientTransport();
   late ShoppingRepository repository;
   Future<void> open() async {
@@ -83,7 +86,7 @@ class ClientFixture {
     await start();
   }
 
-  Future<void> start() async {
+  Future<void> start({bool waitForContext = true}) async {
     dispatcher = ShoppingMutationDispatcher(
       outbox: box,
       transport: transport,
@@ -99,7 +102,12 @@ class ClientFixture {
       firebaseAuth: auth,
       coordinator: Future.value(client),
     );
-    await bind('A');
+    if (waitForContext) {
+      await bind('A');
+    } else {
+      auth.currentUser = RecipeTestUser('A');
+      await client.bind('A');
+    }
   }
 
   Future<void> bind(String? uid) async {
@@ -112,9 +120,17 @@ class ClientFixture {
     await client.settled;
   }
 
-  Future<void> restart() async {
+  Future<void> restart({bool waitForContext = true}) async {
     await client.close();
     await box.close();
+    box = await ShoppingOutbox.open(
+      factory: databaseFactoryFfiNoIsolate,
+      path: '${directory.path}/journal.db',
+    );
+    await start(waitForContext: waitForContext);
+  }
+
+  Future<void> reopenDatabase() async {
     box = await ShoppingOutbox.open(
       factory: databaseFactoryFfiNoIsolate,
       path: '${directory.path}/journal.db',
