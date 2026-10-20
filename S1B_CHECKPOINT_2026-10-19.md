@@ -1,3 +1,87 @@
+## H2B bulk native durability — PASS, 2026-10-20
+
+Baseline: clean committed H2A `33ad58347ebea3de81bc2c5febe5094e4e873bac`.
+Only the local native harness, new H2B integration test and evidence docs change.
+Application/backend business source, rules, Image Import and production unchanged.
+
+Environment reused safely: Kuktam_H2A_Local / emulator-5580 / Android 35 x86_64;
+demo-kuktam-local only, Firestore :8088, Auth :9098, fixture :8099, hub :4408,
+logging :4508 on host loopback (Android reaches host at 10.0.2.2). Fresh Firebase
+emulator state and dedicated test app data at whole-run start; never clear data
+or uninstall between phases. No real device/user data touched.
+
+Native acceptance run has four phases:
+1. death-queued: production addOrMergeItems accepts two independent offline BULK
+   parents, exactly 50 and 200 children, each atomically in real SQLite. The
+   projected rows/normalized quantities are verified, complete original requests
+   and IDs persisted, then abrupt am force-stop (PID 4712). No graceful close.
+2. death-partial: restart STILL offline verifies identical requests/IDs and both
+   reconstructed projections. Reconnect with automatic processing paused. Actual
+   ShoppingMutationStore processes exactly 17/50 and 73/200 children through
+   calls bounded to at most 20 steps each. SQLite records PROCESSING and the
+   result prefix; applied rows are canonical and unresolved suffix remains pending.
+   Disable networking and force-stop again with SQLite/coordinator open (PID 4887).
+3. complete: restart offline verifies exact persisted partial SQLite rows, original
+   requests/IDs, nonterminal parents and reconstructed rows. One deterministic
+   network flap advances child 18 of the 50 parent while client networking is off.
+   Receipt observation resumes, then normal harness dispatch finishes both parents.
+   All 250 results complete; no accepted child is lost. Original result prefixes
+   are byte-equivalent after JSON decoding. Household shoppingRevision is exactly
+   250 before any later fixtures, and every canonical item's revision equals its
+   last actual receipt revision. This uses the existing household-global sequence,
+   NOT an incorrect assumption that each new item's revision starts at 1.
+4. reopen: another native launch after completion proves both parents remain
+   APPLIED, outbox has no unresolved entries, IDs unchanged, canonical counts,
+   quantities and receipt-matching revisions unchanged. No child is resubmitted.
+
+Each bulk includes 300 ml + 2 l + 500 ml of the same normalized product and a
+separate 1 db item. Result: one 2800 ml row plus one db row. Therefore 50 children
+produce 48 canonical rows and 200 produce 198, intentionally; all other quantities
+are checked individually. No truncation/phantom child, duplicate logical effect
+or projection starvation observed. Child identity in the actual protocol is
+(immutable parent mutationId, immutable payload array index), not a separate
+client-generated ID per child. Exact persisted payload equality preserves it.
+
+Mixed-state native test uses the real clearShoppingList facade with four observed
+items. First three results: APPLIED, REJECTED_STALE (authoritative +500 survives),
+REJECTED_NOT_FOUND; fourth still pending and parent nonterminal. Advance epoch,
+process final child -> REJECTED_CONTEXT_CHANGED; parent PARTIAL/terminal, successful
+sibling stays deleted and one aggregate notice is available. No receipt is forged.
+No held child is manufactured: dependency behavior is already covered by H1/H2A.
+Within one parent the server's cursor/results contract is a sequential prefix;
+child 40-before-child 3 delivery is not naturally supported and was NOT simulated
+by violating that contract. Different parent continuation can interleave normally.
+
+Parent completion remains the existing server criterion: results cover all children,
+including explicit context-rejected suffixes. Client nonterminal requests remain
+in the outbox; terminal results remove pending contributions, and held intents
+would still prevent the existing done check from succeeding. No polling added.
+Observation architecture unchanged: 1 canonical listener, at most 1 bounded
+receipt observer (max 10 parent IDs, 2 bulk parents here), no per-child listener.
+Test-only firstWhere server-command barriers terminate on their matching event.
+This is a scoped sanity check, not H3's final listener/source audit. Firestore
+read/write counts were not instrumented; no cost optimization performed.
+
+Evidence: 2 completed native test phases PASS / 0 unexpected failures in final run;
+2 separately verified intentional force-stops with successful subsequent assertions;
+harness exit 0. Killed Flutter runners report expected "did not complete" and
+temporary listener finalization errors; those are not counted as passed tests.
+Debug/native APK builds PASS. Shopping/analyzer/diff results are recorded in the
+progress report. Backend business code untouched; no backend suites/build rerun.
+Local Firebase processes and dedicated AVD stopped; test ports released.
+
+Reproduce with the H2A safety setup but KUKTAM_E2E_SCOPE=H2B and the same local
+emulators:exec command. Final log: %TEMP%\kuktam-h2b-acceptance.log. Earlier harness
+development failures (missing test extension import and incorrect revision assertion)
+were corrected without application changes and do not count as acceptance evidence.
+
+Files: functions/scripts/shopping-client-e2e.cjs;
+integration_test/shopping_h2b_e2e_test.dart (new); this checkpoint;
+S1B_PROGRESS_REPORT.md; SHOPPING_MUTATION_SAFETY.md.
+Next ONLY H2C account/session switch + multi-client conflicts. H3 full validation
+and S1C cutoff remain separate. H2 COMPLETE: NO. S1B ACCEPTED: NO.
+S1C READY: NO. PHASE 4B READY: NO. Production/deploy/commit/push: NONE.
+
 ## H2A single-client native durability — PASS, 2026-10-20
 
 Baseline: clean committed H1, `05310fecb28eb91b45179f11b49001b8b9c1c846`

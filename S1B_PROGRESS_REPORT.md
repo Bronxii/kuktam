@@ -1,3 +1,20 @@
+## H2B update — PASS, 2026-10-20
+
+Baseline 33ad58347ebea3de81bc2c5febe5094e4e873bac. Real native demo stack proves
+50/200 offline bulk acceptance, unchanged parent/payload-index identities after
+offline process restart, partial 17/73-child progress, a second abrupt force-stop,
+resume, one event-gated network flap, exact quantities and no repeated effects.
+Mixed APPLIED/STALE/NOT_FOUND/pending then CONTEXT_CHANGED yields correct PARTIAL
+completion and aggregate notice. Completed-parent reopen does not replay work.
+Two completed native phases PASS; two independently verified deliberate process
+terminations followed by passing checks; harness exit 0. Debug APK PASS.
+Final shopping Flutter: 263 PASS / 0 FAIL. Analyzer PASS (no issues),
+JavaScript harness syntax PASS, git diff --check PASS including new test file.
+Only test/harness/docs changed; backend business source untouched. See checkpoint
+for exact fixture, revisions, sequential receipt contract and limitations.
+Next H2C only. H2 complete/S1B accepted/S1C ready/Phase 4B ready: NO.
+Production changes/deploy/commit/push: NONE.
+
 ## H2A update — PASS, 2026-10-20
 
 Starting committed H1: `05310fecb28eb91b45179f11b49001b8b9c1c846`.

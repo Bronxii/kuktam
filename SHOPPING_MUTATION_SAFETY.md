@@ -1,3 +1,15 @@
+## H2B bulk native evidence — PASS, 2026-10-20
+
+Real SQLite/FlutterFire/S1A validation now covers 50 and 200 children through
+offline acceptance, two abrupt process deaths, partial 17/73-child progress,
+reconnect, mixed terminal outcomes and completed-parent reopen. No protocol or
+application change was required. Child identity is immutable parent ID plus array
+index; server receipts are an ordered prefix, not independently delivered child
+documents. Exact quantities, unchanged prefix receipts and household-global
+revision checks prove no repeated logical effects in the tested scenarios.
+See S1B_CHECKPOINT_2026-10-19.md for complete evidence and test boundaries.
+H2C/H3/S1C remain unperformed; S1B is NOT accepted. No production changes.
+
 ## H2A native evidence — PASS, 2026-10-20
 
 Current H1 client protocol now has real single-client native evidence using
