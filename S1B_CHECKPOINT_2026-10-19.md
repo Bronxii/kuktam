@@ -1,3 +1,89 @@
+## H2C1 account/session native isolation — PASS, 2026-10-21
+
+Baseline: clean committed H2B `9db148a3bb5eed116c3c6c36de21ad10cdc5f8d3`.
+Only the local harness, new native test and evidence documentation changed.
+Production Dart, S1A business backend, rules and Image Import remain unchanged.
+
+Environment: Kuktam_H2A_Local / emulator-5580 / Android 35 x86_64;
+demo-kuktam-local, Firestore 127.0.0.1:8088, Auth :9098, fixture :8099,
+hub :4408, logging :4508. Android uses host loopback alias 10.0.2.2.
+AVD identity is checked before resetting dedicated test app data at run start.
+No uninstall/data reset between phases. Real user device/data is not used.
+Firebase emulators and dedicated Android emulator were stopped after acceptance.
+
+Native test uses one real Firebase Auth instance, real SQLite file and the actual
+ShoppingCoordinatorRegistry, ShoppingCoordinator, dispatcher, intent queue,
+projection, repository and Firestore transport. Auth state changes bind that same
+coordinator; registry opener count remains one per process despite repeated gets.
+Test bootstrap supplies demo Firebase instances instead of the production singleton
+factory. Callable delivery is the existing local fixture invoking the actual
+ShoppingMutationStore.ensureContext; mutation processing uses actual S1A store.
+No fabricated context, mutation result, canonical item or receipt is substituted.
+
+Three native phases:
+1. death-transition: A accepts offline ADD in SQLite and displays it pending.
+   Sign-out clears active projection/notice/authority and all A subscriptions,
+   but preserves original request and mutation ID. B signs in, accepts its own
+   pending ADD, then completes it using the real processor. A remains pending
+   and unchanged in SQLite, invisible to B. A/B IDs differ. Host runs
+   `adb -s emulator-5580 shell am force-stop com.bronxii.kuktam` while B is active
+   and coordinator/SQLite are open. PID 4132 existed before and none afterward;
+   no graceful close. A manifest was flushed before the signal.
+2. resume-transition: restart restores Auth B, B canonical state and invisible A
+   request with byte-equivalent decoded payload/ID. Return to A processes its
+   original ADD exactly once: one row, quantity 3, unchanged request; B row is
+   absent from A's private list. Delayed real ensure completions are released
+   across A->B, B->A, and A->sign-out->A. For same-UID relogin the new session's
+   epoch is advanced before old completion, proving it cannot downgrade authority.
+   Pending same-UID work keeps its ID and receives CONTEXT_CHANGED, never rebases.
+   Separate same-session E1->E2 test retains old request epoch, rejects it and
+   accepts a new E2 action. Durable rejection notices are hidden from B and
+   restored to A without duplicate IDs. Local family fixture switches A from
+   private H1 to H2; delayed H1 completion cannot overwrite H2, old request stays
+   H1/E1 and is rejected, new action targets H2. Server H2 contains only its new
+   item. This is a structural test fixture, NOT JOIN or multi-client execution.
+   Actual local runtime gate denial clears SQLite authority; new submission fails.
+3. invalid-reopen: a separate app launch starts with Firestore networking disabled,
+   Auth A retained and previously invalidated authority absent. It cannot create a
+   new mutation from old cache. A and B UID-scoped persistent mutation rows remain
+   intact and correctly bound. This last cache test uses a normal close/relaunch;
+   abrupt process-death proof is specifically phase 1 followed by phase 2.
+
+Deterministic delayed callback injection covers actual ensure-context Future
+completion (one of the requested callback types), not every SDK callback type
+individually. Canonical/household/authority/receipt subscriptions are real and
+instrumented at subscribe/cancel boundaries; inactive UID counts are zero.
+At active checkpoints: one coordinator/dispatcher, one canonical listener,
+one household and one authority listener, at most one receipt observer with
+1..10 parent IDs. Maximum simultaneous canonical/receipt subscriptions <=1.
+Signed out: zero listeners/observers. No polling or per-mutation listener added.
+No new logical mutation ID, context rebinding or duplicate effect in tested flows.
+These are targeted H2C1 observations, not H3's final source/read-budget audit.
+
+Validation on final test source:
+- Native: 2 completed phases PASS (9s and 1s), 1 independently verified intentional
+  process termination with passing resume; entire harness exit 0.
+- The killed Flutter test deliberately reports did-not-complete; it is not counted
+  as a normally completed passing test. Host PID verification and resume assertions
+  are its durability evidence. Runner cleanup warning after force-stop is expected.
+- Shopping Flutter: 263 PASS / 0 FAIL (`flutter test test/shopping --reporter expanded`).
+- Flutter analyze: PASS / no issues (6.9s).
+- Android debug/native APK: PASS, built and installed for all three phases.
+- JavaScript harness syntax and git diff --check (including new native file): PASS.
+- Backend business source untouched; backend suites/build not rerun.
+- Initial harness-only failure tried reusing a deleted FirebaseApp in the same
+  process. Moving cache proof to a separate app launch resolved it; no product fix.
+
+Reproduce after dedicated AVD boot and fresh dedicated test app data:
+`$env:KUKTAM_E2E_SCOPE='H2C1'`
+`node .\functions\node_modules\firebase-tools\lib\bin\firebase.js emulators:exec --only firestore,auth --project demo-kuktam-local --config firebase.shopping-e2e.json 'node functions/scripts/shopping-client-e2e.cjs'`
+Local evidence logs: `%TEMP%\kuktam-h2c1-acceptance.log`,
+`%TEMP%\kuktam-h2c1-shopping.log`, `%TEMP%\kuktam-h2c1-analyze.log`.
+
+Next: H2C2 multi-client concurrent conflicts ONLY, then H3 and S1C separately.
+H2 COMPLETE: NO. S1B ACCEPTED: NO. S1C READY: NO. PHASE 4B READY: NO.
+Production changes/deploy/commit/push: NONE. No production gate or IAM changes.
+
 ## H2B bulk native durability — PASS, 2026-10-20
 
 Baseline: clean committed H2A `33ad58347ebea3de81bc2c5febe5094e4e873bac`.

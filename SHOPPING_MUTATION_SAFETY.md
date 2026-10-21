@@ -1,3 +1,19 @@
+## H2C1 native session isolation evidence — PASS, 2026-10-21
+
+The current protocol/coordinator now has real demo-stack evidence for pending
+A->B->A recovery, same-UID session-generation fencing, H1->H2 and E1->E2 binding,
+persistent notice isolation and invalid write-authority cache removal across
+relaunch. Abrupt process death while B is active preserves inactive A's original
+SQLite request without resurrecting A subscriptions. No protocol/business-code
+change was required. Actual ensure results are delayed by event gates; all
+Firestore reads/writes and S1A execution remain real local emulator operations.
+One coordinator, one canonical listener and <=1 receipt observer (<=10 parents)
+were measured at the native session boundaries. No polling added. This is not
+H3's full source/read audit. Exact phases and evidence: S1B_CHECKPOINT_2026-10-19.md.
+Shopping 263 PASS, analyzer/native APK/diff check PASS; two completed native phases
+and one verified abrupt termination with passing recovery, harness exit 0.
+H2C2/H3/S1C remain; S1B is NOT accepted. Production unchanged.
+
 ## H2B bulk native evidence — PASS, 2026-10-20
 
 Real SQLite/FlutterFire/S1A validation now covers 50 and 200 children through

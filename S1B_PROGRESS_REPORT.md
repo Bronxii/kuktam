@@ -1,3 +1,22 @@
+## H2C1 update — PASS, 2026-10-21
+
+Baseline `9db148a3bb5eed116c3c6c36de21ad10cdc5f8d3` (committed H2B).
+Actual native demo stack now proves A->B->A, pending sign-out/same-UID relogin,
+late ensure callback fencing across sessions and household/epoch changes,
+UID-bound SQLite recovery, isolated durable notices and invalid authority cache
+rejection after offline relaunch. One real abrupt am force-stop with B active
+and A pending; restart restores B without activating A, then A recovers its ID.
+One coordinator/canonical listener and <=1 bounded receipt observer observed;
+inactive UID subscriptions detach. No production-code change was needed.
+
+Final validation: 2 completed native phases PASS plus 1 verified intentional
+process death and passing recovery, harness exit 0; shopping 263 PASS / 0 FAIL;
+analyzer PASS; native debug APK PASS; harness syntax/diff check PASS.
+Backend business source untouched. Only native test/harness/docs modified.
+See checkpoint for exact measurement boundaries and local-only fixture design.
+Next H2C2, not started. H2 complete/S1B accepted/S1C ready/Phase 4B ready: NO.
+Production changes/deploy/commit/push: NONE.
+
 ## H2B update — PASS, 2026-10-20
 
 Baseline 33ad58347ebea3de81bc2c5febe5094e4e873bac. Real native demo stack proves
