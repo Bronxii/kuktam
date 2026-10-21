@@ -9,8 +9,9 @@ const {execFileSync}=require('node:child_process');
 const h2a=process.env.KUKTAM_E2E_SCOPE==='H2A';
 const h2b=process.env.KUKTAM_E2E_SCOPE==='H2B';
 const h2c1=process.env.KUKTAM_E2E_SCOPE==='H2C1';
+const h2c2a=process.env.KUKTAM_E2E_SCOPE==='H2C2A';
 const adb=path.join(process.env.LOCALAPPDATA,'Android/Sdk/platform-tools/adb.exe');
-if(h2a||h2b||h2c1){
+if(h2a||h2b||h2c1||h2c2a){
  const avd=execFileSync(adb,['-s','emulator-5580','emu','avd','name'],{encoding:'utf8'});
  if(!avd.split('\n').map(s=>s.trim()).includes('Kuktam_H2A_Local'))throw Error('Dedicated H2A AVD required');
 }
@@ -26,7 +27,7 @@ const {HouseholdStore}=require('../lib/src/households/household-store');
 const {newMutationId}=require('../lib/src/shopping/mutation-contract');
 const app=initializeApp({projectId:'demo-kuktam-local'}),db=getFirestore(app),auth=getAuth(app);
 const store=new ShoppingMutationStore(db),households=new HouseholdStore(db);
-let paused=h2b;const running=new Map(),queued=new Map();
+let paused=h2b||h2c2a;const running=new Map(),queued=new Map();
 async function execute(uid,id){
  const key=uid+'/'+id;if(paused||running.has(key))return;
  const work=(async()=>{let status;do{status=await store.process(uid,id,20);}while(status==='PROCESSING');})();
@@ -52,6 +53,18 @@ const server=http.createServer(async(req,res)=>{
    case '/crash-ready':
     if(!(h2a||h2b||h2c1)||!crashReady)throw Error('Unexpected crash request');
     crashReady();break;
+   case '/process-selected':{
+    if(!h2c2a||!paused||!Array.isArray(input.commands)||input.commands.length<1||input.commands.length>3||!['concurrent','ordered'].includes(input.mode))throw Error('Bounded paused H2C2A commands required');
+    const refs=input.commands.map(c=>{
+      if(!/^client-[ab]$/.test(c.uid)||typeof c.id!=='string'||! /^[A-Za-z0-9_-]+$/.test(c.id))throw Error('Invalid local command');
+      return db.doc(`users/${c.uid}/shoppingMutations/${c.id}`);
+    });
+    const before=await db.getAll(...refs);
+    if(before.some(d=>!d.exists))throw Error('All commands must arrive before processing');
+    if(input.mode==='concurrent')await Promise.all(input.commands.map(c=>store.process(c.uid,c.id,1)));
+    else for(const c of input.commands)await store.process(c.uid,c.id,1);
+    result={receipts:(await db.getAll(...refs)).map(d=>({id:d.id,actorUid:d.get('actorUid'),status:d.get('status'),results:d.get('results')}))};break;
+   }
    case '/step':{
     if(!h2b||!paused||!Number.isInteger(input.steps)||input.steps<1||input.steps>200||typeof input.id!=='string')throw Error('Paused bounded H2B step required');
     for(let n=input.steps;n>0;n-=20)await store.process(uid,input.id,Math.min(n,20));
@@ -106,13 +119,13 @@ server.listen(8099,'127.0.0.1',async()=>{
  const flutter=process.env.KUKTAM_TEST_FLUTTER||'D:\\Flutter\\bin\\flutter.bat';
  const root=path.resolve(__dirname,'../..');
  try{
-  for(const phase of h2c1?['death-transition','resume-transition','invalid-reopen']:h2b?['death-queued','death-partial','complete','reopen']:h2a?['single','death-add','resume-add','death-edit','resume-edit']:['main','restart']){
+  for(const phase of h2c2a?['online']:h2c1?['death-transition','resume-transition','invalid-reopen']:h2b?['death-queued','death-partial','complete','reopen']:h2a?['single','death-add','resume-add','death-edit','resume-edit']:['main','restart']){
    const death=phase.startsWith('death-');
    let signal;
    const crash=new Promise(resolve=>{signal=resolve;});
    crashReady=death?signal:null;
    const code=await new Promise((resolve,reject)=>{
-    const child=spawn('cmd.exe',['/d','/c',flutter,'test',h2c1?'integration_test/shopping_h2c1_e2e_test.dart':h2b?'integration_test/shopping_h2b_e2e_test.dart':h2a?'integration_test/shopping_h2a_e2e_test.dart':'integration_test/shopping_mutation_e2e_test.dart','-d','emulator-5580','--no-uninstall',`--dart-define=SHOPPING_E2E_PHASE=${phase}`],{cwd:root,stdio:'inherit'});
+    const child=spawn('cmd.exe',['/d','/c',flutter,'test',h2c2a?'integration_test/shopping_h2c2a_e2e_test.dart':h2c1?'integration_test/shopping_h2c1_e2e_test.dart':h2b?'integration_test/shopping_h2b_e2e_test.dart':h2a?'integration_test/shopping_h2a_e2e_test.dart':'integration_test/shopping_mutation_e2e_test.dart','-d','emulator-5580','--no-uninstall',`--dart-define=SHOPPING_E2E_PHASE=${phase}`],{cwd:root,stdio:'inherit'});
     let killed=false,watchdog;
     if(death)crash.then(()=>{
      try{

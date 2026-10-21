@@ -1,3 +1,19 @@
+## H2C2A online multi-client evidence — PASS, 2026-10-21
+
+Two independent named native Firebase apps with separate Auth/Firestore state,
+SQLite files and coordinator/dispatcher instances now exercise concurrent online
+S1A execution in the guarded demo shared-household fixture. ADD deltas accumulate
+exactly once, both forced creator/merge orders preserve 2300 ml, three contributions
+preserve 2800 ml, and terminal command replay leaves canonical revision unchanged.
+Revision-bound stale EDIT/DELETE/CHECK reject newer-state overwrite; real delivery
+gates prove optimistic rollback without disabling networking. Same-state concurrent
+CHECK still uses strict revision matching: one APPLIED, one STALE. Canonical views
+converge on both clients without refresh. No protocol or product code change.
+Native 1 PASS (11 focused checks), targeted Flutter 85 PASS, analyzer/APK/diff PASS.
+This is online two-client evidence on one dedicated AVD, not offline multi-client
+or lifecycle acceptance. See checkpoint for guards, orchestration and exact results.
+H2C2B, H3 and S1C remain; S1B not accepted. Production unchanged.
+
 ## H2C1 native session isolation evidence — PASS, 2026-10-21
 
 The current protocol/coordinator now has real demo-stack evidence for pending

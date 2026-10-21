@@ -1,3 +1,88 @@
+## H2C2A basic online multi-client concurrency — PASS, 2026-10-21
+
+Baseline: clean committed H2C1 `4860b58139108db81e79d8030fba9aac72fd8698`.
+Scope strictly online concurrency. No offline/restart/account-switch matrix,
+H2C2B, H3, S1C, Family lifecycle implementation or production work performed.
+Application Dart, S1A business source and rules unchanged; no product bug/fix.
+
+Topology: one dedicated Android 35 x86_64 AVD Kuktam_H2A_Local, emulator-5580,
+running two named native FirebaseApp instances h2c2a-a / h2c2a-b. Each has its
+own Auth/Firestore SDK instance, authenticated client-a / client-b, SQLite file,
+coordinator, dispatcher, projection and receipt observer. Independence is asserted
+(including different DB paths and no shared coordinator). It is NOT two devices
+and NOT two coordinators sharing one Auth or outbox. Normal production repository,
+coordinator, dispatcher, outbox and projection classes execute all business work.
+Existing test-only callable delivery invokes the actual S1A store via loopback.
+
+Project demo-kuktam-local only. Firestore 127.0.0.1:8088, Auth :9098, fixture :8099,
+hub :4408/logging :4508; Android accesses host via 10.0.2.2. Existing guards reject
+non-demo/non-emulator configuration and require the dedicated AVD. Only dedicated
+AVD app data is cleared at whole-run start. Release configuration is unchanged.
+The existing local fixture provisions both private fallbacks and test-family,
+with A owner, B member, ACTIVE member/reverse-index records and authoritative
+pointers. No Family create/invite/join feature gate is enabled; no JOIN executes.
+
+Concurrency control: H2C2A starts automatic processor delivery paused. Both real
+client immutable commands must be server-observed before the bounded fixture
+accepts /process-selected (1..3 commands, local A/B UIDs only). It verifies every
+command exists, then invokes actual ShoppingMutationStore.process concurrently
+with Promise.all, or in explicit A->B / B->A order. No mutation logic is replaced.
+No arbitrary sleep controls correctness. The one-shot test command-arrival
+subscriptions terminate on server observation; they are not application listeners.
+
+Final native acceptance covers 11 focused checks in one native test:
+- Empty logical product + concurrent 300 ml and 2 l: exactly one 2300 ml row.
+- Two additional pairs explicitly processed A-first and B-first: each 2300 ml,
+  one row; first receipt created=true, second created=false. Concurrent winner
+  is not assumed, but exactly one created and one merged receipt is required.
+- Same successful immutable IDs redelivered to actual processor: canonical view
+  AND household shoppingRevision unchanged; no new semantic effect.
+- Optional three-command case across two independent clients (A/B/A):
+  300 ml + 2 l + 500 ml = one 2800 ml row. No third client was necessary.
+- Distinct Milk/Flour deltas both survive (2000 ml and 500 g).
+- Same-name incompatible units remain two rows: 2000 ml and 1 db.
+- Stale EDIT, DELETE and SET_CHECKED: both clients first see revision N; A adds
+  +500 and commits a higher revision. A real B canonical snapshot is held by a
+  Completer delivery gate while B remains ONLINE. B submits observed revision N;
+  optimistic quantity=12 / hidden row / checked=true is asserted BEFORE processing.
+  Actual server receipt is REJECTED_STALE. After receipt and gate release, B
+  automatically returns to A's newer exact row/revision/quantity. Every +500
+  survives (final conflict quantity 1501). Durable conflict belongs to B only;
+  A has no notice. Acknowledgement is explicit, not auto-retry/rebase.
+- Both clients request checked=true at the same revision: exactly one APPLIED,
+  one REJECTED_STALE under existing revision semantics; final checked=true.
+
+After every scenario, BOTH client views must equal a Source.server query across
+all item IDs/names/quantities/units/check state/revisions, with no pending flags.
+No manual refresh/recover call is used. Final local requests and server receipts
+are compared by ID/actor/result; all terminal, no ID collision, no other UID rows
+in either SQLite database and server/local command ID sets match exactly.
+Observed application listener model per client: one canonical subscription,
+at most one receipt query with 1..10 parent IDs, no per-command permanent listener,
+no polling. Two clients therefore have two canonical listeners total. Subscription
+maximum is asserted and disposal returns counts to zero. This is targeted sanity,
+NOT the final H3 listener/cost/source audit.
+
+Validation on final source:
+- Native: 1 PASS / 0 FAIL, all 11 scenario checks; 31s; harness exit 0.
+- Targeted Flutter: 85 PASS / 0 FAIL (shopping_coordinator_test,
+  shopping_mutation_dispatcher_test, shopping_repository_test, shopping_h1_test).
+- Flutter analyze: PASS / no issues (6.2s).
+- Android debug/native APK: PASS (built/installed for acceptance).
+- JavaScript syntax and git diff --check including new test: PASS.
+- Backend business source untouched; no backend test/build rerun required.
+- First native version also passed; final version adds explicit optimistic
+  hide/edit/check evidence using delivery gates, without changing business code.
+
+Run: KUKTAM_E2E_SCOPE=H2C2A with the existing project-local Firebase CLI
+emulators:exec --only firestore,auth --project demo-kuktam-local
+--config firebase.shopping-e2e.json 'node functions/scripts/shopping-client-e2e.cjs'.
+Local logs: %TEMP%/kuktam-h2c2a-acceptance.log, kuktam-h2c2a-targeted.log,
+kuktam-h2c2a-analyze.log. Firebase and dedicated Android emulators stopped.
+Next: H2C2B offline/reconnect multi-client + remaining complex conflict recovery.
+H2 COMPLETE / S1B ACCEPTED / S1C READY / PHASE 4B READY: NO.
+Production changes/deploy/commit/push: NONE.
+
 ## H2C1 account/session native isolation — PASS, 2026-10-21
 
 Baseline: clean committed H2B `9db148a3bb5eed116c3c6c36de21ad10cdc5f8d3`.

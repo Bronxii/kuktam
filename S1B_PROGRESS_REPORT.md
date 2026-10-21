@@ -1,3 +1,22 @@
+## H2C2A update — PASS, 2026-10-21
+
+Baseline 4860b58139108db81e79d8030fba9aac72fd8698 (committed H2C1).
+Two independent native Firebase/Auth/Firestore/SQLite/coordinator clients in one
+dedicated AVD now prove basic ONLINE shared-household concurrency. Same-product
+ADD sums to 2300 ml in concurrent and both explicit processing orders; optional
+three-command case sums to 2800 ml. Distinct products/incompatible units survive,
+replayed terminal commands do not change quantity or shoppingRevision. Stale
+EDIT/DELETE/CHECK are rejected, optimistic projections reconcile, +500 increments
+survive. Identical concurrent CHECK intents yield one APPLIED and one STALE.
+Both clients converge automatically to server data; UID-local receipts/notices
+stay isolated. No polling or listener multiplication. No production-code fix.
+Final evidence: 1 native test PASS (11 focused checks, 31s), harness exit 0;
+85 directly affected Flutter tests PASS; analyzer/native APK/diff check PASS.
+Backend business source untouched. Only local harness/new native test/docs change.
+Full details and topology limitations in S1B_CHECKPOINT_2026-10-19.md.
+Next H2C2B only; not started. H2/S1B/S1C/Family4B remain incomplete/not ready.
+Production changes/deploy/commit/push: NONE.
+
 ## H2C1 update — PASS, 2026-10-21
 
 Baseline `9db148a3bb5eed116c3c6c36de21ad10cdc5f8d3` (committed H2B).
