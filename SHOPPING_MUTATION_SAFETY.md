@@ -1,3 +1,18 @@
+## H2C2B1 offline multi-client evidence — PASS, 2026-10-21
+
+The same two independent native clients now prove offline semantic ADD/reconnect
+safety against actual local S1A: A-first, B-first, simultaneous and receipt-flap
+cases each preserve 1000+300+2000 = 3300 ml in one canonical row. Separate SQLite
+intents and optimistic views do not modify the SDK's cached canonical documents.
+Offline revision-bound EDIT/DELETE/CHECK reject the later stale client; reversed
+winner direction is also covered. Both views converge automatically, with isolated
+durable notices, original IDs/payloads and no refresh/recover/manual replay.
+Final comparison covers 24 original server/local commands and receipts. No product
+or protocol change. Native 1 PASS (eight checks), direct Flutter 85 PASS, analyzer/
+native APK/diff PASS. See checkpoint for network controls, topology and boundaries.
+H2C2B2 process-death/complex recovery, H3 and S1C remain. S1B not accepted;
+Family Phase 4B not ready. Production unchanged.
+
 ## H2C2A online multi-client evidence — PASS, 2026-10-21
 
 Two independent named native Firebase apps with separate Auth/Firestore state,

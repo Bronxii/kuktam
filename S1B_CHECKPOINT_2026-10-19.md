@@ -1,3 +1,93 @@
+## H2C2B1 two-client offline/reconnect — PASS, 2026-10-21
+
+Baseline: clean committed H2C2A `f4141f4d97986687797dbe8d73f7e435b9431eb8`.
+Only new native test, narrow harness scope routing and evidence docs changed.
+Production Dart, S1A business source, rules, release config and Image Import unchanged.
+No process-death/account-switch scenarios, H2C2B2, H3, S1C or Family lifecycle work.
+
+Topology reuses H2C2A: dedicated Android 35 x86_64 Kuktam_H2A_Local,
+emulator-5580, two named native FirebaseApp instances h2c2b1-a / h2c2b1-b,
+independent Auth/Firestore, UID client-a / client-b, SQLite files, coordinators,
+dispatchers and projections. Distinct identities/DB paths are asserted. This is
+one AVD with independent client instances, not two physical devices. Both are
+members of the existing guarded local test-family fixture (owner A/member B).
+No production Family gate or lifecycle operation is used.
+
+Demo project demo-kuktam-local only; host loopback Firestore :8088, Auth :9098,
+fixture :8099, hub :4408, logging :4508; Android host alias 10.0.2.2. Dedicated AVD
+identity checked before whole-run app-data reset; no real user/device data touched.
+Real SQLite, production repository/coordinator/dispatcher/projection/transport,
+local Auth/Firestore and actual ShoppingMutationStore execute the protocol.
+The new ReconnectClient only changes the TEST acceptance helper: it returns after
+real repository/SQLite acceptance rather than awaiting server command arrival.
+No mocked receipt or canonical payload, no replacement business implementation.
+
+Eight native scenario checks:
+1. Both observe Milk 1000 ml at the same canonical revision, then BOTH Firestore
+   networks are disabled. A accepts +300 ml, B accepts +2 l. A projects 1300 ml,
+   B projects 3000 ml, each pending; each Firestore cache still has original
+   1000 ml/revision/check state. Verified UID-bound SQLite contexts are unchanged.
+   Reconnect A, process its actual command, await its receipt/canonical 1300 ml.
+   B remains offline with only its own projection and old canonical cache.
+   Reconnect/process B: one canonical 3300 ml row, both clients converge.
+2. Repeat with B reconnecting/committing first, then A: same one-row 3300 ml result.
+3. Both reconnect together; actual S1A processing starts concurrently after both
+   immutable commands arrive: same one-row 3300 ml result.
+4. Focused receipt-uncertainty network flap: both queue offline; A reconnects and
+   its original command reaches server. Disable A networking BEFORE processing.
+   Actual server processes A while A cannot observe its receipt. Local A remains
+   nonterminal/pending, immutable request unchanged. Restore A networking; receipt
+   observation automatically completes. B reconnects later and adds its delta.
+   Final one-row quantity 3300 ml. No coordinator recover/refresh or new ID used.
+   This proves receipt-observation uncertainty, not every possible lost-ACK timing.
+5-7. Separate EDIT/DELETE/CHECK fixtures: both see revision N/quantity 10, then
+   both go offline. A queues EDIT to 510; B queues EDIT to 12, DELETE, or explicit
+   CHECK true using N. Assert separate optimistic views (including hidden DELETE)
+   and unchanged canonical caches. A reconnects/commits first. B still retains N
+   and its original pending request, then reconnects: REJECTED_STALE. A's 510 and
+   checked=false survive; B's projection resolves to the exact canonical item.
+8. Reverse direction: B wins EDIT to 510, A's offline DELETE becomes stale.
+   Same preservation/convergence and notice isolation, without A-specific logic.
+
+After every scenario both full client views equal Source.server data by ID/name/
+quantity/unit/check/revision, with no pending rows and no manual refresh/recover.
+Conflict notices appear only in the losing client's UID-scoped outbox/UX and are
+explicitly acknowledged. Final reconciliation proves exactly 24 distinct original
+command IDs across both clients, unchanged complete local request payloads,
+terminal results matching actual server receipts, equal server/local ID sets,
+and zero other-UID rows in either SQLite outbox. No semantic replay, duplicate
+quantity, lost contribution or stuck optimistic state in the tested paths.
+
+Determinism: existing /process-selected is enabled for the new guarded scope,
+keeps automatic worker delivery paused and processes at most three actual commands.
+One-shot test arrival barriers precede processing; SDK network enable/disable
+completions and receipt/canonical stream events define reconnect order. No sleep,
+polling, periodic retry or manual app refresh is used. Offline here means each
+real Firestore SDK's disableNetwork(), not airplane mode or Auth sign-out.
+Per-client application model remains one canonical listener and <=1 receipt query
+(max 10 parent IDs); maximum subscription counts and zero counts after disposal
+are asserted. Two independent canonical listeners total. Test-only one-shot
+command-arrival subscriptions end automatically; no permanent per-command listener.
+
+Final validation:
+- Native: 1 PASS / 0 FAIL, eight scenario checks, 21s, entire harness exit 0.
+- Direct Flutter: 85 PASS / 0 FAIL (shopping_coordinator_test,
+  shopping_mutation_dispatcher_test, shopping_repository_test, shopping_h1_test).
+- Flutter analyze: PASS / no issues (42.1s).
+- Native Android debug APK: PASS, built and installed (46.0s build).
+- JavaScript harness syntax and git diff --check including new file: PASS.
+- Backend business source untouched; no backend suite/Functions build rerun.
+No product fix was needed. Firebase/Android test emulators stopped after completion.
+
+Reproduce using KUKTAM_E2E_SCOPE=H2C2B1 with existing project-local Firebase CLI:
+emulators:exec --only firestore,auth --project demo-kuktam-local
+--config firebase.shopping-e2e.json 'node functions/scripts/shopping-client-e2e.cjs'.
+Logs: %TEMP%/kuktam-h2c2b1-acceptance.log, kuktam-h2c2b1-targeted.log,
+kuktam-h2c2b1-analyze.log.
+Next: H2C2B2 process-death/reconnect complex recovery and H2 closing evidence ONLY.
+H2 COMPLETE / S1B ACCEPTED / S1C READY / PHASE 4B READY: NO.
+Production changes/deploy/commit/push: NONE.
+
 ## H2C2A basic online multi-client concurrency — PASS, 2026-10-21
 
 Baseline: clean committed H2C1 `4860b58139108db81e79d8030fba9aac72fd8698`.

@@ -1,3 +1,21 @@
+## H2C2B1 update — PASS, 2026-10-21
+
+Baseline f4141f4d97986687797dbe8d73f7e435b9431eb8 (committed H2C2A).
+Real two-client offline/reconnect native evidence now covers A->B, B->A and
+simultaneous reconnect ADD, plus one receipt-uncertainty network flap: initial
+1000 ml +300 ml +2 l always yields one 3300 ml canonical row. Offline EDIT,
+DELETE and CHECK conflicts reject stale revisions; B-winning/A-stale DELETE
+also passes. Own optimistic state and cached canonical data stay separate.
+Both clients converge without manual refresh/recover; loser-only notices,
+24 unchanged immutable requests/IDs, server/local receipt equality, no duplicates.
+No production or business-code change needed; same H2C2A topology reused.
+Final native: 1 PASS, eight scenario checks (21s), harness exit 0.
+Direct Flutter: 85 PASS / 0 FAIL. Analyzer/debug APK/harness syntax/diff check PASS.
+Backend business source untouched, no broad regressions run. Exact evidence and
+limits are in S1B_CHECKPOINT_2026-10-19.md. Test emulators stopped.
+Next H2C2B2 ONLY, not started. H2 complete/S1B accepted/S1C ready/Phase4B ready: NO.
+Production changes/deploy/commit/push: NONE.
+
 ## H2C2A update — PASS, 2026-10-21
 
 Baseline 4860b58139108db81e79d8030fba9aac72fd8698 (committed H2C1).
