@@ -1,3 +1,41 @@
+## Current implemented status — S1B ACCEPTED, H3B PASS, 2026-10-21
+
+This section and the implemented S1A contract below describe current source.
+Older dated checkpoints/design proposals are historical, not current failures
+or implementation gaps. Baseline: committed H3A 79d62ee75ffd873985c55a1c09341e42856889a9.
+H1/H2/H3A/H3B all PASS; S1B client migration COMPLETE / ACCEPTED.
+
+Final full regression after the narrow AuthGate Future.sync initialization-error
+fix: Flutter 1527 PASS / 0 FAIL / 1 intentional opt-in performance SKIP (1528
+total); included shopping group 263 PASS. Analyze/no issues, Functions build,
+backend unit 237, full Firestore emulator 653, Android debug/native test APK and
+diff checks PASS. All six native H2 groups rerun on demo-kuktam-local, each exit
+0: ten completed phases and seven real force-stops with successful recovery.
+No backend/rules/harness contract change. Exact commands and evidence in the
+checkpoint H3B section. No unexplained flaky shopping tests.
+
+Client: SQLite schema 6, FULL synchronous, immutable UID/household/epoch/action
+identity; durable backward dependencies materialize from actual receipts, never
+predicted revisions. APPLIED ADD hands off immediately to canonical state, with
+receipt evidence retained for dependencies. Merged/ambiguous destructive retarget
+fails closed. All UI writers, clear pages and import/recipe bulk routes use the
+same facade, without canonical writes or fallback. Revision-bound actions retain
+the user's observed context. UID deletion markers prevent late recreation;
+normal sign-out keeps accepted work. v1-v5 upgrades/reopen remain proven.
+
+Observation: one canonical list, shared UID-root routing, one household epoch
+observer; at most one receipt observer with ten parent IDs. No polling/permanent
+per-mutation listeners. Indexed projection: 100 unresolved/held plus 100 terminal-
+unretired parents, max 200 children per parent. Client read paths and server costs
+remain as H3A documented; no cost optimization was performed.
+
+S1C READY: YES; S1C COMPLETE: NO. Direct-write rules cutoff NOT YET APPLIED.
+S1D bulk cost optimization NOT STARTED / NOT COMPLETE (known cost release gate).
+Family Phase 4B NOT READY. Required next order: S1C -> S1D -> Family Phase 4B.
+Do not claim S1 overall or the production flaw fully closed: older clients can
+still bypass the new protocol under pre-S1C rules. Production gate remains OFF.
+No production access/change/deploy, rule/App Check/Play change, commit or push.
+
 ## H3A production source / read architecture — PASS, 2026-10-21
 
 At committed H2 baseline 52b15be967e0a4723f09cafb40cded2b26d135b3, all normal
@@ -144,7 +182,7 @@ APPLIED ADD receipts now end the optimistic contribution immediately, independen
 
 H1 is NOT accepted: a positive absence lookup followed by deletion before canonical observation can leave a ghost pending row. The deterministic STOP characterization reproduces it. Read S1B_CHECKPOINT_2026-10-19.md for partial fixes, validation and remaining H1 work. Actual baseline is 8b6255ce0ff6d604ff70c85c74ac2e6ac170cdc2; SQLite is now v5 in the uncommitted H1 worktree. Earlier status below is historical. H2/S1C/Phase 4B are not ready.
 
-# Current S1B worktree checkpoint — 2026-10-19
+# Historical S1B worktree checkpoint — 2026-10-19 (superseded above)
 
 The uncommitted client cutover is paused, not accepted. Read
 [S1B_CHECKPOINT_2026-10-19.md](S1B_CHECKPOINT_2026-10-19.md) for implemented
@@ -202,7 +240,7 @@ Status: S1A SERVER IMPLEMENTED LOCALLY; full S1 remains incomplete.
 Implementation baseline: cfd3630 (approved design), containing Phase 4A 321a700.
 No production changes. No Flutter writer migration. No Phase 4B transfer.
 
-## S1B work in progress — not a completed client cutover
+## Historical S1B foundation checkpoint — not yet cut over at that date
 
 Baseline checked: `965318d feat(shopping): add safe mutation backend protocol`.
 The worktree was clean before S1B. The following new components are not yet wired
@@ -347,7 +385,9 @@ Source: `functions/src/shopping/mutation-contract.ts` and `mutation-store.ts`.
 
 New command/work/config fields are protected. Clients cannot create or change a
 canonical revision. Existing canonical create/update/delete OTHERWISE REMAIN
-ALLOWED, as expressly required for S1A; legacy repository is unchanged. Therefore
+ALLOWED, as expressly required for S1A. The repository was unchanged at the S1A
+checkpoint; S1B has since migrated every production Flutter writer (see latest
+dated evidence above). Rules still permit older/external client writers. Therefore
 old writers can still bypass revision advancement or race the new executor.
 New-protocol guarantees are proven for participating new-protocol writers, not
 mixed legacy/new production traffic. No claim that the original production bug

@@ -34,7 +34,10 @@ class _AuthGateState extends State<AuthGate> {
     super.initState();
     if (widget.mainBuilder == null) {
       unawaited(
-        productionShoppingCoordinator()
+        // Registry lookup can fail synchronously before returning a Future
+        // (for example with injected auth and no global Firebase app). Keep it
+        // inside the same failure boundary as asynchronous initialization.
+        Future.sync(() => productionShoppingCoordinator())
             .then<void>((_) {})
             .catchError((Object _) {}),
       );

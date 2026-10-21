@@ -1,3 +1,43 @@
+## H3B final acceptance — S1B ACCEPTED / COMPLETE, 2026-10-21
+
+Latest authoritative status: H1 PASS, H2 PASS, H3A PASS, H3B PASS.
+Older dated sections below retain historical evidence and are superseded for
+current status. Baseline: committed H3A 79d62ee75ffd873985c55a1c09341e42856889a9,
+clean starting worktree. Full evidence/commands are in the checkpoint's H3B entry.
+
+Final validation AFTER the last application-code change:
+- Full Flutter: 1528 total, 1527 PASS / 0 FAIL / 1 intentional SCALING_PERF skip.
+- Included shopping subset: 263 PASS; account-deletion-named tests: 45 PASS.
+- Analyzer: PASS, no issues. Functions build: PASS.
+- Backend unit: 237 PASS. Full Firestore emulator: 653 PASS, 0 FAIL/0 SKIP.
+- Android debug and app:assembleDebugAndroidTest: PASS.
+- All six committed native H2 groups rerun: H2A/H2B/H2C1/H2C2A/H2C2B1/H2C2B2
+  PASS, each harness exit 0. Ten completed phases, seven verified force-stops,
+  all recovery assertions successful. No scenario expansion or test weakening.
+- Diff check PASS. No unexplained flaky shopping failure.
+
+One narrow AuthGate fix: Future.sync places synchronous production-coordinator
+lookup errors inside its existing asynchronous error boundary. This fixes three
+deterministic injected-auth startup tests without disabling production startup.
+No backend business, rules, harness or test-code edits. Existing Kotlin/Gradle
+deprecation warnings remain non-failing. A local emulator port-collision launch
+ran no tests and was replaced by the successful sequential full run.
+
+Current implementation: SQLite 6/FULL, stable UID/household/epoch/action identity,
+actual receipt revisions for dependencies; APPLIED ADD retires its contribution.
+All business writers migrated; direct canonical writes 0, no legacy fallback.
+One canonical + shared UID-root + household epoch observation; <=1 receipt query,
+<=10 parent IDs; no polling/permanent per-command listener. Indexed projection:
+100 unresolved/held +100 terminal-unretired parents, <=200 children each.
+
+S1B ACCEPTED: YES. S1B COMPLETE: YES. S1C READY: YES.
+S1C COMPLETE: NO. S1D COMPLETE: NO. Family Phase4B READY: NO.
+Next: S1C -> S1D bulk cost optimization -> Family Phase4B. Do not skip S1D.
+Production rules still allow legacy direct writes until S1C; this acceptance is
+client migration, not final production closure. All production gates unchanged.
+Dedicated test services/AVD stopped. Production access/changes/deploy/rule cutoff/
+App Check/Play/commit/push: NONE. No unrelated work changed. No S1B blocker.
+
 ## H3A final source/listener audit — PASS, 2026-10-21
 
 Baseline 52b15be967e0a4723f09cafb40cded2b26d135b3, clean committed H2.
@@ -186,7 +226,7 @@ It does not switch the application to the mutation protocol.
 - Retention preserves prerequisite receipts, then cleans intent payloads alongside
   eligible journal rows. Schema upgrade, reopen and concurrency tests cover this.
 
-## Acceptance matrix — current state, not historical test claims
+## Historical sequencing-phase acceptance matrix — superseded by dated updates above
 
 PHASE S1B FLUTTER CLIENT MIGRATION: FAIL / INCOMPLETE
 FOUNDATION PRESERVED: YES

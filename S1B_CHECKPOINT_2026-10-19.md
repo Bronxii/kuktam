@@ -1,3 +1,127 @@
+## H3B final regression — PASS; S1B ACCEPTED, 2026-10-21
+
+Authoritative latest status: S1B COMPLETE / ACCEPTED. H1, H2, H3A and H3B PASS.
+All older dated sections below are historical evidence, not current gate status.
+Baseline: clean committed H3A `79d62ee75ffd873985c55a1c09341e42856889a9`.
+No pre-existing unrelated modifications. Final worktree has four unstaged files:
+this checkpoint, S1B_PROGRESS_REPORT.md, SHOPPING_MUTATION_SAFETY.md, and
+lib/features/auth/presentation/widgets/auth_gate.dart. No commit or push.
+
+### Regression found and narrow fix
+
+The initial full Flutter run exposed three deterministic startup failures:
+`Kuktám alkalmazás elindul`, and the walkthrough `KuktamApp skip/finish reaches
+AuthGate and restart retains preference` cases. With injected authentication and
+no default Firebase app, productionShoppingCoordinator could throw synchronously
+before its existing Future.catchError boundary. AuthGate now invokes that lookup
+through Future.sync; both synchronous and asynchronous initialization failures
+use the existing error boundary. Production startup still opens the coordinator
+with the same condition and registry; no shopping-screen dependency or fallback
+was introduced. No business backend, shopping protocol, rule or harness changes.
+The existing failing tests are now green; no diagnostics/tests were suppressed.
+
+All final acceptance suites below ran after the last application-code change.
+
+### Final local results and exact commands
+
+| Validation | Final result |
+| --- | --- |
+| `flutter test --reporter json` | 1528 total: 1527 PASS, 0 FAIL, 1 intentional SKIP |
+| Shopping subset of that full run | 263 PASS, 0 FAIL; not additional unique tests |
+| Auth / household / recipe subsets | 73 / 31 / 506 PASS; recipe group also contains the one skip |
+| Account-deletion-named subset | 45 PASS (overlaps auth); UID cleanup also covered by shopping H1C |
+| `flutter analyze` | PASS, no issues (5.3s) |
+| `npm run test:unit` in functions | Functions TypeScript build PASS; 237 PASS, 0 FAIL, 0 SKIP |
+| `npm run test:rules` in functions | Full demo Firestore suite: 653 PASS, 0 FAIL, 0 SKIP; exit 0 |
+| `flutter build apk --debug` | PASS (final assembleDebug 10.7s) |
+| `android/gradlew.bat app:assembleDebugAndroidTest` | PASS, BUILD SUCCESSFUL; native test APK |
+| `git diff --check` | PASS |
+
+The skipped test is `perf: focus and inset sweep do not scale or format` in
+test/recipes/recipe_scaling_dialog_test.dart. It is guarded by
+`skip: !scalingPerfEnabled`; SCALING_PERF is an opt-in non-release diagnostic,
+not enabled by the normal suite. No other tests were excluded.
+Builds retain existing FlutterFire Kotlin-plugin / Gradle deprecation warnings;
+builds pass and analyzer has no warnings/errors. No dependency upgrade here.
+
+Full backend coverage includes S1A contract/executor/rules, exact-once ADD,
+strict EDIT/DELETE/SET_CHECKED revisions, epoch/retention, bulk 200, CREATE,
+invite/email identity, JOIN reservation, household authorization, maintenance,
+billing and local account deletion. All PASS. The first full emulator run also
+passed 653 tests; an overlapping second launch was rejected before running tests
+because its local port was occupied. It was replaced by the complete sequential
+final run above (686382ms). This was runner scheduling, not a flaky test.
+No unexplained intermittent shopping failure remains.
+
+### Native H2 final rerun (unchanged committed scenarios)
+
+Dedicated Android 35 x86_64 AVD Kuktam_H2A_Local, serial emulator-5580.
+Only demo-kuktam-local: Firestore 127.0.0.1:8088, Auth 127.0.0.1:9098,
+fixture HTTP 127.0.0.1:8099; Android uses emulator host 10.0.2.2.
+Real SQLite, native Firebase SDKs, production client coordinator/dispatcher/
+projection and actual S1A ShoppingMutationStore. Two-client groups use separate
+FirebaseApp/Auth/Firestore/UID/SQLite/client state in the same Android process.
+
+Each group ran `firebase emulators:exec --only firestore,auth --project
+demo-kuktam-local --config firebase.shopping-e2e.json` with the committed
+`node functions/scripts/shopping-client-e2e.cjs` and KUKTAM_E2E_SCOPE below.
+Harness internally runs the corresponding integration_test/shopping_h2*.dart
+with `flutter test -d emulator-5580 --no-uninstall` and its phase define.
+Only dedicated com.bronxii.kuktam test-package data was cleared BETWEEN groups.
+Within each group every restart/kill retained data. No real user data touched.
+
+| Group | Completed native phases | Verified abrupt kills | Harness exit |
+| --- | ---: | ---: | ---: |
+| H2A | 3 PASS | 2 | 0 |
+| H2B | 2 PASS | 2 | 0 |
+| H2C1 | 2 PASS | 1 | 0 |
+| H2C2A | 1 PASS | 0 | 0 |
+| H2C2B1 | 1 PASS | 0 | 0 |
+| H2C2B2 | 1 PASS | 2 | 0 |
+
+Total: 10 completed phases PASS, 7 intentional kills with successful recovery,
+all six harness exits 0. Killed intermediate runners are not ordinary passing
+tests or unexplained failures. Actual mechanism: `adb -s emulator-5580 shell am
+force-stop com.bronxii.kuktam`, prior PID verified and absent afterward, while
+coordinator/SQLite remained open. H2C2B2 kills BOTH clients, never one-only.
+All native APK builds passed. Dedicated AVD and Firebase services stopped;
+ports 8088/9098/8099/4408/4508 confirmed released after completion.
+
+Final logs: C:/Users/gabor/AppData/Local/Temp/kuktam-h3b-flutter-final.jsonl,
+kuktam-h3b-analyze-final.log, kuktam-h3b-unit-final.log,
+kuktam-h3b-emulator-final.log, kuktam-h3b-debug-final.log,
+kuktam-h3b-android-test-build.log, kuktam-h3b-H2A.log through the six scope logs,
+and kuktam-h3b-native-summary.log. Temp logs are local evidence, not committed.
+
+### Final implementation / acceptance recheck
+
+SQLite schema 6: FULL synchronous; upgrades v1-v5 and reopen preserve accepted
+requests, IDs, bindings, prerequisites and notices. Deleted-UID tombstone blocks
+late recreation; ordinary sign-out retains accepted work. Projection uses indexed
+100 unresolved/held +100 terminal-unretired PARENTS, each at most 200 children.
+No history scan on widget rebuild, no pending starvation regression.
+
+Direct production canonical shopping writes: 0. The two lib shoppingItems
+references remain read-only list subscription and bounded absence lookup.
+Manual ADD/EDIT/CHECK/UNCHECK/DELETE, clear pages, text import, normal/scaled
+recipe-to-shopping all use semantic intents; observed revision/context retained.
+No legacy direct-write fallback, no new canonical writer from this fix.
+
+Per active client: 1 canonical shopping listener, 1 shared UID-root routing
+observer, 1 household epoch observer, at most 1 receipt observer over at most
+10 parent IDs. No permanent per-mutation listener or polling. Normal AuthGate
+startup/registry ownership is unchanged by Future.sync. Test/emulator fixtures
+remain outside release code; main/release config unchanged. H3A audit retained.
+
+S1B ACCEPTED / COMPLETE: YES. S1C READY: YES, not started or complete.
+S1D bulk cost optimization: NOT STARTED / NOT COMPLETE. Family Phase 4B: NOT READY.
+Next separate sequence: S1C hard rule cutoff -> S1D bulk cost optimization ->
+Family Phase 4B. Existing rules STILL permit legacy canonical writes; original
+production risk is not declared fully closed. Keep production gates OFF.
+Production project accessed: NO. Production changes/deploy/rules/App Check/Play:
+NONE. No production deletion E2E. No Image Import changes. Blockers: NONE for
+S1B acceptance. Commit/push: NO. STOP; do not automatically start S1C.
+
 ## H3A final source / listener / read-path audit — PASS, 2026-10-21
 
 Baseline: clean committed H2 `52b15be967e0a4723f09cafb40cded2b26d135b3`.
