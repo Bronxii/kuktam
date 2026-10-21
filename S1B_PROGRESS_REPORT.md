@@ -1,3 +1,31 @@
+## H3A final source/listener audit — PASS, 2026-10-21
+
+Baseline 52b15be967e0a4723f09cafb40cded2b26d135b3, clean committed H2.
+Complete production lib audit: ZERO direct canonical shoppingItems writes.
+Manual ADD/EDIT/CHECK/DELETE, clear, text import, recipe multiplier/1x and scaled
+recipe all route through semantic facade -> atomic SQLite intent acceptance ->
+immutable command transport. Captured item revision/context retained, no requery
+rebase or legacy write fallback. Android shares import recipes, not shopping;
+later explicit recipe-to-shopping uses the same facade.
+
+Steady-state: one canonical listener; one shared UID-root context listener and
+one household-epoch listener; <=1 receipt query over <=10 parent IDs. No polling
+or permanent per-mutation listener. SQLite projection has separate indexed
+100 unresolved/held +100 terminal-unretired parent windows. Read-only exceptional
+receipt/context/absence queries are documented separately from server transactions.
+Legacy account deletion removes users/{uid}/shopping, never canonical items;
+local deletion is UID-specific, ordinary sign-out retains accepted work.
+Unreferenced old submitShoppingLocally helper has no production caller/write;
+debug-only emulator config and harness are isolated from release.
+
+Evidence: shopping Flutter 263 PASS / 0 FAIL; analyzer PASS/no issues (62.9s);
+git diff --check PASS. No code fixes required; only these three audit docs changed.
+Backend NOT TOUCHED. No native H2/full regression rerun. Detailed source locations,
+all entry-point classifications and read/retry model are in the checkpoint.
+Next separate H3B full regression/final S1B acceptance; NOT STARTED.
+S1B accepted/S1C ready/Phase4B ready: NO. Production/deploy/rule cutoff/commit/push:
+NONE. H2 remains complete; H3A does not replace H3B acceptance.
+
 ## H2C2B2 update — PASS; H2 COMPLETE, 2026-10-21
 
 Baseline e2df8eda0a6ddf587241e0aa3c65c227bfe9b275 (committed H2C2B1).

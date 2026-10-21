@@ -1,3 +1,39 @@
+## H3A production source / read architecture — PASS, 2026-10-21
+
+At committed H2 baseline 52b15be967e0a4723f09cafb40cded2b26d135b3, all normal
+Flutter shopping business writes exclusively use the semantic mutation protocol.
+Canonical shoppingItems direct-write count = 0. Its only two lib references are
+the common list subscription and bounded server absence GET. CRUD, clear pages,
+text import, recipe 1x/multiplier and scaled recipe reach atomic SQLite intent
+acceptance; transport writes only immutable users/{uid}/shoppingMutations IDs.
+Observed revisions/context remain bound to user intent; no legacy error fallback.
+Android incoming share imports recipes; it cannot auto-write shopping items.
+
+Client read architecture (separate from server cost): one canonical list listener,
+one shared users/{uid} routing listener, one household epoch listener, <=1 receipt
+observer with <=10 parent IDs. UI list/notice streams only subscribe to local
+coordinator events. Additional event-driven reads are ensure-context callables,
+receipt/context checks after permission rejection and terminal EDIT/CHECK missing
+target proofs in <=10-ID queries. ADD receipt handoff needs no absence read.
+Proof attempts are once per candidate/session, reset by explicit resume recovery;
+timeouts preserve uncertainty, never establish correctness. No polling/permanent
+per-item listeners. Projection queries use indexed independent 100 unresolved/
+held and 100 terminal-unretired parent windows, each parent <=200 children.
+
+Server child transactions read immutable command, lifecycle/user/household/member/
+reverse-index authority (family adds fallback checks), source item for revision
+operations, and <=3 normalized matches for ADD/EDIT. Existing due-work maintenance
+and bounded retry remain unchanged. Bulk cost optimization is deliberately later.
+Legacy account cleanup of users/{uid}/shopping is distinct from canonical data;
+UID-local outbox cleanup is deletion-only, not normal sign-out. Old local-submission
+helper has no production callers; test/emulator wiring remains outside release.
+
+No implementation change required. Exact source inventory and read-path exceptions
+are recorded in the checkpoint. Shopping tests 263 PASS, analyze/diff PASS.
+H3B full regression remains required; S1B NOT accepted, S1C/Family4B NOT ready.
+Firestore rules unchanged: legacy direct-write permission is still technically
+present until separate S1C. Production bug is not declared fully closed by H3A.
+
 ## H2C2B2 multi-client process-death evidence — PASS, 2026-10-21
 
 H2 is now complete; S1B acceptance still awaits separate H3 audit/regression.

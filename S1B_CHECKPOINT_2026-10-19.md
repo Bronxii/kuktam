@@ -1,3 +1,169 @@
+## H3A final source / listener / read-path audit — PASS, 2026-10-21
+
+Baseline: clean committed H2 `52b15be967e0a4723f09cafb40cded2b26d135b3`.
+Audit scope: complete production lib/ Firestore references and set/update/delete/
+commit/add/batch/transaction calls, shopping method callers, injected callbacks,
+offline/catch branches, timer/delay paths, Android main/debug source separation.
+No application, backend, rule or release-config modification was necessary.
+
+### Zero-bypass inventory
+
+Production direct canonical shoppingItems writes: **0**. Both literal canonical
+references are in production_shopping_coordinator.dart:
+- line 35: absentItems server-only GET, IDs grouped by 10; read-only.
+- line 99: items ordered canonical query + snapshots; read-only.
+No alternate dynamic shopping collection writer or native Android Firestore
+writer was found. No Flutter WriteBatch/runTransaction shopping implementation.
+
+Other write-shaped search hits are classified explicitly:
+- shopping_mutation_transport.dart:98 set creates only
+  users/{authenticatedUid}/shoppingMutations/{stableId}; immutable command path.
+- shopping_outbox.dart and shopping_intent_queue.dart tx.update/delete/insert,
+  rawDelete and database.transaction are local SQLite, not Firestore.
+- ShoppingMutationChild.delete is a typed intent factory, not a document delete.
+- recipe_repository.dart add/update/delete target users/{uid}/recipes.
+- ingredient_repository.dart set targets ingredients/{normalizedName}, the
+  ingredient-name catalog; it never changes shopping quantity/list contents.
+- account_deletion_repository.dart:88-111 deletes legacy users/{uid}/shopping,
+  recipes and user root AFTER coordinated deletion begin. This is explicit
+  legacy-domain account cleanup, NOT a canonical household shoppingItems bypass.
+- export, sharing, image preparation delete calls remove local files/directories;
+  secure entitlement/household storage delete calls remove local keys. Unrelated
+  domains were inspected only, not modified (including Image Import).
+- list/set .add, widget setState, stream sinks and SQL helpers are not remote
+  document writes. Recipe export/ingredient catalog reads are unrelated reads.
+- integration_test fixtures and functions/scripts use local-only Admin setup;
+  functions/src/shopping/mutation-store.ts is the authorized SERVER writer.
+- shopping_local_submission.dart is an unreferenced legacy callback helper:
+  no production import/caller and no Firestore reference inside it. Its generic
+  commit/listener seam does not provide a reachable business-write fallback.
+
+### Complete production entry-point trace
+
+All routes below: mutation protocol YES; direct canonical write NO.
+
+| Entry | Repository / intent |
+| --- | --- |
+| shopping_item_dialog.dart:104 EDIT | updateItem(observed: widget.item) -> EDIT with captured revision |
+| shopping_item_dialog.dart:112 manual ADD | addOrMergeItem -> addOrMergeItems -> semantic ADD delta |
+| shopping_screen.dart:292 checkbox | setItemChecked(observed: item, desired !item.isChecked) -> SET_CHECKED |
+| shopping_screen.dart:277 confirmed delete | deleteItem(observed: captured item) -> DELETE |
+| shopping_screen.dart:139 finish/clear | clearShoppingList(observed: captured List.of(items)) -> revision-bound DELETE children |
+| main_screen.dart:296 text import -> shopping_import_dialog.dart:75 | confirmed parser snapshot -> addOrMergeItems -> ADD/BULK |
+| recipe_details_screen.dart:468 recipe/multiplier (1x included) | normalized ingredient snapshot -> addOrMergeItems -> ADD/BULK |
+| recipe_scaling_dialog.dart:89 scaled recipe | calculated normalized quantities -> addOrMergeItems -> ADD/BULK |
+
+Common suffix: ShoppingCoordinator.add/mutate -> dispatcher.enqueueIntent(s) ->
+ShoppingIntentQueue.enqueueMany SQLite transaction (FULL synchronous durability)
+-> held dependency materialization and immutable outbox insertion -> bounded
+receipt observer proves server absence -> transport.create immutable command.
+No user-facing API accepts a presentation-supplied UID. Context comes from the
+authenticated session; mutation request retains UID/household/epoch/random stable
+ID. Item operations use their captured ShoppingItem.context and revision, not a
+fresh item query. Pending dependencies use actual predecessor result identity/
+revision; ambiguous merged-ADD destructive retarget fails closed.
+
+Clear snapshots the observed list before confirmation resolves. Coordinator splits
+into <=200-child commands; enqueueMany accepts all pages atomically or none when
+the 100-action capacity is exhausted. No canonical batch.delete loop exists.
+ADD never calculates a final remote quantity from a client query: local canonical
+matching only records projection observations. Server owns transactional merge.
+Bulk callers may normalize units/scaled quantities; no client server-list merge.
+All optional injected widget callbacks default to this facade; production call
+sites do not inject a competing writer.
+
+Android SEND text -> TextShareController -> MainScreen._scheduleShare -> recipe
+import; recipe files -> RecipeFileReceiver -> AddRecipeScreen. Neither directly
+adds shopping. Later explicit recipe-to-shopping uses the table above. Shopping
+text import is the separate confirmed main-screen dialog. Shopping share/export
+uses getShoppingItems (local composed view), not a fresh canonical subscription.
+
+### Listener ownership / client read map
+
+- AuthGate.initState opens the production registry once per FirebaseAuth object.
+  The registry memoizes the Future; repository/widget rebuilds reuse it. Auth
+  changes bind the app-lifetime coordinator; resume triggers explicit recovery.
+- One shared users/{uid} root listener via productionHouseholdContext and
+  CachedHouseholdGateway._remoteFor, shared with HouseholdGate; last consumer
+  releases it. Cached gateway deduplicates ensure calls, no polling.
+- One household root snapshots observer for shopping epoch, server-confirmed
+  snapshots only. It is separate from the UID/root routing observer.
+- Exactly ONE canonical shoppingItems ordered snapshots listener per active
+  bound client; zero while signed out. Coordinator cancels old subscriptions
+  before replacements and fences auth/household/authority generations.
+- At most ONE receipt query observer, WHERE documentId IN <=10 parent IDs.
+  refresh chooses oldest unresolved outbox entries, cancels old query before
+  replacing, and fences observation generations. Terminal receipts leave the
+  pending set; rotation admits subsequent parents. Empty queue means no observer.
+- watchShoppingItems/watchNotices observe only coordinator.changes locally.
+  Navigation/rebuilds do not create canonical/receipt subscriptions.
+- ensureShoppingContext callable on household bind validates current authority;
+  ensureHouseholdContext comes through the shared household gateway. No UI poll.
+- Exceptional reads: permission-denied submission first looks up <=10 receipt
+  IDs (currently one), then user/root epoch if needed to classify rejection.
+  Terminal EDIT/CHECK missing-target proof queries canonical IDs in groups of 10.
+  ADD receipt handoff does NOT require that proof; DELETE also excluded.
+  Proof candidates are bounded by the 100 terminal projection parents and <=200
+  children each, not by one item per parent. One attempt per candidate/session;
+  app resume explicitly permits another bounded recovery attempt. 15s timeout
+  preserves uncertainty; it never proves absence or retries a semantic mutation.
+  No periodic reads or permanent per-command/per-row listeners.
+
+SQLite projection: indexed (uid,projectionState,sequence), separate LIMIT 100
+unresolved/held + LIMIT 100 terminal-unretired branches, joined by UID/ID, ordered
+by sequence. Retired historical parents excluded. Bound is PARENTS, each up to
+200 children. Ordinary widget builds consume memory; DB projections run on
+canonical/receipt/acceptance/context/recovery events. No full-history UI scan.
+Notice query <=100; pending outbox <=100. H1C starvation/reopen and H2 bulk proof
+remain applicable, implementation unchanged.
+
+### Server read map (separate from client listeners)
+
+Each mutation child transaction reads command receipt, lifecycle, user root,
+household, membership and family reverse index. Family adds private fallback
+root/member reads; reserved JOIN private authority may read its operation.
+ADD: normalized name+unit query limit 3. EDIT: source item + same bounded query.
+DELETE/CHECK: source item only. Household shoppingRevision write serializes
+concurrent ADD destinations. Receipt/canonical writes commit atomically.
+ensureContext additionally reads runtime gate and may query highest revision
+limit 1 for lazy initialization. Maintenance queries due shoppingMutationWork
+with limit min(5,pageSize), no user scan. Rules may also charge authorization
+document reads; these are separate from SDK listeners. No cost optimization or
+new cost claim: existing ~1400 private/~1800 family reads per 200 ADD estimate
+remains a later optimization concern, not H3A scope.
+
+Retry: original persisted request/ID only. Authoritative missing receipt precedes
+create; permission denial is checked against existing receipt before terminal
+classification. Network uncertainty retains work, resumes via network snapshots,
+session bind or app resume; no retry timer or new ID. Expired missing receipt is
+terminal resultExpired. Server deferred failures use bounded backoff (5min to
+1h, at most 8 failures), maintenance keeps original identity. Stale/context/
+unauthorized/terminal results never blindly rebase. No Timer.periodic or
+Future.delayed in lib; recipe scaling's one-shot 500ms input debounce is local
+calculation, not Firestore/status polling.
+
+### Local cleanup / release isolation
+
+Settings passes deletion-accepted UID to coordinator.deleteLocalAccount only
+after backend begin acknowledgment. It unbinds matching active session, waits
+authority writes, deletes only that UID's SQLite technical rows and retains a
+deleted-UID tombstone to block late recreation. Normal sign-out only unbinds;
+accepted queue remains recoverable. Existing server deletion safety unchanged.
+
+No emulator host/config/test import in production lib. Debug-only Android
+network-security XML allows cleartext solely 10.0.2.2/127.0.0.1/localhost, denies
+other cleartext; main/release manifest does not reference it. Harness lives
+outside release lib, guards exact demo project + loopback Firestore/Auth ports
+and dedicated AVD. functions package entry is lib/src/index.js, not scripts.
+No test fixture hook is reachable through normal production flows.
+
+Validation: shopping-focused Flutter 263 PASS / 0 FAIL; H1 lifecycle, projection,
+dispatcher and repository coverage included. Native H2 matrices NOT rerun.
+Backend NOT TOUCHED. Flutter analyze PASS/no issues (62.9s); git diff --check PASS.
+Audit found no bypass or lifecycle fix requiring code changes. H3B full regression
+and final S1B acceptance remain separate. S1B ACCEPTED / S1C READY / PHASE4B READY:
+NO. Production/deploy/rule cutoff/commit/push: NONE.
+
 ## H2C2B2 two-client process death — PASS; H2 COMPLETE, 2026-10-21
 
 Baseline: clean committed H2C2B1 `e2df8eda0a6ddf587241e0aa3c65c227bfe9b275`.
