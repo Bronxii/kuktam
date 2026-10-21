@@ -1,3 +1,103 @@
+## H2C2B2 two-client process death — PASS; H2 COMPLETE, 2026-10-21
+
+Baseline: clean committed H2C2B1 `e2df8eda0a6ddf587241e0aa3c65c227bfe9b275`.
+No production/business/backend/rules change. Only new native test, existing local
+harness scope routing and these evidence documents changed. Previous H2 test files
+remain unchanged. No H3, S1C, cost optimization or Family Phase 4B work.
+
+Topology: dedicated Android 35 x86_64 Kuktam_H2A_Local / emulator-5580,
+demo-kuktam-local, Auth 127.0.0.1:9098, Firestore 127.0.0.1:8088,
+fixture HTTP 127.0.0.1:8099 (Android uses 10.0.2.2). Two named FirebaseApps,
+separate native Auth/Firestore instances, UIDs client-a/client-b, SQLite files,
+coordinators, dispatchers and projections share only the guarded test-family
+fixture and Android OS process. Actual S1A ShoppingMutationStore executes requests;
+the harness replaces event delivery, not mutation business logic. Production
+Family gates are untouched. Only dedicated test-package data was reset before
+the entire run; all three phases use --no-uninstall and preserve app data.
+
+Final three-phase evidence:
+1. death-offline: seed Milk 1000 ml and three revision-conflict targets. Both
+   clients disable Firestore networking, durably accept Milk +300 ml / +2 l,
+   and three A EDIT versus B EDIT/DELETE/CHECK pairs. Eight pending requests,
+   separate optimistic quantities 1300/3000, complete original request maps and
+   IDs are recorded in a flushed local manifest. Both coordinators/DBs stay open.
+   Host runs `adb -s emulator-5580 shell am force-stop com.bronxii.kuktam` and
+   verifies PID 3915 disappeared. This kills BOTH clients, not just one.
+2. death-uncertain: restart BOTH offline, using persisted native Auth, real
+   SQLite and cached Firestore snapshots; ensure-context deliberately reports
+   offline, never substitutes fresh server authority. Restore all original IDs,
+   payloads, UID/household/epoch bindings and separate pending views before any
+   reconnect. A reconnects/applies first; B's three revision operations become
+   REJECTED_STALE. Both automatically converge: Milk 3300 ml in one row, each
+   conflict target quantity 510 and unchecked. Three durable notices belong only
+   to B. Then seed another Milk 1000 ml; accept A+300/B+2000 offline. Let A's
+   immutable command reach the server, disable A networking before processing,
+   execute actual S1A to APPLIED while its local result remains nonterminal.
+   B stays offline/unresolved. Persist this receipt and original requests, then
+   host force-stops BOTH open clients again; PID 4163 disappearance verified.
+3. complete: restart BOTH offline again. Original pending quantities and complete
+   requests reconstruct without server results; one unresolved request per UID.
+   Reconnect A: existing server receipt resolves automatically, with NO process
+   replay call or manual recovery. Reconnect/process B. Both Milk cases remain
+   exactly 3300 ml, one logical row each. Compare all 15 original IDs/full local
+   requests, server ID sets, originating UIDs and exact child result arrays.
+   All terminal; B's three notices survive restart without A leakage. Both
+   canonical views equal authoritative Firestore, no optimistic ghosts.
+
+Deterministic control: server processing paused; one-shot command-arrival barriers
+precede bounded process-selected calls. Firestore network toggles prevent receipt
+delivery before the second kill. No arbitrary sleep decides correctness. The host
+15s watchdog only cleans a killed Flutter runner, never retries application work.
+Restart tests wait for both SQLite projection AND cached canonical snapshot events;
+neither arrival is assumed first. Initial development run exposed a test barrier
+that checked pending presence too early (delta-only row before cached baseline).
+The final barrier also requires the correct composed quantity; no product fix or
+timeout-based correctness was introduced. Initial failed run is not acceptance.
+
+Observed per client: exactly one canonical subscription, at most one receipt
+observer with <=10 parent IDs. Maximum active counts are asserted across the
+run; disposal leaves zero. No permanent per-command listener, polling, ID
+replacement, cross-UID local rows/notices, semantic replay or manual refresh.
+Safety claims apply to the tested scenarios, not a proof against all possible bugs.
+
+Validation:
+- Native: one normally completed phase PASS (4s), two independently verified
+  abrupt force-stops with successful subsequent recovery assertions; harness exit 0.
+  Interrupted runners' expected "did not complete" / temp-listener cleanup errors
+  are NOT counted as passed tests. All three debug/native APK builds PASS.
+- Direct Flutter: 85 PASS / 0 FAIL (coordinator, dispatcher, repository, H1 tests).
+- Final flutter analyze: PASS, no issues (6.7s).
+- Harness JS syntax and git diff --check including new test: PASS.
+- Backend business source NOT TOUCHED; no backend suite/Functions build required.
+- No broad regression or old H2 matrix rerun.
+- Local Firebase services and dedicated Android AVD stopped; test ports
+  8088/9098/8099/4408/4508 have no remaining listeners.
+
+Reproduce with KUKTAM_E2E_SCOPE=H2C2B2 and the existing project-local
+emulators:exec command/config. Final log:
+`%TEMP%\kuktam-h2c2b2-acceptance-final.log`; unit log:
+`%TEMP%\kuktam-h2c2b2-flutter.log`.
+
+H2 closing evidence audit (prior documented results retained, not rerun):
+- H2A PASS: three completed phases + two abrupt stops; single-client offline CRUD,
+  restart, dependencies, stale +500, old epoch, network flap and ghost sanity.
+- H2B PASS: two completed phases + two abrupt stops; 50/200 bulk, partial recovery,
+  stable children, mixed outcomes and completed reopen.
+- H2C1 PASS: two completed phases + one abrupt stop; account/session/household/
+  epoch isolation, durable notice isolation and invalid cached authority rejection.
+- H2C2A PASS: one native test, 11 checks; online multi-client concurrency,
+  normalization, reversed order, duplicate delivery, revision conflicts/convergence.
+- H2C2B1 PASS: one native test, eight checks; offline ADD reconnect orders,
+  stale EDIT/DELETE/CHECK, reversed winner, network uncertainty and convergence.
+- H2C2B2 PASS: current dual-client process-death and uncertain receipt recovery.
+Application/backend/rules and all previous H2 test files match this committed
+baseline. Together these establish H2's durability, isolation, exact-once identity,
+strict stale-revision protection, automatic convergence and bounded observations.
+
+H2 COMPLETE: YES. STOP here. Next separate task: S1B-H3 final audit/full regression.
+S1B ACCEPTED / S1C READY / PHASE 4B READY: NO.
+Production changes / deploy / commit / push: NONE.
+
 ## H2C2B1 two-client offline/reconnect — PASS, 2026-10-21
 
 Baseline: clean committed H2C2A `f4141f4d97986687797dbe8d73f7e435b9431eb8`.

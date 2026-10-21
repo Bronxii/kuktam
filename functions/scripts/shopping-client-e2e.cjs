@@ -11,8 +11,9 @@ const h2b=process.env.KUKTAM_E2E_SCOPE==='H2B';
 const h2c1=process.env.KUKTAM_E2E_SCOPE==='H2C1';
 const h2c2a=process.env.KUKTAM_E2E_SCOPE==='H2C2A';
 const h2c2b1=process.env.KUKTAM_E2E_SCOPE==='H2C2B1';
+const h2c2b2=process.env.KUKTAM_E2E_SCOPE==='H2C2B2';
 const adb=path.join(process.env.LOCALAPPDATA,'Android/Sdk/platform-tools/adb.exe');
-if(h2a||h2b||h2c1||h2c2a||h2c2b1){
+if(h2a||h2b||h2c1||h2c2a||h2c2b1||h2c2b2){
  const avd=execFileSync(adb,['-s','emulator-5580','emu','avd','name'],{encoding:'utf8'});
  if(!avd.split('\n').map(s=>s.trim()).includes('Kuktam_H2A_Local'))throw Error('Dedicated H2A AVD required');
 }
@@ -28,7 +29,7 @@ const {HouseholdStore}=require('../lib/src/households/household-store');
 const {newMutationId}=require('../lib/src/shopping/mutation-contract');
 const app=initializeApp({projectId:'demo-kuktam-local'}),db=getFirestore(app),auth=getAuth(app);
 const store=new ShoppingMutationStore(db),households=new HouseholdStore(db);
-let paused=h2b||h2c2a||h2c2b1;const running=new Map(),queued=new Map();
+let paused=h2b||h2c2a||h2c2b1||h2c2b2;const running=new Map(),queued=new Map();
 async function execute(uid,id){
  const key=uid+'/'+id;if(paused||running.has(key))return;
  const work=(async()=>{let status;do{status=await store.process(uid,id,20);}while(status==='PROCESSING');})();
@@ -52,10 +53,10 @@ const server=http.createServer(async(req,res)=>{
   let result={};
   switch(req.url){
    case '/crash-ready':
-    if(!(h2a||h2b||h2c1)||!crashReady)throw Error('Unexpected crash request');
+    if(!(h2a||h2b||h2c1||h2c2b2)||!crashReady)throw Error('Unexpected crash request');
     crashReady();break;
    case '/process-selected':{
-    if(!(h2c2a||h2c2b1)||!paused||!Array.isArray(input.commands)||input.commands.length<1||input.commands.length>3||!['concurrent','ordered'].includes(input.mode))throw Error('Bounded paused H2C2A commands required');
+    if(!(h2c2a||h2c2b1||h2c2b2)||!paused||!Array.isArray(input.commands)||input.commands.length<1||input.commands.length>3||!['concurrent','ordered'].includes(input.mode))throw Error('Bounded paused multi-client commands required');
     const refs=input.commands.map(c=>{
       if(!/^client-[ab]$/.test(c.uid)||typeof c.id!=='string'||! /^[A-Za-z0-9_-]+$/.test(c.id))throw Error('Invalid local command');
       return db.doc(`users/${c.uid}/shoppingMutations/${c.id}`);
@@ -120,13 +121,13 @@ server.listen(8099,'127.0.0.1',async()=>{
  const flutter=process.env.KUKTAM_TEST_FLUTTER||'D:\\Flutter\\bin\\flutter.bat';
  const root=path.resolve(__dirname,'../..');
  try{
-  for(const phase of h2c2b1?['offline']:h2c2a?['online']:h2c1?['death-transition','resume-transition','invalid-reopen']:h2b?['death-queued','death-partial','complete','reopen']:h2a?['single','death-add','resume-add','death-edit','resume-edit']:['main','restart']){
+  for(const phase of h2c2b2?['death-offline','death-uncertain','complete']:h2c2b1?['offline']:h2c2a?['online']:h2c1?['death-transition','resume-transition','invalid-reopen']:h2b?['death-queued','death-partial','complete','reopen']:h2a?['single','death-add','resume-add','death-edit','resume-edit']:['main','restart']){
    const death=phase.startsWith('death-');
    let signal;
    const crash=new Promise(resolve=>{signal=resolve;});
    crashReady=death?signal:null;
    const code=await new Promise((resolve,reject)=>{
-    const child=spawn('cmd.exe',['/d','/c',flutter,'test',h2c2b1?'integration_test/shopping_h2c2b1_e2e_test.dart':h2c2a?'integration_test/shopping_h2c2a_e2e_test.dart':h2c1?'integration_test/shopping_h2c1_e2e_test.dart':h2b?'integration_test/shopping_h2b_e2e_test.dart':h2a?'integration_test/shopping_h2a_e2e_test.dart':'integration_test/shopping_mutation_e2e_test.dart','-d','emulator-5580','--no-uninstall',`--dart-define=SHOPPING_E2E_PHASE=${phase}`],{cwd:root,stdio:'inherit'});
+    const child=spawn('cmd.exe',['/d','/c',flutter,'test',h2c2b2?'integration_test/shopping_h2c2b2_e2e_test.dart':h2c2b1?'integration_test/shopping_h2c2b1_e2e_test.dart':h2c2a?'integration_test/shopping_h2c2a_e2e_test.dart':h2c1?'integration_test/shopping_h2c1_e2e_test.dart':h2b?'integration_test/shopping_h2b_e2e_test.dart':h2a?'integration_test/shopping_h2a_e2e_test.dart':'integration_test/shopping_mutation_e2e_test.dart','-d','emulator-5580','--no-uninstall',`--dart-define=SHOPPING_E2E_PHASE=${phase}`],{cwd:root,stdio:'inherit'});
     let killed=false,watchdog;
     if(death)crash.then(()=>{
      try{
@@ -137,7 +138,7 @@ server.listen(8099,'127.0.0.1',async()=>{
       try{remaining=execFileSync(adb,['-s','emulator-5580','shell','pidof','com.bronxii.kuktam'],{encoding:'utf8'}).trim();}catch(e){if(e.status!==1)throw e;}
       if(remaining)throw Error('Application survived force-stop');
       killed=true;
-      console.log(`${h2c1?'H2C1':h2b?'H2B':'H2A'} ${phase}: abrupt am force-stop verified, prior PID ${pid}; no graceful close`);
+      console.log(`${h2c2b2?'H2C2B2 (BOTH clients)':h2c1?'H2C1':h2b?'H2B':'H2A'} ${phase}: abrupt am force-stop verified, prior PID ${pid}; no graceful close`);
       // Harness watchdog only: the killed Flutter test runner may await VM data.
       // It does not decide application correctness or retry any mutation.
       watchdog=setTimeout(()=>{try{execFileSync('taskkill',['/PID',String(child.pid),'/T','/F']);}catch{}},15000);

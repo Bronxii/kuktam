@@ -1,3 +1,24 @@
+## H2C2B2 multi-client process-death evidence — PASS, 2026-10-21
+
+H2 is now complete; S1B acceptance still awaits separate H3 audit/regression.
+Two independent named Firebase/native Auth/Firestore/SQLite/coordinator clients
+survive two abrupt whole-application force-stops in the dedicated demo AVD.
+Offline restart reconstructs both original UID/context-bound requests and local
+projections before reconnect. Server-existing APPLIED receipt, unobserved locally
+at death, resolves with the same identity and no semantic replay. Both independent
+Milk cases preserve exactly 1000+300+2000=3300 ml in one canonical row. Restarted
+stale EDIT/DELETE/CHECK reject newer-state overwrite; isolated durable conflicts
+and automatic canonical convergence are verified. Fifteen immutable requests and
+their server results are compared, with no IDs regenerated or local UID leakage.
+
+Protocol/product unchanged. Only the guarded local harness and new native test
+were added/extended. One completed native phase PASS, two verified kills plus
+successful recovery assertions, targeted Flutter 85 PASS, analyzer/native APK/
+diff PASS. Prior H2 evidence audited, not rerun; see checkpoint for exact scope.
+One canonical listener and at most one <=10-parent receipt observer per client;
+no polling or permanent per-mutation listener. H3, S1C hardened rules and Family
+Phase4B remain separate and unstarted. Production unchanged; S1 overall incomplete.
+
 ## H2C2B1 offline multi-client evidence — PASS, 2026-10-21
 
 The same two independent native clients now prove offline semantic ADD/reconnect

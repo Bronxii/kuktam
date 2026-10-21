@@ -1,3 +1,22 @@
+## H2C2B2 update — PASS; H2 COMPLETE, 2026-10-21
+
+Baseline e2df8eda0a6ddf587241e0aa3c65c227bfe9b275 (committed H2C2B1).
+Two real force-stops kill BOTH independent native clients in the shared Android
+process. Both restart offline with original SQLite requests and separate cached
+projections. Existing server-APPLIED/local-unobserved command recovers without
+replay or manual refresh; B's pending work independently completes. Two Milk
+scenarios each finish at 3300 ml in one row. Stale EDIT/DELETE/CHECK after restart
+are rejected; newer 510 quantities remain, B-only notices survive the next kill.
+Final comparison proves all 15 original requests/IDs and server child receipts.
+One completed native phase PASS plus two verified kills/successful resumes;
+harness exit 0. Targeted Flutter 85 PASS; analyzer, native APK and diff check PASS.
+No business code changes. Initial test-only cache/projection event ordering barrier
+was corrected before final acceptance. Details and exact evidence in checkpoint.
+
+Previous H2A/H2B/H2C1/H2C2A/H2C2B1 evidence audited and unchanged; all PASS.
+H2 COMPLETE: YES. Next separate phase H3 final audit/full regression, NOT STARTED.
+S1B accepted/S1C ready/Family Phase4B ready: NO. Production/deploy/commit/push: NONE.
+
 ## H2C2B1 update — PASS, 2026-10-21
 
 Baseline f4141f4d97986687797dbe8d73f7e435b9431eb8 (committed H2C2A).
