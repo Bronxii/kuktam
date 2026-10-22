@@ -1,3 +1,32 @@
+## S1D2B final cost validation - PASS; S1D COMPLETE / ACCEPTED, 2026-10-22
+
+Baseline: 7719da0cdc78dfb565d509305fcdb624722df60a, committed S1D2A; clean start.
+No production backend/client/rules implementation changes required in S1D2B.
+Same instrumented R metric (not billing), W includes one immutable command write.
+Measured distinct ADD-only bulk, with actual maintenance continuations:
+private50 88 R /66 W; private200 358 R /261 W;
+family50 98 R /66 W; family200 398 R /261 W.
+ALL four original targets PASS; baseline retries0; block counts5/20.
+Two independent measurement runs: all54 records exactly identical.
+
+Semantic-unit merge50: private53/31, family63/31 R/W; merge200: private218/121,
+family258/121. Partial25, forced retry, interruption/resume, lost ACK, auth/epoch
+invalidation, external concurrent ADD, receipt/revision/cursor correctness PASS.
+Max10 block architecture and conservative legacy fallback unchanged.
+
+Full backend unit237/237 PASS. Full emulator662/662 PASS, including S1A/S1C,
+account deletion, billing and completed Family foundation. Complete S1D2A suite
+27/27 PASS. Acceptance run1 75/75; repeat48/48; no failures/skips. Functions build
+and diff-check PASS. No Flutter/native/Android rerun; no production code change.
+
+Details: [S1D2B_CHECKPOINT_2026-10-22.md](S1D2B_CHECKPOINT_2026-10-22.md).
+Evidence: [S1D2B_COST_MEASUREMENT.json](S1D2B_COST_MEASUREMENT.json).
+S1B COMPLETE / ACCEPTED; S1C COMPLETE LOCALLY; S1D1/S1D2A/S1D2B PASS.
+S1D COMPLETE / ACCEPTED. Family Phase4B READY FOR DEVELOPMENT: YES.
+Next separate phase: JOIN transfer / activation; NOT started here.
+Production Family rollout NO. Production access/changes/deploy NONE.
+Commit/push NO. Historical checkpoint results below are preserved unchanged.
+
 ## S1D2A atomic ADD blocks - PASS, 2026-10-22
 
 Baseline: 261d5602d02bd091b9ac8c84dcfc89d47e8575ac (committed S1D1).

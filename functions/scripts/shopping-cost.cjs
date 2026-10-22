@@ -2,7 +2,7 @@
 const {spawnSync}=require('node:child_process');
 const path=require('node:path');
 if(process.argv.length!==2)throw new Error('No target overrides allowed');
-const env={...process.env};
+const env={...process.env};delete env.S1D_COST_SMALL_ONLY;
 for(const key of ['GOOGLE_APPLICATION_CREDENTIALS','FIREBASE_TOKEN','FIREBASE_CONFIG','FIRESTORE_EMULATOR_HOST','FIREBASE_AUTH_EMULATOR_HOST'])delete env[key];
 env.GCLOUD_PROJECT=env.GOOGLE_CLOUD_PROJECT='demo-kuktam-local';
 env.METADATA_SERVER_DETECTION='none';env.CI='true';

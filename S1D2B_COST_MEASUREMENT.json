@@ -1,0 +1,6623 @@
+{
+  "measurementVersion": 1,
+  "baseline": "7719da0cdc78dfb565d509305fcdb624722df60a",
+  "comparisonBaseline": "S1D1_COST_BASELINE.json",
+  "historicalBaselines": {
+    "S1D1": [
+      {
+        "name": "private/BULK_1",
+        "submission": {
+          "documentGets": 0,
+          "missingDocuments": 0,
+          "queryCalls": 0,
+          "queryDocuments": 0,
+          "emptyQueries": 0,
+          "maxQueryDocuments": 0,
+          "readCategories": {},
+          "queryCategories": {},
+          "attemptedWrites": 1,
+          "committedWrites": 1,
+          "writeCategories": {
+            "commandReceipt": 1
+          },
+          "transactionCalls": 0,
+          "transactionAttempts": 0,
+          "transactionRetries": 0,
+          "readOnlyTransactions": 0
+        },
+        "continuationRounds": 0,
+        "totalWritesIncludingSubmission": 5,
+        "counts": {
+          "documentGets": 6,
+          "missingDocuments": 1,
+          "queryCalls": 1,
+          "queryDocuments": 0,
+          "emptyQueries": 1,
+          "maxQueryDocuments": 0,
+          "readCategories": {
+            "commandReceipt": 1,
+            "lifecycle": 1,
+            "user": 1,
+            "household": 1,
+            "membership": 1,
+            "reverseMembership": 1
+          },
+          "queryCategories": {
+            "itemCandidates": 1
+          },
+          "attemptedWrites": 4,
+          "committedWrites": 4,
+          "writeCategories": {
+            "household": 1,
+            "item": 1,
+            "commandReceipt": 1,
+            "work": 1
+          },
+          "transactionCalls": 1,
+          "transactionAttempts": 1,
+          "transactionRetries": 0,
+          "readOnlyTransactions": 0
+        },
+        "readEquivalent": 7
+      },
+      {
+        "name": "private/BULK_10",
+        "submission": {
+          "documentGets": 0,
+          "missingDocuments": 0,
+          "queryCalls": 0,
+          "queryDocuments": 0,
+          "emptyQueries": 0,
+          "maxQueryDocuments": 0,
+          "readCategories": {},
+          "queryCategories": {},
+          "attemptedWrites": 1,
+          "committedWrites": 1,
+          "writeCategories": {
+            "commandReceipt": 1
+          },
+          "transactionCalls": 0,
+          "transactionAttempts": 0,
+          "transactionRetries": 0,
+          "readOnlyTransactions": 0
+        },
+        "continuationRounds": 0,
+        "totalWritesIncludingSubmission": 41,
+        "counts": {
+          "documentGets": 60,
+          "missingDocuments": 10,
+          "queryCalls": 10,
+          "queryDocuments": 0,
+          "emptyQueries": 10,
+          "maxQueryDocuments": 0,
+          "readCategories": {
+            "commandReceipt": 10,
+            "lifecycle": 10,
+            "user": 10,
+            "household": 10,
+            "membership": 10,
+            "reverseMembership": 10
+          },
+          "queryCategories": {
+            "itemCandidates": 10
+          },
+          "attemptedWrites": 40,
+          "committedWrites": 40,
+          "writeCategories": {
+            "household": 10,
+            "item": 10,
+            "commandReceipt": 10,
+            "work": 10
+          },
+          "transactionCalls": 10,
+          "transactionAttempts": 10,
+          "transactionRetries": 0,
+          "readOnlyTransactions": 0
+        },
+        "readEquivalent": 70
+      },
+      {
+        "name": "private/BULK_50",
+        "submission": {
+          "documentGets": 0,
+          "missingDocuments": 0,
+          "queryCalls": 0,
+          "queryDocuments": 0,
+          "emptyQueries": 0,
+          "maxQueryDocuments": 0,
+          "readCategories": {},
+          "queryCategories": {},
+          "attemptedWrites": 1,
+          "committedWrites": 1,
+          "writeCategories": {
+            "commandReceipt": 1
+          },
+          "transactionCalls": 0,
+          "transactionAttempts": 0,
+          "transactionRetries": 0,
+          "readOnlyTransactions": 0
+        },
+        "continuationRounds": 4,
+        "totalWritesIncludingSubmission": 201,
+        "counts": {
+          "documentGets": 304,
+          "missingDocuments": 50,
+          "queryCalls": 54,
+          "queryDocuments": 4,
+          "emptyQueries": 50,
+          "maxQueryDocuments": 1,
+          "readCategories": {
+            "commandReceipt": 54,
+            "lifecycle": 50,
+            "user": 50,
+            "household": 50,
+            "membership": 50,
+            "reverseMembership": 50
+          },
+          "queryCategories": {
+            "itemCandidates": 50,
+            "dueWork": 4
+          },
+          "attemptedWrites": 200,
+          "committedWrites": 200,
+          "writeCategories": {
+            "household": 50,
+            "item": 50,
+            "commandReceipt": 50,
+            "work": 50
+          },
+          "transactionCalls": 54,
+          "transactionAttempts": 54,
+          "transactionRetries": 0,
+          "readOnlyTransactions": 4
+        },
+        "readEquivalent": 358
+      },
+      {
+        "name": "private/BULK_200",
+        "submission": {
+          "documentGets": 0,
+          "missingDocuments": 0,
+          "queryCalls": 0,
+          "queryDocuments": 0,
+          "emptyQueries": 0,
+          "maxQueryDocuments": 0,
+          "readCategories": {},
+          "queryCategories": {},
+          "attemptedWrites": 1,
+          "committedWrites": 1,
+          "writeCategories": {
+            "commandReceipt": 1
+          },
+          "transactionCalls": 0,
+          "transactionAttempts": 0,
+          "transactionRetries": 0,
+          "readOnlyTransactions": 0
+        },
+        "continuationRounds": 19,
+        "totalWritesIncludingSubmission": 801,
+        "counts": {
+          "documentGets": 1219,
+          "missingDocuments": 200,
+          "queryCalls": 219,
+          "queryDocuments": 19,
+          "emptyQueries": 200,
+          "maxQueryDocuments": 1,
+          "readCategories": {
+            "commandReceipt": 219,
+            "lifecycle": 200,
+            "user": 200,
+            "household": 200,
+            "membership": 200,
+            "reverseMembership": 200
+          },
+          "queryCategories": {
+            "itemCandidates": 200,
+            "dueWork": 19
+          },
+          "attemptedWrites": 800,
+          "committedWrites": 800,
+          "writeCategories": {
+            "household": 200,
+            "item": 200,
+            "commandReceipt": 200,
+            "work": 200
+          },
+          "transactionCalls": 219,
+          "transactionAttempts": 219,
+          "transactionRetries": 0,
+          "readOnlyTransactions": 19
+        },
+        "readEquivalent": 1438
+      },
+      {
+        "name": "family/BULK_1",
+        "submission": {
+          "documentGets": 0,
+          "missingDocuments": 0,
+          "queryCalls": 0,
+          "queryDocuments": 0,
+          "emptyQueries": 0,
+          "maxQueryDocuments": 0,
+          "readCategories": {},
+          "queryCategories": {},
+          "attemptedWrites": 1,
+          "committedWrites": 1,
+          "writeCategories": {
+            "commandReceipt": 1
+          },
+          "transactionCalls": 0,
+          "transactionAttempts": 0,
+          "transactionRetries": 0,
+          "readOnlyTransactions": 0
+        },
+        "continuationRounds": 0,
+        "totalWritesIncludingSubmission": 5,
+        "counts": {
+          "documentGets": 8,
+          "missingDocuments": 0,
+          "queryCalls": 1,
+          "queryDocuments": 0,
+          "emptyQueries": 1,
+          "maxQueryDocuments": 0,
+          "readCategories": {
+            "commandReceipt": 1,
+            "lifecycle": 1,
+            "user": 1,
+            "household": 1,
+            "membership": 1,
+            "reverseMembership": 1,
+            "fallbackHousehold": 1,
+            "fallbackMembership": 1
+          },
+          "queryCategories": {
+            "itemCandidates": 1
+          },
+          "attemptedWrites": 4,
+          "committedWrites": 4,
+          "writeCategories": {
+            "household": 1,
+            "item": 1,
+            "commandReceipt": 1,
+            "work": 1
+          },
+          "transactionCalls": 1,
+          "transactionAttempts": 1,
+          "transactionRetries": 0,
+          "readOnlyTransactions": 0
+        },
+        "readEquivalent": 9
+      },
+      {
+        "name": "family/BULK_10",
+        "submission": {
+          "documentGets": 0,
+          "missingDocuments": 0,
+          "queryCalls": 0,
+          "queryDocuments": 0,
+          "emptyQueries": 0,
+          "maxQueryDocuments": 0,
+          "readCategories": {},
+          "queryCategories": {},
+          "attemptedWrites": 1,
+          "committedWrites": 1,
+          "writeCategories": {
+            "commandReceipt": 1
+          },
+          "transactionCalls": 0,
+          "transactionAttempts": 0,
+          "transactionRetries": 0,
+          "readOnlyTransactions": 0
+        },
+        "continuationRounds": 0,
+        "totalWritesIncludingSubmission": 41,
+        "counts": {
+          "documentGets": 80,
+          "missingDocuments": 0,
+          "queryCalls": 10,
+          "queryDocuments": 0,
+          "emptyQueries": 10,
+          "maxQueryDocuments": 0,
+          "readCategories": {
+            "commandReceipt": 10,
+            "lifecycle": 10,
+            "user": 10,
+            "household": 10,
+            "membership": 10,
+            "reverseMembership": 10,
+            "fallbackHousehold": 10,
+            "fallbackMembership": 10
+          },
+          "queryCategories": {
+            "itemCandidates": 10
+          },
+          "attemptedWrites": 40,
+          "committedWrites": 40,
+          "writeCategories": {
+            "household": 10,
+            "item": 10,
+            "commandReceipt": 10,
+            "work": 10
+          },
+          "transactionCalls": 10,
+          "transactionAttempts": 10,
+          "transactionRetries": 0,
+          "readOnlyTransactions": 0
+        },
+        "readEquivalent": 90
+      },
+      {
+        "name": "family/BULK_50",
+        "submission": {
+          "documentGets": 0,
+          "missingDocuments": 0,
+          "queryCalls": 0,
+          "queryDocuments": 0,
+          "emptyQueries": 0,
+          "maxQueryDocuments": 0,
+          "readCategories": {},
+          "queryCategories": {},
+          "attemptedWrites": 1,
+          "committedWrites": 1,
+          "writeCategories": {
+            "commandReceipt": 1
+          },
+          "transactionCalls": 0,
+          "transactionAttempts": 0,
+          "transactionRetries": 0,
+          "readOnlyTransactions": 0
+        },
+        "continuationRounds": 4,
+        "totalWritesIncludingSubmission": 201,
+        "counts": {
+          "documentGets": 404,
+          "missingDocuments": 0,
+          "queryCalls": 54,
+          "queryDocuments": 4,
+          "emptyQueries": 50,
+          "maxQueryDocuments": 1,
+          "readCategories": {
+            "commandReceipt": 54,
+            "lifecycle": 50,
+            "user": 50,
+            "household": 50,
+            "membership": 50,
+            "reverseMembership": 50,
+            "fallbackHousehold": 50,
+            "fallbackMembership": 50
+          },
+          "queryCategories": {
+            "itemCandidates": 50,
+            "dueWork": 4
+          },
+          "attemptedWrites": 200,
+          "committedWrites": 200,
+          "writeCategories": {
+            "household": 50,
+            "item": 50,
+            "commandReceipt": 50,
+            "work": 50
+          },
+          "transactionCalls": 54,
+          "transactionAttempts": 54,
+          "transactionRetries": 0,
+          "readOnlyTransactions": 4
+        },
+        "readEquivalent": 458
+      },
+      {
+        "name": "family/BULK_200",
+        "submission": {
+          "documentGets": 0,
+          "missingDocuments": 0,
+          "queryCalls": 0,
+          "queryDocuments": 0,
+          "emptyQueries": 0,
+          "maxQueryDocuments": 0,
+          "readCategories": {},
+          "queryCategories": {},
+          "attemptedWrites": 1,
+          "committedWrites": 1,
+          "writeCategories": {
+            "commandReceipt": 1
+          },
+          "transactionCalls": 0,
+          "transactionAttempts": 0,
+          "transactionRetries": 0,
+          "readOnlyTransactions": 0
+        },
+        "continuationRounds": 19,
+        "totalWritesIncludingSubmission": 801,
+        "counts": {
+          "documentGets": 1619,
+          "missingDocuments": 0,
+          "queryCalls": 219,
+          "queryDocuments": 19,
+          "emptyQueries": 200,
+          "maxQueryDocuments": 1,
+          "readCategories": {
+            "commandReceipt": 219,
+            "lifecycle": 200,
+            "user": 200,
+            "household": 200,
+            "membership": 200,
+            "reverseMembership": 200,
+            "fallbackHousehold": 200,
+            "fallbackMembership": 200
+          },
+          "queryCategories": {
+            "itemCandidates": 200,
+            "dueWork": 19
+          },
+          "attemptedWrites": 800,
+          "committedWrites": 800,
+          "writeCategories": {
+            "household": 200,
+            "item": 200,
+            "commandReceipt": 200,
+            "work": 200
+          },
+          "transactionCalls": 219,
+          "transactionAttempts": 219,
+          "transactionRetries": 0,
+          "readOnlyTransactions": 19
+        },
+        "readEquivalent": 1838
+      }
+    ],
+    "S1D2A": [
+      {
+        "name": "private/BULK_1",
+        "submission": {
+          "documentGets": 0,
+          "missingDocuments": 0,
+          "queryCalls": 0,
+          "queryDocuments": 0,
+          "emptyQueries": 0,
+          "maxQueryDocuments": 0,
+          "readCategories": {},
+          "queryCategories": {},
+          "attemptedWrites": 1,
+          "committedWrites": 1,
+          "writeCategories": {
+            "commandReceipt": 1
+          },
+          "transactionCalls": 0,
+          "transactionAttempts": 0,
+          "transactionRetries": 0,
+          "readOnlyTransactions": 0
+        },
+        "continuationRounds": 0,
+        "totalWritesIncludingSubmission": 5,
+        "counts": {
+          "documentGets": 6,
+          "missingDocuments": 1,
+          "queryCalls": 1,
+          "queryDocuments": 0,
+          "emptyQueries": 1,
+          "maxQueryDocuments": 0,
+          "readCategories": {
+            "commandReceipt": 1,
+            "lifecycle": 1,
+            "user": 1,
+            "household": 1,
+            "membership": 1,
+            "reverseMembership": 1
+          },
+          "queryCategories": {
+            "itemCandidates": 1
+          },
+          "attemptedWrites": 4,
+          "committedWrites": 4,
+          "writeCategories": {
+            "household": 1,
+            "item": 1,
+            "commandReceipt": 1,
+            "work": 1
+          },
+          "transactionCalls": 1,
+          "transactionAttempts": 1,
+          "transactionRetries": 0,
+          "readOnlyTransactions": 0
+        },
+        "readEquivalent": 7
+      },
+      {
+        "name": "private/BULK_10",
+        "submission": {
+          "documentGets": 0,
+          "missingDocuments": 0,
+          "queryCalls": 0,
+          "queryDocuments": 0,
+          "emptyQueries": 0,
+          "maxQueryDocuments": 0,
+          "readCategories": {},
+          "queryCategories": {},
+          "attemptedWrites": 1,
+          "committedWrites": 1,
+          "writeCategories": {
+            "commandReceipt": 1
+          },
+          "transactionCalls": 0,
+          "transactionAttempts": 0,
+          "transactionRetries": 0,
+          "readOnlyTransactions": 0
+        },
+        "continuationRounds": 0,
+        "totalWritesIncludingSubmission": 14,
+        "counts": {
+          "documentGets": 6,
+          "missingDocuments": 1,
+          "queryCalls": 10,
+          "queryDocuments": 0,
+          "emptyQueries": 10,
+          "maxQueryDocuments": 0,
+          "readCategories": {
+            "commandReceipt": 1,
+            "lifecycle": 1,
+            "user": 1,
+            "household": 1,
+            "membership": 1,
+            "reverseMembership": 1
+          },
+          "queryCategories": {
+            "itemCandidates": 10
+          },
+          "attemptedWrites": 13,
+          "committedWrites": 13,
+          "writeCategories": {
+            "household": 1,
+            "item": 10,
+            "commandReceipt": 1,
+            "work": 1
+          },
+          "transactionCalls": 1,
+          "transactionAttempts": 1,
+          "transactionRetries": 0,
+          "readOnlyTransactions": 0
+        },
+        "readEquivalent": 16
+      },
+      {
+        "name": "family/BULK_1",
+        "submission": {
+          "documentGets": 0,
+          "missingDocuments": 0,
+          "queryCalls": 0,
+          "queryDocuments": 0,
+          "emptyQueries": 0,
+          "maxQueryDocuments": 0,
+          "readCategories": {},
+          "queryCategories": {},
+          "attemptedWrites": 1,
+          "committedWrites": 1,
+          "writeCategories": {
+            "commandReceipt": 1
+          },
+          "transactionCalls": 0,
+          "transactionAttempts": 0,
+          "transactionRetries": 0,
+          "readOnlyTransactions": 0
+        },
+        "continuationRounds": 0,
+        "totalWritesIncludingSubmission": 5,
+        "counts": {
+          "documentGets": 8,
+          "missingDocuments": 0,
+          "queryCalls": 1,
+          "queryDocuments": 0,
+          "emptyQueries": 1,
+          "maxQueryDocuments": 0,
+          "readCategories": {
+            "commandReceipt": 1,
+            "lifecycle": 1,
+            "user": 1,
+            "household": 1,
+            "membership": 1,
+            "reverseMembership": 1,
+            "fallbackHousehold": 1,
+            "fallbackMembership": 1
+          },
+          "queryCategories": {
+            "itemCandidates": 1
+          },
+          "attemptedWrites": 4,
+          "committedWrites": 4,
+          "writeCategories": {
+            "household": 1,
+            "item": 1,
+            "commandReceipt": 1,
+            "work": 1
+          },
+          "transactionCalls": 1,
+          "transactionAttempts": 1,
+          "transactionRetries": 0,
+          "readOnlyTransactions": 0
+        },
+        "readEquivalent": 9
+      },
+      {
+        "name": "family/BULK_10",
+        "submission": {
+          "documentGets": 0,
+          "missingDocuments": 0,
+          "queryCalls": 0,
+          "queryDocuments": 0,
+          "emptyQueries": 0,
+          "maxQueryDocuments": 0,
+          "readCategories": {},
+          "queryCategories": {},
+          "attemptedWrites": 1,
+          "committedWrites": 1,
+          "writeCategories": {
+            "commandReceipt": 1
+          },
+          "transactionCalls": 0,
+          "transactionAttempts": 0,
+          "transactionRetries": 0,
+          "readOnlyTransactions": 0
+        },
+        "continuationRounds": 0,
+        "totalWritesIncludingSubmission": 14,
+        "counts": {
+          "documentGets": 8,
+          "missingDocuments": 0,
+          "queryCalls": 10,
+          "queryDocuments": 0,
+          "emptyQueries": 10,
+          "maxQueryDocuments": 0,
+          "readCategories": {
+            "commandReceipt": 1,
+            "lifecycle": 1,
+            "user": 1,
+            "household": 1,
+            "membership": 1,
+            "reverseMembership": 1,
+            "fallbackHousehold": 1,
+            "fallbackMembership": 1
+          },
+          "queryCategories": {
+            "itemCandidates": 10
+          },
+          "attemptedWrites": 13,
+          "committedWrites": 13,
+          "writeCategories": {
+            "household": 1,
+            "item": 10,
+            "commandReceipt": 1,
+            "work": 1
+          },
+          "transactionCalls": 1,
+          "transactionAttempts": 1,
+          "transactionRetries": 0,
+          "readOnlyTransactions": 0
+        },
+        "readEquivalent": 18
+      }
+    ]
+  },
+  "executor": "current checkout",
+  "project": "demo-kuktam-local",
+  "method": "Actual SDK operations/results, not billing counters. readEquivalent = documentGets + queryDocuments + emptyQueries. Submission separate; client/rules reads excluded.",
+  "reports": [
+    {
+      "name": "private/ADD_NEW",
+      "childCount": 1,
+      "blockCount": 1,
+      "progress": [
+        1
+      ],
+      "finalParentState": "APPLIED",
+      "submission": {
+        "documentGets": 0,
+        "missingDocuments": 0,
+        "queryCalls": 0,
+        "queryDocuments": 0,
+        "emptyQueries": 0,
+        "maxQueryDocuments": 0,
+        "readCategories": {},
+        "queryCategories": {},
+        "attemptedWrites": 1,
+        "committedWrites": 1,
+        "writeCategories": {
+          "commandReceipt": 1
+        },
+        "transactionCalls": 0,
+        "transactionAttempts": 0,
+        "transactionRetries": 0,
+        "readOnlyTransactions": 0
+      },
+      "continuationRounds": 0,
+      "totalWritesIncludingSubmission": 5,
+      "counts": {
+        "documentGets": 6,
+        "missingDocuments": 1,
+        "queryCalls": 1,
+        "queryDocuments": 0,
+        "emptyQueries": 1,
+        "maxQueryDocuments": 0,
+        "readCategories": {
+          "commandReceipt": 1,
+          "lifecycle": 1,
+          "user": 1,
+          "household": 1,
+          "membership": 1,
+          "reverseMembership": 1
+        },
+        "queryCategories": {
+          "itemCandidates": 1
+        },
+        "attemptedWrites": 4,
+        "committedWrites": 4,
+        "writeCategories": {
+          "household": 1,
+          "item": 1,
+          "commandReceipt": 1,
+          "work": 1
+        },
+        "transactionCalls": 1,
+        "transactionAttempts": 1,
+        "transactionRetries": 0,
+        "readOnlyTransactions": 0
+      },
+      "readEquivalent": 7
+    },
+    {
+      "name": "private/ADD_MERGE",
+      "childCount": 1,
+      "blockCount": 1,
+      "progress": [
+        1
+      ],
+      "finalParentState": "APPLIED",
+      "submission": {
+        "documentGets": 0,
+        "missingDocuments": 0,
+        "queryCalls": 0,
+        "queryDocuments": 0,
+        "emptyQueries": 0,
+        "maxQueryDocuments": 0,
+        "readCategories": {},
+        "queryCategories": {},
+        "attemptedWrites": 1,
+        "committedWrites": 1,
+        "writeCategories": {
+          "commandReceipt": 1
+        },
+        "transactionCalls": 0,
+        "transactionAttempts": 0,
+        "transactionRetries": 0,
+        "readOnlyTransactions": 0
+      },
+      "continuationRounds": 0,
+      "totalWritesIncludingSubmission": 5,
+      "counts": {
+        "documentGets": 6,
+        "missingDocuments": 1,
+        "queryCalls": 1,
+        "queryDocuments": 1,
+        "emptyQueries": 0,
+        "maxQueryDocuments": 1,
+        "readCategories": {
+          "commandReceipt": 1,
+          "lifecycle": 1,
+          "user": 1,
+          "household": 1,
+          "membership": 1,
+          "reverseMembership": 1
+        },
+        "queryCategories": {
+          "itemCandidates": 1
+        },
+        "attemptedWrites": 4,
+        "committedWrites": 4,
+        "writeCategories": {
+          "household": 1,
+          "item": 1,
+          "commandReceipt": 1,
+          "work": 1
+        },
+        "transactionCalls": 1,
+        "transactionAttempts": 1,
+        "transactionRetries": 0,
+        "readOnlyTransactions": 0
+      },
+      "readEquivalent": 7
+    },
+    {
+      "name": "private/EDIT",
+      "childCount": 1,
+      "progress": [],
+      "finalParentState": "APPLIED",
+      "submission": {
+        "documentGets": 0,
+        "missingDocuments": 0,
+        "queryCalls": 0,
+        "queryDocuments": 0,
+        "emptyQueries": 0,
+        "maxQueryDocuments": 0,
+        "readCategories": {},
+        "queryCategories": {},
+        "attemptedWrites": 1,
+        "committedWrites": 1,
+        "writeCategories": {
+          "commandReceipt": 1
+        },
+        "transactionCalls": 0,
+        "transactionAttempts": 0,
+        "transactionRetries": 0,
+        "readOnlyTransactions": 0
+      },
+      "continuationRounds": 0,
+      "totalWritesIncludingSubmission": 5,
+      "counts": {
+        "documentGets": 7,
+        "missingDocuments": 1,
+        "queryCalls": 1,
+        "queryDocuments": 0,
+        "emptyQueries": 1,
+        "maxQueryDocuments": 0,
+        "readCategories": {
+          "commandReceipt": 1,
+          "lifecycle": 1,
+          "user": 1,
+          "household": 1,
+          "membership": 1,
+          "reverseMembership": 1,
+          "item": 1
+        },
+        "queryCategories": {
+          "itemCandidates": 1
+        },
+        "attemptedWrites": 4,
+        "committedWrites": 4,
+        "writeCategories": {
+          "household": 1,
+          "item": 1,
+          "commandReceipt": 1,
+          "work": 1
+        },
+        "transactionCalls": 1,
+        "transactionAttempts": 1,
+        "transactionRetries": 0,
+        "readOnlyTransactions": 0
+      },
+      "readEquivalent": 8
+    },
+    {
+      "name": "private/CHECK",
+      "childCount": 1,
+      "progress": [],
+      "finalParentState": "APPLIED",
+      "submission": {
+        "documentGets": 0,
+        "missingDocuments": 0,
+        "queryCalls": 0,
+        "queryDocuments": 0,
+        "emptyQueries": 0,
+        "maxQueryDocuments": 0,
+        "readCategories": {},
+        "queryCategories": {},
+        "attemptedWrites": 1,
+        "committedWrites": 1,
+        "writeCategories": {
+          "commandReceipt": 1
+        },
+        "transactionCalls": 0,
+        "transactionAttempts": 0,
+        "transactionRetries": 0,
+        "readOnlyTransactions": 0
+      },
+      "continuationRounds": 0,
+      "totalWritesIncludingSubmission": 5,
+      "counts": {
+        "documentGets": 7,
+        "missingDocuments": 1,
+        "queryCalls": 0,
+        "queryDocuments": 0,
+        "emptyQueries": 0,
+        "maxQueryDocuments": 0,
+        "readCategories": {
+          "commandReceipt": 1,
+          "lifecycle": 1,
+          "user": 1,
+          "household": 1,
+          "membership": 1,
+          "reverseMembership": 1,
+          "item": 1
+        },
+        "queryCategories": {},
+        "attemptedWrites": 4,
+        "committedWrites": 4,
+        "writeCategories": {
+          "household": 1,
+          "item": 1,
+          "commandReceipt": 1,
+          "work": 1
+        },
+        "transactionCalls": 1,
+        "transactionAttempts": 1,
+        "transactionRetries": 0,
+        "readOnlyTransactions": 0
+      },
+      "readEquivalent": 7
+    },
+    {
+      "name": "private/DELETE",
+      "childCount": 1,
+      "progress": [],
+      "finalParentState": "APPLIED",
+      "submission": {
+        "documentGets": 0,
+        "missingDocuments": 0,
+        "queryCalls": 0,
+        "queryDocuments": 0,
+        "emptyQueries": 0,
+        "maxQueryDocuments": 0,
+        "readCategories": {},
+        "queryCategories": {},
+        "attemptedWrites": 1,
+        "committedWrites": 1,
+        "writeCategories": {
+          "commandReceipt": 1
+        },
+        "transactionCalls": 0,
+        "transactionAttempts": 0,
+        "transactionRetries": 0,
+        "readOnlyTransactions": 0
+      },
+      "continuationRounds": 0,
+      "totalWritesIncludingSubmission": 5,
+      "counts": {
+        "documentGets": 7,
+        "missingDocuments": 1,
+        "queryCalls": 0,
+        "queryDocuments": 0,
+        "emptyQueries": 0,
+        "maxQueryDocuments": 0,
+        "readCategories": {
+          "commandReceipt": 1,
+          "lifecycle": 1,
+          "user": 1,
+          "household": 1,
+          "membership": 1,
+          "reverseMembership": 1,
+          "item": 1
+        },
+        "queryCategories": {},
+        "attemptedWrites": 4,
+        "committedWrites": 4,
+        "writeCategories": {
+          "household": 1,
+          "item": 1,
+          "commandReceipt": 1,
+          "work": 1
+        },
+        "transactionCalls": 1,
+        "transactionAttempts": 1,
+        "transactionRetries": 0,
+        "readOnlyTransactions": 0
+      },
+      "readEquivalent": 7
+    },
+    {
+      "name": "private/BULK_1",
+      "childCount": 1,
+      "blockCount": 1,
+      "progress": [
+        1
+      ],
+      "finalParentState": "APPLIED",
+      "submission": {
+        "documentGets": 0,
+        "missingDocuments": 0,
+        "queryCalls": 0,
+        "queryDocuments": 0,
+        "emptyQueries": 0,
+        "maxQueryDocuments": 0,
+        "readCategories": {},
+        "queryCategories": {},
+        "attemptedWrites": 1,
+        "committedWrites": 1,
+        "writeCategories": {
+          "commandReceipt": 1
+        },
+        "transactionCalls": 0,
+        "transactionAttempts": 0,
+        "transactionRetries": 0,
+        "readOnlyTransactions": 0
+      },
+      "continuationRounds": 0,
+      "totalWritesIncludingSubmission": 5,
+      "counts": {
+        "documentGets": 6,
+        "missingDocuments": 1,
+        "queryCalls": 1,
+        "queryDocuments": 0,
+        "emptyQueries": 1,
+        "maxQueryDocuments": 0,
+        "readCategories": {
+          "commandReceipt": 1,
+          "lifecycle": 1,
+          "user": 1,
+          "household": 1,
+          "membership": 1,
+          "reverseMembership": 1
+        },
+        "queryCategories": {
+          "itemCandidates": 1
+        },
+        "attemptedWrites": 4,
+        "committedWrites": 4,
+        "writeCategories": {
+          "household": 1,
+          "item": 1,
+          "commandReceipt": 1,
+          "work": 1
+        },
+        "transactionCalls": 1,
+        "transactionAttempts": 1,
+        "transactionRetries": 0,
+        "readOnlyTransactions": 0
+      },
+      "readEquivalent": 7
+    },
+    {
+      "name": "private/BULK_10",
+      "childCount": 10,
+      "blockCount": 1,
+      "progress": [
+        10
+      ],
+      "finalParentState": "APPLIED",
+      "submission": {
+        "documentGets": 0,
+        "missingDocuments": 0,
+        "queryCalls": 0,
+        "queryDocuments": 0,
+        "emptyQueries": 0,
+        "maxQueryDocuments": 0,
+        "readCategories": {},
+        "queryCategories": {},
+        "attemptedWrites": 1,
+        "committedWrites": 1,
+        "writeCategories": {
+          "commandReceipt": 1
+        },
+        "transactionCalls": 0,
+        "transactionAttempts": 0,
+        "transactionRetries": 0,
+        "readOnlyTransactions": 0
+      },
+      "continuationRounds": 0,
+      "totalWritesIncludingSubmission": 14,
+      "counts": {
+        "documentGets": 6,
+        "missingDocuments": 1,
+        "queryCalls": 10,
+        "queryDocuments": 0,
+        "emptyQueries": 10,
+        "maxQueryDocuments": 0,
+        "readCategories": {
+          "commandReceipt": 1,
+          "lifecycle": 1,
+          "user": 1,
+          "household": 1,
+          "membership": 1,
+          "reverseMembership": 1
+        },
+        "queryCategories": {
+          "itemCandidates": 10
+        },
+        "attemptedWrites": 13,
+        "committedWrites": 13,
+        "writeCategories": {
+          "household": 1,
+          "item": 10,
+          "commandReceipt": 1,
+          "work": 1
+        },
+        "transactionCalls": 1,
+        "transactionAttempts": 1,
+        "transactionRetries": 0,
+        "readOnlyTransactions": 0
+      },
+      "readEquivalent": 16
+    },
+    {
+      "name": "private/BULK_50",
+      "childCount": 50,
+      "blockCount": 5,
+      "progress": [
+        10,
+        20,
+        30,
+        40,
+        50
+      ],
+      "finalParentState": "APPLIED",
+      "submission": {
+        "documentGets": 0,
+        "missingDocuments": 0,
+        "queryCalls": 0,
+        "queryDocuments": 0,
+        "emptyQueries": 0,
+        "maxQueryDocuments": 0,
+        "readCategories": {},
+        "queryCategories": {},
+        "attemptedWrites": 1,
+        "committedWrites": 1,
+        "writeCategories": {
+          "commandReceipt": 1
+        },
+        "transactionCalls": 0,
+        "transactionAttempts": 0,
+        "transactionRetries": 0,
+        "readOnlyTransactions": 0
+      },
+      "continuationRounds": 4,
+      "totalWritesIncludingSubmission": 66,
+      "counts": {
+        "documentGets": 34,
+        "missingDocuments": 5,
+        "queryCalls": 54,
+        "queryDocuments": 4,
+        "emptyQueries": 50,
+        "maxQueryDocuments": 1,
+        "readCategories": {
+          "commandReceipt": 9,
+          "lifecycle": 5,
+          "user": 5,
+          "household": 5,
+          "membership": 5,
+          "reverseMembership": 5
+        },
+        "queryCategories": {
+          "itemCandidates": 50,
+          "dueWork": 4
+        },
+        "attemptedWrites": 65,
+        "committedWrites": 65,
+        "writeCategories": {
+          "household": 5,
+          "item": 50,
+          "commandReceipt": 5,
+          "work": 5
+        },
+        "transactionCalls": 9,
+        "transactionAttempts": 9,
+        "transactionRetries": 0,
+        "readOnlyTransactions": 4
+      },
+      "readEquivalent": 88
+    },
+    {
+      "name": "private/BULK_200",
+      "childCount": 200,
+      "blockCount": 20,
+      "progress": [
+        10,
+        20,
+        30,
+        40,
+        50,
+        60,
+        70,
+        80,
+        90,
+        100,
+        110,
+        120,
+        130,
+        140,
+        150,
+        160,
+        170,
+        180,
+        190,
+        200
+      ],
+      "finalParentState": "APPLIED",
+      "submission": {
+        "documentGets": 0,
+        "missingDocuments": 0,
+        "queryCalls": 0,
+        "queryDocuments": 0,
+        "emptyQueries": 0,
+        "maxQueryDocuments": 0,
+        "readCategories": {},
+        "queryCategories": {},
+        "attemptedWrites": 1,
+        "committedWrites": 1,
+        "writeCategories": {
+          "commandReceipt": 1
+        },
+        "transactionCalls": 0,
+        "transactionAttempts": 0,
+        "transactionRetries": 0,
+        "readOnlyTransactions": 0
+      },
+      "continuationRounds": 19,
+      "totalWritesIncludingSubmission": 261,
+      "counts": {
+        "documentGets": 139,
+        "missingDocuments": 20,
+        "queryCalls": 219,
+        "queryDocuments": 19,
+        "emptyQueries": 200,
+        "maxQueryDocuments": 1,
+        "readCategories": {
+          "commandReceipt": 39,
+          "lifecycle": 20,
+          "user": 20,
+          "household": 20,
+          "membership": 20,
+          "reverseMembership": 20
+        },
+        "queryCategories": {
+          "itemCandidates": 200,
+          "dueWork": 19
+        },
+        "attemptedWrites": 260,
+        "committedWrites": 260,
+        "writeCategories": {
+          "household": 20,
+          "item": 200,
+          "commandReceipt": 20,
+          "work": 20
+        },
+        "transactionCalls": 39,
+        "transactionAttempts": 39,
+        "transactionRetries": 0,
+        "readOnlyTransactions": 19
+      },
+      "readEquivalent": 358
+    },
+    {
+      "name": "private/MERGE_BULK_50",
+      "childCount": 50,
+      "blockCount": 5,
+      "progress": [
+        10,
+        20,
+        30,
+        40,
+        50
+      ],
+      "finalParentState": "APPLIED",
+      "submission": {
+        "documentGets": 0,
+        "missingDocuments": 0,
+        "queryCalls": 0,
+        "queryDocuments": 0,
+        "emptyQueries": 0,
+        "maxQueryDocuments": 0,
+        "readCategories": {},
+        "queryCategories": {},
+        "attemptedWrites": 1,
+        "committedWrites": 1,
+        "writeCategories": {
+          "commandReceipt": 1
+        },
+        "transactionCalls": 0,
+        "transactionAttempts": 0,
+        "transactionRetries": 0,
+        "readOnlyTransactions": 0
+      },
+      "continuationRounds": 4,
+      "totalWritesIncludingSubmission": 41,
+      "counts": {
+        "documentGets": 34,
+        "missingDocuments": 5,
+        "queryCalls": 29,
+        "queryDocuments": 24,
+        "emptyQueries": 5,
+        "maxQueryDocuments": 1,
+        "readCategories": {
+          "commandReceipt": 9,
+          "lifecycle": 5,
+          "user": 5,
+          "household": 5,
+          "membership": 5,
+          "reverseMembership": 5
+        },
+        "queryCategories": {
+          "itemCandidates": 25,
+          "dueWork": 4
+        },
+        "attemptedWrites": 40,
+        "committedWrites": 40,
+        "writeCategories": {
+          "household": 5,
+          "item": 25,
+          "commandReceipt": 5,
+          "work": 5
+        },
+        "transactionCalls": 9,
+        "transactionAttempts": 9,
+        "transactionRetries": 0,
+        "readOnlyTransactions": 4
+      },
+      "readEquivalent": 63
+    },
+    {
+      "name": "private/MIXED_5",
+      "childCount": 5,
+      "progress": [],
+      "finalParentState": "APPLIED",
+      "submission": {
+        "documentGets": 0,
+        "missingDocuments": 0,
+        "queryCalls": 0,
+        "queryDocuments": 0,
+        "emptyQueries": 0,
+        "maxQueryDocuments": 0,
+        "readCategories": {},
+        "queryCategories": {},
+        "attemptedWrites": 1,
+        "committedWrites": 1,
+        "writeCategories": {
+          "commandReceipt": 1
+        },
+        "transactionCalls": 0,
+        "transactionAttempts": 0,
+        "transactionRetries": 0,
+        "readOnlyTransactions": 0
+      },
+      "continuationRounds": 0,
+      "totalWritesIncludingSubmission": 21,
+      "counts": {
+        "documentGets": 33,
+        "missingDocuments": 5,
+        "queryCalls": 3,
+        "queryDocuments": 1,
+        "emptyQueries": 2,
+        "maxQueryDocuments": 1,
+        "readCategories": {
+          "commandReceipt": 5,
+          "lifecycle": 5,
+          "user": 5,
+          "household": 5,
+          "membership": 5,
+          "reverseMembership": 5,
+          "item": 3
+        },
+        "queryCategories": {
+          "itemCandidates": 3
+        },
+        "attemptedWrites": 20,
+        "committedWrites": 20,
+        "writeCategories": {
+          "household": 5,
+          "item": 5,
+          "commandReceipt": 5,
+          "work": 5
+        },
+        "transactionCalls": 5,
+        "transactionAttempts": 5,
+        "transactionRetries": 0,
+        "readOnlyTransactions": 0
+      },
+      "readEquivalent": 36
+    },
+    {
+      "name": "private/EDIT_SAME_IDENTITY",
+      "childCount": 1,
+      "progress": [],
+      "finalParentState": "APPLIED",
+      "submission": {
+        "documentGets": 0,
+        "missingDocuments": 0,
+        "queryCalls": 0,
+        "queryDocuments": 0,
+        "emptyQueries": 0,
+        "maxQueryDocuments": 0,
+        "readCategories": {},
+        "queryCategories": {},
+        "attemptedWrites": 1,
+        "committedWrites": 1,
+        "writeCategories": {
+          "commandReceipt": 1
+        },
+        "transactionCalls": 0,
+        "transactionAttempts": 0,
+        "transactionRetries": 0,
+        "readOnlyTransactions": 0
+      },
+      "continuationRounds": 0,
+      "totalWritesIncludingSubmission": 5,
+      "counts": {
+        "documentGets": 7,
+        "missingDocuments": 1,
+        "queryCalls": 1,
+        "queryDocuments": 1,
+        "emptyQueries": 0,
+        "maxQueryDocuments": 1,
+        "readCategories": {
+          "commandReceipt": 1,
+          "lifecycle": 1,
+          "user": 1,
+          "household": 1,
+          "membership": 1,
+          "reverseMembership": 1,
+          "item": 1
+        },
+        "queryCategories": {
+          "itemCandidates": 1
+        },
+        "attemptedWrites": 4,
+        "committedWrites": 4,
+        "writeCategories": {
+          "household": 1,
+          "item": 1,
+          "commandReceipt": 1,
+          "work": 1
+        },
+        "transactionCalls": 1,
+        "transactionAttempts": 1,
+        "transactionRetries": 0,
+        "readOnlyTransactions": 0
+      },
+      "readEquivalent": 8
+    },
+    {
+      "name": "private/EDIT_MERGE",
+      "childCount": 1,
+      "progress": [],
+      "finalParentState": "APPLIED",
+      "submission": {
+        "documentGets": 0,
+        "missingDocuments": 0,
+        "queryCalls": 0,
+        "queryDocuments": 0,
+        "emptyQueries": 0,
+        "maxQueryDocuments": 0,
+        "readCategories": {},
+        "queryCategories": {},
+        "attemptedWrites": 1,
+        "committedWrites": 1,
+        "writeCategories": {
+          "commandReceipt": 1
+        },
+        "transactionCalls": 0,
+        "transactionAttempts": 0,
+        "transactionRetries": 0,
+        "readOnlyTransactions": 0
+      },
+      "continuationRounds": 0,
+      "totalWritesIncludingSubmission": 6,
+      "counts": {
+        "documentGets": 7,
+        "missingDocuments": 1,
+        "queryCalls": 1,
+        "queryDocuments": 1,
+        "emptyQueries": 0,
+        "maxQueryDocuments": 1,
+        "readCategories": {
+          "commandReceipt": 1,
+          "lifecycle": 1,
+          "user": 1,
+          "household": 1,
+          "membership": 1,
+          "reverseMembership": 1,
+          "item": 1
+        },
+        "queryCategories": {
+          "itemCandidates": 1
+        },
+        "attemptedWrites": 5,
+        "committedWrites": 5,
+        "writeCategories": {
+          "household": 1,
+          "item": 2,
+          "commandReceipt": 1,
+          "work": 1
+        },
+        "transactionCalls": 1,
+        "transactionAttempts": 1,
+        "transactionRetries": 0,
+        "readOnlyTransactions": 0
+      },
+      "readEquivalent": 8
+    },
+    {
+      "name": "private/COLD_CONTEXT",
+      "counts": {
+        "documentGets": 7,
+        "missingDocuments": 1,
+        "queryCalls": 1,
+        "queryDocuments": 0,
+        "emptyQueries": 1,
+        "maxQueryDocuments": 0,
+        "readCategories": {
+          "runtimeGate": 1,
+          "user": 2,
+          "lifecycle": 1,
+          "household": 1,
+          "membership": 1,
+          "reverseMembership": 1
+        },
+        "queryCategories": {
+          "itemCandidates": 1
+        },
+        "attemptedWrites": 1,
+        "committedWrites": 1,
+        "writeCategories": {
+          "household": 1
+        },
+        "transactionCalls": 1,
+        "transactionAttempts": 1,
+        "transactionRetries": 0,
+        "readOnlyTransactions": 0
+      },
+      "readEquivalent": 8
+    },
+    {
+      "name": "private/WARM_CONTEXT",
+      "counts": {
+        "documentGets": 7,
+        "missingDocuments": 1,
+        "queryCalls": 0,
+        "queryDocuments": 0,
+        "emptyQueries": 0,
+        "maxQueryDocuments": 0,
+        "readCategories": {
+          "runtimeGate": 1,
+          "user": 2,
+          "lifecycle": 1,
+          "household": 1,
+          "membership": 1,
+          "reverseMembership": 1
+        },
+        "queryCategories": {},
+        "attemptedWrites": 0,
+        "committedWrites": 0,
+        "writeCategories": {},
+        "transactionCalls": 1,
+        "transactionAttempts": 1,
+        "transactionRetries": 0,
+        "readOnlyTransactions": 1
+      },
+      "readEquivalent": 7
+    },
+    {
+      "name": "private/SUBMIT_HELPER",
+      "counts": {
+        "documentGets": 7,
+        "missingDocuments": 2,
+        "queryCalls": 0,
+        "queryDocuments": 0,
+        "emptyQueries": 0,
+        "maxQueryDocuments": 0,
+        "readCategories": {
+          "commandReceipt": 1,
+          "runtimeGate": 1,
+          "lifecycle": 1,
+          "user": 1,
+          "household": 1,
+          "membership": 1,
+          "reverseMembership": 1
+        },
+        "queryCategories": {},
+        "attemptedWrites": 1,
+        "committedWrites": 1,
+        "writeCategories": {
+          "commandReceipt": 1
+        },
+        "transactionCalls": 1,
+        "transactionAttempts": 1,
+        "transactionRetries": 0,
+        "readOnlyTransactions": 0
+      },
+      "readEquivalent": 7
+    },
+    {
+      "name": "family/ADD_NEW",
+      "childCount": 1,
+      "blockCount": 1,
+      "progress": [
+        1
+      ],
+      "finalParentState": "APPLIED",
+      "submission": {
+        "documentGets": 0,
+        "missingDocuments": 0,
+        "queryCalls": 0,
+        "queryDocuments": 0,
+        "emptyQueries": 0,
+        "maxQueryDocuments": 0,
+        "readCategories": {},
+        "queryCategories": {},
+        "attemptedWrites": 1,
+        "committedWrites": 1,
+        "writeCategories": {
+          "commandReceipt": 1
+        },
+        "transactionCalls": 0,
+        "transactionAttempts": 0,
+        "transactionRetries": 0,
+        "readOnlyTransactions": 0
+      },
+      "continuationRounds": 0,
+      "totalWritesIncludingSubmission": 5,
+      "counts": {
+        "documentGets": 8,
+        "missingDocuments": 0,
+        "queryCalls": 1,
+        "queryDocuments": 0,
+        "emptyQueries": 1,
+        "maxQueryDocuments": 0,
+        "readCategories": {
+          "commandReceipt": 1,
+          "lifecycle": 1,
+          "user": 1,
+          "household": 1,
+          "membership": 1,
+          "reverseMembership": 1,
+          "fallbackHousehold": 1,
+          "fallbackMembership": 1
+        },
+        "queryCategories": {
+          "itemCandidates": 1
+        },
+        "attemptedWrites": 4,
+        "committedWrites": 4,
+        "writeCategories": {
+          "household": 1,
+          "item": 1,
+          "commandReceipt": 1,
+          "work": 1
+        },
+        "transactionCalls": 1,
+        "transactionAttempts": 1,
+        "transactionRetries": 0,
+        "readOnlyTransactions": 0
+      },
+      "readEquivalent": 9
+    },
+    {
+      "name": "family/ADD_MERGE",
+      "childCount": 1,
+      "blockCount": 1,
+      "progress": [
+        1
+      ],
+      "finalParentState": "APPLIED",
+      "submission": {
+        "documentGets": 0,
+        "missingDocuments": 0,
+        "queryCalls": 0,
+        "queryDocuments": 0,
+        "emptyQueries": 0,
+        "maxQueryDocuments": 0,
+        "readCategories": {},
+        "queryCategories": {},
+        "attemptedWrites": 1,
+        "committedWrites": 1,
+        "writeCategories": {
+          "commandReceipt": 1
+        },
+        "transactionCalls": 0,
+        "transactionAttempts": 0,
+        "transactionRetries": 0,
+        "readOnlyTransactions": 0
+      },
+      "continuationRounds": 0,
+      "totalWritesIncludingSubmission": 5,
+      "counts": {
+        "documentGets": 8,
+        "missingDocuments": 0,
+        "queryCalls": 1,
+        "queryDocuments": 1,
+        "emptyQueries": 0,
+        "maxQueryDocuments": 1,
+        "readCategories": {
+          "commandReceipt": 1,
+          "lifecycle": 1,
+          "user": 1,
+          "household": 1,
+          "membership": 1,
+          "reverseMembership": 1,
+          "fallbackHousehold": 1,
+          "fallbackMembership": 1
+        },
+        "queryCategories": {
+          "itemCandidates": 1
+        },
+        "attemptedWrites": 4,
+        "committedWrites": 4,
+        "writeCategories": {
+          "household": 1,
+          "item": 1,
+          "commandReceipt": 1,
+          "work": 1
+        },
+        "transactionCalls": 1,
+        "transactionAttempts": 1,
+        "transactionRetries": 0,
+        "readOnlyTransactions": 0
+      },
+      "readEquivalent": 9
+    },
+    {
+      "name": "family/EDIT",
+      "childCount": 1,
+      "progress": [],
+      "finalParentState": "APPLIED",
+      "submission": {
+        "documentGets": 0,
+        "missingDocuments": 0,
+        "queryCalls": 0,
+        "queryDocuments": 0,
+        "emptyQueries": 0,
+        "maxQueryDocuments": 0,
+        "readCategories": {},
+        "queryCategories": {},
+        "attemptedWrites": 1,
+        "committedWrites": 1,
+        "writeCategories": {
+          "commandReceipt": 1
+        },
+        "transactionCalls": 0,
+        "transactionAttempts": 0,
+        "transactionRetries": 0,
+        "readOnlyTransactions": 0
+      },
+      "continuationRounds": 0,
+      "totalWritesIncludingSubmission": 5,
+      "counts": {
+        "documentGets": 9,
+        "missingDocuments": 0,
+        "queryCalls": 1,
+        "queryDocuments": 0,
+        "emptyQueries": 1,
+        "maxQueryDocuments": 0,
+        "readCategories": {
+          "commandReceipt": 1,
+          "lifecycle": 1,
+          "user": 1,
+          "household": 1,
+          "membership": 1,
+          "reverseMembership": 1,
+          "fallbackHousehold": 1,
+          "fallbackMembership": 1,
+          "item": 1
+        },
+        "queryCategories": {
+          "itemCandidates": 1
+        },
+        "attemptedWrites": 4,
+        "committedWrites": 4,
+        "writeCategories": {
+          "household": 1,
+          "item": 1,
+          "commandReceipt": 1,
+          "work": 1
+        },
+        "transactionCalls": 1,
+        "transactionAttempts": 1,
+        "transactionRetries": 0,
+        "readOnlyTransactions": 0
+      },
+      "readEquivalent": 10
+    },
+    {
+      "name": "family/CHECK",
+      "childCount": 1,
+      "progress": [],
+      "finalParentState": "APPLIED",
+      "submission": {
+        "documentGets": 0,
+        "missingDocuments": 0,
+        "queryCalls": 0,
+        "queryDocuments": 0,
+        "emptyQueries": 0,
+        "maxQueryDocuments": 0,
+        "readCategories": {},
+        "queryCategories": {},
+        "attemptedWrites": 1,
+        "committedWrites": 1,
+        "writeCategories": {
+          "commandReceipt": 1
+        },
+        "transactionCalls": 0,
+        "transactionAttempts": 0,
+        "transactionRetries": 0,
+        "readOnlyTransactions": 0
+      },
+      "continuationRounds": 0,
+      "totalWritesIncludingSubmission": 5,
+      "counts": {
+        "documentGets": 9,
+        "missingDocuments": 0,
+        "queryCalls": 0,
+        "queryDocuments": 0,
+        "emptyQueries": 0,
+        "maxQueryDocuments": 0,
+        "readCategories": {
+          "commandReceipt": 1,
+          "lifecycle": 1,
+          "user": 1,
+          "household": 1,
+          "membership": 1,
+          "reverseMembership": 1,
+          "fallbackHousehold": 1,
+          "fallbackMembership": 1,
+          "item": 1
+        },
+        "queryCategories": {},
+        "attemptedWrites": 4,
+        "committedWrites": 4,
+        "writeCategories": {
+          "household": 1,
+          "item": 1,
+          "commandReceipt": 1,
+          "work": 1
+        },
+        "transactionCalls": 1,
+        "transactionAttempts": 1,
+        "transactionRetries": 0,
+        "readOnlyTransactions": 0
+      },
+      "readEquivalent": 9
+    },
+    {
+      "name": "family/DELETE",
+      "childCount": 1,
+      "progress": [],
+      "finalParentState": "APPLIED",
+      "submission": {
+        "documentGets": 0,
+        "missingDocuments": 0,
+        "queryCalls": 0,
+        "queryDocuments": 0,
+        "emptyQueries": 0,
+        "maxQueryDocuments": 0,
+        "readCategories": {},
+        "queryCategories": {},
+        "attemptedWrites": 1,
+        "committedWrites": 1,
+        "writeCategories": {
+          "commandReceipt": 1
+        },
+        "transactionCalls": 0,
+        "transactionAttempts": 0,
+        "transactionRetries": 0,
+        "readOnlyTransactions": 0
+      },
+      "continuationRounds": 0,
+      "totalWritesIncludingSubmission": 5,
+      "counts": {
+        "documentGets": 9,
+        "missingDocuments": 0,
+        "queryCalls": 0,
+        "queryDocuments": 0,
+        "emptyQueries": 0,
+        "maxQueryDocuments": 0,
+        "readCategories": {
+          "commandReceipt": 1,
+          "lifecycle": 1,
+          "user": 1,
+          "household": 1,
+          "membership": 1,
+          "reverseMembership": 1,
+          "fallbackHousehold": 1,
+          "fallbackMembership": 1,
+          "item": 1
+        },
+        "queryCategories": {},
+        "attemptedWrites": 4,
+        "committedWrites": 4,
+        "writeCategories": {
+          "household": 1,
+          "item": 1,
+          "commandReceipt": 1,
+          "work": 1
+        },
+        "transactionCalls": 1,
+        "transactionAttempts": 1,
+        "transactionRetries": 0,
+        "readOnlyTransactions": 0
+      },
+      "readEquivalent": 9
+    },
+    {
+      "name": "family/BULK_1",
+      "childCount": 1,
+      "blockCount": 1,
+      "progress": [
+        1
+      ],
+      "finalParentState": "APPLIED",
+      "submission": {
+        "documentGets": 0,
+        "missingDocuments": 0,
+        "queryCalls": 0,
+        "queryDocuments": 0,
+        "emptyQueries": 0,
+        "maxQueryDocuments": 0,
+        "readCategories": {},
+        "queryCategories": {},
+        "attemptedWrites": 1,
+        "committedWrites": 1,
+        "writeCategories": {
+          "commandReceipt": 1
+        },
+        "transactionCalls": 0,
+        "transactionAttempts": 0,
+        "transactionRetries": 0,
+        "readOnlyTransactions": 0
+      },
+      "continuationRounds": 0,
+      "totalWritesIncludingSubmission": 5,
+      "counts": {
+        "documentGets": 8,
+        "missingDocuments": 0,
+        "queryCalls": 1,
+        "queryDocuments": 0,
+        "emptyQueries": 1,
+        "maxQueryDocuments": 0,
+        "readCategories": {
+          "commandReceipt": 1,
+          "lifecycle": 1,
+          "user": 1,
+          "household": 1,
+          "membership": 1,
+          "reverseMembership": 1,
+          "fallbackHousehold": 1,
+          "fallbackMembership": 1
+        },
+        "queryCategories": {
+          "itemCandidates": 1
+        },
+        "attemptedWrites": 4,
+        "committedWrites": 4,
+        "writeCategories": {
+          "household": 1,
+          "item": 1,
+          "commandReceipt": 1,
+          "work": 1
+        },
+        "transactionCalls": 1,
+        "transactionAttempts": 1,
+        "transactionRetries": 0,
+        "readOnlyTransactions": 0
+      },
+      "readEquivalent": 9
+    },
+    {
+      "name": "family/BULK_10",
+      "childCount": 10,
+      "blockCount": 1,
+      "progress": [
+        10
+      ],
+      "finalParentState": "APPLIED",
+      "submission": {
+        "documentGets": 0,
+        "missingDocuments": 0,
+        "queryCalls": 0,
+        "queryDocuments": 0,
+        "emptyQueries": 0,
+        "maxQueryDocuments": 0,
+        "readCategories": {},
+        "queryCategories": {},
+        "attemptedWrites": 1,
+        "committedWrites": 1,
+        "writeCategories": {
+          "commandReceipt": 1
+        },
+        "transactionCalls": 0,
+        "transactionAttempts": 0,
+        "transactionRetries": 0,
+        "readOnlyTransactions": 0
+      },
+      "continuationRounds": 0,
+      "totalWritesIncludingSubmission": 14,
+      "counts": {
+        "documentGets": 8,
+        "missingDocuments": 0,
+        "queryCalls": 10,
+        "queryDocuments": 0,
+        "emptyQueries": 10,
+        "maxQueryDocuments": 0,
+        "readCategories": {
+          "commandReceipt": 1,
+          "lifecycle": 1,
+          "user": 1,
+          "household": 1,
+          "membership": 1,
+          "reverseMembership": 1,
+          "fallbackHousehold": 1,
+          "fallbackMembership": 1
+        },
+        "queryCategories": {
+          "itemCandidates": 10
+        },
+        "attemptedWrites": 13,
+        "committedWrites": 13,
+        "writeCategories": {
+          "household": 1,
+          "item": 10,
+          "commandReceipt": 1,
+          "work": 1
+        },
+        "transactionCalls": 1,
+        "transactionAttempts": 1,
+        "transactionRetries": 0,
+        "readOnlyTransactions": 0
+      },
+      "readEquivalent": 18
+    },
+    {
+      "name": "family/BULK_50",
+      "childCount": 50,
+      "blockCount": 5,
+      "progress": [
+        10,
+        20,
+        30,
+        40,
+        50
+      ],
+      "finalParentState": "APPLIED",
+      "submission": {
+        "documentGets": 0,
+        "missingDocuments": 0,
+        "queryCalls": 0,
+        "queryDocuments": 0,
+        "emptyQueries": 0,
+        "maxQueryDocuments": 0,
+        "readCategories": {},
+        "queryCategories": {},
+        "attemptedWrites": 1,
+        "committedWrites": 1,
+        "writeCategories": {
+          "commandReceipt": 1
+        },
+        "transactionCalls": 0,
+        "transactionAttempts": 0,
+        "transactionRetries": 0,
+        "readOnlyTransactions": 0
+      },
+      "continuationRounds": 4,
+      "totalWritesIncludingSubmission": 66,
+      "counts": {
+        "documentGets": 44,
+        "missingDocuments": 0,
+        "queryCalls": 54,
+        "queryDocuments": 4,
+        "emptyQueries": 50,
+        "maxQueryDocuments": 1,
+        "readCategories": {
+          "commandReceipt": 9,
+          "lifecycle": 5,
+          "user": 5,
+          "household": 5,
+          "membership": 5,
+          "reverseMembership": 5,
+          "fallbackHousehold": 5,
+          "fallbackMembership": 5
+        },
+        "queryCategories": {
+          "itemCandidates": 50,
+          "dueWork": 4
+        },
+        "attemptedWrites": 65,
+        "committedWrites": 65,
+        "writeCategories": {
+          "household": 5,
+          "item": 50,
+          "commandReceipt": 5,
+          "work": 5
+        },
+        "transactionCalls": 9,
+        "transactionAttempts": 9,
+        "transactionRetries": 0,
+        "readOnlyTransactions": 4
+      },
+      "readEquivalent": 98
+    },
+    {
+      "name": "family/BULK_200",
+      "childCount": 200,
+      "blockCount": 20,
+      "progress": [
+        10,
+        20,
+        30,
+        40,
+        50,
+        60,
+        70,
+        80,
+        90,
+        100,
+        110,
+        120,
+        130,
+        140,
+        150,
+        160,
+        170,
+        180,
+        190,
+        200
+      ],
+      "finalParentState": "APPLIED",
+      "submission": {
+        "documentGets": 0,
+        "missingDocuments": 0,
+        "queryCalls": 0,
+        "queryDocuments": 0,
+        "emptyQueries": 0,
+        "maxQueryDocuments": 0,
+        "readCategories": {},
+        "queryCategories": {},
+        "attemptedWrites": 1,
+        "committedWrites": 1,
+        "writeCategories": {
+          "commandReceipt": 1
+        },
+        "transactionCalls": 0,
+        "transactionAttempts": 0,
+        "transactionRetries": 0,
+        "readOnlyTransactions": 0
+      },
+      "continuationRounds": 19,
+      "totalWritesIncludingSubmission": 261,
+      "counts": {
+        "documentGets": 179,
+        "missingDocuments": 0,
+        "queryCalls": 219,
+        "queryDocuments": 19,
+        "emptyQueries": 200,
+        "maxQueryDocuments": 1,
+        "readCategories": {
+          "commandReceipt": 39,
+          "lifecycle": 20,
+          "user": 20,
+          "household": 20,
+          "membership": 20,
+          "reverseMembership": 20,
+          "fallbackHousehold": 20,
+          "fallbackMembership": 20
+        },
+        "queryCategories": {
+          "itemCandidates": 200,
+          "dueWork": 19
+        },
+        "attemptedWrites": 260,
+        "committedWrites": 260,
+        "writeCategories": {
+          "household": 20,
+          "item": 200,
+          "commandReceipt": 20,
+          "work": 20
+        },
+        "transactionCalls": 39,
+        "transactionAttempts": 39,
+        "transactionRetries": 0,
+        "readOnlyTransactions": 19
+      },
+      "readEquivalent": 398
+    },
+    {
+      "name": "family/MERGE_BULK_50",
+      "childCount": 50,
+      "blockCount": 5,
+      "progress": [
+        10,
+        20,
+        30,
+        40,
+        50
+      ],
+      "finalParentState": "APPLIED",
+      "submission": {
+        "documentGets": 0,
+        "missingDocuments": 0,
+        "queryCalls": 0,
+        "queryDocuments": 0,
+        "emptyQueries": 0,
+        "maxQueryDocuments": 0,
+        "readCategories": {},
+        "queryCategories": {},
+        "attemptedWrites": 1,
+        "committedWrites": 1,
+        "writeCategories": {
+          "commandReceipt": 1
+        },
+        "transactionCalls": 0,
+        "transactionAttempts": 0,
+        "transactionRetries": 0,
+        "readOnlyTransactions": 0
+      },
+      "continuationRounds": 4,
+      "totalWritesIncludingSubmission": 41,
+      "counts": {
+        "documentGets": 44,
+        "missingDocuments": 0,
+        "queryCalls": 29,
+        "queryDocuments": 24,
+        "emptyQueries": 5,
+        "maxQueryDocuments": 1,
+        "readCategories": {
+          "commandReceipt": 9,
+          "lifecycle": 5,
+          "user": 5,
+          "household": 5,
+          "membership": 5,
+          "reverseMembership": 5,
+          "fallbackHousehold": 5,
+          "fallbackMembership": 5
+        },
+        "queryCategories": {
+          "itemCandidates": 25,
+          "dueWork": 4
+        },
+        "attemptedWrites": 40,
+        "committedWrites": 40,
+        "writeCategories": {
+          "household": 5,
+          "item": 25,
+          "commandReceipt": 5,
+          "work": 5
+        },
+        "transactionCalls": 9,
+        "transactionAttempts": 9,
+        "transactionRetries": 0,
+        "readOnlyTransactions": 4
+      },
+      "readEquivalent": 73
+    },
+    {
+      "name": "family/MIXED_5",
+      "childCount": 5,
+      "progress": [],
+      "finalParentState": "APPLIED",
+      "submission": {
+        "documentGets": 0,
+        "missingDocuments": 0,
+        "queryCalls": 0,
+        "queryDocuments": 0,
+        "emptyQueries": 0,
+        "maxQueryDocuments": 0,
+        "readCategories": {},
+        "queryCategories": {},
+        "attemptedWrites": 1,
+        "committedWrites": 1,
+        "writeCategories": {
+          "commandReceipt": 1
+        },
+        "transactionCalls": 0,
+        "transactionAttempts": 0,
+        "transactionRetries": 0,
+        "readOnlyTransactions": 0
+      },
+      "continuationRounds": 0,
+      "totalWritesIncludingSubmission": 21,
+      "counts": {
+        "documentGets": 43,
+        "missingDocuments": 0,
+        "queryCalls": 3,
+        "queryDocuments": 1,
+        "emptyQueries": 2,
+        "maxQueryDocuments": 1,
+        "readCategories": {
+          "commandReceipt": 5,
+          "lifecycle": 5,
+          "user": 5,
+          "household": 5,
+          "membership": 5,
+          "reverseMembership": 5,
+          "fallbackHousehold": 5,
+          "fallbackMembership": 5,
+          "item": 3
+        },
+        "queryCategories": {
+          "itemCandidates": 3
+        },
+        "attemptedWrites": 20,
+        "committedWrites": 20,
+        "writeCategories": {
+          "household": 5,
+          "item": 5,
+          "commandReceipt": 5,
+          "work": 5
+        },
+        "transactionCalls": 5,
+        "transactionAttempts": 5,
+        "transactionRetries": 0,
+        "readOnlyTransactions": 0
+      },
+      "readEquivalent": 46
+    },
+    {
+      "name": "family/EDIT_SAME_IDENTITY",
+      "childCount": 1,
+      "progress": [],
+      "finalParentState": "APPLIED",
+      "submission": {
+        "documentGets": 0,
+        "missingDocuments": 0,
+        "queryCalls": 0,
+        "queryDocuments": 0,
+        "emptyQueries": 0,
+        "maxQueryDocuments": 0,
+        "readCategories": {},
+        "queryCategories": {},
+        "attemptedWrites": 1,
+        "committedWrites": 1,
+        "writeCategories": {
+          "commandReceipt": 1
+        },
+        "transactionCalls": 0,
+        "transactionAttempts": 0,
+        "transactionRetries": 0,
+        "readOnlyTransactions": 0
+      },
+      "continuationRounds": 0,
+      "totalWritesIncludingSubmission": 5,
+      "counts": {
+        "documentGets": 9,
+        "missingDocuments": 0,
+        "queryCalls": 1,
+        "queryDocuments": 1,
+        "emptyQueries": 0,
+        "maxQueryDocuments": 1,
+        "readCategories": {
+          "commandReceipt": 1,
+          "lifecycle": 1,
+          "user": 1,
+          "household": 1,
+          "membership": 1,
+          "reverseMembership": 1,
+          "fallbackHousehold": 1,
+          "fallbackMembership": 1,
+          "item": 1
+        },
+        "queryCategories": {
+          "itemCandidates": 1
+        },
+        "attemptedWrites": 4,
+        "committedWrites": 4,
+        "writeCategories": {
+          "household": 1,
+          "item": 1,
+          "commandReceipt": 1,
+          "work": 1
+        },
+        "transactionCalls": 1,
+        "transactionAttempts": 1,
+        "transactionRetries": 0,
+        "readOnlyTransactions": 0
+      },
+      "readEquivalent": 10
+    },
+    {
+      "name": "family/EDIT_MERGE",
+      "childCount": 1,
+      "progress": [],
+      "finalParentState": "APPLIED",
+      "submission": {
+        "documentGets": 0,
+        "missingDocuments": 0,
+        "queryCalls": 0,
+        "queryDocuments": 0,
+        "emptyQueries": 0,
+        "maxQueryDocuments": 0,
+        "readCategories": {},
+        "queryCategories": {},
+        "attemptedWrites": 1,
+        "committedWrites": 1,
+        "writeCategories": {
+          "commandReceipt": 1
+        },
+        "transactionCalls": 0,
+        "transactionAttempts": 0,
+        "transactionRetries": 0,
+        "readOnlyTransactions": 0
+      },
+      "continuationRounds": 0,
+      "totalWritesIncludingSubmission": 6,
+      "counts": {
+        "documentGets": 9,
+        "missingDocuments": 0,
+        "queryCalls": 1,
+        "queryDocuments": 1,
+        "emptyQueries": 0,
+        "maxQueryDocuments": 1,
+        "readCategories": {
+          "commandReceipt": 1,
+          "lifecycle": 1,
+          "user": 1,
+          "household": 1,
+          "membership": 1,
+          "reverseMembership": 1,
+          "fallbackHousehold": 1,
+          "fallbackMembership": 1,
+          "item": 1
+        },
+        "queryCategories": {
+          "itemCandidates": 1
+        },
+        "attemptedWrites": 5,
+        "committedWrites": 5,
+        "writeCategories": {
+          "household": 1,
+          "item": 2,
+          "commandReceipt": 1,
+          "work": 1
+        },
+        "transactionCalls": 1,
+        "transactionAttempts": 1,
+        "transactionRetries": 0,
+        "readOnlyTransactions": 0
+      },
+      "readEquivalent": 10
+    },
+    {
+      "name": "family/COLD_CONTEXT",
+      "counts": {
+        "documentGets": 9,
+        "missingDocuments": 0,
+        "queryCalls": 1,
+        "queryDocuments": 0,
+        "emptyQueries": 1,
+        "maxQueryDocuments": 0,
+        "readCategories": {
+          "runtimeGate": 1,
+          "user": 2,
+          "lifecycle": 1,
+          "household": 1,
+          "membership": 1,
+          "reverseMembership": 1,
+          "fallbackHousehold": 1,
+          "fallbackMembership": 1
+        },
+        "queryCategories": {
+          "itemCandidates": 1
+        },
+        "attemptedWrites": 1,
+        "committedWrites": 1,
+        "writeCategories": {
+          "household": 1
+        },
+        "transactionCalls": 1,
+        "transactionAttempts": 1,
+        "transactionRetries": 0,
+        "readOnlyTransactions": 0
+      },
+      "readEquivalent": 10
+    },
+    {
+      "name": "family/WARM_CONTEXT",
+      "counts": {
+        "documentGets": 9,
+        "missingDocuments": 0,
+        "queryCalls": 0,
+        "queryDocuments": 0,
+        "emptyQueries": 0,
+        "maxQueryDocuments": 0,
+        "readCategories": {
+          "runtimeGate": 1,
+          "user": 2,
+          "lifecycle": 1,
+          "household": 1,
+          "membership": 1,
+          "reverseMembership": 1,
+          "fallbackHousehold": 1,
+          "fallbackMembership": 1
+        },
+        "queryCategories": {},
+        "attemptedWrites": 0,
+        "committedWrites": 0,
+        "writeCategories": {},
+        "transactionCalls": 1,
+        "transactionAttempts": 1,
+        "transactionRetries": 0,
+        "readOnlyTransactions": 1
+      },
+      "readEquivalent": 9
+    },
+    {
+      "name": "family/SUBMIT_HELPER",
+      "counts": {
+        "documentGets": 9,
+        "missingDocuments": 1,
+        "queryCalls": 0,
+        "queryDocuments": 0,
+        "emptyQueries": 0,
+        "maxQueryDocuments": 0,
+        "readCategories": {
+          "commandReceipt": 1,
+          "runtimeGate": 1,
+          "lifecycle": 1,
+          "user": 1,
+          "household": 1,
+          "membership": 1,
+          "reverseMembership": 1,
+          "fallbackHousehold": 1,
+          "fallbackMembership": 1
+        },
+        "queryCategories": {},
+        "attemptedWrites": 1,
+        "committedWrites": 1,
+        "writeCategories": {
+          "commandReceipt": 1
+        },
+        "transactionCalls": 1,
+        "transactionAttempts": 1,
+        "transactionRetries": 0,
+        "readOnlyTransactions": 0
+      },
+      "readEquivalent": 9
+    },
+    {
+      "name": "private/DUPLICATE_CANDIDATES_2",
+      "childCount": 1,
+      "blockCount": 1,
+      "progress": [],
+      "finalParentState": "FAILED_TERMINAL",
+      "submission": {
+        "documentGets": 0,
+        "missingDocuments": 0,
+        "queryCalls": 0,
+        "queryDocuments": 0,
+        "emptyQueries": 0,
+        "maxQueryDocuments": 0,
+        "readCategories": {},
+        "queryCategories": {},
+        "attemptedWrites": 1,
+        "committedWrites": 1,
+        "writeCategories": {
+          "commandReceipt": 1
+        },
+        "transactionCalls": 0,
+        "transactionAttempts": 0,
+        "transactionRetries": 0,
+        "readOnlyTransactions": 0
+      },
+      "continuationRounds": 0,
+      "totalWritesIncludingSubmission": 3,
+      "counts": {
+        "documentGets": 6,
+        "missingDocuments": 1,
+        "queryCalls": 1,
+        "queryDocuments": 2,
+        "emptyQueries": 0,
+        "maxQueryDocuments": 2,
+        "readCategories": {
+          "commandReceipt": 1,
+          "lifecycle": 1,
+          "user": 1,
+          "household": 1,
+          "membership": 1,
+          "reverseMembership": 1
+        },
+        "queryCategories": {
+          "itemCandidates": 1
+        },
+        "attemptedWrites": 2,
+        "committedWrites": 2,
+        "writeCategories": {
+          "commandReceipt": 1,
+          "work": 1
+        },
+        "transactionCalls": 1,
+        "transactionAttempts": 1,
+        "transactionRetries": 0,
+        "readOnlyTransactions": 0
+      },
+      "readEquivalent": 8
+    },
+    {
+      "name": "private/DUPLICATE_CANDIDATES_3",
+      "childCount": 1,
+      "blockCount": 1,
+      "progress": [],
+      "finalParentState": "FAILED_TERMINAL",
+      "submission": {
+        "documentGets": 0,
+        "missingDocuments": 0,
+        "queryCalls": 0,
+        "queryDocuments": 0,
+        "emptyQueries": 0,
+        "maxQueryDocuments": 0,
+        "readCategories": {},
+        "queryCategories": {},
+        "attemptedWrites": 1,
+        "committedWrites": 1,
+        "writeCategories": {
+          "commandReceipt": 1
+        },
+        "transactionCalls": 0,
+        "transactionAttempts": 0,
+        "transactionRetries": 0,
+        "readOnlyTransactions": 0
+      },
+      "continuationRounds": 0,
+      "totalWritesIncludingSubmission": 3,
+      "counts": {
+        "documentGets": 6,
+        "missingDocuments": 1,
+        "queryCalls": 1,
+        "queryDocuments": 3,
+        "emptyQueries": 0,
+        "maxQueryDocuments": 3,
+        "readCategories": {
+          "commandReceipt": 1,
+          "lifecycle": 1,
+          "user": 1,
+          "household": 1,
+          "membership": 1,
+          "reverseMembership": 1
+        },
+        "queryCategories": {
+          "itemCandidates": 1
+        },
+        "attemptedWrites": 2,
+        "committedWrites": 2,
+        "writeCategories": {
+          "commandReceipt": 1,
+          "work": 1
+        },
+        "transactionCalls": 1,
+        "transactionAttempts": 1,
+        "transactionRetries": 0,
+        "readOnlyTransactions": 0
+      },
+      "readEquivalent": 9
+    },
+    {
+      "name": "private/DUPLICATE_CANDIDATES_4",
+      "childCount": 1,
+      "blockCount": 1,
+      "progress": [],
+      "finalParentState": "FAILED_TERMINAL",
+      "submission": {
+        "documentGets": 0,
+        "missingDocuments": 0,
+        "queryCalls": 0,
+        "queryDocuments": 0,
+        "emptyQueries": 0,
+        "maxQueryDocuments": 0,
+        "readCategories": {},
+        "queryCategories": {},
+        "attemptedWrites": 1,
+        "committedWrites": 1,
+        "writeCategories": {
+          "commandReceipt": 1
+        },
+        "transactionCalls": 0,
+        "transactionAttempts": 0,
+        "transactionRetries": 0,
+        "readOnlyTransactions": 0
+      },
+      "continuationRounds": 0,
+      "totalWritesIncludingSubmission": 3,
+      "counts": {
+        "documentGets": 6,
+        "missingDocuments": 1,
+        "queryCalls": 1,
+        "queryDocuments": 3,
+        "emptyQueries": 0,
+        "maxQueryDocuments": 3,
+        "readCategories": {
+          "commandReceipt": 1,
+          "lifecycle": 1,
+          "user": 1,
+          "household": 1,
+          "membership": 1,
+          "reverseMembership": 1
+        },
+        "queryCategories": {
+          "itemCandidates": 1
+        },
+        "attemptedWrites": 2,
+        "committedWrites": 2,
+        "writeCategories": {
+          "commandReceipt": 1,
+          "work": 1
+        },
+        "transactionCalls": 1,
+        "transactionAttempts": 1,
+        "transactionRetries": 0,
+        "readOnlyTransactions": 0
+      },
+      "readEquivalent": 9
+    },
+    {
+      "name": "private/REPLAY_SEED",
+      "childCount": 1,
+      "blockCount": 1,
+      "progress": [
+        1
+      ],
+      "finalParentState": "APPLIED",
+      "submission": {
+        "documentGets": 0,
+        "missingDocuments": 0,
+        "queryCalls": 0,
+        "queryDocuments": 0,
+        "emptyQueries": 0,
+        "maxQueryDocuments": 0,
+        "readCategories": {},
+        "queryCategories": {},
+        "attemptedWrites": 1,
+        "committedWrites": 1,
+        "writeCategories": {
+          "commandReceipt": 1
+        },
+        "transactionCalls": 0,
+        "transactionAttempts": 0,
+        "transactionRetries": 0,
+        "readOnlyTransactions": 0
+      },
+      "continuationRounds": 0,
+      "totalWritesIncludingSubmission": 5,
+      "counts": {
+        "documentGets": 6,
+        "missingDocuments": 1,
+        "queryCalls": 1,
+        "queryDocuments": 0,
+        "emptyQueries": 1,
+        "maxQueryDocuments": 0,
+        "readCategories": {
+          "commandReceipt": 1,
+          "lifecycle": 1,
+          "user": 1,
+          "household": 1,
+          "membership": 1,
+          "reverseMembership": 1
+        },
+        "queryCategories": {
+          "itemCandidates": 1
+        },
+        "attemptedWrites": 4,
+        "committedWrites": 4,
+        "writeCategories": {
+          "household": 1,
+          "item": 1,
+          "commandReceipt": 1,
+          "work": 1
+        },
+        "transactionCalls": 1,
+        "transactionAttempts": 1,
+        "transactionRetries": 0,
+        "readOnlyTransactions": 0
+      },
+      "readEquivalent": 7
+    },
+    {
+      "name": "private/TERMINAL_REPLAY",
+      "counts": {
+        "documentGets": 1,
+        "missingDocuments": 0,
+        "queryCalls": 0,
+        "queryDocuments": 0,
+        "emptyQueries": 0,
+        "maxQueryDocuments": 0,
+        "readCategories": {
+          "commandReceipt": 1
+        },
+        "queryCategories": {},
+        "attemptedWrites": 0,
+        "committedWrites": 0,
+        "writeCategories": {},
+        "transactionCalls": 1,
+        "transactionAttempts": 1,
+        "transactionRetries": 0,
+        "readOnlyTransactions": 1
+      },
+      "readEquivalent": 1
+    },
+    {
+      "name": "private/EXPIRY_CLEANUP",
+      "counts": {
+        "documentGets": 1,
+        "missingDocuments": 0,
+        "queryCalls": 1,
+        "queryDocuments": 1,
+        "emptyQueries": 0,
+        "maxQueryDocuments": 1,
+        "readCategories": {
+          "commandReceipt": 1
+        },
+        "queryCategories": {
+          "dueWork": 1
+        },
+        "attemptedWrites": 2,
+        "committedWrites": 2,
+        "writeCategories": {
+          "commandReceipt": 1,
+          "work": 1
+        },
+        "transactionCalls": 1,
+        "transactionAttempts": 1,
+        "transactionRetries": 0,
+        "readOnlyTransactions": 0
+      },
+      "readEquivalent": 2
+    },
+    {
+      "name": "private/EMPTY_DUE_QUERY",
+      "counts": {
+        "documentGets": 0,
+        "missingDocuments": 0,
+        "queryCalls": 1,
+        "queryDocuments": 0,
+        "emptyQueries": 1,
+        "maxQueryDocuments": 0,
+        "readCategories": {},
+        "queryCategories": {
+          "dueWork": 1
+        },
+        "attemptedWrites": 0,
+        "committedWrites": 0,
+        "writeCategories": {},
+        "transactionCalls": 0,
+        "transactionAttempts": 0,
+        "transactionRetries": 0,
+        "readOnlyTransactions": 0
+      },
+      "readEquivalent": 1
+    },
+    {
+      "name": "calibration/FORCED_ABORT_RETRY",
+      "counts": {
+        "documentGets": 2,
+        "missingDocuments": 0,
+        "queryCalls": 0,
+        "queryDocuments": 0,
+        "emptyQueries": 0,
+        "maxQueryDocuments": 0,
+        "readCategories": {
+          "item": 2
+        },
+        "queryCategories": {},
+        "attemptedWrites": 2,
+        "committedWrites": 1,
+        "writeCategories": {
+          "item": 1
+        },
+        "transactionCalls": 1,
+        "transactionAttempts": 2,
+        "transactionRetries": 1,
+        "readOnlyTransactions": 0
+      },
+      "readEquivalent": 2
+    },
+    {
+      "name": "private/SEMANTIC_25",
+      "childCount": 25,
+      "blockCount": 3,
+      "progress": [
+        10,
+        20,
+        25
+      ],
+      "finalParentState": "APPLIED",
+      "submission": {
+        "documentGets": 0,
+        "missingDocuments": 0,
+        "queryCalls": 0,
+        "queryDocuments": 0,
+        "emptyQueries": 0,
+        "maxQueryDocuments": 0,
+        "readCategories": {},
+        "queryCategories": {},
+        "attemptedWrites": 1,
+        "committedWrites": 1,
+        "writeCategories": {
+          "commandReceipt": 1
+        },
+        "transactionCalls": 0,
+        "transactionAttempts": 0,
+        "transactionRetries": 0,
+        "readOnlyTransactions": 0
+      },
+      "continuationRounds": 2,
+      "totalWritesIncludingSubmission": 19,
+      "counts": {
+        "documentGets": 20,
+        "missingDocuments": 3,
+        "queryCalls": 11,
+        "queryDocuments": 8,
+        "emptyQueries": 3,
+        "maxQueryDocuments": 1,
+        "readCategories": {
+          "commandReceipt": 5,
+          "lifecycle": 3,
+          "user": 3,
+          "household": 3,
+          "membership": 3,
+          "reverseMembership": 3
+        },
+        "queryCategories": {
+          "itemCandidates": 9,
+          "dueWork": 2
+        },
+        "attemptedWrites": 18,
+        "committedWrites": 18,
+        "writeCategories": {
+          "household": 3,
+          "item": 9,
+          "commandReceipt": 3,
+          "work": 3
+        },
+        "transactionCalls": 5,
+        "transactionAttempts": 5,
+        "transactionRetries": 0,
+        "readOnlyTransactions": 2
+      },
+      "readEquivalent": 31
+    },
+    {
+      "name": "private/SEMANTIC_50",
+      "childCount": 50,
+      "blockCount": 5,
+      "progress": [
+        10,
+        20,
+        30,
+        40,
+        50
+      ],
+      "finalParentState": "APPLIED",
+      "submission": {
+        "documentGets": 0,
+        "missingDocuments": 0,
+        "queryCalls": 0,
+        "queryDocuments": 0,
+        "emptyQueries": 0,
+        "maxQueryDocuments": 0,
+        "readCategories": {},
+        "queryCategories": {},
+        "attemptedWrites": 1,
+        "committedWrites": 1,
+        "writeCategories": {
+          "commandReceipt": 1
+        },
+        "transactionCalls": 0,
+        "transactionAttempts": 0,
+        "transactionRetries": 0,
+        "readOnlyTransactions": 0
+      },
+      "continuationRounds": 4,
+      "totalWritesIncludingSubmission": 31,
+      "counts": {
+        "documentGets": 34,
+        "missingDocuments": 5,
+        "queryCalls": 19,
+        "queryDocuments": 16,
+        "emptyQueries": 3,
+        "maxQueryDocuments": 1,
+        "readCategories": {
+          "commandReceipt": 9,
+          "lifecycle": 5,
+          "user": 5,
+          "household": 5,
+          "membership": 5,
+          "reverseMembership": 5
+        },
+        "queryCategories": {
+          "itemCandidates": 15,
+          "dueWork": 4
+        },
+        "attemptedWrites": 30,
+        "committedWrites": 30,
+        "writeCategories": {
+          "household": 5,
+          "item": 15,
+          "commandReceipt": 5,
+          "work": 5
+        },
+        "transactionCalls": 9,
+        "transactionAttempts": 9,
+        "transactionRetries": 0,
+        "readOnlyTransactions": 4
+      },
+      "readEquivalent": 53
+    },
+    {
+      "name": "private/SEMANTIC_200",
+      "childCount": 200,
+      "blockCount": 20,
+      "progress": [
+        10,
+        20,
+        30,
+        40,
+        50,
+        60,
+        70,
+        80,
+        90,
+        100,
+        110,
+        120,
+        130,
+        140,
+        150,
+        160,
+        170,
+        180,
+        190,
+        200
+      ],
+      "finalParentState": "APPLIED",
+      "submission": {
+        "documentGets": 0,
+        "missingDocuments": 0,
+        "queryCalls": 0,
+        "queryDocuments": 0,
+        "emptyQueries": 0,
+        "maxQueryDocuments": 0,
+        "readCategories": {},
+        "queryCategories": {},
+        "attemptedWrites": 1,
+        "committedWrites": 1,
+        "writeCategories": {
+          "commandReceipt": 1
+        },
+        "transactionCalls": 0,
+        "transactionAttempts": 0,
+        "transactionRetries": 0,
+        "readOnlyTransactions": 0
+      },
+      "continuationRounds": 19,
+      "totalWritesIncludingSubmission": 121,
+      "counts": {
+        "documentGets": 139,
+        "missingDocuments": 20,
+        "queryCalls": 79,
+        "queryDocuments": 76,
+        "emptyQueries": 3,
+        "maxQueryDocuments": 1,
+        "readCategories": {
+          "commandReceipt": 39,
+          "lifecycle": 20,
+          "user": 20,
+          "household": 20,
+          "membership": 20,
+          "reverseMembership": 20
+        },
+        "queryCategories": {
+          "itemCandidates": 60,
+          "dueWork": 19
+        },
+        "attemptedWrites": 120,
+        "committedWrites": 120,
+        "writeCategories": {
+          "household": 20,
+          "item": 60,
+          "commandReceipt": 20,
+          "work": 20
+        },
+        "transactionCalls": 39,
+        "transactionAttempts": 39,
+        "transactionRetries": 0,
+        "readOnlyTransactions": 19
+      },
+      "readEquivalent": 218
+    },
+    {
+      "name": "family/SEMANTIC_25",
+      "childCount": 25,
+      "blockCount": 3,
+      "progress": [
+        10,
+        20,
+        25
+      ],
+      "finalParentState": "APPLIED",
+      "submission": {
+        "documentGets": 0,
+        "missingDocuments": 0,
+        "queryCalls": 0,
+        "queryDocuments": 0,
+        "emptyQueries": 0,
+        "maxQueryDocuments": 0,
+        "readCategories": {},
+        "queryCategories": {},
+        "attemptedWrites": 1,
+        "committedWrites": 1,
+        "writeCategories": {
+          "commandReceipt": 1
+        },
+        "transactionCalls": 0,
+        "transactionAttempts": 0,
+        "transactionRetries": 0,
+        "readOnlyTransactions": 0
+      },
+      "continuationRounds": 2,
+      "totalWritesIncludingSubmission": 19,
+      "counts": {
+        "documentGets": 26,
+        "missingDocuments": 0,
+        "queryCalls": 11,
+        "queryDocuments": 8,
+        "emptyQueries": 3,
+        "maxQueryDocuments": 1,
+        "readCategories": {
+          "commandReceipt": 5,
+          "lifecycle": 3,
+          "user": 3,
+          "household": 3,
+          "membership": 3,
+          "reverseMembership": 3,
+          "fallbackHousehold": 3,
+          "fallbackMembership": 3
+        },
+        "queryCategories": {
+          "itemCandidates": 9,
+          "dueWork": 2
+        },
+        "attemptedWrites": 18,
+        "committedWrites": 18,
+        "writeCategories": {
+          "household": 3,
+          "item": 9,
+          "commandReceipt": 3,
+          "work": 3
+        },
+        "transactionCalls": 5,
+        "transactionAttempts": 5,
+        "transactionRetries": 0,
+        "readOnlyTransactions": 2
+      },
+      "readEquivalent": 37
+    },
+    {
+      "name": "family/SEMANTIC_50",
+      "childCount": 50,
+      "blockCount": 5,
+      "progress": [
+        10,
+        20,
+        30,
+        40,
+        50
+      ],
+      "finalParentState": "APPLIED",
+      "submission": {
+        "documentGets": 0,
+        "missingDocuments": 0,
+        "queryCalls": 0,
+        "queryDocuments": 0,
+        "emptyQueries": 0,
+        "maxQueryDocuments": 0,
+        "readCategories": {},
+        "queryCategories": {},
+        "attemptedWrites": 1,
+        "committedWrites": 1,
+        "writeCategories": {
+          "commandReceipt": 1
+        },
+        "transactionCalls": 0,
+        "transactionAttempts": 0,
+        "transactionRetries": 0,
+        "readOnlyTransactions": 0
+      },
+      "continuationRounds": 4,
+      "totalWritesIncludingSubmission": 31,
+      "counts": {
+        "documentGets": 44,
+        "missingDocuments": 0,
+        "queryCalls": 19,
+        "queryDocuments": 16,
+        "emptyQueries": 3,
+        "maxQueryDocuments": 1,
+        "readCategories": {
+          "commandReceipt": 9,
+          "lifecycle": 5,
+          "user": 5,
+          "household": 5,
+          "membership": 5,
+          "reverseMembership": 5,
+          "fallbackHousehold": 5,
+          "fallbackMembership": 5
+        },
+        "queryCategories": {
+          "itemCandidates": 15,
+          "dueWork": 4
+        },
+        "attemptedWrites": 30,
+        "committedWrites": 30,
+        "writeCategories": {
+          "household": 5,
+          "item": 15,
+          "commandReceipt": 5,
+          "work": 5
+        },
+        "transactionCalls": 9,
+        "transactionAttempts": 9,
+        "transactionRetries": 0,
+        "readOnlyTransactions": 4
+      },
+      "readEquivalent": 63
+    },
+    {
+      "name": "family/SEMANTIC_200",
+      "childCount": 200,
+      "blockCount": 20,
+      "progress": [
+        10,
+        20,
+        30,
+        40,
+        50,
+        60,
+        70,
+        80,
+        90,
+        100,
+        110,
+        120,
+        130,
+        140,
+        150,
+        160,
+        170,
+        180,
+        190,
+        200
+      ],
+      "finalParentState": "APPLIED",
+      "submission": {
+        "documentGets": 0,
+        "missingDocuments": 0,
+        "queryCalls": 0,
+        "queryDocuments": 0,
+        "emptyQueries": 0,
+        "maxQueryDocuments": 0,
+        "readCategories": {},
+        "queryCategories": {},
+        "attemptedWrites": 1,
+        "committedWrites": 1,
+        "writeCategories": {
+          "commandReceipt": 1
+        },
+        "transactionCalls": 0,
+        "transactionAttempts": 0,
+        "transactionRetries": 0,
+        "readOnlyTransactions": 0
+      },
+      "continuationRounds": 19,
+      "totalWritesIncludingSubmission": 121,
+      "counts": {
+        "documentGets": 179,
+        "missingDocuments": 0,
+        "queryCalls": 79,
+        "queryDocuments": 76,
+        "emptyQueries": 3,
+        "maxQueryDocuments": 1,
+        "readCategories": {
+          "commandReceipt": 39,
+          "lifecycle": 20,
+          "user": 20,
+          "household": 20,
+          "membership": 20,
+          "reverseMembership": 20,
+          "fallbackHousehold": 20,
+          "fallbackMembership": 20
+        },
+        "queryCategories": {
+          "itemCandidates": 60,
+          "dueWork": 19
+        },
+        "attemptedWrites": 120,
+        "committedWrites": 120,
+        "writeCategories": {
+          "household": 20,
+          "item": 60,
+          "commandReceipt": 20,
+          "work": 20
+        },
+        "transactionCalls": 39,
+        "transactionAttempts": 39,
+        "transactionRetries": 0,
+        "readOnlyTransactions": 19
+      },
+      "readEquivalent": 258
+    },
+    {
+      "name": "private/PARTIAL_25",
+      "childCount": 25,
+      "blockCount": 3,
+      "progress": [
+        10,
+        20,
+        25
+      ],
+      "finalParentState": "APPLIED",
+      "submission": {
+        "documentGets": 0,
+        "missingDocuments": 0,
+        "queryCalls": 0,
+        "queryDocuments": 0,
+        "emptyQueries": 0,
+        "maxQueryDocuments": 0,
+        "readCategories": {},
+        "queryCategories": {},
+        "attemptedWrites": 1,
+        "committedWrites": 1,
+        "writeCategories": {
+          "commandReceipt": 1
+        },
+        "transactionCalls": 0,
+        "transactionAttempts": 0,
+        "transactionRetries": 0,
+        "readOnlyTransactions": 0
+      },
+      "continuationRounds": 2,
+      "totalWritesIncludingSubmission": 35,
+      "counts": {
+        "documentGets": 20,
+        "missingDocuments": 3,
+        "queryCalls": 27,
+        "queryDocuments": 2,
+        "emptyQueries": 25,
+        "maxQueryDocuments": 1,
+        "readCategories": {
+          "commandReceipt": 5,
+          "lifecycle": 3,
+          "user": 3,
+          "household": 3,
+          "membership": 3,
+          "reverseMembership": 3
+        },
+        "queryCategories": {
+          "itemCandidates": 25,
+          "dueWork": 2
+        },
+        "attemptedWrites": 34,
+        "committedWrites": 34,
+        "writeCategories": {
+          "household": 3,
+          "item": 25,
+          "commandReceipt": 3,
+          "work": 3
+        },
+        "transactionCalls": 5,
+        "transactionAttempts": 5,
+        "transactionRetries": 0,
+        "readOnlyTransactions": 2
+      },
+      "readEquivalent": 47
+    },
+    {
+      "name": "private/RETRY_10",
+      "normalR": 16,
+      "normalCommittedW": 13,
+      "submissionWrites": 1,
+      "totalCommittedW": 14,
+      "counts": {
+        "documentGets": 12,
+        "missingDocuments": 2,
+        "queryCalls": 20,
+        "queryDocuments": 0,
+        "emptyQueries": 20,
+        "maxQueryDocuments": 0,
+        "readCategories": {
+          "commandReceipt": 2,
+          "lifecycle": 2,
+          "user": 2,
+          "household": 2,
+          "membership": 2,
+          "reverseMembership": 2
+        },
+        "queryCategories": {
+          "itemCandidates": 20
+        },
+        "attemptedWrites": 26,
+        "committedWrites": 13,
+        "writeCategories": {
+          "household": 1,
+          "item": 10,
+          "commandReceipt": 1,
+          "work": 1
+        },
+        "transactionCalls": 1,
+        "transactionAttempts": 2,
+        "transactionRetries": 1,
+        "readOnlyTransactions": 0
+      },
+      "readEquivalent": 32
+    },
+    {
+      "name": "private/INTERRUPT_PREFIX_30",
+      "counts": {
+        "documentGets": 18,
+        "missingDocuments": 3,
+        "queryCalls": 30,
+        "queryDocuments": 0,
+        "emptyQueries": 30,
+        "maxQueryDocuments": 0,
+        "readCategories": {
+          "commandReceipt": 3,
+          "lifecycle": 3,
+          "user": 3,
+          "household": 3,
+          "membership": 3,
+          "reverseMembership": 3
+        },
+        "queryCategories": {
+          "itemCandidates": 30
+        },
+        "attemptedWrites": 39,
+        "committedWrites": 39,
+        "writeCategories": {
+          "household": 3,
+          "item": 30,
+          "commandReceipt": 3,
+          "work": 3
+        },
+        "transactionCalls": 3,
+        "transactionAttempts": 3,
+        "transactionRetries": 0,
+        "readOnlyTransactions": 0
+      },
+      "readEquivalent": 48
+    },
+    {
+      "name": "private/RESUME_SUFFIX_20",
+      "counts": {
+        "documentGets": 14,
+        "missingDocuments": 2,
+        "queryCalls": 20,
+        "queryDocuments": 0,
+        "emptyQueries": 20,
+        "maxQueryDocuments": 0,
+        "readCategories": {
+          "commandReceipt": 4,
+          "lifecycle": 2,
+          "user": 2,
+          "household": 2,
+          "membership": 2,
+          "reverseMembership": 2
+        },
+        "queryCategories": {
+          "itemCandidates": 20
+        },
+        "attemptedWrites": 26,
+        "committedWrites": 26,
+        "writeCategories": {
+          "household": 2,
+          "item": 20,
+          "commandReceipt": 2,
+          "work": 2
+        },
+        "transactionCalls": 4,
+        "transactionAttempts": 4,
+        "transactionRetries": 0,
+        "readOnlyTransactions": 2
+      },
+      "readEquivalent": 34
+    },
+    {
+      "name": "private/RESUME_TERMINAL_REPLAY",
+      "counts": {
+        "documentGets": 1,
+        "missingDocuments": 0,
+        "queryCalls": 0,
+        "queryDocuments": 0,
+        "emptyQueries": 0,
+        "maxQueryDocuments": 0,
+        "readCategories": {
+          "commandReceipt": 1
+        },
+        "queryCategories": {},
+        "attemptedWrites": 0,
+        "committedWrites": 0,
+        "writeCategories": {},
+        "transactionCalls": 1,
+        "transactionAttempts": 1,
+        "transactionRetries": 0,
+        "readOnlyTransactions": 1
+      },
+      "readEquivalent": 1
+    },
+    {
+      "name": "privateOrFamily/INVALIDATED_epoch",
+      "committedChildren": 30,
+      "terminalChildren": 50,
+      "counts": {
+        "documentGets": 6,
+        "missingDocuments": 1,
+        "queryCalls": 0,
+        "queryDocuments": 0,
+        "emptyQueries": 0,
+        "maxQueryDocuments": 0,
+        "readCategories": {
+          "commandReceipt": 1,
+          "lifecycle": 1,
+          "user": 1,
+          "household": 1,
+          "membership": 1,
+          "reverseMembership": 1
+        },
+        "queryCategories": {},
+        "attemptedWrites": 2,
+        "committedWrites": 2,
+        "writeCategories": {
+          "commandReceipt": 1,
+          "work": 1
+        },
+        "transactionCalls": 1,
+        "transactionAttempts": 1,
+        "transactionRetries": 0,
+        "readOnlyTransactions": 0
+      },
+      "readEquivalent": 6
+    },
+    {
+      "name": "privateOrFamily/INVALIDATED_membership",
+      "committedChildren": 30,
+      "terminalChildren": 50,
+      "counts": {
+        "documentGets": 6,
+        "missingDocuments": 1,
+        "queryCalls": 0,
+        "queryDocuments": 0,
+        "emptyQueries": 0,
+        "maxQueryDocuments": 0,
+        "readCategories": {
+          "commandReceipt": 1,
+          "lifecycle": 1,
+          "user": 1,
+          "household": 1,
+          "membership": 1,
+          "reverseMembership": 1
+        },
+        "queryCategories": {},
+        "attemptedWrites": 2,
+        "committedWrites": 2,
+        "writeCategories": {
+          "commandReceipt": 1,
+          "work": 1
+        },
+        "transactionCalls": 1,
+        "transactionAttempts": 1,
+        "transactionRetries": 0,
+        "readOnlyTransactions": 0
+      },
+      "readEquivalent": 6
+    },
+    {
+      "name": "privateOrFamily/INVALIDATED_lifecycle",
+      "committedChildren": 30,
+      "terminalChildren": 50,
+      "counts": {
+        "documentGets": 2,
+        "missingDocuments": 0,
+        "queryCalls": 0,
+        "queryDocuments": 0,
+        "emptyQueries": 0,
+        "maxQueryDocuments": 0,
+        "readCategories": {
+          "commandReceipt": 1,
+          "lifecycle": 1
+        },
+        "queryCategories": {},
+        "attemptedWrites": 2,
+        "committedWrites": 2,
+        "writeCategories": {
+          "commandReceipt": 1,
+          "work": 1
+        },
+        "transactionCalls": 1,
+        "transactionAttempts": 1,
+        "transactionRetries": 0,
+        "readOnlyTransactions": 0
+      },
+      "readEquivalent": 2
+    }
+  ],
+  "acceptanceTargets": [
+    {
+      "name": "private/BULK_50",
+      "oldR": 358,
+      "oldW": 201,
+      "maxR": 88,
+      "maxW": 66,
+      "R": 88,
+      "W": 66,
+      "pass": true,
+      "readReduction": {
+        "saved": 270,
+        "baseline": 358,
+        "percent": 75.41899441340782
+      },
+      "writeReduction": {
+        "saved": 135,
+        "baseline": 201,
+        "percent": 67.16417910447761
+      }
+    },
+    {
+      "name": "private/BULK_200",
+      "oldR": 1438,
+      "oldW": 801,
+      "maxR": 358,
+      "maxW": 261,
+      "R": 358,
+      "W": 261,
+      "pass": true,
+      "readReduction": {
+        "saved": 1080,
+        "baseline": 1438,
+        "percent": 75.10431154381085
+      },
+      "writeReduction": {
+        "saved": 540,
+        "baseline": 801,
+        "percent": 67.41573033707866
+      }
+    },
+    {
+      "name": "family/BULK_50",
+      "oldR": 458,
+      "oldW": 201,
+      "maxR": 98,
+      "maxW": 66,
+      "R": 98,
+      "W": 66,
+      "pass": true,
+      "readReduction": {
+        "saved": 360,
+        "baseline": 458,
+        "percent": 78.60262008733625
+      },
+      "writeReduction": {
+        "saved": 135,
+        "baseline": 201,
+        "percent": 67.16417910447761
+      }
+    },
+    {
+      "name": "family/BULK_200",
+      "oldR": 1838,
+      "oldW": 801,
+      "maxR": 398,
+      "maxW": 261,
+      "R": 398,
+      "W": 261,
+      "pass": true,
+      "readReduction": {
+        "saved": 1440,
+        "baseline": 1838,
+        "percent": 78.34602829162132
+      },
+      "writeReduction": {
+        "saved": 540,
+        "baseline": 801,
+        "percent": 67.41573033707866
+      }
+    }
+  ],
+  "repeatability": {
+    "runs": 2,
+    "identicalRecords": 54,
+    "identical": true,
+    "firstRunReports": [
+      {
+        "name": "private/ADD_NEW",
+        "childCount": 1,
+        "blockCount": 1,
+        "progress": [
+          1
+        ],
+        "finalParentState": "APPLIED",
+        "submission": {
+          "documentGets": 0,
+          "missingDocuments": 0,
+          "queryCalls": 0,
+          "queryDocuments": 0,
+          "emptyQueries": 0,
+          "maxQueryDocuments": 0,
+          "readCategories": {},
+          "queryCategories": {},
+          "attemptedWrites": 1,
+          "committedWrites": 1,
+          "writeCategories": {
+            "commandReceipt": 1
+          },
+          "transactionCalls": 0,
+          "transactionAttempts": 0,
+          "transactionRetries": 0,
+          "readOnlyTransactions": 0
+        },
+        "continuationRounds": 0,
+        "totalWritesIncludingSubmission": 5,
+        "counts": {
+          "documentGets": 6,
+          "missingDocuments": 1,
+          "queryCalls": 1,
+          "queryDocuments": 0,
+          "emptyQueries": 1,
+          "maxQueryDocuments": 0,
+          "readCategories": {
+            "commandReceipt": 1,
+            "lifecycle": 1,
+            "user": 1,
+            "household": 1,
+            "membership": 1,
+            "reverseMembership": 1
+          },
+          "queryCategories": {
+            "itemCandidates": 1
+          },
+          "attemptedWrites": 4,
+          "committedWrites": 4,
+          "writeCategories": {
+            "household": 1,
+            "item": 1,
+            "commandReceipt": 1,
+            "work": 1
+          },
+          "transactionCalls": 1,
+          "transactionAttempts": 1,
+          "transactionRetries": 0,
+          "readOnlyTransactions": 0
+        },
+        "readEquivalent": 7
+      },
+      {
+        "name": "private/ADD_MERGE",
+        "childCount": 1,
+        "blockCount": 1,
+        "progress": [
+          1
+        ],
+        "finalParentState": "APPLIED",
+        "submission": {
+          "documentGets": 0,
+          "missingDocuments": 0,
+          "queryCalls": 0,
+          "queryDocuments": 0,
+          "emptyQueries": 0,
+          "maxQueryDocuments": 0,
+          "readCategories": {},
+          "queryCategories": {},
+          "attemptedWrites": 1,
+          "committedWrites": 1,
+          "writeCategories": {
+            "commandReceipt": 1
+          },
+          "transactionCalls": 0,
+          "transactionAttempts": 0,
+          "transactionRetries": 0,
+          "readOnlyTransactions": 0
+        },
+        "continuationRounds": 0,
+        "totalWritesIncludingSubmission": 5,
+        "counts": {
+          "documentGets": 6,
+          "missingDocuments": 1,
+          "queryCalls": 1,
+          "queryDocuments": 1,
+          "emptyQueries": 0,
+          "maxQueryDocuments": 1,
+          "readCategories": {
+            "commandReceipt": 1,
+            "lifecycle": 1,
+            "user": 1,
+            "household": 1,
+            "membership": 1,
+            "reverseMembership": 1
+          },
+          "queryCategories": {
+            "itemCandidates": 1
+          },
+          "attemptedWrites": 4,
+          "committedWrites": 4,
+          "writeCategories": {
+            "household": 1,
+            "item": 1,
+            "commandReceipt": 1,
+            "work": 1
+          },
+          "transactionCalls": 1,
+          "transactionAttempts": 1,
+          "transactionRetries": 0,
+          "readOnlyTransactions": 0
+        },
+        "readEquivalent": 7
+      },
+      {
+        "name": "private/EDIT",
+        "childCount": 1,
+        "progress": [],
+        "finalParentState": "APPLIED",
+        "submission": {
+          "documentGets": 0,
+          "missingDocuments": 0,
+          "queryCalls": 0,
+          "queryDocuments": 0,
+          "emptyQueries": 0,
+          "maxQueryDocuments": 0,
+          "readCategories": {},
+          "queryCategories": {},
+          "attemptedWrites": 1,
+          "committedWrites": 1,
+          "writeCategories": {
+            "commandReceipt": 1
+          },
+          "transactionCalls": 0,
+          "transactionAttempts": 0,
+          "transactionRetries": 0,
+          "readOnlyTransactions": 0
+        },
+        "continuationRounds": 0,
+        "totalWritesIncludingSubmission": 5,
+        "counts": {
+          "documentGets": 7,
+          "missingDocuments": 1,
+          "queryCalls": 1,
+          "queryDocuments": 0,
+          "emptyQueries": 1,
+          "maxQueryDocuments": 0,
+          "readCategories": {
+            "commandReceipt": 1,
+            "lifecycle": 1,
+            "user": 1,
+            "household": 1,
+            "membership": 1,
+            "reverseMembership": 1,
+            "item": 1
+          },
+          "queryCategories": {
+            "itemCandidates": 1
+          },
+          "attemptedWrites": 4,
+          "committedWrites": 4,
+          "writeCategories": {
+            "household": 1,
+            "item": 1,
+            "commandReceipt": 1,
+            "work": 1
+          },
+          "transactionCalls": 1,
+          "transactionAttempts": 1,
+          "transactionRetries": 0,
+          "readOnlyTransactions": 0
+        },
+        "readEquivalent": 8
+      },
+      {
+        "name": "private/CHECK",
+        "childCount": 1,
+        "progress": [],
+        "finalParentState": "APPLIED",
+        "submission": {
+          "documentGets": 0,
+          "missingDocuments": 0,
+          "queryCalls": 0,
+          "queryDocuments": 0,
+          "emptyQueries": 0,
+          "maxQueryDocuments": 0,
+          "readCategories": {},
+          "queryCategories": {},
+          "attemptedWrites": 1,
+          "committedWrites": 1,
+          "writeCategories": {
+            "commandReceipt": 1
+          },
+          "transactionCalls": 0,
+          "transactionAttempts": 0,
+          "transactionRetries": 0,
+          "readOnlyTransactions": 0
+        },
+        "continuationRounds": 0,
+        "totalWritesIncludingSubmission": 5,
+        "counts": {
+          "documentGets": 7,
+          "missingDocuments": 1,
+          "queryCalls": 0,
+          "queryDocuments": 0,
+          "emptyQueries": 0,
+          "maxQueryDocuments": 0,
+          "readCategories": {
+            "commandReceipt": 1,
+            "lifecycle": 1,
+            "user": 1,
+            "household": 1,
+            "membership": 1,
+            "reverseMembership": 1,
+            "item": 1
+          },
+          "queryCategories": {},
+          "attemptedWrites": 4,
+          "committedWrites": 4,
+          "writeCategories": {
+            "household": 1,
+            "item": 1,
+            "commandReceipt": 1,
+            "work": 1
+          },
+          "transactionCalls": 1,
+          "transactionAttempts": 1,
+          "transactionRetries": 0,
+          "readOnlyTransactions": 0
+        },
+        "readEquivalent": 7
+      },
+      {
+        "name": "private/DELETE",
+        "childCount": 1,
+        "progress": [],
+        "finalParentState": "APPLIED",
+        "submission": {
+          "documentGets": 0,
+          "missingDocuments": 0,
+          "queryCalls": 0,
+          "queryDocuments": 0,
+          "emptyQueries": 0,
+          "maxQueryDocuments": 0,
+          "readCategories": {},
+          "queryCategories": {},
+          "attemptedWrites": 1,
+          "committedWrites": 1,
+          "writeCategories": {
+            "commandReceipt": 1
+          },
+          "transactionCalls": 0,
+          "transactionAttempts": 0,
+          "transactionRetries": 0,
+          "readOnlyTransactions": 0
+        },
+        "continuationRounds": 0,
+        "totalWritesIncludingSubmission": 5,
+        "counts": {
+          "documentGets": 7,
+          "missingDocuments": 1,
+          "queryCalls": 0,
+          "queryDocuments": 0,
+          "emptyQueries": 0,
+          "maxQueryDocuments": 0,
+          "readCategories": {
+            "commandReceipt": 1,
+            "lifecycle": 1,
+            "user": 1,
+            "household": 1,
+            "membership": 1,
+            "reverseMembership": 1,
+            "item": 1
+          },
+          "queryCategories": {},
+          "attemptedWrites": 4,
+          "committedWrites": 4,
+          "writeCategories": {
+            "household": 1,
+            "item": 1,
+            "commandReceipt": 1,
+            "work": 1
+          },
+          "transactionCalls": 1,
+          "transactionAttempts": 1,
+          "transactionRetries": 0,
+          "readOnlyTransactions": 0
+        },
+        "readEquivalent": 7
+      },
+      {
+        "name": "private/BULK_1",
+        "childCount": 1,
+        "blockCount": 1,
+        "progress": [
+          1
+        ],
+        "finalParentState": "APPLIED",
+        "submission": {
+          "documentGets": 0,
+          "missingDocuments": 0,
+          "queryCalls": 0,
+          "queryDocuments": 0,
+          "emptyQueries": 0,
+          "maxQueryDocuments": 0,
+          "readCategories": {},
+          "queryCategories": {},
+          "attemptedWrites": 1,
+          "committedWrites": 1,
+          "writeCategories": {
+            "commandReceipt": 1
+          },
+          "transactionCalls": 0,
+          "transactionAttempts": 0,
+          "transactionRetries": 0,
+          "readOnlyTransactions": 0
+        },
+        "continuationRounds": 0,
+        "totalWritesIncludingSubmission": 5,
+        "counts": {
+          "documentGets": 6,
+          "missingDocuments": 1,
+          "queryCalls": 1,
+          "queryDocuments": 0,
+          "emptyQueries": 1,
+          "maxQueryDocuments": 0,
+          "readCategories": {
+            "commandReceipt": 1,
+            "lifecycle": 1,
+            "user": 1,
+            "household": 1,
+            "membership": 1,
+            "reverseMembership": 1
+          },
+          "queryCategories": {
+            "itemCandidates": 1
+          },
+          "attemptedWrites": 4,
+          "committedWrites": 4,
+          "writeCategories": {
+            "household": 1,
+            "item": 1,
+            "commandReceipt": 1,
+            "work": 1
+          },
+          "transactionCalls": 1,
+          "transactionAttempts": 1,
+          "transactionRetries": 0,
+          "readOnlyTransactions": 0
+        },
+        "readEquivalent": 7
+      },
+      {
+        "name": "private/BULK_10",
+        "childCount": 10,
+        "blockCount": 1,
+        "progress": [
+          10
+        ],
+        "finalParentState": "APPLIED",
+        "submission": {
+          "documentGets": 0,
+          "missingDocuments": 0,
+          "queryCalls": 0,
+          "queryDocuments": 0,
+          "emptyQueries": 0,
+          "maxQueryDocuments": 0,
+          "readCategories": {},
+          "queryCategories": {},
+          "attemptedWrites": 1,
+          "committedWrites": 1,
+          "writeCategories": {
+            "commandReceipt": 1
+          },
+          "transactionCalls": 0,
+          "transactionAttempts": 0,
+          "transactionRetries": 0,
+          "readOnlyTransactions": 0
+        },
+        "continuationRounds": 0,
+        "totalWritesIncludingSubmission": 14,
+        "counts": {
+          "documentGets": 6,
+          "missingDocuments": 1,
+          "queryCalls": 10,
+          "queryDocuments": 0,
+          "emptyQueries": 10,
+          "maxQueryDocuments": 0,
+          "readCategories": {
+            "commandReceipt": 1,
+            "lifecycle": 1,
+            "user": 1,
+            "household": 1,
+            "membership": 1,
+            "reverseMembership": 1
+          },
+          "queryCategories": {
+            "itemCandidates": 10
+          },
+          "attemptedWrites": 13,
+          "committedWrites": 13,
+          "writeCategories": {
+            "household": 1,
+            "item": 10,
+            "commandReceipt": 1,
+            "work": 1
+          },
+          "transactionCalls": 1,
+          "transactionAttempts": 1,
+          "transactionRetries": 0,
+          "readOnlyTransactions": 0
+        },
+        "readEquivalent": 16
+      },
+      {
+        "name": "private/BULK_50",
+        "childCount": 50,
+        "blockCount": 5,
+        "progress": [
+          10,
+          20,
+          30,
+          40,
+          50
+        ],
+        "finalParentState": "APPLIED",
+        "submission": {
+          "documentGets": 0,
+          "missingDocuments": 0,
+          "queryCalls": 0,
+          "queryDocuments": 0,
+          "emptyQueries": 0,
+          "maxQueryDocuments": 0,
+          "readCategories": {},
+          "queryCategories": {},
+          "attemptedWrites": 1,
+          "committedWrites": 1,
+          "writeCategories": {
+            "commandReceipt": 1
+          },
+          "transactionCalls": 0,
+          "transactionAttempts": 0,
+          "transactionRetries": 0,
+          "readOnlyTransactions": 0
+        },
+        "continuationRounds": 4,
+        "totalWritesIncludingSubmission": 66,
+        "counts": {
+          "documentGets": 34,
+          "missingDocuments": 5,
+          "queryCalls": 54,
+          "queryDocuments": 4,
+          "emptyQueries": 50,
+          "maxQueryDocuments": 1,
+          "readCategories": {
+            "commandReceipt": 9,
+            "lifecycle": 5,
+            "user": 5,
+            "household": 5,
+            "membership": 5,
+            "reverseMembership": 5
+          },
+          "queryCategories": {
+            "itemCandidates": 50,
+            "dueWork": 4
+          },
+          "attemptedWrites": 65,
+          "committedWrites": 65,
+          "writeCategories": {
+            "household": 5,
+            "item": 50,
+            "commandReceipt": 5,
+            "work": 5
+          },
+          "transactionCalls": 9,
+          "transactionAttempts": 9,
+          "transactionRetries": 0,
+          "readOnlyTransactions": 4
+        },
+        "readEquivalent": 88
+      },
+      {
+        "name": "private/BULK_200",
+        "childCount": 200,
+        "blockCount": 20,
+        "progress": [
+          10,
+          20,
+          30,
+          40,
+          50,
+          60,
+          70,
+          80,
+          90,
+          100,
+          110,
+          120,
+          130,
+          140,
+          150,
+          160,
+          170,
+          180,
+          190,
+          200
+        ],
+        "finalParentState": "APPLIED",
+        "submission": {
+          "documentGets": 0,
+          "missingDocuments": 0,
+          "queryCalls": 0,
+          "queryDocuments": 0,
+          "emptyQueries": 0,
+          "maxQueryDocuments": 0,
+          "readCategories": {},
+          "queryCategories": {},
+          "attemptedWrites": 1,
+          "committedWrites": 1,
+          "writeCategories": {
+            "commandReceipt": 1
+          },
+          "transactionCalls": 0,
+          "transactionAttempts": 0,
+          "transactionRetries": 0,
+          "readOnlyTransactions": 0
+        },
+        "continuationRounds": 19,
+        "totalWritesIncludingSubmission": 261,
+        "counts": {
+          "documentGets": 139,
+          "missingDocuments": 20,
+          "queryCalls": 219,
+          "queryDocuments": 19,
+          "emptyQueries": 200,
+          "maxQueryDocuments": 1,
+          "readCategories": {
+            "commandReceipt": 39,
+            "lifecycle": 20,
+            "user": 20,
+            "household": 20,
+            "membership": 20,
+            "reverseMembership": 20
+          },
+          "queryCategories": {
+            "itemCandidates": 200,
+            "dueWork": 19
+          },
+          "attemptedWrites": 260,
+          "committedWrites": 260,
+          "writeCategories": {
+            "household": 20,
+            "item": 200,
+            "commandReceipt": 20,
+            "work": 20
+          },
+          "transactionCalls": 39,
+          "transactionAttempts": 39,
+          "transactionRetries": 0,
+          "readOnlyTransactions": 19
+        },
+        "readEquivalent": 358
+      },
+      {
+        "name": "private/MERGE_BULK_50",
+        "childCount": 50,
+        "blockCount": 5,
+        "progress": [
+          10,
+          20,
+          30,
+          40,
+          50
+        ],
+        "finalParentState": "APPLIED",
+        "submission": {
+          "documentGets": 0,
+          "missingDocuments": 0,
+          "queryCalls": 0,
+          "queryDocuments": 0,
+          "emptyQueries": 0,
+          "maxQueryDocuments": 0,
+          "readCategories": {},
+          "queryCategories": {},
+          "attemptedWrites": 1,
+          "committedWrites": 1,
+          "writeCategories": {
+            "commandReceipt": 1
+          },
+          "transactionCalls": 0,
+          "transactionAttempts": 0,
+          "transactionRetries": 0,
+          "readOnlyTransactions": 0
+        },
+        "continuationRounds": 4,
+        "totalWritesIncludingSubmission": 41,
+        "counts": {
+          "documentGets": 34,
+          "missingDocuments": 5,
+          "queryCalls": 29,
+          "queryDocuments": 24,
+          "emptyQueries": 5,
+          "maxQueryDocuments": 1,
+          "readCategories": {
+            "commandReceipt": 9,
+            "lifecycle": 5,
+            "user": 5,
+            "household": 5,
+            "membership": 5,
+            "reverseMembership": 5
+          },
+          "queryCategories": {
+            "itemCandidates": 25,
+            "dueWork": 4
+          },
+          "attemptedWrites": 40,
+          "committedWrites": 40,
+          "writeCategories": {
+            "household": 5,
+            "item": 25,
+            "commandReceipt": 5,
+            "work": 5
+          },
+          "transactionCalls": 9,
+          "transactionAttempts": 9,
+          "transactionRetries": 0,
+          "readOnlyTransactions": 4
+        },
+        "readEquivalent": 63
+      },
+      {
+        "name": "private/MIXED_5",
+        "childCount": 5,
+        "progress": [],
+        "finalParentState": "APPLIED",
+        "submission": {
+          "documentGets": 0,
+          "missingDocuments": 0,
+          "queryCalls": 0,
+          "queryDocuments": 0,
+          "emptyQueries": 0,
+          "maxQueryDocuments": 0,
+          "readCategories": {},
+          "queryCategories": {},
+          "attemptedWrites": 1,
+          "committedWrites": 1,
+          "writeCategories": {
+            "commandReceipt": 1
+          },
+          "transactionCalls": 0,
+          "transactionAttempts": 0,
+          "transactionRetries": 0,
+          "readOnlyTransactions": 0
+        },
+        "continuationRounds": 0,
+        "totalWritesIncludingSubmission": 21,
+        "counts": {
+          "documentGets": 33,
+          "missingDocuments": 5,
+          "queryCalls": 3,
+          "queryDocuments": 1,
+          "emptyQueries": 2,
+          "maxQueryDocuments": 1,
+          "readCategories": {
+            "commandReceipt": 5,
+            "lifecycle": 5,
+            "user": 5,
+            "household": 5,
+            "membership": 5,
+            "reverseMembership": 5,
+            "item": 3
+          },
+          "queryCategories": {
+            "itemCandidates": 3
+          },
+          "attemptedWrites": 20,
+          "committedWrites": 20,
+          "writeCategories": {
+            "household": 5,
+            "item": 5,
+            "commandReceipt": 5,
+            "work": 5
+          },
+          "transactionCalls": 5,
+          "transactionAttempts": 5,
+          "transactionRetries": 0,
+          "readOnlyTransactions": 0
+        },
+        "readEquivalent": 36
+      },
+      {
+        "name": "private/EDIT_SAME_IDENTITY",
+        "childCount": 1,
+        "progress": [],
+        "finalParentState": "APPLIED",
+        "submission": {
+          "documentGets": 0,
+          "missingDocuments": 0,
+          "queryCalls": 0,
+          "queryDocuments": 0,
+          "emptyQueries": 0,
+          "maxQueryDocuments": 0,
+          "readCategories": {},
+          "queryCategories": {},
+          "attemptedWrites": 1,
+          "committedWrites": 1,
+          "writeCategories": {
+            "commandReceipt": 1
+          },
+          "transactionCalls": 0,
+          "transactionAttempts": 0,
+          "transactionRetries": 0,
+          "readOnlyTransactions": 0
+        },
+        "continuationRounds": 0,
+        "totalWritesIncludingSubmission": 5,
+        "counts": {
+          "documentGets": 7,
+          "missingDocuments": 1,
+          "queryCalls": 1,
+          "queryDocuments": 1,
+          "emptyQueries": 0,
+          "maxQueryDocuments": 1,
+          "readCategories": {
+            "commandReceipt": 1,
+            "lifecycle": 1,
+            "user": 1,
+            "household": 1,
+            "membership": 1,
+            "reverseMembership": 1,
+            "item": 1
+          },
+          "queryCategories": {
+            "itemCandidates": 1
+          },
+          "attemptedWrites": 4,
+          "committedWrites": 4,
+          "writeCategories": {
+            "household": 1,
+            "item": 1,
+            "commandReceipt": 1,
+            "work": 1
+          },
+          "transactionCalls": 1,
+          "transactionAttempts": 1,
+          "transactionRetries": 0,
+          "readOnlyTransactions": 0
+        },
+        "readEquivalent": 8
+      },
+      {
+        "name": "private/EDIT_MERGE",
+        "childCount": 1,
+        "progress": [],
+        "finalParentState": "APPLIED",
+        "submission": {
+          "documentGets": 0,
+          "missingDocuments": 0,
+          "queryCalls": 0,
+          "queryDocuments": 0,
+          "emptyQueries": 0,
+          "maxQueryDocuments": 0,
+          "readCategories": {},
+          "queryCategories": {},
+          "attemptedWrites": 1,
+          "committedWrites": 1,
+          "writeCategories": {
+            "commandReceipt": 1
+          },
+          "transactionCalls": 0,
+          "transactionAttempts": 0,
+          "transactionRetries": 0,
+          "readOnlyTransactions": 0
+        },
+        "continuationRounds": 0,
+        "totalWritesIncludingSubmission": 6,
+        "counts": {
+          "documentGets": 7,
+          "missingDocuments": 1,
+          "queryCalls": 1,
+          "queryDocuments": 1,
+          "emptyQueries": 0,
+          "maxQueryDocuments": 1,
+          "readCategories": {
+            "commandReceipt": 1,
+            "lifecycle": 1,
+            "user": 1,
+            "household": 1,
+            "membership": 1,
+            "reverseMembership": 1,
+            "item": 1
+          },
+          "queryCategories": {
+            "itemCandidates": 1
+          },
+          "attemptedWrites": 5,
+          "committedWrites": 5,
+          "writeCategories": {
+            "household": 1,
+            "item": 2,
+            "commandReceipt": 1,
+            "work": 1
+          },
+          "transactionCalls": 1,
+          "transactionAttempts": 1,
+          "transactionRetries": 0,
+          "readOnlyTransactions": 0
+        },
+        "readEquivalent": 8
+      },
+      {
+        "name": "private/COLD_CONTEXT",
+        "counts": {
+          "documentGets": 7,
+          "missingDocuments": 1,
+          "queryCalls": 1,
+          "queryDocuments": 0,
+          "emptyQueries": 1,
+          "maxQueryDocuments": 0,
+          "readCategories": {
+            "runtimeGate": 1,
+            "user": 2,
+            "lifecycle": 1,
+            "household": 1,
+            "membership": 1,
+            "reverseMembership": 1
+          },
+          "queryCategories": {
+            "itemCandidates": 1
+          },
+          "attemptedWrites": 1,
+          "committedWrites": 1,
+          "writeCategories": {
+            "household": 1
+          },
+          "transactionCalls": 1,
+          "transactionAttempts": 1,
+          "transactionRetries": 0,
+          "readOnlyTransactions": 0
+        },
+        "readEquivalent": 8
+      },
+      {
+        "name": "private/WARM_CONTEXT",
+        "counts": {
+          "documentGets": 7,
+          "missingDocuments": 1,
+          "queryCalls": 0,
+          "queryDocuments": 0,
+          "emptyQueries": 0,
+          "maxQueryDocuments": 0,
+          "readCategories": {
+            "runtimeGate": 1,
+            "user": 2,
+            "lifecycle": 1,
+            "household": 1,
+            "membership": 1,
+            "reverseMembership": 1
+          },
+          "queryCategories": {},
+          "attemptedWrites": 0,
+          "committedWrites": 0,
+          "writeCategories": {},
+          "transactionCalls": 1,
+          "transactionAttempts": 1,
+          "transactionRetries": 0,
+          "readOnlyTransactions": 1
+        },
+        "readEquivalent": 7
+      },
+      {
+        "name": "private/SUBMIT_HELPER",
+        "counts": {
+          "documentGets": 7,
+          "missingDocuments": 2,
+          "queryCalls": 0,
+          "queryDocuments": 0,
+          "emptyQueries": 0,
+          "maxQueryDocuments": 0,
+          "readCategories": {
+            "commandReceipt": 1,
+            "runtimeGate": 1,
+            "lifecycle": 1,
+            "user": 1,
+            "household": 1,
+            "membership": 1,
+            "reverseMembership": 1
+          },
+          "queryCategories": {},
+          "attemptedWrites": 1,
+          "committedWrites": 1,
+          "writeCategories": {
+            "commandReceipt": 1
+          },
+          "transactionCalls": 1,
+          "transactionAttempts": 1,
+          "transactionRetries": 0,
+          "readOnlyTransactions": 0
+        },
+        "readEquivalent": 7
+      },
+      {
+        "name": "family/ADD_NEW",
+        "childCount": 1,
+        "blockCount": 1,
+        "progress": [
+          1
+        ],
+        "finalParentState": "APPLIED",
+        "submission": {
+          "documentGets": 0,
+          "missingDocuments": 0,
+          "queryCalls": 0,
+          "queryDocuments": 0,
+          "emptyQueries": 0,
+          "maxQueryDocuments": 0,
+          "readCategories": {},
+          "queryCategories": {},
+          "attemptedWrites": 1,
+          "committedWrites": 1,
+          "writeCategories": {
+            "commandReceipt": 1
+          },
+          "transactionCalls": 0,
+          "transactionAttempts": 0,
+          "transactionRetries": 0,
+          "readOnlyTransactions": 0
+        },
+        "continuationRounds": 0,
+        "totalWritesIncludingSubmission": 5,
+        "counts": {
+          "documentGets": 8,
+          "missingDocuments": 0,
+          "queryCalls": 1,
+          "queryDocuments": 0,
+          "emptyQueries": 1,
+          "maxQueryDocuments": 0,
+          "readCategories": {
+            "commandReceipt": 1,
+            "lifecycle": 1,
+            "user": 1,
+            "household": 1,
+            "membership": 1,
+            "reverseMembership": 1,
+            "fallbackHousehold": 1,
+            "fallbackMembership": 1
+          },
+          "queryCategories": {
+            "itemCandidates": 1
+          },
+          "attemptedWrites": 4,
+          "committedWrites": 4,
+          "writeCategories": {
+            "household": 1,
+            "item": 1,
+            "commandReceipt": 1,
+            "work": 1
+          },
+          "transactionCalls": 1,
+          "transactionAttempts": 1,
+          "transactionRetries": 0,
+          "readOnlyTransactions": 0
+        },
+        "readEquivalent": 9
+      },
+      {
+        "name": "family/ADD_MERGE",
+        "childCount": 1,
+        "blockCount": 1,
+        "progress": [
+          1
+        ],
+        "finalParentState": "APPLIED",
+        "submission": {
+          "documentGets": 0,
+          "missingDocuments": 0,
+          "queryCalls": 0,
+          "queryDocuments": 0,
+          "emptyQueries": 0,
+          "maxQueryDocuments": 0,
+          "readCategories": {},
+          "queryCategories": {},
+          "attemptedWrites": 1,
+          "committedWrites": 1,
+          "writeCategories": {
+            "commandReceipt": 1
+          },
+          "transactionCalls": 0,
+          "transactionAttempts": 0,
+          "transactionRetries": 0,
+          "readOnlyTransactions": 0
+        },
+        "continuationRounds": 0,
+        "totalWritesIncludingSubmission": 5,
+        "counts": {
+          "documentGets": 8,
+          "missingDocuments": 0,
+          "queryCalls": 1,
+          "queryDocuments": 1,
+          "emptyQueries": 0,
+          "maxQueryDocuments": 1,
+          "readCategories": {
+            "commandReceipt": 1,
+            "lifecycle": 1,
+            "user": 1,
+            "household": 1,
+            "membership": 1,
+            "reverseMembership": 1,
+            "fallbackHousehold": 1,
+            "fallbackMembership": 1
+          },
+          "queryCategories": {
+            "itemCandidates": 1
+          },
+          "attemptedWrites": 4,
+          "committedWrites": 4,
+          "writeCategories": {
+            "household": 1,
+            "item": 1,
+            "commandReceipt": 1,
+            "work": 1
+          },
+          "transactionCalls": 1,
+          "transactionAttempts": 1,
+          "transactionRetries": 0,
+          "readOnlyTransactions": 0
+        },
+        "readEquivalent": 9
+      },
+      {
+        "name": "family/EDIT",
+        "childCount": 1,
+        "progress": [],
+        "finalParentState": "APPLIED",
+        "submission": {
+          "documentGets": 0,
+          "missingDocuments": 0,
+          "queryCalls": 0,
+          "queryDocuments": 0,
+          "emptyQueries": 0,
+          "maxQueryDocuments": 0,
+          "readCategories": {},
+          "queryCategories": {},
+          "attemptedWrites": 1,
+          "committedWrites": 1,
+          "writeCategories": {
+            "commandReceipt": 1
+          },
+          "transactionCalls": 0,
+          "transactionAttempts": 0,
+          "transactionRetries": 0,
+          "readOnlyTransactions": 0
+        },
+        "continuationRounds": 0,
+        "totalWritesIncludingSubmission": 5,
+        "counts": {
+          "documentGets": 9,
+          "missingDocuments": 0,
+          "queryCalls": 1,
+          "queryDocuments": 0,
+          "emptyQueries": 1,
+          "maxQueryDocuments": 0,
+          "readCategories": {
+            "commandReceipt": 1,
+            "lifecycle": 1,
+            "user": 1,
+            "household": 1,
+            "membership": 1,
+            "reverseMembership": 1,
+            "fallbackHousehold": 1,
+            "fallbackMembership": 1,
+            "item": 1
+          },
+          "queryCategories": {
+            "itemCandidates": 1
+          },
+          "attemptedWrites": 4,
+          "committedWrites": 4,
+          "writeCategories": {
+            "household": 1,
+            "item": 1,
+            "commandReceipt": 1,
+            "work": 1
+          },
+          "transactionCalls": 1,
+          "transactionAttempts": 1,
+          "transactionRetries": 0,
+          "readOnlyTransactions": 0
+        },
+        "readEquivalent": 10
+      },
+      {
+        "name": "family/CHECK",
+        "childCount": 1,
+        "progress": [],
+        "finalParentState": "APPLIED",
+        "submission": {
+          "documentGets": 0,
+          "missingDocuments": 0,
+          "queryCalls": 0,
+          "queryDocuments": 0,
+          "emptyQueries": 0,
+          "maxQueryDocuments": 0,
+          "readCategories": {},
+          "queryCategories": {},
+          "attemptedWrites": 1,
+          "committedWrites": 1,
+          "writeCategories": {
+            "commandReceipt": 1
+          },
+          "transactionCalls": 0,
+          "transactionAttempts": 0,
+          "transactionRetries": 0,
+          "readOnlyTransactions": 0
+        },
+        "continuationRounds": 0,
+        "totalWritesIncludingSubmission": 5,
+        "counts": {
+          "documentGets": 9,
+          "missingDocuments": 0,
+          "queryCalls": 0,
+          "queryDocuments": 0,
+          "emptyQueries": 0,
+          "maxQueryDocuments": 0,
+          "readCategories": {
+            "commandReceipt": 1,
+            "lifecycle": 1,
+            "user": 1,
+            "household": 1,
+            "membership": 1,
+            "reverseMembership": 1,
+            "fallbackHousehold": 1,
+            "fallbackMembership": 1,
+            "item": 1
+          },
+          "queryCategories": {},
+          "attemptedWrites": 4,
+          "committedWrites": 4,
+          "writeCategories": {
+            "household": 1,
+            "item": 1,
+            "commandReceipt": 1,
+            "work": 1
+          },
+          "transactionCalls": 1,
+          "transactionAttempts": 1,
+          "transactionRetries": 0,
+          "readOnlyTransactions": 0
+        },
+        "readEquivalent": 9
+      },
+      {
+        "name": "family/DELETE",
+        "childCount": 1,
+        "progress": [],
+        "finalParentState": "APPLIED",
+        "submission": {
+          "documentGets": 0,
+          "missingDocuments": 0,
+          "queryCalls": 0,
+          "queryDocuments": 0,
+          "emptyQueries": 0,
+          "maxQueryDocuments": 0,
+          "readCategories": {},
+          "queryCategories": {},
+          "attemptedWrites": 1,
+          "committedWrites": 1,
+          "writeCategories": {
+            "commandReceipt": 1
+          },
+          "transactionCalls": 0,
+          "transactionAttempts": 0,
+          "transactionRetries": 0,
+          "readOnlyTransactions": 0
+        },
+        "continuationRounds": 0,
+        "totalWritesIncludingSubmission": 5,
+        "counts": {
+          "documentGets": 9,
+          "missingDocuments": 0,
+          "queryCalls": 0,
+          "queryDocuments": 0,
+          "emptyQueries": 0,
+          "maxQueryDocuments": 0,
+          "readCategories": {
+            "commandReceipt": 1,
+            "lifecycle": 1,
+            "user": 1,
+            "household": 1,
+            "membership": 1,
+            "reverseMembership": 1,
+            "fallbackHousehold": 1,
+            "fallbackMembership": 1,
+            "item": 1
+          },
+          "queryCategories": {},
+          "attemptedWrites": 4,
+          "committedWrites": 4,
+          "writeCategories": {
+            "household": 1,
+            "item": 1,
+            "commandReceipt": 1,
+            "work": 1
+          },
+          "transactionCalls": 1,
+          "transactionAttempts": 1,
+          "transactionRetries": 0,
+          "readOnlyTransactions": 0
+        },
+        "readEquivalent": 9
+      },
+      {
+        "name": "family/BULK_1",
+        "childCount": 1,
+        "blockCount": 1,
+        "progress": [
+          1
+        ],
+        "finalParentState": "APPLIED",
+        "submission": {
+          "documentGets": 0,
+          "missingDocuments": 0,
+          "queryCalls": 0,
+          "queryDocuments": 0,
+          "emptyQueries": 0,
+          "maxQueryDocuments": 0,
+          "readCategories": {},
+          "queryCategories": {},
+          "attemptedWrites": 1,
+          "committedWrites": 1,
+          "writeCategories": {
+            "commandReceipt": 1
+          },
+          "transactionCalls": 0,
+          "transactionAttempts": 0,
+          "transactionRetries": 0,
+          "readOnlyTransactions": 0
+        },
+        "continuationRounds": 0,
+        "totalWritesIncludingSubmission": 5,
+        "counts": {
+          "documentGets": 8,
+          "missingDocuments": 0,
+          "queryCalls": 1,
+          "queryDocuments": 0,
+          "emptyQueries": 1,
+          "maxQueryDocuments": 0,
+          "readCategories": {
+            "commandReceipt": 1,
+            "lifecycle": 1,
+            "user": 1,
+            "household": 1,
+            "membership": 1,
+            "reverseMembership": 1,
+            "fallbackHousehold": 1,
+            "fallbackMembership": 1
+          },
+          "queryCategories": {
+            "itemCandidates": 1
+          },
+          "attemptedWrites": 4,
+          "committedWrites": 4,
+          "writeCategories": {
+            "household": 1,
+            "item": 1,
+            "commandReceipt": 1,
+            "work": 1
+          },
+          "transactionCalls": 1,
+          "transactionAttempts": 1,
+          "transactionRetries": 0,
+          "readOnlyTransactions": 0
+        },
+        "readEquivalent": 9
+      },
+      {
+        "name": "family/BULK_10",
+        "childCount": 10,
+        "blockCount": 1,
+        "progress": [
+          10
+        ],
+        "finalParentState": "APPLIED",
+        "submission": {
+          "documentGets": 0,
+          "missingDocuments": 0,
+          "queryCalls": 0,
+          "queryDocuments": 0,
+          "emptyQueries": 0,
+          "maxQueryDocuments": 0,
+          "readCategories": {},
+          "queryCategories": {},
+          "attemptedWrites": 1,
+          "committedWrites": 1,
+          "writeCategories": {
+            "commandReceipt": 1
+          },
+          "transactionCalls": 0,
+          "transactionAttempts": 0,
+          "transactionRetries": 0,
+          "readOnlyTransactions": 0
+        },
+        "continuationRounds": 0,
+        "totalWritesIncludingSubmission": 14,
+        "counts": {
+          "documentGets": 8,
+          "missingDocuments": 0,
+          "queryCalls": 10,
+          "queryDocuments": 0,
+          "emptyQueries": 10,
+          "maxQueryDocuments": 0,
+          "readCategories": {
+            "commandReceipt": 1,
+            "lifecycle": 1,
+            "user": 1,
+            "household": 1,
+            "membership": 1,
+            "reverseMembership": 1,
+            "fallbackHousehold": 1,
+            "fallbackMembership": 1
+          },
+          "queryCategories": {
+            "itemCandidates": 10
+          },
+          "attemptedWrites": 13,
+          "committedWrites": 13,
+          "writeCategories": {
+            "household": 1,
+            "item": 10,
+            "commandReceipt": 1,
+            "work": 1
+          },
+          "transactionCalls": 1,
+          "transactionAttempts": 1,
+          "transactionRetries": 0,
+          "readOnlyTransactions": 0
+        },
+        "readEquivalent": 18
+      },
+      {
+        "name": "family/BULK_50",
+        "childCount": 50,
+        "blockCount": 5,
+        "progress": [
+          10,
+          20,
+          30,
+          40,
+          50
+        ],
+        "finalParentState": "APPLIED",
+        "submission": {
+          "documentGets": 0,
+          "missingDocuments": 0,
+          "queryCalls": 0,
+          "queryDocuments": 0,
+          "emptyQueries": 0,
+          "maxQueryDocuments": 0,
+          "readCategories": {},
+          "queryCategories": {},
+          "attemptedWrites": 1,
+          "committedWrites": 1,
+          "writeCategories": {
+            "commandReceipt": 1
+          },
+          "transactionCalls": 0,
+          "transactionAttempts": 0,
+          "transactionRetries": 0,
+          "readOnlyTransactions": 0
+        },
+        "continuationRounds": 4,
+        "totalWritesIncludingSubmission": 66,
+        "counts": {
+          "documentGets": 44,
+          "missingDocuments": 0,
+          "queryCalls": 54,
+          "queryDocuments": 4,
+          "emptyQueries": 50,
+          "maxQueryDocuments": 1,
+          "readCategories": {
+            "commandReceipt": 9,
+            "lifecycle": 5,
+            "user": 5,
+            "household": 5,
+            "membership": 5,
+            "reverseMembership": 5,
+            "fallbackHousehold": 5,
+            "fallbackMembership": 5
+          },
+          "queryCategories": {
+            "itemCandidates": 50,
+            "dueWork": 4
+          },
+          "attemptedWrites": 65,
+          "committedWrites": 65,
+          "writeCategories": {
+            "household": 5,
+            "item": 50,
+            "commandReceipt": 5,
+            "work": 5
+          },
+          "transactionCalls": 9,
+          "transactionAttempts": 9,
+          "transactionRetries": 0,
+          "readOnlyTransactions": 4
+        },
+        "readEquivalent": 98
+      },
+      {
+        "name": "family/BULK_200",
+        "childCount": 200,
+        "blockCount": 20,
+        "progress": [
+          10,
+          20,
+          30,
+          40,
+          50,
+          60,
+          70,
+          80,
+          90,
+          100,
+          110,
+          120,
+          130,
+          140,
+          150,
+          160,
+          170,
+          180,
+          190,
+          200
+        ],
+        "finalParentState": "APPLIED",
+        "submission": {
+          "documentGets": 0,
+          "missingDocuments": 0,
+          "queryCalls": 0,
+          "queryDocuments": 0,
+          "emptyQueries": 0,
+          "maxQueryDocuments": 0,
+          "readCategories": {},
+          "queryCategories": {},
+          "attemptedWrites": 1,
+          "committedWrites": 1,
+          "writeCategories": {
+            "commandReceipt": 1
+          },
+          "transactionCalls": 0,
+          "transactionAttempts": 0,
+          "transactionRetries": 0,
+          "readOnlyTransactions": 0
+        },
+        "continuationRounds": 19,
+        "totalWritesIncludingSubmission": 261,
+        "counts": {
+          "documentGets": 179,
+          "missingDocuments": 0,
+          "queryCalls": 219,
+          "queryDocuments": 19,
+          "emptyQueries": 200,
+          "maxQueryDocuments": 1,
+          "readCategories": {
+            "commandReceipt": 39,
+            "lifecycle": 20,
+            "user": 20,
+            "household": 20,
+            "membership": 20,
+            "reverseMembership": 20,
+            "fallbackHousehold": 20,
+            "fallbackMembership": 20
+          },
+          "queryCategories": {
+            "itemCandidates": 200,
+            "dueWork": 19
+          },
+          "attemptedWrites": 260,
+          "committedWrites": 260,
+          "writeCategories": {
+            "household": 20,
+            "item": 200,
+            "commandReceipt": 20,
+            "work": 20
+          },
+          "transactionCalls": 39,
+          "transactionAttempts": 39,
+          "transactionRetries": 0,
+          "readOnlyTransactions": 19
+        },
+        "readEquivalent": 398
+      },
+      {
+        "name": "family/MERGE_BULK_50",
+        "childCount": 50,
+        "blockCount": 5,
+        "progress": [
+          10,
+          20,
+          30,
+          40,
+          50
+        ],
+        "finalParentState": "APPLIED",
+        "submission": {
+          "documentGets": 0,
+          "missingDocuments": 0,
+          "queryCalls": 0,
+          "queryDocuments": 0,
+          "emptyQueries": 0,
+          "maxQueryDocuments": 0,
+          "readCategories": {},
+          "queryCategories": {},
+          "attemptedWrites": 1,
+          "committedWrites": 1,
+          "writeCategories": {
+            "commandReceipt": 1
+          },
+          "transactionCalls": 0,
+          "transactionAttempts": 0,
+          "transactionRetries": 0,
+          "readOnlyTransactions": 0
+        },
+        "continuationRounds": 4,
+        "totalWritesIncludingSubmission": 41,
+        "counts": {
+          "documentGets": 44,
+          "missingDocuments": 0,
+          "queryCalls": 29,
+          "queryDocuments": 24,
+          "emptyQueries": 5,
+          "maxQueryDocuments": 1,
+          "readCategories": {
+            "commandReceipt": 9,
+            "lifecycle": 5,
+            "user": 5,
+            "household": 5,
+            "membership": 5,
+            "reverseMembership": 5,
+            "fallbackHousehold": 5,
+            "fallbackMembership": 5
+          },
+          "queryCategories": {
+            "itemCandidates": 25,
+            "dueWork": 4
+          },
+          "attemptedWrites": 40,
+          "committedWrites": 40,
+          "writeCategories": {
+            "household": 5,
+            "item": 25,
+            "commandReceipt": 5,
+            "work": 5
+          },
+          "transactionCalls": 9,
+          "transactionAttempts": 9,
+          "transactionRetries": 0,
+          "readOnlyTransactions": 4
+        },
+        "readEquivalent": 73
+      },
+      {
+        "name": "family/MIXED_5",
+        "childCount": 5,
+        "progress": [],
+        "finalParentState": "APPLIED",
+        "submission": {
+          "documentGets": 0,
+          "missingDocuments": 0,
+          "queryCalls": 0,
+          "queryDocuments": 0,
+          "emptyQueries": 0,
+          "maxQueryDocuments": 0,
+          "readCategories": {},
+          "queryCategories": {},
+          "attemptedWrites": 1,
+          "committedWrites": 1,
+          "writeCategories": {
+            "commandReceipt": 1
+          },
+          "transactionCalls": 0,
+          "transactionAttempts": 0,
+          "transactionRetries": 0,
+          "readOnlyTransactions": 0
+        },
+        "continuationRounds": 0,
+        "totalWritesIncludingSubmission": 21,
+        "counts": {
+          "documentGets": 43,
+          "missingDocuments": 0,
+          "queryCalls": 3,
+          "queryDocuments": 1,
+          "emptyQueries": 2,
+          "maxQueryDocuments": 1,
+          "readCategories": {
+            "commandReceipt": 5,
+            "lifecycle": 5,
+            "user": 5,
+            "household": 5,
+            "membership": 5,
+            "reverseMembership": 5,
+            "fallbackHousehold": 5,
+            "fallbackMembership": 5,
+            "item": 3
+          },
+          "queryCategories": {
+            "itemCandidates": 3
+          },
+          "attemptedWrites": 20,
+          "committedWrites": 20,
+          "writeCategories": {
+            "household": 5,
+            "item": 5,
+            "commandReceipt": 5,
+            "work": 5
+          },
+          "transactionCalls": 5,
+          "transactionAttempts": 5,
+          "transactionRetries": 0,
+          "readOnlyTransactions": 0
+        },
+        "readEquivalent": 46
+      },
+      {
+        "name": "family/EDIT_SAME_IDENTITY",
+        "childCount": 1,
+        "progress": [],
+        "finalParentState": "APPLIED",
+        "submission": {
+          "documentGets": 0,
+          "missingDocuments": 0,
+          "queryCalls": 0,
+          "queryDocuments": 0,
+          "emptyQueries": 0,
+          "maxQueryDocuments": 0,
+          "readCategories": {},
+          "queryCategories": {},
+          "attemptedWrites": 1,
+          "committedWrites": 1,
+          "writeCategories": {
+            "commandReceipt": 1
+          },
+          "transactionCalls": 0,
+          "transactionAttempts": 0,
+          "transactionRetries": 0,
+          "readOnlyTransactions": 0
+        },
+        "continuationRounds": 0,
+        "totalWritesIncludingSubmission": 5,
+        "counts": {
+          "documentGets": 9,
+          "missingDocuments": 0,
+          "queryCalls": 1,
+          "queryDocuments": 1,
+          "emptyQueries": 0,
+          "maxQueryDocuments": 1,
+          "readCategories": {
+            "commandReceipt": 1,
+            "lifecycle": 1,
+            "user": 1,
+            "household": 1,
+            "membership": 1,
+            "reverseMembership": 1,
+            "fallbackHousehold": 1,
+            "fallbackMembership": 1,
+            "item": 1
+          },
+          "queryCategories": {
+            "itemCandidates": 1
+          },
+          "attemptedWrites": 4,
+          "committedWrites": 4,
+          "writeCategories": {
+            "household": 1,
+            "item": 1,
+            "commandReceipt": 1,
+            "work": 1
+          },
+          "transactionCalls": 1,
+          "transactionAttempts": 1,
+          "transactionRetries": 0,
+          "readOnlyTransactions": 0
+        },
+        "readEquivalent": 10
+      },
+      {
+        "name": "family/EDIT_MERGE",
+        "childCount": 1,
+        "progress": [],
+        "finalParentState": "APPLIED",
+        "submission": {
+          "documentGets": 0,
+          "missingDocuments": 0,
+          "queryCalls": 0,
+          "queryDocuments": 0,
+          "emptyQueries": 0,
+          "maxQueryDocuments": 0,
+          "readCategories": {},
+          "queryCategories": {},
+          "attemptedWrites": 1,
+          "committedWrites": 1,
+          "writeCategories": {
+            "commandReceipt": 1
+          },
+          "transactionCalls": 0,
+          "transactionAttempts": 0,
+          "transactionRetries": 0,
+          "readOnlyTransactions": 0
+        },
+        "continuationRounds": 0,
+        "totalWritesIncludingSubmission": 6,
+        "counts": {
+          "documentGets": 9,
+          "missingDocuments": 0,
+          "queryCalls": 1,
+          "queryDocuments": 1,
+          "emptyQueries": 0,
+          "maxQueryDocuments": 1,
+          "readCategories": {
+            "commandReceipt": 1,
+            "lifecycle": 1,
+            "user": 1,
+            "household": 1,
+            "membership": 1,
+            "reverseMembership": 1,
+            "fallbackHousehold": 1,
+            "fallbackMembership": 1,
+            "item": 1
+          },
+          "queryCategories": {
+            "itemCandidates": 1
+          },
+          "attemptedWrites": 5,
+          "committedWrites": 5,
+          "writeCategories": {
+            "household": 1,
+            "item": 2,
+            "commandReceipt": 1,
+            "work": 1
+          },
+          "transactionCalls": 1,
+          "transactionAttempts": 1,
+          "transactionRetries": 0,
+          "readOnlyTransactions": 0
+        },
+        "readEquivalent": 10
+      },
+      {
+        "name": "family/COLD_CONTEXT",
+        "counts": {
+          "documentGets": 9,
+          "missingDocuments": 0,
+          "queryCalls": 1,
+          "queryDocuments": 0,
+          "emptyQueries": 1,
+          "maxQueryDocuments": 0,
+          "readCategories": {
+            "runtimeGate": 1,
+            "user": 2,
+            "lifecycle": 1,
+            "household": 1,
+            "membership": 1,
+            "reverseMembership": 1,
+            "fallbackHousehold": 1,
+            "fallbackMembership": 1
+          },
+          "queryCategories": {
+            "itemCandidates": 1
+          },
+          "attemptedWrites": 1,
+          "committedWrites": 1,
+          "writeCategories": {
+            "household": 1
+          },
+          "transactionCalls": 1,
+          "transactionAttempts": 1,
+          "transactionRetries": 0,
+          "readOnlyTransactions": 0
+        },
+        "readEquivalent": 10
+      },
+      {
+        "name": "family/WARM_CONTEXT",
+        "counts": {
+          "documentGets": 9,
+          "missingDocuments": 0,
+          "queryCalls": 0,
+          "queryDocuments": 0,
+          "emptyQueries": 0,
+          "maxQueryDocuments": 0,
+          "readCategories": {
+            "runtimeGate": 1,
+            "user": 2,
+            "lifecycle": 1,
+            "household": 1,
+            "membership": 1,
+            "reverseMembership": 1,
+            "fallbackHousehold": 1,
+            "fallbackMembership": 1
+          },
+          "queryCategories": {},
+          "attemptedWrites": 0,
+          "committedWrites": 0,
+          "writeCategories": {},
+          "transactionCalls": 1,
+          "transactionAttempts": 1,
+          "transactionRetries": 0,
+          "readOnlyTransactions": 1
+        },
+        "readEquivalent": 9
+      },
+      {
+        "name": "family/SUBMIT_HELPER",
+        "counts": {
+          "documentGets": 9,
+          "missingDocuments": 1,
+          "queryCalls": 0,
+          "queryDocuments": 0,
+          "emptyQueries": 0,
+          "maxQueryDocuments": 0,
+          "readCategories": {
+            "commandReceipt": 1,
+            "runtimeGate": 1,
+            "lifecycle": 1,
+            "user": 1,
+            "household": 1,
+            "membership": 1,
+            "reverseMembership": 1,
+            "fallbackHousehold": 1,
+            "fallbackMembership": 1
+          },
+          "queryCategories": {},
+          "attemptedWrites": 1,
+          "committedWrites": 1,
+          "writeCategories": {
+            "commandReceipt": 1
+          },
+          "transactionCalls": 1,
+          "transactionAttempts": 1,
+          "transactionRetries": 0,
+          "readOnlyTransactions": 0
+        },
+        "readEquivalent": 9
+      },
+      {
+        "name": "private/DUPLICATE_CANDIDATES_2",
+        "childCount": 1,
+        "blockCount": 1,
+        "progress": [],
+        "finalParentState": "FAILED_TERMINAL",
+        "submission": {
+          "documentGets": 0,
+          "missingDocuments": 0,
+          "queryCalls": 0,
+          "queryDocuments": 0,
+          "emptyQueries": 0,
+          "maxQueryDocuments": 0,
+          "readCategories": {},
+          "queryCategories": {},
+          "attemptedWrites": 1,
+          "committedWrites": 1,
+          "writeCategories": {
+            "commandReceipt": 1
+          },
+          "transactionCalls": 0,
+          "transactionAttempts": 0,
+          "transactionRetries": 0,
+          "readOnlyTransactions": 0
+        },
+        "continuationRounds": 0,
+        "totalWritesIncludingSubmission": 3,
+        "counts": {
+          "documentGets": 6,
+          "missingDocuments": 1,
+          "queryCalls": 1,
+          "queryDocuments": 2,
+          "emptyQueries": 0,
+          "maxQueryDocuments": 2,
+          "readCategories": {
+            "commandReceipt": 1,
+            "lifecycle": 1,
+            "user": 1,
+            "household": 1,
+            "membership": 1,
+            "reverseMembership": 1
+          },
+          "queryCategories": {
+            "itemCandidates": 1
+          },
+          "attemptedWrites": 2,
+          "committedWrites": 2,
+          "writeCategories": {
+            "commandReceipt": 1,
+            "work": 1
+          },
+          "transactionCalls": 1,
+          "transactionAttempts": 1,
+          "transactionRetries": 0,
+          "readOnlyTransactions": 0
+        },
+        "readEquivalent": 8
+      },
+      {
+        "name": "private/DUPLICATE_CANDIDATES_3",
+        "childCount": 1,
+        "blockCount": 1,
+        "progress": [],
+        "finalParentState": "FAILED_TERMINAL",
+        "submission": {
+          "documentGets": 0,
+          "missingDocuments": 0,
+          "queryCalls": 0,
+          "queryDocuments": 0,
+          "emptyQueries": 0,
+          "maxQueryDocuments": 0,
+          "readCategories": {},
+          "queryCategories": {},
+          "attemptedWrites": 1,
+          "committedWrites": 1,
+          "writeCategories": {
+            "commandReceipt": 1
+          },
+          "transactionCalls": 0,
+          "transactionAttempts": 0,
+          "transactionRetries": 0,
+          "readOnlyTransactions": 0
+        },
+        "continuationRounds": 0,
+        "totalWritesIncludingSubmission": 3,
+        "counts": {
+          "documentGets": 6,
+          "missingDocuments": 1,
+          "queryCalls": 1,
+          "queryDocuments": 3,
+          "emptyQueries": 0,
+          "maxQueryDocuments": 3,
+          "readCategories": {
+            "commandReceipt": 1,
+            "lifecycle": 1,
+            "user": 1,
+            "household": 1,
+            "membership": 1,
+            "reverseMembership": 1
+          },
+          "queryCategories": {
+            "itemCandidates": 1
+          },
+          "attemptedWrites": 2,
+          "committedWrites": 2,
+          "writeCategories": {
+            "commandReceipt": 1,
+            "work": 1
+          },
+          "transactionCalls": 1,
+          "transactionAttempts": 1,
+          "transactionRetries": 0,
+          "readOnlyTransactions": 0
+        },
+        "readEquivalent": 9
+      },
+      {
+        "name": "private/DUPLICATE_CANDIDATES_4",
+        "childCount": 1,
+        "blockCount": 1,
+        "progress": [],
+        "finalParentState": "FAILED_TERMINAL",
+        "submission": {
+          "documentGets": 0,
+          "missingDocuments": 0,
+          "queryCalls": 0,
+          "queryDocuments": 0,
+          "emptyQueries": 0,
+          "maxQueryDocuments": 0,
+          "readCategories": {},
+          "queryCategories": {},
+          "attemptedWrites": 1,
+          "committedWrites": 1,
+          "writeCategories": {
+            "commandReceipt": 1
+          },
+          "transactionCalls": 0,
+          "transactionAttempts": 0,
+          "transactionRetries": 0,
+          "readOnlyTransactions": 0
+        },
+        "continuationRounds": 0,
+        "totalWritesIncludingSubmission": 3,
+        "counts": {
+          "documentGets": 6,
+          "missingDocuments": 1,
+          "queryCalls": 1,
+          "queryDocuments": 3,
+          "emptyQueries": 0,
+          "maxQueryDocuments": 3,
+          "readCategories": {
+            "commandReceipt": 1,
+            "lifecycle": 1,
+            "user": 1,
+            "household": 1,
+            "membership": 1,
+            "reverseMembership": 1
+          },
+          "queryCategories": {
+            "itemCandidates": 1
+          },
+          "attemptedWrites": 2,
+          "committedWrites": 2,
+          "writeCategories": {
+            "commandReceipt": 1,
+            "work": 1
+          },
+          "transactionCalls": 1,
+          "transactionAttempts": 1,
+          "transactionRetries": 0,
+          "readOnlyTransactions": 0
+        },
+        "readEquivalent": 9
+      },
+      {
+        "name": "private/REPLAY_SEED",
+        "childCount": 1,
+        "blockCount": 1,
+        "progress": [
+          1
+        ],
+        "finalParentState": "APPLIED",
+        "submission": {
+          "documentGets": 0,
+          "missingDocuments": 0,
+          "queryCalls": 0,
+          "queryDocuments": 0,
+          "emptyQueries": 0,
+          "maxQueryDocuments": 0,
+          "readCategories": {},
+          "queryCategories": {},
+          "attemptedWrites": 1,
+          "committedWrites": 1,
+          "writeCategories": {
+            "commandReceipt": 1
+          },
+          "transactionCalls": 0,
+          "transactionAttempts": 0,
+          "transactionRetries": 0,
+          "readOnlyTransactions": 0
+        },
+        "continuationRounds": 0,
+        "totalWritesIncludingSubmission": 5,
+        "counts": {
+          "documentGets": 6,
+          "missingDocuments": 1,
+          "queryCalls": 1,
+          "queryDocuments": 0,
+          "emptyQueries": 1,
+          "maxQueryDocuments": 0,
+          "readCategories": {
+            "commandReceipt": 1,
+            "lifecycle": 1,
+            "user": 1,
+            "household": 1,
+            "membership": 1,
+            "reverseMembership": 1
+          },
+          "queryCategories": {
+            "itemCandidates": 1
+          },
+          "attemptedWrites": 4,
+          "committedWrites": 4,
+          "writeCategories": {
+            "household": 1,
+            "item": 1,
+            "commandReceipt": 1,
+            "work": 1
+          },
+          "transactionCalls": 1,
+          "transactionAttempts": 1,
+          "transactionRetries": 0,
+          "readOnlyTransactions": 0
+        },
+        "readEquivalent": 7
+      },
+      {
+        "name": "private/TERMINAL_REPLAY",
+        "counts": {
+          "documentGets": 1,
+          "missingDocuments": 0,
+          "queryCalls": 0,
+          "queryDocuments": 0,
+          "emptyQueries": 0,
+          "maxQueryDocuments": 0,
+          "readCategories": {
+            "commandReceipt": 1
+          },
+          "queryCategories": {},
+          "attemptedWrites": 0,
+          "committedWrites": 0,
+          "writeCategories": {},
+          "transactionCalls": 1,
+          "transactionAttempts": 1,
+          "transactionRetries": 0,
+          "readOnlyTransactions": 1
+        },
+        "readEquivalent": 1
+      },
+      {
+        "name": "private/EXPIRY_CLEANUP",
+        "counts": {
+          "documentGets": 1,
+          "missingDocuments": 0,
+          "queryCalls": 1,
+          "queryDocuments": 1,
+          "emptyQueries": 0,
+          "maxQueryDocuments": 1,
+          "readCategories": {
+            "commandReceipt": 1
+          },
+          "queryCategories": {
+            "dueWork": 1
+          },
+          "attemptedWrites": 2,
+          "committedWrites": 2,
+          "writeCategories": {
+            "commandReceipt": 1,
+            "work": 1
+          },
+          "transactionCalls": 1,
+          "transactionAttempts": 1,
+          "transactionRetries": 0,
+          "readOnlyTransactions": 0
+        },
+        "readEquivalent": 2
+      },
+      {
+        "name": "private/EMPTY_DUE_QUERY",
+        "counts": {
+          "documentGets": 0,
+          "missingDocuments": 0,
+          "queryCalls": 1,
+          "queryDocuments": 0,
+          "emptyQueries": 1,
+          "maxQueryDocuments": 0,
+          "readCategories": {},
+          "queryCategories": {
+            "dueWork": 1
+          },
+          "attemptedWrites": 0,
+          "committedWrites": 0,
+          "writeCategories": {},
+          "transactionCalls": 0,
+          "transactionAttempts": 0,
+          "transactionRetries": 0,
+          "readOnlyTransactions": 0
+        },
+        "readEquivalent": 1
+      },
+      {
+        "name": "calibration/FORCED_ABORT_RETRY",
+        "counts": {
+          "documentGets": 2,
+          "missingDocuments": 0,
+          "queryCalls": 0,
+          "queryDocuments": 0,
+          "emptyQueries": 0,
+          "maxQueryDocuments": 0,
+          "readCategories": {
+            "item": 2
+          },
+          "queryCategories": {},
+          "attemptedWrites": 2,
+          "committedWrites": 1,
+          "writeCategories": {
+            "item": 1
+          },
+          "transactionCalls": 1,
+          "transactionAttempts": 2,
+          "transactionRetries": 1,
+          "readOnlyTransactions": 0
+        },
+        "readEquivalent": 2
+      },
+      {
+        "name": "private/SEMANTIC_25",
+        "childCount": 25,
+        "blockCount": 3,
+        "progress": [
+          10,
+          20,
+          25
+        ],
+        "finalParentState": "APPLIED",
+        "submission": {
+          "documentGets": 0,
+          "missingDocuments": 0,
+          "queryCalls": 0,
+          "queryDocuments": 0,
+          "emptyQueries": 0,
+          "maxQueryDocuments": 0,
+          "readCategories": {},
+          "queryCategories": {},
+          "attemptedWrites": 1,
+          "committedWrites": 1,
+          "writeCategories": {
+            "commandReceipt": 1
+          },
+          "transactionCalls": 0,
+          "transactionAttempts": 0,
+          "transactionRetries": 0,
+          "readOnlyTransactions": 0
+        },
+        "continuationRounds": 2,
+        "totalWritesIncludingSubmission": 19,
+        "counts": {
+          "documentGets": 20,
+          "missingDocuments": 3,
+          "queryCalls": 11,
+          "queryDocuments": 8,
+          "emptyQueries": 3,
+          "maxQueryDocuments": 1,
+          "readCategories": {
+            "commandReceipt": 5,
+            "lifecycle": 3,
+            "user": 3,
+            "household": 3,
+            "membership": 3,
+            "reverseMembership": 3
+          },
+          "queryCategories": {
+            "itemCandidates": 9,
+            "dueWork": 2
+          },
+          "attemptedWrites": 18,
+          "committedWrites": 18,
+          "writeCategories": {
+            "household": 3,
+            "item": 9,
+            "commandReceipt": 3,
+            "work": 3
+          },
+          "transactionCalls": 5,
+          "transactionAttempts": 5,
+          "transactionRetries": 0,
+          "readOnlyTransactions": 2
+        },
+        "readEquivalent": 31
+      },
+      {
+        "name": "private/SEMANTIC_50",
+        "childCount": 50,
+        "blockCount": 5,
+        "progress": [
+          10,
+          20,
+          30,
+          40,
+          50
+        ],
+        "finalParentState": "APPLIED",
+        "submission": {
+          "documentGets": 0,
+          "missingDocuments": 0,
+          "queryCalls": 0,
+          "queryDocuments": 0,
+          "emptyQueries": 0,
+          "maxQueryDocuments": 0,
+          "readCategories": {},
+          "queryCategories": {},
+          "attemptedWrites": 1,
+          "committedWrites": 1,
+          "writeCategories": {
+            "commandReceipt": 1
+          },
+          "transactionCalls": 0,
+          "transactionAttempts": 0,
+          "transactionRetries": 0,
+          "readOnlyTransactions": 0
+        },
+        "continuationRounds": 4,
+        "totalWritesIncludingSubmission": 31,
+        "counts": {
+          "documentGets": 34,
+          "missingDocuments": 5,
+          "queryCalls": 19,
+          "queryDocuments": 16,
+          "emptyQueries": 3,
+          "maxQueryDocuments": 1,
+          "readCategories": {
+            "commandReceipt": 9,
+            "lifecycle": 5,
+            "user": 5,
+            "household": 5,
+            "membership": 5,
+            "reverseMembership": 5
+          },
+          "queryCategories": {
+            "itemCandidates": 15,
+            "dueWork": 4
+          },
+          "attemptedWrites": 30,
+          "committedWrites": 30,
+          "writeCategories": {
+            "household": 5,
+            "item": 15,
+            "commandReceipt": 5,
+            "work": 5
+          },
+          "transactionCalls": 9,
+          "transactionAttempts": 9,
+          "transactionRetries": 0,
+          "readOnlyTransactions": 4
+        },
+        "readEquivalent": 53
+      },
+      {
+        "name": "private/SEMANTIC_200",
+        "childCount": 200,
+        "blockCount": 20,
+        "progress": [
+          10,
+          20,
+          30,
+          40,
+          50,
+          60,
+          70,
+          80,
+          90,
+          100,
+          110,
+          120,
+          130,
+          140,
+          150,
+          160,
+          170,
+          180,
+          190,
+          200
+        ],
+        "finalParentState": "APPLIED",
+        "submission": {
+          "documentGets": 0,
+          "missingDocuments": 0,
+          "queryCalls": 0,
+          "queryDocuments": 0,
+          "emptyQueries": 0,
+          "maxQueryDocuments": 0,
+          "readCategories": {},
+          "queryCategories": {},
+          "attemptedWrites": 1,
+          "committedWrites": 1,
+          "writeCategories": {
+            "commandReceipt": 1
+          },
+          "transactionCalls": 0,
+          "transactionAttempts": 0,
+          "transactionRetries": 0,
+          "readOnlyTransactions": 0
+        },
+        "continuationRounds": 19,
+        "totalWritesIncludingSubmission": 121,
+        "counts": {
+          "documentGets": 139,
+          "missingDocuments": 20,
+          "queryCalls": 79,
+          "queryDocuments": 76,
+          "emptyQueries": 3,
+          "maxQueryDocuments": 1,
+          "readCategories": {
+            "commandReceipt": 39,
+            "lifecycle": 20,
+            "user": 20,
+            "household": 20,
+            "membership": 20,
+            "reverseMembership": 20
+          },
+          "queryCategories": {
+            "itemCandidates": 60,
+            "dueWork": 19
+          },
+          "attemptedWrites": 120,
+          "committedWrites": 120,
+          "writeCategories": {
+            "household": 20,
+            "item": 60,
+            "commandReceipt": 20,
+            "work": 20
+          },
+          "transactionCalls": 39,
+          "transactionAttempts": 39,
+          "transactionRetries": 0,
+          "readOnlyTransactions": 19
+        },
+        "readEquivalent": 218
+      },
+      {
+        "name": "family/SEMANTIC_25",
+        "childCount": 25,
+        "blockCount": 3,
+        "progress": [
+          10,
+          20,
+          25
+        ],
+        "finalParentState": "APPLIED",
+        "submission": {
+          "documentGets": 0,
+          "missingDocuments": 0,
+          "queryCalls": 0,
+          "queryDocuments": 0,
+          "emptyQueries": 0,
+          "maxQueryDocuments": 0,
+          "readCategories": {},
+          "queryCategories": {},
+          "attemptedWrites": 1,
+          "committedWrites": 1,
+          "writeCategories": {
+            "commandReceipt": 1
+          },
+          "transactionCalls": 0,
+          "transactionAttempts": 0,
+          "transactionRetries": 0,
+          "readOnlyTransactions": 0
+        },
+        "continuationRounds": 2,
+        "totalWritesIncludingSubmission": 19,
+        "counts": {
+          "documentGets": 26,
+          "missingDocuments": 0,
+          "queryCalls": 11,
+          "queryDocuments": 8,
+          "emptyQueries": 3,
+          "maxQueryDocuments": 1,
+          "readCategories": {
+            "commandReceipt": 5,
+            "lifecycle": 3,
+            "user": 3,
+            "household": 3,
+            "membership": 3,
+            "reverseMembership": 3,
+            "fallbackHousehold": 3,
+            "fallbackMembership": 3
+          },
+          "queryCategories": {
+            "itemCandidates": 9,
+            "dueWork": 2
+          },
+          "attemptedWrites": 18,
+          "committedWrites": 18,
+          "writeCategories": {
+            "household": 3,
+            "item": 9,
+            "commandReceipt": 3,
+            "work": 3
+          },
+          "transactionCalls": 5,
+          "transactionAttempts": 5,
+          "transactionRetries": 0,
+          "readOnlyTransactions": 2
+        },
+        "readEquivalent": 37
+      },
+      {
+        "name": "family/SEMANTIC_50",
+        "childCount": 50,
+        "blockCount": 5,
+        "progress": [
+          10,
+          20,
+          30,
+          40,
+          50
+        ],
+        "finalParentState": "APPLIED",
+        "submission": {
+          "documentGets": 0,
+          "missingDocuments": 0,
+          "queryCalls": 0,
+          "queryDocuments": 0,
+          "emptyQueries": 0,
+          "maxQueryDocuments": 0,
+          "readCategories": {},
+          "queryCategories": {},
+          "attemptedWrites": 1,
+          "committedWrites": 1,
+          "writeCategories": {
+            "commandReceipt": 1
+          },
+          "transactionCalls": 0,
+          "transactionAttempts": 0,
+          "transactionRetries": 0,
+          "readOnlyTransactions": 0
+        },
+        "continuationRounds": 4,
+        "totalWritesIncludingSubmission": 31,
+        "counts": {
+          "documentGets": 44,
+          "missingDocuments": 0,
+          "queryCalls": 19,
+          "queryDocuments": 16,
+          "emptyQueries": 3,
+          "maxQueryDocuments": 1,
+          "readCategories": {
+            "commandReceipt": 9,
+            "lifecycle": 5,
+            "user": 5,
+            "household": 5,
+            "membership": 5,
+            "reverseMembership": 5,
+            "fallbackHousehold": 5,
+            "fallbackMembership": 5
+          },
+          "queryCategories": {
+            "itemCandidates": 15,
+            "dueWork": 4
+          },
+          "attemptedWrites": 30,
+          "committedWrites": 30,
+          "writeCategories": {
+            "household": 5,
+            "item": 15,
+            "commandReceipt": 5,
+            "work": 5
+          },
+          "transactionCalls": 9,
+          "transactionAttempts": 9,
+          "transactionRetries": 0,
+          "readOnlyTransactions": 4
+        },
+        "readEquivalent": 63
+      },
+      {
+        "name": "family/SEMANTIC_200",
+        "childCount": 200,
+        "blockCount": 20,
+        "progress": [
+          10,
+          20,
+          30,
+          40,
+          50,
+          60,
+          70,
+          80,
+          90,
+          100,
+          110,
+          120,
+          130,
+          140,
+          150,
+          160,
+          170,
+          180,
+          190,
+          200
+        ],
+        "finalParentState": "APPLIED",
+        "submission": {
+          "documentGets": 0,
+          "missingDocuments": 0,
+          "queryCalls": 0,
+          "queryDocuments": 0,
+          "emptyQueries": 0,
+          "maxQueryDocuments": 0,
+          "readCategories": {},
+          "queryCategories": {},
+          "attemptedWrites": 1,
+          "committedWrites": 1,
+          "writeCategories": {
+            "commandReceipt": 1
+          },
+          "transactionCalls": 0,
+          "transactionAttempts": 0,
+          "transactionRetries": 0,
+          "readOnlyTransactions": 0
+        },
+        "continuationRounds": 19,
+        "totalWritesIncludingSubmission": 121,
+        "counts": {
+          "documentGets": 179,
+          "missingDocuments": 0,
+          "queryCalls": 79,
+          "queryDocuments": 76,
+          "emptyQueries": 3,
+          "maxQueryDocuments": 1,
+          "readCategories": {
+            "commandReceipt": 39,
+            "lifecycle": 20,
+            "user": 20,
+            "household": 20,
+            "membership": 20,
+            "reverseMembership": 20,
+            "fallbackHousehold": 20,
+            "fallbackMembership": 20
+          },
+          "queryCategories": {
+            "itemCandidates": 60,
+            "dueWork": 19
+          },
+          "attemptedWrites": 120,
+          "committedWrites": 120,
+          "writeCategories": {
+            "household": 20,
+            "item": 60,
+            "commandReceipt": 20,
+            "work": 20
+          },
+          "transactionCalls": 39,
+          "transactionAttempts": 39,
+          "transactionRetries": 0,
+          "readOnlyTransactions": 19
+        },
+        "readEquivalent": 258
+      },
+      {
+        "name": "private/PARTIAL_25",
+        "childCount": 25,
+        "blockCount": 3,
+        "progress": [
+          10,
+          20,
+          25
+        ],
+        "finalParentState": "APPLIED",
+        "submission": {
+          "documentGets": 0,
+          "missingDocuments": 0,
+          "queryCalls": 0,
+          "queryDocuments": 0,
+          "emptyQueries": 0,
+          "maxQueryDocuments": 0,
+          "readCategories": {},
+          "queryCategories": {},
+          "attemptedWrites": 1,
+          "committedWrites": 1,
+          "writeCategories": {
+            "commandReceipt": 1
+          },
+          "transactionCalls": 0,
+          "transactionAttempts": 0,
+          "transactionRetries": 0,
+          "readOnlyTransactions": 0
+        },
+        "continuationRounds": 2,
+        "totalWritesIncludingSubmission": 35,
+        "counts": {
+          "documentGets": 20,
+          "missingDocuments": 3,
+          "queryCalls": 27,
+          "queryDocuments": 2,
+          "emptyQueries": 25,
+          "maxQueryDocuments": 1,
+          "readCategories": {
+            "commandReceipt": 5,
+            "lifecycle": 3,
+            "user": 3,
+            "household": 3,
+            "membership": 3,
+            "reverseMembership": 3
+          },
+          "queryCategories": {
+            "itemCandidates": 25,
+            "dueWork": 2
+          },
+          "attemptedWrites": 34,
+          "committedWrites": 34,
+          "writeCategories": {
+            "household": 3,
+            "item": 25,
+            "commandReceipt": 3,
+            "work": 3
+          },
+          "transactionCalls": 5,
+          "transactionAttempts": 5,
+          "transactionRetries": 0,
+          "readOnlyTransactions": 2
+        },
+        "readEquivalent": 47
+      },
+      {
+        "name": "private/RETRY_10",
+        "normalR": 16,
+        "normalCommittedW": 13,
+        "submissionWrites": 1,
+        "totalCommittedW": 14,
+        "counts": {
+          "documentGets": 12,
+          "missingDocuments": 2,
+          "queryCalls": 20,
+          "queryDocuments": 0,
+          "emptyQueries": 20,
+          "maxQueryDocuments": 0,
+          "readCategories": {
+            "commandReceipt": 2,
+            "lifecycle": 2,
+            "user": 2,
+            "household": 2,
+            "membership": 2,
+            "reverseMembership": 2
+          },
+          "queryCategories": {
+            "itemCandidates": 20
+          },
+          "attemptedWrites": 26,
+          "committedWrites": 13,
+          "writeCategories": {
+            "household": 1,
+            "item": 10,
+            "commandReceipt": 1,
+            "work": 1
+          },
+          "transactionCalls": 1,
+          "transactionAttempts": 2,
+          "transactionRetries": 1,
+          "readOnlyTransactions": 0
+        },
+        "readEquivalent": 32
+      },
+      {
+        "name": "private/INTERRUPT_PREFIX_30",
+        "counts": {
+          "documentGets": 18,
+          "missingDocuments": 3,
+          "queryCalls": 30,
+          "queryDocuments": 0,
+          "emptyQueries": 30,
+          "maxQueryDocuments": 0,
+          "readCategories": {
+            "commandReceipt": 3,
+            "lifecycle": 3,
+            "user": 3,
+            "household": 3,
+            "membership": 3,
+            "reverseMembership": 3
+          },
+          "queryCategories": {
+            "itemCandidates": 30
+          },
+          "attemptedWrites": 39,
+          "committedWrites": 39,
+          "writeCategories": {
+            "household": 3,
+            "item": 30,
+            "commandReceipt": 3,
+            "work": 3
+          },
+          "transactionCalls": 3,
+          "transactionAttempts": 3,
+          "transactionRetries": 0,
+          "readOnlyTransactions": 0
+        },
+        "readEquivalent": 48
+      },
+      {
+        "name": "private/RESUME_SUFFIX_20",
+        "counts": {
+          "documentGets": 14,
+          "missingDocuments": 2,
+          "queryCalls": 20,
+          "queryDocuments": 0,
+          "emptyQueries": 20,
+          "maxQueryDocuments": 0,
+          "readCategories": {
+            "commandReceipt": 4,
+            "lifecycle": 2,
+            "user": 2,
+            "household": 2,
+            "membership": 2,
+            "reverseMembership": 2
+          },
+          "queryCategories": {
+            "itemCandidates": 20
+          },
+          "attemptedWrites": 26,
+          "committedWrites": 26,
+          "writeCategories": {
+            "household": 2,
+            "item": 20,
+            "commandReceipt": 2,
+            "work": 2
+          },
+          "transactionCalls": 4,
+          "transactionAttempts": 4,
+          "transactionRetries": 0,
+          "readOnlyTransactions": 2
+        },
+        "readEquivalent": 34
+      },
+      {
+        "name": "private/RESUME_TERMINAL_REPLAY",
+        "counts": {
+          "documentGets": 1,
+          "missingDocuments": 0,
+          "queryCalls": 0,
+          "queryDocuments": 0,
+          "emptyQueries": 0,
+          "maxQueryDocuments": 0,
+          "readCategories": {
+            "commandReceipt": 1
+          },
+          "queryCategories": {},
+          "attemptedWrites": 0,
+          "committedWrites": 0,
+          "writeCategories": {},
+          "transactionCalls": 1,
+          "transactionAttempts": 1,
+          "transactionRetries": 0,
+          "readOnlyTransactions": 1
+        },
+        "readEquivalent": 1
+      },
+      {
+        "name": "privateOrFamily/INVALIDATED_epoch",
+        "committedChildren": 30,
+        "terminalChildren": 50,
+        "counts": {
+          "documentGets": 6,
+          "missingDocuments": 1,
+          "queryCalls": 0,
+          "queryDocuments": 0,
+          "emptyQueries": 0,
+          "maxQueryDocuments": 0,
+          "readCategories": {
+            "commandReceipt": 1,
+            "lifecycle": 1,
+            "user": 1,
+            "household": 1,
+            "membership": 1,
+            "reverseMembership": 1
+          },
+          "queryCategories": {},
+          "attemptedWrites": 2,
+          "committedWrites": 2,
+          "writeCategories": {
+            "commandReceipt": 1,
+            "work": 1
+          },
+          "transactionCalls": 1,
+          "transactionAttempts": 1,
+          "transactionRetries": 0,
+          "readOnlyTransactions": 0
+        },
+        "readEquivalent": 6
+      },
+      {
+        "name": "privateOrFamily/INVALIDATED_membership",
+        "committedChildren": 30,
+        "terminalChildren": 50,
+        "counts": {
+          "documentGets": 6,
+          "missingDocuments": 1,
+          "queryCalls": 0,
+          "queryDocuments": 0,
+          "emptyQueries": 0,
+          "maxQueryDocuments": 0,
+          "readCategories": {
+            "commandReceipt": 1,
+            "lifecycle": 1,
+            "user": 1,
+            "household": 1,
+            "membership": 1,
+            "reverseMembership": 1
+          },
+          "queryCategories": {},
+          "attemptedWrites": 2,
+          "committedWrites": 2,
+          "writeCategories": {
+            "commandReceipt": 1,
+            "work": 1
+          },
+          "transactionCalls": 1,
+          "transactionAttempts": 1,
+          "transactionRetries": 0,
+          "readOnlyTransactions": 0
+        },
+        "readEquivalent": 6
+      },
+      {
+        "name": "privateOrFamily/INVALIDATED_lifecycle",
+        "committedChildren": 30,
+        "terminalChildren": 50,
+        "counts": {
+          "documentGets": 2,
+          "missingDocuments": 0,
+          "queryCalls": 0,
+          "queryDocuments": 0,
+          "emptyQueries": 0,
+          "maxQueryDocuments": 0,
+          "readCategories": {
+            "commandReceipt": 1,
+            "lifecycle": 1
+          },
+          "queryCategories": {},
+          "attemptedWrites": 2,
+          "committedWrites": 2,
+          "writeCategories": {
+            "commandReceipt": 1,
+            "work": 1
+          },
+          "transactionCalls": 1,
+          "transactionAttempts": 1,
+          "transactionRetries": 0,
+          "readOnlyTransactions": 0
+        },
+        "readEquivalent": 2
+      }
+    ]
+  }
+}
