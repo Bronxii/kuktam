@@ -1,3 +1,32 @@
+## S1D1 cost measurement / design - PASS, 2026-10-22
+
+Baseline: committed S1C 6891ceabeef90d8dd4efc34bcbcb5b18d9bbfa8d; clean worktree.
+S1B remains accepted and S1C complete locally. No production business code/rules/
+Dart/config changes. S1D2 optimization is NOT implemented.
+
+Real Admin SDK/ShoppingMutationStore/Maintenance instrumentation on the guarded
+local demo emulator: 35 measurement/calibration +15 contract tests PASS. Final
+40 raw records in [S1D1_COST_BASELINE.json](S1D1_COST_BASELINE.json); 34 shared records
+are identical across two runs. Baseline retries zero (calibration deliberately one).
+Functions build/diff checks PASS. No production access/deploy/commit/push.
+
+Read equivalent R = measured document gets + query documents + empty-query floors;
+not a Firebase billed-read counter. Server processing + required continuations:
+private ADD bulk 10/50/200 = R70/358/1438; family = R90/458/1838.
+Writes including one request = 41/201/801. Client listeners and rules-dependent
+reads are excluded, context/admission/cleanup overheads measured separately.
+
+Recommended design ONLY: <=10 ADD children share full fresh authority inside one
+atomic transaction, with sequential semantic results and atomic receipt/work;
+revision/mixed paths initially unchanged. Whole-parent authority caching or an
+epoch-only authorization guard is unsafe and rejected. Derived 200-child targets:
+private R1438 -> <=358, family R1838 -> <=398, W801 -> <=261. Not measured optimized
+performance. Exact categories, constraints, targets and S1D2 test plan:
+[S1D1_CHECKPOINT_2026-10-22.md](S1D1_CHECKPOINT_2026-10-22.md).
+
+S1D1 PASS; S1D NOT COMPLETE. Family Phase4B NOT READY. Next separate S1D2 only.
+Older dated entries below preserve historical evidence, not current gate status.
+
 ## S1C continuation — PASS / locally COMPLETE, 2026-10-22
 
 S1B remains COMPLETE / ACCEPTED at d4dfe76723f1029fb6e11fda59044a84dff8bad2.
