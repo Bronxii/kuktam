@@ -115,10 +115,9 @@ service cloud.firestore {
       }
       match /shoppingItems/{itemId} {
         allow read: if householdWritable(hid);
-        // S1A preserves legacy writes, but clients cannot forge server revisions.
-        allow create: if householdWritable(hid) && !('revision' in request.resource.data);
-        allow update: if householdWritable(hid) && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['revision']);
-        allow delete: if householdWritable(hid);
+        // S1C: canonical mutations are exclusively trusted server/Admin work.
+        // Clients submit immutable shoppingMutations; membership grants reads only.
+        allow create, update, delete: if false;
       }
     }
     match /familyMemberships/{uid} {

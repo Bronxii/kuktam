@@ -23,7 +23,7 @@ before(async()=>{
  });
 });
 after(()=>env.cleanup());
-test('JOIN reservation keeps private CRUD usable, grants no family access and cannot be forged',async()=>{
+test('JOIN reservation keeps private reads usable, grants no family access and cannot be forged',async()=>{
  const uid='joining',p='joining-private';
  await env.withSecurityRulesDisabled(async ctx=>{const db=ctx.firestore();
   await setDoc(doc(db,`accountLifecycle/${uid}`),{state:'ACTIVE'});
@@ -34,8 +34,9 @@ test('JOIN reservation keeps private CRUD usable, grants no family access and ca
   await setDoc(doc(db,'familyOperations/join-op'),{kind:'JOIN',status:'READY',phase:'READY_FOR_TRANSFER',actorUid:uid,sourceHouseholdId:p,householdId:'home'});
  });
  const db=env.authenticatedContext(uid).firestore(),item=doc(db,`households/${p}/shoppingItems/a`);
- await assertSucceeds(setDoc(item,{name:'milk'}));await assertSucceeds(getDoc(item));
- await assertSucceeds(updateDoc(item,{quantity:2}));await assertSucceeds(deleteDoc(item));
+ await env.withSecurityRulesDisabled(ctx=>setDoc(doc(ctx.firestore(),`households/${p}/shoppingItems/a`),{name:'milk'}));
+ await assertFails(setDoc(item,{name:'milk'}));await assertSucceeds(getDoc(item));
+ await assertFails(updateDoc(item,{quantity:2}));await assertFails(deleteDoc(item));
  await assertFails(getDoc(doc(db,'households/home/shoppingItems/a')));
  await assertFails(setDoc(doc(db,'households/home/shoppingItems/forged'),{name:'x'}));
  for(const path of ['familyOperations/join-op','familyJoinCapacity/home',`familyMemberships/${uid}`,'familyInvites/hash']) {
@@ -43,7 +44,7 @@ test('JOIN reservation keeps private CRUD usable, grants no family access and ca
  }
  for(const state of ['DELETING','DELETED']) {
   await env.withSecurityRulesDisabled(ctx=>setDoc(doc(ctx.firestore(),`accountLifecycle/${uid}`),{state}));
-  await assertFails(setDoc(item,{name:'blocked'}));
+  await assertFails(setDoc(item,{name:'blocked'}));await assertFails(getDoc(item));
  }
 });
 test('reserved private exception fails closed without matching JOIN operation',async()=>{
@@ -53,6 +54,7 @@ test('reserved private exception fails closed without matching JOIN operation',a
   await updateDoc(doc(ctx.firestore(),'familyOperations/join-op'),{actorUid:'other'});
  });
  await assertFails(setDoc(doc(env.authenticatedContext(uid).firestore(),'households/joining-private/shoppingItems/a'),{name:'blocked'}));
+ await assertFails(getDoc(doc(env.authenticatedContext(uid).firestore(),'households/joining-private/shoppingItems/a')));
 });
 for(const uid of ['owner','member','outsider'])test(`${uid} cannot read/forge invites, slot inventory or member email`,async()=>{
  const db=env.authenticatedContext(uid).firestore();
@@ -84,10 +86,10 @@ test('CREATE reservation fences source and PREPARING destination; operation stat
  await assertFails(updateDoc(doc(db,`households/${f}`),{state:'ACTIVE',operationId:null}));
  await assertSucceeds(setDoc(doc(db,`users/${uid}/recipes/own`),{name:'private recipe'}));
 });
-for(const uid of ['owner','member'])test(`${uid} reads and CRUDs household shopping with zero recipes`,async()=>{
- const db=env.authenticatedContext(uid).firestore(),ref=doc(db,`households/home/shoppingItems/${uid}`);
+for(const uid of ['owner','member'])test(`${uid} reads household shopping but cannot directly mutate it with zero recipes`,async()=>{
+ const db=env.authenticatedContext(uid).firestore(),ref=doc(db,'households/home/shoppingItems/a');
  await assertSucceeds(getDocs(collection(db,'households/home/shoppingItems')));
- await assertSucceeds(setDoc(ref,{name:'bread'}));await assertSucceeds(updateDoc(ref,{isChecked:true}));await assertSucceeds(deleteDoc(ref));
+ await assertFails(setDoc(ref,{name:'bread'}));await assertFails(updateDoc(ref,{isChecked:true}));await assertFails(deleteDoc(ref));
  await assertSucceeds(setDoc(doc(db,`users/${uid}/recipes/first`),{name:'private recipe'}));
 });
 for(const uid of ['outsider',null])test(`${uid} cannot read or mutate household`,async()=>{
@@ -102,8 +104,9 @@ for(const uid of ['owner','outsider'])test(`${uid} cannot forge household/member
  await assertFails(updateDoc(doc(db,`users/${uid}`),{shoppingMigrationVersion:99}));
  await assertFails(updateDoc(doc(db,`users/${uid}`),{activeHouseholdId:'forged'}));
 });
-for(const uid of ['deleting','deleted','migrating'])test(`${uid} cannot write household items`,async()=>{
+for(const uid of ['deleting','deleted','migrating'])test(`${uid} cannot read or write household items`,async()=>{
  const db=env.authenticatedContext(uid).firestore(),ref=doc(db,'households/home/shoppingItems/a');
+ await assertFails(getDoc(ref));await assertFails(getDocs(collection(db,'households/home/shoppingItems')));
  await assertFails(setDoc(ref,{name:'bad'}));await assertFails(updateDoc(ref,{isChecked:true}));await assertFails(deleteDoc(ref));
 });
 test('migration barrier cannot be erased by ACTIVE client; legacy cannot be reopened',async()=>{
@@ -144,7 +147,7 @@ for(const variation of ['RESERVED','PREPARING','DISSOLVING','activeMismatch','fa
  const db=env.authenticatedContext(uid).firestore(),ref=doc(db,`households/${hid}/shoppingItems/a`);
  await assertFails(getDoc(ref));await assertFails(setDoc(ref,{name:'bad'}));await assertFails(deleteDoc(ref));
 });
-for(const legacy of [false,true])test(`standalone ${legacy?'v1 compatibility':'v2'} active list CRUD works`,async()=>{
+for(const legacy of [false,true])test(`standalone ${legacy?'v1 compatibility':'v2'} active list reads work and direct writes fail`,async()=>{
  const uid=legacy?'legacy':'standalone',hid=`p-${uid}`;
  await env.withSecurityRulesDisabled(async ctx=>{const db=ctx.firestore();
   await setDoc(doc(db,`users/${uid}`),{activeHouseholdId:hid,shoppingMigrationVersion:1,...(legacy?{}:{privateHouseholdId:hid,familyHouseholdId:null})});
@@ -153,7 +156,8 @@ for(const legacy of [false,true])test(`standalone ${legacy?'v1 compatibility':'v
   await setDoc(doc(db,`households/${hid}/members/${uid}`),{role:'owner'});
  });
  const db=env.authenticatedContext(uid).firestore(),ref=doc(db,`households/${hid}/shoppingItems/a`);
- await assertSucceeds(setDoc(ref,{name:'ok'}));await assertSucceeds(getDoc(ref));await assertSucceeds(updateDoc(ref,{isChecked:true}));await assertSucceeds(deleteDoc(ref));
+ await env.withSecurityRulesDisabled(ctx=>setDoc(doc(ctx.firestore(),`households/${hid}/shoppingItems/a`),{name:'ok'}));
+ await assertFails(setDoc(ref,{name:'ok'}));await assertSucceeds(getDoc(ref));await assertSucceeds(getDocs(collection(db,`households/${hid}/shoppingItems`)));await assertFails(updateDoc(ref,{isChecked:true}));await assertFails(deleteDoc(ref));
  await assertFails(setDoc(doc(db,'households/private-owner/shoppingItems/x'),{name:'bad'}));
  await assertFails(setDoc(doc(db,`users/${uid}/shopping/x`),{name:'legacy'}));
 });

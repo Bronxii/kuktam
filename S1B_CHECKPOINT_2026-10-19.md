@@ -1,3 +1,126 @@
+## S1C canonical rules cutoff — PASS / locally complete, 2026-10-22
+
+Starting accepted S1B commit: `d4dfe76723f1029fb6e11fda59044a84dff8bad2`
+(`fix(shopping): complete S1B client mutation safety`). Starting worktree and
+`git diff --check` clean. S1B remains ACCEPTED; older dated sections below are
+historical checkpoints. This section records local source changes, NOT deployment.
+
+### Rule inventory and minimal cutoff
+
+Canonical path: `households/{hid}/shoppingItems/{itemId}`. Previously read/create/
+update/delete used `householdWritable(hid)`; create additionally excluded revision,
+update protected revision, but authorized clients could still change quantities,
+name/unit/checked state or delete newer data. Now create/update/delete are
+unconditionally `false`. Reads retain exactly the existing householdWritable
+predicate. No parent/recursive rule grants an alternate canonical write path.
+No payload flag, special role, debug or migration client exception was introduced.
+
+The unchanged read/command authority requires membership, ACTIVE account lifecycle,
+completed shopping migration and matching active household. Private v1/v2 rules,
+family owner/member/reverse-index/fallback checks, and matching READY JOIN reserved-
+private access remain. PREPARING/DISSOLVING/invalid routing and DELETING/DELETED
+canonical reads remain denied. There is no client canonical deletion exception.
+
+Immutable `users/{uid}/shoppingMutations/{mid}` keeps its existing CREATE-only
+contract: authenticated owner/path/actor equality, strict eight-field envelope,
+current unexpired household epoch, enabled gate, supported kind and server timestamp.
+Clients cannot update/delete commands or forge results/processor state. Work,
+runtime and structural metadata remain server-only. Server execution uses
+firebase-admin Firestore transactions, not a client privilege in security rules.
+
+Legacy `users/{uid}/shopping` is a DIFFERENT path: pre-migration compatibility and
+owner cleanup rules are unchanged. Once the backend starts migration, the
+server-owned activeHouseholdId barrier forbids legacy create/update. HouseholdStore
+copies legacy documents and deletes sources with Admin transactions; account
+private-household cleanup also uses Admin transactions, retaining its existing
+fail-closed family policy. No production Flutter canonical write was needed.
+
+### Focused S1C emulator evidence design
+
+All tests use the single root `firestore.rules`; both firebase.json and
+firebase.emulators.json point there, with a regression assertion for both.
+Existing emulator guard requires demo-kuktam-local and 127.0.0.1:8088. Runner strips
+credential configuration, disables metadata probing and exposes no deployment.
+Rules-unit authenticated SDK contexts represent ordinary private owner, family
+owner and member callers. Only fixture/provisioning/processor operations use Admin.
+No Android/native or Auth emulator scenario is claimed in this S1C run.
+
+New tests cover, for each role: server-backed realtime/get/list reads; denied new
+set, overwrite, merge-set, individual quantity/name/unit/checked/revision/createdAt/
+custom updates; delete; batch clear and mixed batch; spoofed source/trusted/server/
+internal/role flags; unrelated/anonymous reads; unchanged authoritative documents.
+Denied operations assert the concrete `permission-denied` code.
+
+Each role also submits real SDK immutable commands through hardened rules, invokes
+the actual production ShoppingMutationStore.process with Admin Firestore, and
+reads resulting canonical state/receipts as the client. Covers created/merged ADD
+(300 ml + 2 l = 2300 ml, one row), duplicate processing, EDIT, CHECK and UNCHECK,
+all three stale revision operations, DELETE, three-child ADD bulk and revision-
+bound three-child clear. This is real rules/processor integration, not a mocked
+executor or a new Functions-trigger/native test.
+
+Original attack coverage: protocol ADD preserves 1000+500=1500; stale direct update
+and delete are denied and the entire newer document is unchanged. Epoch advances
+with the actual server helper: stale direct ADD denied, previously accepted
+command rejected CONTEXT_CHANGED, late old-epoch command CREATE denied, no new row.
+Trusted legacy migration remains usable and DELETING/DELETED fence reads/commands.
+Existing legacy-CRUD expectation tests were updated to the intentional cutoff;
+read/family/JOIN authorization checks were preserved and lifecycle read checks
+strengthened rather than made vacuous by unconditional write denial.
+
+### Validation
+
+- Functions TypeScript build: PASS (`npm run build`).
+- S1A contract unit tests: 15 PASS, 0 FAIL (`node --test lib/test/shopping-contract.test.js`).
+- Shopping Flutter: 263 PASS, 0 FAIL, 0 SKIP (`flutter test test/shopping --reporter json`).
+- Flutter analyze: PASS, no issues (5.3s).
+- Full Firestore emulator suite: 662 PASS, 0 FAIL, 0 SKIP, exit 0; 686959.95ms
+  (`npm run test:rules`). Includes 45 S1A executor tests plus household migration,
+  account deletion/lifecycle, CREATE/invite/JOIN-reservation and all existing rules.
+- Final focused shopping/household rules + protocol run: 59 PASS, 0 FAIL, 0 SKIP,
+  exit 0; 17456.1029ms. These overlap the full run, not 59 additional unique tests.
+  Final attack inputs deliberately omit revision on creates and use boolean
+  spoofing flags, so the old revision-field guard cannot account for rejection.
+  This test-only strengthening was rebuilt and rerun after the full suite;
+  the final rules and all production code were identical in both runs.
+- Final Functions build: PASS (`npm run build`).
+- Final diff review/check: PASS; exactly the six scoped files below.
+
+Logs: C:/Users/gabor/AppData/Local/Temp/s1c-build.log, s1c-contract.log,
+s1c-flutter.jsonl, s1c-analyze.log, s1c-emulator.log, s1c-build-final.log and
+s1c-rules-final.log. Final focused command after the build:
+`node node_modules/firebase-tools/lib/bin/firebase.js emulators:exec --only firestore
+--project demo-kuktam-local --config ../firebase.emulators.json "node --test
+--test-concurrency=1 lib/test/shopping-rules.test.js lib/test/household-rules.test.js"`
+from functions, with credentials cleared and the same demo/metadata guards as the
+standard runner. Both emulator runs stopped cleanly; no test services retained.
+
+Static recheck: two lib shoppingItems references, both read-only in
+production_shopping_coordinator.dart (bounded server absence query and shared
+canonical list listener). Direct production canonical writes = 0. No Dart or
+backend business implementation changes. No protocol/schema/observer changes.
+No native H2 rerun or full Flutter rerun required for this rules/tests/docs change.
+
+S1C PASS / COMPLETE (local milestone): YES. Private owner/family owner/member
+reads and protocol CRUD/merge/clear PASS; direct create/update/delete/batch DENIED;
+unauthorized reads DENIED; stale direct ADD and +500 edit/delete BLOCKED;
+canonical state preserved. Lifecycle, legacy migration and Admin execution PASS.
+No spoofable client escape hatch; no blocker.
+
+Modified files only:
+- firestore.rules (canonical write cutoff)
+- functions/test/shopping-rules.test.ts (9 new S1C cases, revised obsolete CRUD expectation)
+- functions/test/household-rules.test.ts (hardened contract, preserved read/lifecycle coverage)
+- S1B_CHECKPOINT_2026-10-19.md (this evidence)
+- S1B_PROGRESS_REPORT.md (current S1C status)
+- SHOPPING_MUTATION_SAFETY.md (current rule boundary and rollout distinction)
+
+S1B remains COMPLETE / ACCEPTED. S1D READY: YES, NOT STARTED / NOT COMPLETE.
+Next separate milestone: S1D bulk cost optimization. Family Phase 4B NOT READY.
+Production accessed/changed/deployed: NO. No gate,
+App Check, Play, Image Import, commit or push changes. Production rules remain
+untouched; any later rollout requires separate explicit authorization.
+
 ## H3B final regression â€” PASS; S1B ACCEPTED, 2026-10-21
 
 Authoritative latest status: S1B COMPLETE / ACCEPTED. H1, H2, H3A and H3B PASS.

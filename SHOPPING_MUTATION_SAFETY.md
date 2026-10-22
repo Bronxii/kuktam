@@ -1,3 +1,23 @@
+## S1C local rules cutoff — PASS / COMPLETE, 2026-10-22
+
+Baseline: accepted S1B commit d4dfe76723f1029fb6e11fda59044a84dff8bad2.
+Canonical client create/update/delete now deny unconditionally; authorized reads
+and the immutable mutation protocol remain unchanged. No business Dart/backend
+changes. See the checkpoint's S1C entry for the exact inventory, attack cases and
+rules-mediated SDK -> actual Admin processor integration coverage.
+
+Shopping Flutter 263/263, analyzer, Functions build and S1A contract 15/15 PASS.
+Full Firestore emulator regression: 662/662 PASS (includes 45 S1A executor tests).
+Final focused rules/protocol validation: 59/59 PASS, overlapping the full suite.
+Private/family reads preserved; direct CRUD/batches denied; client-command/Admin
+CRUD, semantic merge and representative clear work. Stale direct ADD and +500
+stale edit/delete are blocked with canonical data preserved. Lifecycle/migration,
+source zero-bypass and diff checks PASS. No blockers.
+S1B remains ACCEPTED. S1C locally COMPLETE; S1D READY but not started/complete.
+Family Phase4B remains NOT READY. No production access,
+deploy, gate change, commit or push. Older dated sections below are historical;
+local prepared rules must not be confused with deployed production rules.
+
 ## Current implemented status â€” S1B ACCEPTED, H3B PASS, 2026-10-21
 
 This section and the implemented S1A contract below describe current source.
@@ -381,17 +401,24 @@ Source: `functions/src/shopping/mutation-contract.ts` and `mutation-store.ts`.
 * CREATE source reservation advances shopping epoch with its fence. New family
   context is lazily initialized after activation. Phase 4A remains unchanged.
 
-### S1A rules and remaining risk
+### Current S1C rules boundary and production rollout risk
 
-New command/work/config fields are protected. Clients cannot create or change a
-canonical revision. Existing canonical create/update/delete OTHERWISE REMAIN
-ALLOWED, as expressly required for S1A. The repository was unchanged at the S1A
-checkpoint; S1B has since migrated every production Flutter writer (see latest
-dated evidence above). Rules still permit older/external client writers. Therefore
-old writers can still bypass revision advancement or race the new executor.
-New-protocol guarantees are proven for participating new-protocol writers, not
-mixed legacy/new production traffic. No claim that the original production bug
-is fully fixed. Do not enable the protocol publicly while that bypass remains.
+S1A originally retained direct canonical CRUD for the later client migration.
+S1B has completed that migration. The local S1C rules now unconditionally deny
+client create/update/delete on households/{hid}/shoppingItems/{itemId}; authorized
+reads retain the existing householdWritable predicate. There are no client flags,
+role exceptions or migration write exceptions. Immutable command CREATE and owner
+receipt reads remain unchanged; command update/delete and technical state writes
+remain denied. The production Admin processor performs canonical transactions.
+
+HouseholdStore legacy migration and private-household account-deletion cleanup use
+Admin transactions and require no client canonical permission. The separate legacy
+users/{uid}/shopping compatibility/cleanup rules are unchanged; the server-owned
+migration pointer already closes legacy create/update for migrated accounts.
+
+This is LOCAL source/test preparation only. Production rules have NOT been
+changed, and production gates remain OFF. No claim that the deployed production
+flaw is closed. S1D cost optimization and a separately authorized rollout remain.
 
 Rules validate the envelope and current context, not arbitrary nested JSON. The
 executor strictly validates nested payload before effects; invalid JSON becomes
