@@ -1,4 +1,4 @@
-// S1D1 measurement only. No business executor replacement, deploy or production target.
+// Current-executor measurement; frozen S1D1 artifact is never overwritten. No business executor replacement, deploy or production target.
 const {spawnSync}=require('node:child_process');
 const path=require('node:path');
 if(process.argv.length!==2)throw new Error('No target overrides allowed');

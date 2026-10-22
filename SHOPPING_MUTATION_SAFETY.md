@@ -1,3 +1,30 @@
+## S1D2A atomic ADD blocks - PASS, 2026-10-22
+
+Baseline: 261d5602d02bd091b9ac8c84dcfc89d47e8575ac (committed S1D1).
+ADD-only BULK now executes up to 10 ordered children per atomic transaction,
+within the existing worker child budget. Command/hash read once; full authority
+and epoch revalidated in every block and SDK retry. Repeated normalized products
+share transaction-local working state. Per-child revisions/results/created proof
+remain; canonical final target, household sequence, receipt/cursor and work state
+commit together. Mixed parents and standalone CRUD retain the original path.
+Legacy/custom or oversized targets conservatively use one-child granularity.
+No whole-parent authorization cache, client change, rules change or new protocol.
+
+Final targeted result: 175 PASS / 0 FAIL / 0 SKIP (27 new block, 29 small cost,
+15 contract, 45 executor, 59 rules). Functions build and diff-check PASS.
+Actual emulator-meter 1/10 costs, including command write, not billing truth:
+private 1: 7 R / 5 W; private 10: 16 R / 14 W (was 70 / 41);
+family 1: 9 R / 5 W; family 10: 18 R / 14 W (was 90 / 41).
+No retry in baseline measurements; explicit retry/atomicity/fresh-authority and
+lost-ACK recovery tests PASS. Historical S1D1 artifact is unchanged.
+
+Details: [S1D2A_CHECKPOINT_2026-10-22.md](S1D2A_CHECKPOINT_2026-10-22.md).
+Raw counts: [S1D2A_COST_MEASUREMENT.json](S1D2A_COST_MEASUREMENT.json).
+S1B remains COMPLETE / ACCEPTED. S1C remains COMPLETE LOCALLY. S1D1 PASS.
+S1D2A PASS; S1D NOT COMPLETE; Family Phase4B NOT READY. Next separate S1D2B
+50/200 measured cost acceptance, NOT started. No production access/deploy,
+commit or push. Historical sections below describe their own checkpoint dates.
+
 ## S1D1 cost measurement / design - PASS, 2026-10-22
 
 Baseline: committed S1C 6891ceabeef90d8dd4efc34bcbcb5b18d9bbfa8d; clean worktree.

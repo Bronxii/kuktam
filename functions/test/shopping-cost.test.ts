@@ -20,7 +20,7 @@ beforeEach(async()=>{
  now=Timestamp.fromMillis(1800000000000);await raw.doc('shoppingRuntime/config').set({enabled:true});
 });
 after(async()=>{
- writeFileSync(resolve(__dirname,'../../../S1D1_COST_BASELINE.json'),JSON.stringify({baseline:'6891ceabeef90d8dd4efc34bcbcb5b18d9bbfa8d',project:'demo-kuktam-local',method:'Actual SDK operations/results, not billing counters. readEquivalent = documentGets + queryDocuments + emptyQueries. Submission separate; client/rules reads excluded.',reports},null,2)+'\n');
+ writeFileSync(resolve(__dirname,process.env.S1D_COST_SMALL_ONLY==='1'?'../../../S1D2A_COST_MEASUREMENT.json':'../../../S1D_CURRENT_COST_MEASUREMENT.json'),JSON.stringify({comparisonBaseline:'S1D1_COST_BASELINE.json',executor:'current checkout',project:'demo-kuktam-local',method:'Actual SDK operations/results, not billing counters. readEquivalent = documentGets + queryDocuments + emptyQueries. Submission separate; client/rules reads excluded.',reports},null,2)+'\n');
  await deleteApp(app);
 });
 const add=(name:string,quantity=1,unit='g'):Child=>({type:'ADD',name,quantity,unit});
@@ -73,17 +73,17 @@ for(const family of [false,true]){
   const {processing}=await run(f,`${scope}/${operation}`,child);assert.equal(processing.readEquivalent,base+Number(operation==='EDIT'));assert.equal(processing.counts.committedWrites,4);
   if(operation==='ADD_MERGE')assert.equal((await f.items.doc('target').get()).get('quantity'),3000);
  });
- for(const size of [1,10,50,200])test(`cost ${scope} distinct bulk ${size}`,async()=>{
+ for(const size of (process.env.S1D_COST_SMALL_ONLY==='1'?[1,10]:[1,10,50,200]))test(`cost ${scope} distinct bulk ${size}`,async()=>{
   const f=await fixture(family),{processing}=await run(f,`${scope}/BULK_${size}`,Array.from({length:size},(_,i)=>add(`product-${i}`)));
-  const continuations=Math.ceil(size/10)-1;
-  assert.equal(processing.readEquivalent,base*size+2*continuations);assert.equal(processing.counts.documentGets,(base-1)*size+continuations);
+  const blocks=Math.ceil(size/10),continuations=blocks-1;
+  assert.equal(processing.readEquivalent,size+(base-1)*blocks+2*continuations);assert.equal(processing.counts.documentGets,(base-1)*blocks+continuations);
   assert.equal(processing.counts.queryCategories.itemCandidates,size);assert.equal(processing.counts.queryCategories.dueWork??0,continuations);
-  assert.equal(processing.counts.emptyQueries,size);assert.equal(processing.counts.transactionCalls,size+continuations);assert.equal(processing.counts.committedWrites,4*size);
+  assert.equal(processing.counts.emptyQueries,size);assert.equal(processing.counts.transactionCalls,blocks+continuations);assert.equal(processing.counts.committedWrites,size+3*blocks);
   assert.equal((await f.items.get()).size,size);
  });
- test(`cost ${scope} 50 merge-heavy bulk`,async()=>{
+ if(process.env.S1D_COST_SMALL_ONLY!=='1')test(`cost ${scope} 50 merge-heavy bulk`,async()=>{
   const f=await fixture(family);const {processing}=await run(f,`${scope}/MERGE_BULK_50`,Array.from({length:50},(_,i)=>add(`product-${i%5}`)));
-  assert.equal(processing.counts.emptyQueries,5);assert.equal(processing.counts.queryDocuments,49);assert.equal(processing.readEquivalent,base*50+8);
+  assert.equal(processing.counts.emptyQueries,5);assert.equal(processing.counts.queryDocuments,24);assert.equal(processing.counts.committedWrites,40);assert.equal(processing.readEquivalent,(base-1)*5+25+8);
   for(const d of (await f.items.get()).docs)assert.equal(d.get('quantity'),10);
  });
  test(`cost ${scope} mixed five-child bulk`,async()=>{

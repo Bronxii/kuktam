@@ -1,10 +1,12 @@
-import { Firestore, Timestamp, Transaction, DocumentSnapshot, FieldValue } from 'firebase-admin/firestore';
+import { Firestore, Timestamp, Transaction, DocumentSnapshot, DocumentReference, FieldValue } from 'firebase-admin/firestore';
 import { createHash } from 'node:crypto';
 import { AuthContext, authenticatedUid } from '../billing/account-binding';
 import { readFamilyMembership, validatePrivateRoot } from '../households/household-contract';
 import { readAccount } from '../accounts/account-lifecycle';
 import { Child, MutationError, Outcome, Request, RETENTION_MS, epochExpiry, newEpoch, parseRequest, requestFields, revision, safeId, mutationPattern } from './mutation-contract';
 
+export const MAX_ADD_BLOCK_SIZE=10;
+type ChildResult={code:Outcome;itemId?:string;revision?:number;created?:boolean};
 export const workId=(path:string)=>createHash('sha256').update(path).digest('hex');
 const fail=(code:Outcome):never=>{throw new MutationError(code);};
 /** All reads precede writes. This same authority guard applies to every child. */
@@ -81,7 +83,7 @@ export class ShoppingMutationStore {
   async process(uid:string,id:string,maxSteps=10):Promise<string>{
     if(!Number.isSafeInteger(maxSteps)||maxSteps<1||maxSteps>20)throw new MutationError('INVALID_ARGUMENT');
     let status='PENDING';
-    try{for(let i=0;i<maxSteps;i++){status=await this.step(uid,id);if(status!=='PROCESSING')break;}return status;}
+    try{for(let used=0;used<maxSteps;){const step=await this.step(uid,id,maxSteps-used);status=step.status;used+=step.processed;if(status!=='PROCESSING'||step.processed===0)break;}return status;}
     catch(e){await this.defer(uid,id);throw e;}
   }
   private async defer(uid:string,id:string){
@@ -98,25 +100,30 @@ export class ShoppingMutationStore {
       tx.set(work,{uid,mutationId:id,nextAt:next});
     });
   }
-  private async step(uid:string,id:string):Promise<string>{
+  private async step(uid:string,id:string,budget:number):Promise<{status:string;processed:number}>{
     const ref=this.ref(uid,id),work=this.db.doc(`shoppingMutationWork/${workId(ref.path)}`);
     return this.db.runTransaction(async tx=>{
-      const doc=await tx.get(ref);if(!doc.exists){tx.delete(work);return 'ABSENT';}
+      const doc=await tx.get(ref);if(!doc.exists){tx.delete(work);return {status:'ABSENT',processed:0};}
       const d=doc.data()!,now=this.clock();
-      if(d.status&&d.status!=='PROCESSING'&&d.status!=='FAILED_RETRYABLE')return d.status;
-      if(d.status==='FAILED_RETRYABLE'&&d.retryAt instanceof Timestamp&&d.retryAt.toMillis()>now.toMillis())return d.status;
+      if(d.status&&d.status!=='PROCESSING'&&d.status!=='FAILED_RETRYABLE')return {status:d.status,processed:0};
+      if(d.status==='FAILED_RETRYABLE'&&d.retryAt instanceof Timestamp&&d.retryAt.toMillis()>now.toMillis())return {status:d.status,processed:0};
       let parsed:ReturnType<typeof parseRequest>;
       try{parsed=parseRequest(requestFields(d),uid,id);}catch{
         tx.update(ref,{status:'FAILED_TERMINAL',cursor:0,results:[],appliedCount:0,payloadJson:FieldValue.delete(),updatedAt:now,purgeAfter:Timestamp.fromMillis(Math.max(now.toMillis(),epochExpiry(id.split('_')[0]!))+RETENTION_MS)});
-        tx.set(work,{uid,mutationId:id,nextAt:Timestamp.fromMillis(Math.max(now.toMillis(),epochExpiry(id.split('_')[0]!))+RETENTION_MS)});return 'FAILED_TERMINAL';
+        tx.set(work,{uid,mutationId:id,nextAt:Timestamp.fromMillis(Math.max(now.toMillis(),epochExpiry(id.split('_')[0]!))+RETENTION_MS)});return {status:'FAILED_TERMINAL',processed:0};
       }
       const {request:r,children,hash}=parsed,cursor=d.cursor??0,results:{code:Outcome;itemId?:string;revision?:number}[]=d.results??[];
       if(d.requestHash&&d.requestHash!==hash)throw new MutationError('ID_CONFLICT');
       if(!Number.isSafeInteger(cursor)||cursor<0||cursor>=children.length||results.length!==cursor)throw new MutationError('FAILED_TERMINAL');
-      let result:{code:Outcome;itemId?:string;revision?:number},stop=false;
+      let result:ChildResult,stop=false,processed=1;
       try{
         const home=await shoppingAuthority(this.db,tx,uid,r.householdId);this.epoch(home,r,now);
-        result=await this.apply(tx,home,children[cursor]!,now);
+        // Mixed parents deliberately keep the original one-child execution path.
+        if(r.kind==='BULK'&&children.every((c):c is Extract<Child,{type:'ADD'}>=>c.type==='ADD')){
+          const block=await this.applyAddBlock(tx,home,children.slice(cursor,cursor+Math.min(MAX_ADD_BLOCK_SIZE,budget)),now);
+          results.push(...block.slice(0,-1));result=block[block.length-1]!;processed=block.length;
+          stop=result.code==='FAILED_TERMINAL';
+        }else result=await this.apply(tx,home,children[cursor]!,now);
       }catch(e){if(!(e instanceof MutationError)||!['REJECTED_STALE','REJECTED_CONTEXT_CHANGED','REJECTED_NOT_FOUND','REJECTED_UNAUTHORIZED','FAILED_TERMINAL'].includes(e.code))throw e;
         result={code:e.code as Outcome};stop=['REJECTED_CONTEXT_CHANGED','REJECTED_UNAUTHORIZED','FAILED_TERMINAL'].includes(e.code);
       }
@@ -126,8 +133,63 @@ export class ShoppingMutationStore {
       const status=complete?(applied===children.length?'APPLIED':applied>0?'PARTIAL':results.every(r=>r.code===results[0]!.code)?results[0]!.code:'PARTIAL'):'PROCESSING';
       const purgeAfter=Timestamp.fromMillis(epochExpiry(r.epoch)+RETENTION_MS);
       tx.update(ref,{requestHash:hash,status,cursor:results.length,results,appliedCount:applied,updatedAt:now,purgeAfter,...(complete?{payloadJson:FieldValue.delete()}:{} )});
-      tx.set(work,{uid,mutationId:id,nextAt:complete?purgeAfter:now});return status;
+      tx.set(work,{uid,mutationId:id,nextAt:complete?purgeAfter:now});return {status,processed};
     });
+  }
+  /** One read phase, then a payload-ordered working set, then one atomic commit.
+   * Only the final state of each target is written, but every child keeps its own
+   * sequence/result. No authority or item snapshot survives a transaction attempt. */
+  private async applyAddBlock(tx:Transaction,home:DocumentSnapshot,children:Extract<Child,{type:'ADD'}>[],now:Timestamp):Promise<ChildResult[]>{
+    const items=home.ref.collection('shoppingItems');
+    const key=(c:Extract<Child,{type:'ADD'}>)=>JSON.stringify([c.name,c.unit]);
+    const candidates=new Map<string,DocumentSnapshot[]>();
+    for(const c of children)if(!candidates.has(key(c))){
+      const matches=await tx.get(items.where('name','==',c.name).where('unit','==',c.unit).limit(3));
+      candidates.set(key(c),matches.docs);
+      // Unbounded legacy/custom fields must not multiply the existing one-item
+      // transaction size/index risk. Keep their original single-child granularity.
+      if(matches.docs.some(d=>!this.compactAddTarget(d))){children=children.slice(0,1);break;}
+    }
+    const working=new Map<string,{ref:DocumentReference;existing:boolean;name:string;unit:string;quantity:number;revision:number}>();
+    const results:ChildResult[]=[];
+    let seq=revision(home.get('shoppingRevision'));
+    for(const c of children){
+      try{
+        const k=key(c),matches=candidates.get(k)!;
+        if(matches.length>1)fail('FAILED_TERMINAL');
+        const previous=working.get(k),target=matches[0];
+        const old=previous?.quantity??target?.get('quantity');
+        if((previous||target)&&(typeof old!=='number'||!Number.isFinite(old)||old<=0))fail('FAILED_TERMINAL');
+        const quantity=c.quantity+(old??0);
+        const next=Math.max(seq,previous?.revision??(target?revision(target.get('revision')):0))+1;
+        if(!Number.isFinite(quantity)||quantity>Number.MAX_SAFE_INTEGER||!Number.isSafeInteger(next))fail('FAILED_TERMINAL');
+        const destination=previous?.ref??target?.ref??items.doc();
+        working.set(k,{ref:destination,existing:previous?.existing??!!target,name:c.name,unit:c.unit,quantity,revision:next});
+        seq=next;results.push({code:'APPLIED',itemId:destination.id,revision:next,created:!previous&&!target});
+      }catch(e){
+        if(!(e instanceof MutationError)||e.code!=='FAILED_TERMINAL')throw e;
+        // Preserve the old executor's valid-prefix semantics; later children are
+        // terminalized by step, without applying their deltas.
+        results.push({code:'FAILED_TERMINAL'});break;
+      }
+    }
+    if(working.size){
+      tx.update(home.ref,{shoppingRevision:seq});
+      for(const item of working.values()){
+        if(item.existing)tx.update(item.ref,{quantity:item.quantity,revision:item.revision});
+        else tx.create(item.ref,{name:item.name,unit:item.unit,quantity:item.quantity,revision:item.revision,isChecked:false,createdAt:now});
+      }
+    }
+    return results;
+  }
+  private compactAddTarget(doc:DocumentSnapshot):boolean{
+    const data=doc.data()!;
+    return Buffer.byteLength(doc.id)<=128&&Object.keys(data).every(k=>['name','unit','quantity','revision','isChecked','createdAt'].includes(k))&&
+      typeof data.name==='string'&&Buffer.byteLength(data.name)<=1600&&
+      typeof data.unit==='string'&&Buffer.byteLength(data.unit)<=64&&
+      typeof data.quantity==='number'&&(data.revision===undefined||typeof data.revision==='number')&&
+      (data.isChecked===undefined||typeof data.isChecked==='boolean')&&
+      (data.createdAt===undefined||data.createdAt instanceof Timestamp);
   }
   private async apply(tx:Transaction,home:DocumentSnapshot,c:Child,now:Timestamp):Promise<{code:Outcome;itemId:string;revision:number;created?:boolean}>{
     const items=home.ref.collection('shoppingItems');
