@@ -163,9 +163,10 @@ for(const cause of ['ownerFree','guestDeleting','ownerDeleting','familyMissing',
  assert.deepEqual((await db.doc('users/guest').get()).data(),root);assert.equal((await db.doc(`households/${p}/shoppingItems/keep`).get()).exists,true);
  const after=await snapshot();await s.join.resume(s.id);assert.deepEqual(await snapshot(),after);
 });
-test('reserved revoke is IN_PROGRESS; preview never consumes reservation',async()=>{
- const s=await joined(),before=await snapshot();assert.equal((await s.store.revoke({uid:'owner'},s.invite.inviteId)).code,'IN_PROGRESS');
- assert.equal((await s.store.preview({uid:'guest'},s.invite.token)).code,'IN_PROGRESS');assert.deepEqual(await snapshot(),before);
+test('precommit reserved revoke safely aborts without transfer',async()=>{
+ const s=await joined();assert.equal((await s.store.preview({uid:'guest'},s.invite.token)).code,'IN_PROGRESS');
+ assert.equal((await s.store.revoke({uid:'owner'},s.invite.inviteId)).code,'REVOKED');
+ assert.equal((await s.op()).status,'ABORTED');assert.equal((await db.doc('familyMemberships/guest').get()).exists,false);
 });
 test('corrupt foreign invite claim is never revoked or removed from its inventory by abort',async()=>{
  const s=await joined(),ref=db.doc(`familyInvites/${s.invite.inviteId}`);

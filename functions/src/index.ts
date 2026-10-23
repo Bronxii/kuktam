@@ -1,3 +1,5 @@
+import { JoinTransferStore } from './households/join-transfer';
+import { joinTransferHandler } from './households/join-transfer-handler';
 import { FamilyJoinStore } from './households/family-join';
 import { ShoppingMutationStore } from './shopping/mutation-store';
 import { onDocumentCreated } from 'firebase-functions/v2/firestore';
@@ -47,6 +49,11 @@ export const acceptFamilyInvite=onCall(familyOptions,acceptFamilyHandler(()=>{
   const app=getApps().find(a=>a.name==='[DEFAULT]')??initializeApp();
   return new FamilyJoinStore(getFirestore(app));
 }));
+const joinTransferStore=()=>new JoinTransferStore(getFirestore(getApps().find(a=>a.name==='[DEFAULT]')??initializeApp()));
+export const prepareFamilyJoinTransfer=onCall(familyOptions,joinTransferHandler(joinTransferStore,'prepare'));
+export const getFamilyJoinTransferState=onCall(familyOptions,joinTransferHandler(joinTransferStore,'state'));
+export const confirmFamilyJoinDelete=onCall(familyOptions,joinTransferHandler(joinTransferStore,'confirm'));
+export const cancelFamilyJoin=onCall(familyOptions,joinTransferHandler(joinTransferStore,'cancel'));
 export const createFamilyInvite=onCall(familyOptions,invites.create);
 export const revokeFamilyInvite=onCall(familyOptions,invites.revoke);
 export const previewFamilyInvite=onCall(familyOptions,invites.preview);

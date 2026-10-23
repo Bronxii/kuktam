@@ -5,7 +5,7 @@
   "description": "Kuktam backend contracts and lazy production runtime source; no deployment performed",
   "scripts": {
     "build": "tsc",
-    "test:unit": "npm run build && node --test lib/test/shopping-contract.test.js lib/test/invite-contract.test.js lib/test/models.test.js lib/test/binding.test.js lib/test/lifecycle-core.test.js lib/test/revoke-core.test.js lib/test/rtdn-parser.test.js lib/test/maintenance-policy.test.js lib/test/deletion-core.test.js lib/test/production-adapters.test.js lib/test/runtime.test.js",
+    "test:unit": "npm run build && node --test lib/test/join-foundation-contract.test.js lib/test/shopping-contract.test.js lib/test/invite-contract.test.js lib/test/models.test.js lib/test/binding.test.js lib/test/lifecycle-core.test.js lib/test/revoke-core.test.js lib/test/rtdn-parser.test.js lib/test/maintenance-policy.test.js lib/test/deletion-core.test.js lib/test/production-adapters.test.js lib/test/runtime.test.js",
     "test:rules": "npm run build && node scripts/emulator-tests.cjs",
     "test": "npm run test:unit && npm run test:rules"
   },

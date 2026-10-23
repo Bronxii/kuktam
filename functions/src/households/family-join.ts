@@ -1,3 +1,5 @@
+import { readTransfer } from './join-transfer-contract';
+import { readJoinCapacity } from './join-capacity';
 import { createHash } from 'node:crypto';
 import { Firestore, Timestamp, Transaction } from 'firebase-admin/firestore';
 import { AuthContext, authenticatedUid } from '../billing/account-binding';
@@ -10,9 +12,9 @@ import { claimFamilyLease } from './operation-lease';
 export type JoinMode='ADD'|'DELETE';
 export const joinOperationId=(uid:string)=>'join_'+createHash('sha256').update(authenticatedUid({uid})).digest('hex');
 export interface JoinOperation {
-  schemaVersion:1; kind:'JOIN'; actorUid:string; ownerUid:string; inviteId:string;
+  schemaVersion:1|2; kind:'JOIN'; actorUid:string; ownerUid:string; inviteId:string;
   householdId:string; sourceHouseholdId:string; mode:JoinMode;
-  phase:'RESERVED'|'READY_FOR_TRANSFER'; status:'READY'|'ABORTED';
+  phase:'RESERVED'|'READY_FOR_TRANSFER'|'SNAPSHOT_SOURCE'|'SOURCE_FENCED_WAITING_CONFIRMATION'|'COMMITTED_TRANSFER'|'CLEAN_SOURCE'|'TRANSFER_COMPLETE'|'ACTIVE'; status:'READY'|'ABORTED'|'OPERATOR'|'DONE';
   sourceItemCount:number; deleteReconfirmationRequired:boolean;
   createdAt:Timestamp; updatedAt:Timestamp; nextAt:Timestamp|null;
   leaseId:string|null; leaseUntil:Timestamp|null; lastOutcome:string|null;
@@ -21,6 +23,7 @@ const fields='actorUid,createdAt,deleteReconfirmationRequired,householdId,invite
 const uidValue=(v:unknown):v is string=>typeof v==='string'&&v.length>0&&v.length<=128&&!v.includes('/')&&v.trim()===v;
 const identifier=(v:unknown):v is string=>typeof v==='string'&&/^[a-zA-Z0-9_-]{1,128}$/.test(v);
 export function readJoinOperation(raw:unknown,id:string):JoinOperation {
+  if((raw as JoinOperation)?.schemaVersion===2)return readTransfer(raw,id);
   const v=raw as JoinOperation;
   if(!v||Object.keys(v).sort().join(',')!==fields||v.schemaVersion!==1||v.kind!=='JOIN'||
     !uidValue(v.actorUid)||!uidValue(v.ownerUid)||v.actorUid===v.ownerUid||id!==joinOperationId(v.actorUid)||
@@ -37,14 +40,6 @@ export function readJoinOperation(raw:unknown,id:string):JoinOperation {
 /** Phase 4A cannot complete a JOIN. Even an enabled production config cannot reserve. */
 export function localJoinRuntime(project:string|undefined,host:string|undefined):boolean {
   return !!project?.startsWith('demo-')&&!!host&&/^(127\.0\.0\.1|localhost):[0-9]{1,5}$/.test(host);
-}
-function capacity(raw:unknown):string[] {
-  if(raw===undefined)return [];
-  const v=raw as {schemaVersion:number;operationIds:string[]};
-  if(!v||Object.keys(v).sort().join(',')!=='operationIds,schemaVersion'||v.schemaVersion!==1||
-    !Array.isArray(v.operationIds)||v.operationIds.length>7||new Set(v.operationIds).size!==v.operationIds.length||
-    v.operationIds.some(id=>!/^join_[a-f0-9]{64}$/.test(id)))throw new Error('invalidJoinCapacity');
-  return v.operationIds;
 }
 const fail=(code:ConstructorParameters<typeof FamilyInviteError>[0]):never=>{throw new FamilyInviteError(code);};
 export class FamilyJoinStore {
@@ -82,7 +77,7 @@ export class FamilyJoinStore {
       const invite=readInvite(doc.data());
       if(old.exists) {
         const op=readJoinOperation(old.data(),id);
-        if(op.status==='READY') {
+        if(op.status!=='ABORTED') {
           if(op.inviteId!==inviteId||op.mode!==mode)fail('IN_PROGRESS');
           if(invite.status!=='RESERVED'||invite.operationId!==id||index.get('operationId')!==id||
             index.get('state')!=='RESERVED'||index.get('householdId')!==op.householdId||index.get('role')!=='member')fail('INVITE_STATE_UNAVAILABLE');
@@ -97,7 +92,7 @@ export class FamilyJoinStore {
       if(create.exists&&create.get('status')!=='ABORTED')fail('IN_PROGRESS');
       const p=await this.standalone(tx,uid),members=await this.family(tx,invite.createdByUid,invite.householdId);
       if(members.some(m=>m.memberId===uid))fail('ALREADY_MEMBER');
-      const capRef=this.db.doc(`familyJoinCapacity/${invite.householdId}`),cap=await tx.get(capRef),ids=capacity(cap.data());
+      const capRef=this.db.doc(`familyJoinCapacity/${invite.householdId}`),cap=await tx.get(capRef),capState=readJoinCapacity(cap.data()),ids=capState.operationIds;
       if(ids.includes(id))fail('INVITE_STATE_UNAVAILABLE');
       if(members.length+ids.length>=8)fail('FAMILY_FULL');
       const count=await tx.get(this.db.collection(`households/${p}/shoppingItems`).count());
@@ -107,7 +102,7 @@ export class FamilyJoinStore {
         nextAt:now,leaseId:null,leaseUntil:null,lastOutcome:null};
       tx.set(opRef,op);tx.update(inviteRef,{status:'RESERVED',operationId:id});
       tx.create(indexRef,{householdId:invite.householdId,role:'member',state:'RESERVED',operationId:id});
-      tx.set(capRef,{schemaVersion:1,operationIds:[...ids,id]});
+      tx.set(capRef,{...capState,operationIds:[...ids,id]});
       return id;
     });
   }
@@ -115,13 +110,14 @@ export class FamilyJoinStore {
   async step(id:string,leaseId:string):Promise<string> {
     return this.db.runTransaction(async tx=>{
       const ref=this.db.doc(`familyOperations/${id}`),doc=await tx.get(ref);
+      if(doc.get('schemaVersion')===2){const {JoinTransferStore}=await import('./join-transfer');return new JoinTransferStore(this.db,this.clock).stepTransaction(tx,id,leaseId);}
       if(!doc.exists)throw new Error('missingOperation');
       const op=readJoinOperation(doc.data(),id),now=this.clock();
       if(op.status!=='READY')return op.status;
       if(op.leaseId!==leaseId||!op.leaseUntil||op.leaseUntil.toMillis()<=now.toMillis())return 'BUSY';
       const indexRef=this.db.doc(`familyMemberships/${op.actorUid}`),index=await tx.get(indexRef);
       const invRef=this.db.doc(`familyInvites/${op.inviteId}`),invDoc=await tx.get(invRef);
-      const capRef=this.db.doc(`familyJoinCapacity/${op.householdId}`),cap=await tx.get(capRef),ids=capacity(cap.data());
+      const capRef=this.db.doc(`familyJoinCapacity/${op.householdId}`),cap=await tx.get(capRef),capState=readJoinCapacity(cap.data()),ids=capState.operationIds;
       const slotsRef=this.db.doc(`familyInviteSlots/${op.householdId}`),slots=await tx.get(slotsRef);
       const slotIds=slots.exists?readInviteSlots(slots.data()):[];
       const member=await tx.get(this.db.doc(`households/${op.householdId}/members/${op.actorUid}`));
@@ -148,7 +144,7 @@ export class FamilyJoinStore {
         // No transfer has begun: release only this operation's claims. Conservatively
         // revoke its invite (never recycle an explicit claim after eligibility failure).
         if(index.exists)tx.delete(indexRef);
-        tx.set(capRef,{schemaVersion:1,operationIds:ids.filter(v=>v!==id)});
+        tx.set(capRef,{...capState,operationIds:ids.filter(v=>v!==id)});
         const ownedInvite=invDoc.get('status')==='RESERVED'&&invDoc.get('operationId')===id;
         if(ownedInvite)
           tx.update(invRef,{status:'REVOKED',operationId:null});

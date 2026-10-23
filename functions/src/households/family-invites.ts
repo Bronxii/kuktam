@@ -105,6 +105,10 @@ export class FamilyInviteStore {
       if(!doc.exists)fail('NOT_FOUND');
       const invite=readInvite(doc.data());
       if(invite.householdId!==family.householdId || invite.createdByUid!==uid)fail('NOT_FOUND');
+      if(invite.status==='RESERVED'&&invite.operationId){
+        const operation=await tx.get(this.db.doc(`familyOperations/${invite.operationId}`));
+        if(operation.exists&&operation.get('kind')==='JOIN'){const {JoinTransferStore}=await import('./join-transfer');const outcome=await new JoinTransferStore(this.db,this.clock).cancelTransaction(tx,invite.operationId,inviteId,uid);return {schemaVersion:1,code:outcome==='ABORTED'?'REVOKED':'IN_PROGRESS'};}
+      }
       if(invite.status!=='PENDING')return {schemaVersion:1,code:invite.status==='RESERVED'?'IN_PROGRESS':invite.status};
       // Expired PENDING may still be revoked; this never extends its validity.
       const slots=await this.slots(tx,family.householdId);

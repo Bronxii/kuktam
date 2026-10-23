@@ -1,3 +1,11 @@
+## 4B1A implementation follow-up (2026-10-23)
+
+The original Phase4A history below is preserved. See
+[FAMILY_4B1A_CHECKPOINT_2026-10-22.md](FAMILY_4B1A_CHECKPOINT_2026-10-22.md)
+for the new explicit preparation API, v2 source fence/snapshot/consent/commit
+boundary, pre-commit revoke semantics and deletion admission guards.
+No JOIN transfer or activation is implemented by 4B1A. Production remains OFF.
+
 # Family Share Phase 4A: JOIN reservation only
 
 Baseline: `337282e` (Phase 3), following `d809614` CREATE and `13c236b` state foundation.

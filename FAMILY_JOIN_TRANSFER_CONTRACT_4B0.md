@@ -1,5 +1,14 @@
 # Family Phase 4B0 - JOIN transfer contract
 
+Implementation staging note, 2026-10-23: 4B1A preserves the Phase4A accept/reserve
+boundary and exposes explicit prepareFamilyJoinTransfer for the next bounded
+preparation step. A later UI calls preparation after acceptance. This separates
+the already-tested reservation API from the new pre-commit engine; it does not
+add consent for ADD or permit transfer before commit. The API sequence in section4
+describes the complete future flow, not an assertion that accept alone already
+runs all preparation. See FAMILY_4B1A_CHECKPOINT_2026-10-22.md for implementation
+and validation status; 4B0 itself remains a design-only historical checkpoint.
+
 Date: 2026-10-22. Baseline: `13f1c898e24179764169413841ab179f422d6c83`.
 Status: **PASS - design/contract only; no implementation or runtime proof**.
 S1B remains accepted, S1C locally complete, S1D accepted. Production stays disabled.
