@@ -1,4 +1,4 @@
-import { assertNoCommittedJoin, blockingJoin } from '../households/join-capacity';
+import { assertNoCommittedJoin, assertNoActiveFamilyDeletion, blockingJoin } from '../households/join-capacity';
 import { cleanupPrivateHousehold } from '../households/household-store';
 import { workId as shoppingWorkId } from '../shopping/mutation-store';
 import { readDeletion, AuthUserDeletionApi, DeletionPolicy, defaultDeletionPolicy, validateDeletionPolicy } from '../accounts/deletion-contract';
@@ -380,6 +380,7 @@ export class LifecycleStore {
       const markerRef=this.db.doc(`accountLifecycle/${uid}`),jobRef=this.db.doc(`accountDeletions/${uid}`),effectiveRef=this.db.doc(`users/${uid}/entitlements/pro`);
       const markerDoc=await tx.get(markerRef),jobDoc=await tx.get(jobRef),effectiveDoc=await tx.get(effectiveRef),now=this.clock();
       const blocking=await blockingJoin(this.db,tx,uid);
+      if(!blocking&&!authGone)await assertNoActiveFamilyDeletion(this.db,tx,uid);
       if(blocking){
         if(!authGone)throw new Error('JOIN_COMMITTED_IN_PROGRESS');
         tx.update(this.db.doc(`familyOperations/${blocking}`),{status:'OPERATOR',nextAt:null,leaseId:null,leaseUntil:null,lastOutcome:'externalAuthDeletion',updatedAt:now});

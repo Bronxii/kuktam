@@ -1,3 +1,12 @@
+## 4B2 activation follow-up (2026-10-23)
+
+See [FAMILY_4B2_CHECKPOINT_2026-10-23.md](FAMILY_4B2_CHECKPOINT_2026-10-23.md)
+for the atomic TRANSFER_COMPLETE → ACTIVE/DONE implementation and validation.
+It finalizes membership, routing, invite/capacity and source/structural locks without
+shopping item mutations. ACTIVE Family deletion remains admission-blocked pending
+its separate lifecycle milestone. Production remains OFF. Earlier phase boundaries
+below are preserved as historical evidence.
+
 ## 4B1B2 source disposition follow-up (2026-10-23)
 
 See [FAMILY_4B1B2_CHECKPOINT_2026-10-23.md](FAMILY_4B1B2_CHECKPOINT_2026-10-23.md)

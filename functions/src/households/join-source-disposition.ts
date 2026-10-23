@@ -9,7 +9,7 @@ const invalid=():never=>{throw new Error('transferIntegrity');};
 
 /** Original manifest/results stay immutable. Only this bounded cleanup evidence
  * is appended by source disposition. A full page is one atomic deletion unit. */
-function cleanupPage(raw:any,id:string,o:TransferOperation,n:number){
+export function cleanupPage(raw:any,id:string,o:TransferOperation,n:number){
   if(!raw||typeof raw!=='object')invalid();
   const {cleanup,...manifest}=raw;
   const p=readTransferPage(manifest,id,o,n);

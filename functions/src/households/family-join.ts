@@ -159,7 +159,11 @@ export class FamilyJoinStore {
     });
   }
   async resume(id:string):Promise<string> {
-    const lease=await this.claim(id);if(!lease)return 'notDueOrBusy';
+    const lease=await this.claim(id);if(!lease){
+      const doc=await this.db.doc(`familyOperations/${id}`).get();
+      if(doc.exists){const op=readJoinOperation(doc.data(),id);if(op.phase==='ACTIVE'&&op.status==='DONE')return 'DONE';}
+      return 'notDueOrBusy';
+    }
     let failed=false;
     try{return await this.step(id,lease);}catch{failed=true;return 'retry';}
     finally {

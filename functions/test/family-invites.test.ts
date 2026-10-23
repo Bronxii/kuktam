@@ -227,8 +227,9 @@ test('Phase 2 output supports invite creation and deletion remains fail-closed w
  const engine=new FamilyCreateStore(db),id=await engine.reserve({uid:'realCreator'});
  for(let i=0;i<10&&(await db.doc(`familyOperations/${id}`).get()).get('status')!=='DONE';i++)await engine.resume(id);
  const store=new FamilyInviteStore(db,new Emails());await store.create({uid:'realCreator'});
- const deletion=new AccountDeletionService(db,new FakeAuthDeletionApi());await deletion.beginAccountDeletion({uid:'realCreator'});
- assert.equal(await deletion.resume('realCreator',3),'cleanupRetryRequired');
- assert.notEqual((await db.doc('accountDeletions/realCreator').get()).get('stage'),'DONE');
+ const deletion=new AccountDeletionService(db,new FakeAuthDeletionApi());
+ await assert.rejects(deletion.beginAccountDeletion({uid:'realCreator'}),/FAMILY_LIFECYCLE_NOT_READY/);
+ assert.equal((await db.doc('accountDeletions/realCreator').get()).exists,false);
+ assert.equal((await db.doc('accountLifecycle/realCreator').get()).get('state'),'ACTIVE');
  assert.equal((await db.collection('familyInvites').get()).size,1);
 });

@@ -101,7 +101,11 @@ for(const mode of ['ADD','DELETE'] as const)for(const n of mode==='ADD'?[0,1,11,
  assert.equal(o.cursor,null);await assert.rejects(f.shopping.ensureContext({uid:'guest'}));
  for(const uid of ['guest','owner'])await assert.rejects(new LifecycleStore(db,f.clock).beginDeletion(uid),/JOIN_COMMITTED_IN_PROGRESS/);
  const proof=pages.map(p=>[p.id,p.data(),p.updateTime]);await f.tick();await f.tick();
- assert.equal((await f.op()).phase,'TRANSFER_COMPLETE');assert.deepEqual((await f.pages()).map(p=>[p.id,p.data(),p.updateTime]),proof);await f.guards();
+ // 4B2 now owns the next worker step. Reentry must never replay disposition;
+ // the pre-activation boundary above remains asserted before that handoff.
+ assert.equal((await f.op()).phase,'ACTIVE');assert.equal((await f.op()).status,'DONE');
+ assert.deepEqual((await f.pages()).map(p=>[p.id,p.data(),p.updateTime]),proof);
+ assert.equal((await f.source.get()).size,0);assert.ok((await f.source.parent!.get()).exists);
 });
 for(const mode of ['ADD','DELETE'] as const)test(`${mode} interruption resumes 10/10/5 without replay`,async()=>{
  const f=await cleanupFixture(25,mode);await f.tick();assert.equal((await f.source.get()).size,15);assert.deepEqual((await f.op()).cursor,{pageIndex:1,childOffset:0});

@@ -26,4 +26,11 @@ export async function blockingJoin(db:Firestore,tx:Transaction,uid:string) {
 }
 export async function assertNoCommittedJoin(db:Firestore,tx:Transaction,uid:string){
   if(await blockingJoin(db,tx,uid))throw new Error('JOIN_COMMITTED_IN_PROGRESS');
+  await assertNoActiveFamilyDeletion(db,tx,uid);
+}
+/** Temporary admission barrier, not a Family deletion implementation. Unexpected
+ * external Auth deletion still records its access barrier and fails cleanup closed. */
+export async function assertNoActiveFamilyDeletion(db:Firestore,tx:Transaction,uid:string){
+  const index=await tx.get(db.doc(`familyMemberships/${uid}`));
+  if(index.get('state')==='ACTIVE')throw new Error('FAMILY_LIFECYCLE_NOT_READY');
 }

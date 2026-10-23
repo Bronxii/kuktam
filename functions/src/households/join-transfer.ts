@@ -7,10 +7,11 @@ import { FamilyInviteStore } from './family-invites';
 import { FamilyInviteError, readInvite, readInviteSlots } from './invite-contract';
 import { hasPro } from './family-create';
 import { advanceShoppingEpoch } from '../shopping/mutation-store';
-import { parseRequest } from '../shopping/mutation-contract';
+import { parseRequest, epochExpiry, revision } from '../shopping/mutation-contract';
 import { digest, sourceFingerprint } from './join-snapshot';
 import { executeTransfer, transferIntegrityError, transferPageId as pageId, transferSeed as seed } from './join-transfer-execution';
 import { disposeSource } from './join-source-disposition';
+import { verifyActivationEvidence } from './join-activation';
 
 const fail=(code:ConstructorParameters<typeof FamilyInviteError>[0]):never=>{throw new FamilyInviteError(code);};
 const post=(op:TransferOperation)=>op.committedAt!==null;
@@ -119,16 +120,39 @@ export class JoinTransferStore {
     if(o.leaseId!==leaseId||!o.leaseUntil||o.leaseUntil.toMillis()<=now.toMillis())return 'BUSY';
     const patch=(v:Record<string,unknown>)=>tx.update(ref,{...v,updatedAt:now});
     // Committed work uses server JOIN authority, never the reserved actor's public
-    // shopping authority. TRANSFER_COMPLETE stays fenced and awaits 4B2.
+    // shopping authority. Only 4B2 releases the fence with the atomic pointer switch.
     if(post(o)){
       try{
         const c=await this.claims(tx,id,o);
         if(c.capacity.structuralOperationId!==id||c.user.get('privateHouseholdId')!==o.sourceHouseholdId||c.user.get('shoppingMigrationVersion')!==1||c.user.get('activeHouseholdId')!==o.sourceHouseholdId||c.user.get('familyHouseholdId')!==null)throw new Error('joinOwnershipInvariant');
         await this.validation.active(tx,o.actorUid);
-        if((await this.validation.owner(tx,o.ownerUid)).householdId!==o.householdId)throw new Error('joinOwnershipInvariant');
+        const family=await this.validation.owner(tx,o.ownerUid);
+        if(family.householdId!==o.householdId)throw new Error('joinOwnershipInvariant');
         for(const uid of [o.actorUid,o.ownerUid])if((await tx.get(this.db.doc(`accountDeletions/${uid}`))).exists)throw new Error('joinOwnershipInvariant');
         if(o.phase==='COMMITTED_TRANSFER')return await executeTransfer(this.db,tx,id,o,now,await tx.get(this.db.doc(`households/${o.householdId}`)));
         if(o.phase==='CLEAN_SOURCE')return await disposeSource(this.db,tx,id,o,now);
+        if(o.phase==='TRANSFER_COMPLETE'){
+          const lastRevision=await verifyActivationEvidence(this.db,tx,id,o,now);
+          if((await this.validation.members(tx,family)).length+c.capacity.operationIds.length>8)throw new Error('joinOwnershipInvariant');
+          const home=await tx.get(this.db.doc(`households/${o.householdId}`));
+          if(revision(home.get('shoppingRevision'))<lastRevision)throw new Error('transferIntegrity');
+          const epoch=home.get('shoppingEpoch'),expiry=typeof epoch==='string'?epochExpiry(epoch):NaN;
+          const sourceExpires=c.source.get('shoppingEpochExpiresAt'),familyExpires=home.get('shoppingEpochExpiresAt');
+          if(epoch!==undefined&&!Number.isFinite(expiry)||!(sourceExpires instanceof Timestamp)||sourceExpires.toMillis()!==epochExpiry(o.sourceFence!.epoch))throw new Error('transferIntegrity');
+          if(Number.isFinite(expiry)&&(!(familyExpires instanceof Timestamp)||familyExpires.toMillis()!==expiry))throw new Error('transferIntegrity');
+          // Preserve a valid live family epoch. Renew only missing/expired context;
+          // no canonical item or sequence is changed by activation.
+          if(!(expiry>now.toMillis()))tx.update(home.ref,advanceShoppingEpoch(now));
+          tx.create(home.ref.collection('members').doc(o.actorUid),{role:'member'});
+          tx.set(c.index.ref,{householdId:o.householdId,role:'member',state:'ACTIVE',operationId:null});
+          tx.update(c.user.ref,{activeHouseholdId:o.householdId,familyHouseholdId:o.householdId});
+          tx.update(c.source.ref,{operationId:null,...advanceShoppingEpoch(now)});
+          tx.update(c.inv.ref,{status:'USED',usedByUid:o.actorUid,usedAt:now});
+          tx.set(c.cap.ref,{schemaVersion:2,operationIds:c.capacity.operationIds.filter(x=>x!==id),structuralOperationId:null});
+          tx.set(c.slots.ref,{schemaVersion:1,inviteIds:c.slotIds.filter(x=>x!==o.inviteId)});
+          patch({phase:'ACTIVE',status:'DONE',nextAt:null,leaseId:null,leaseUntil:null,lastOutcome:'joinActivated'});
+          return 'DONE';
+        }
       }catch(e){
         if(transferIntegrityError(e)||e instanceof FamilyInviteError||e instanceof Error&&['joinOwnershipInvariant','joinInviteInvariant','invalidJoinCapacity'].includes(e.message)){
           patch({status:'OPERATOR',nextAt:null,leaseId:null,leaseUntil:null,lastOutcome:'committedInvariantViolation'});return 'OPERATOR';
