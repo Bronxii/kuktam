@@ -11,7 +11,7 @@ const invariant=():never=>{throw new Error('transferIntegrity');};
 const exact=(v:any,keys:string)=>!!v&&typeof v==='object'&&Object.keys(v).sort().join(',')===keys;
 
 /** Validate a bounded manifest page and its append-only terminal prefix. */
-function page(raw:any,id:string,o:TransferOperation,n:number){
+export function readTransferPage(raw:any,id:string,o:TransferOperation,n:number){
   const length=Math.min(10,o.snapshot!.count-n*10);
   if(!exact(raw,'chainHash,entries,fenceEpoch,inviteId,pageIndex,results,version')||raw.version!==1||raw.inviteId!==o.inviteId||
     raw.fenceEpoch!==o.sourceFence!.epoch||raw.pageIndex!==n||!hashValue(raw.chainHash)||!Array.isArray(raw.entries)||
@@ -47,8 +47,8 @@ export async function executeTransfer(db:Firestore,tx:Transaction,id:string,o:Tr
   }
   if(n>=Math.ceil(o.snapshot!.count/10))invariant();
   const currentRef=ref.collection('transferJournal').doc(transferPageId(o,n));
-  const current=page((await tx.get(currentRef)).data(),id,o,n);
-  const previous=n?page((await tx.get(ref.collection('transferJournal').doc(transferPageId(o,n-1)))).data(),id,o,n-1):null;
+  const current=readTransferPage((await tx.get(currentRef)).data(),id,o,n);
+  const previous=n?readTransferPage((await tx.get(ref.collection('transferJournal').doc(transferPageId(o,n-1)))).data(),id,o,n-1):null;
   if(current.results.length!==offset||offset>=current.entries.length||previous&&previous.results.length!==previous.entries.length)invariant();
   if(previous&&Buffer.compare(Buffer.from(previous.entries.at(-1).sourceId),Buffer.from(current.entries[0].sourceId))>=0)invariant();
   let chain=previous?.chainHash??transferSeed(id,o);

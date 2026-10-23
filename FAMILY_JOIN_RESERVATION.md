@@ -1,3 +1,10 @@
+## 4B1B2 source disposition follow-up (2026-10-23)
+
+See [FAMILY_4B1B2_CHECKPOINT_2026-10-23.md](FAMILY_4B1B2_CHECKPOINT_2026-10-23.md)
+for bounded exact-manifest source cleanup through TRANSFER_COMPLETE. The private
+fallback and source fence remain, membership stays RESERVED and activation is not
+implemented. Earlier phase boundaries below remain historical evidence.
+
 ## 4B1B1 committed execution follow-up (2026-10-23)
 
 See [FAMILY_4B1B1_CHECKPOINT_2026-10-23.md](FAMILY_4B1B1_CHECKPOINT_2026-10-23.md)

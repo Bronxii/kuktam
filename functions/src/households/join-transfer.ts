@@ -10,6 +10,7 @@ import { advanceShoppingEpoch } from '../shopping/mutation-store';
 import { parseRequest } from '../shopping/mutation-contract';
 import { digest, sourceFingerprint } from './join-snapshot';
 import { executeTransfer, transferIntegrityError, transferPageId as pageId, transferSeed as seed } from './join-transfer-execution';
+import { disposeSource } from './join-source-disposition';
 
 const fail=(code:ConstructorParameters<typeof FamilyInviteError>[0]):never=>{throw new FamilyInviteError(code);};
 const post=(op:TransferOperation)=>op.committedAt!==null;
@@ -118,7 +119,7 @@ export class JoinTransferStore {
     if(o.leaseId!==leaseId||!o.leaseUntil||o.leaseUntil.toMillis()<=now.toMillis())return 'BUSY';
     const patch=(v:Record<string,unknown>)=>tx.update(ref,{...v,updatedAt:now});
     // Committed work uses server JOIN authority, never the reserved actor's public
-    // shopping authority. CLEAN_SOURCE and later phases remain parked here.
+    // shopping authority. TRANSFER_COMPLETE stays fenced and awaits 4B2.
     if(post(o)){
       try{
         const c=await this.claims(tx,id,o);
@@ -127,6 +128,7 @@ export class JoinTransferStore {
         if((await this.validation.owner(tx,o.ownerUid)).householdId!==o.householdId)throw new Error('joinOwnershipInvariant');
         for(const uid of [o.actorUid,o.ownerUid])if((await tx.get(this.db.doc(`accountDeletions/${uid}`))).exists)throw new Error('joinOwnershipInvariant');
         if(o.phase==='COMMITTED_TRANSFER')return await executeTransfer(this.db,tx,id,o,now,await tx.get(this.db.doc(`households/${o.householdId}`)));
+        if(o.phase==='CLEAN_SOURCE')return await disposeSource(this.db,tx,id,o,now);
       }catch(e){
         if(transferIntegrityError(e)||e instanceof FamilyInviteError||e instanceof Error&&['joinOwnershipInvariant','joinInviteInvariant','invalidJoinCapacity'].includes(e.message)){
           patch({status:'OPERATOR',nextAt:null,leaseId:null,leaseUntil:null,lastOutcome:'committedInvariantViolation'});return 'OPERATOR';
