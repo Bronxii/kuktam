@@ -139,7 +139,10 @@ export class ShoppingMutationStore {
   /** One read phase, then a payload-ordered working set, then one atomic commit.
    * Only the final state of each target is written, but every child keeps its own
    * sequence/result. No authority or item snapshot survives a transaction attempt. */
-  private async applyAddBlock(tx:Transaction,home:DocumentSnapshot,children:Extract<Child,{type:'ADD'}>[],now:Timestamp):Promise<ChildResult[]>{
+  /** Server transaction primitive. The caller owns fresh transactional authority,
+   * immutable identity and atomic result/progress persistence. Never a client API. */
+  async applyAddBlock(tx:Transaction,home:DocumentSnapshot,children:Extract<Child,{type:'ADD'}>[],now:Timestamp):Promise<ChildResult[]>{
+    if(children.length<1||children.length>MAX_ADD_BLOCK_SIZE)throw new MutationError('INVALID_ARGUMENT');
     const items=home.ref.collection('shoppingItems');
     const key=(c:Extract<Child,{type:'ADD'}>)=>JSON.stringify([c.name,c.unit]);
     const candidates=new Map<string,DocumentSnapshot[]>();

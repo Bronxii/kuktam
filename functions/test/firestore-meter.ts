@@ -1,14 +1,14 @@
 import {Firestore,DocumentReference,Query} from 'firebase-admin/firestore';
 
 export interface Counts {
- documentGets:number; missingDocuments:number; queryCalls:number;
+ documentGets:number; missingDocuments:number; queryCalls:number; aggregateCalls:number;
  queryDocuments:number; emptyQueries:number; maxQueryDocuments:number;
  readCategories:Record<string,number>; queryCategories:Record<string,number>;
  attemptedWrites:number; committedWrites:number; writeCategories:Record<string,number>;
  transactionCalls:number; transactionAttempts:number; transactionRetries:number;
  readOnlyTransactions:number;
 }
-const fresh=():Counts=>({documentGets:0,missingDocuments:0,queryCalls:0,queryDocuments:0,
+const fresh=():Counts=>({documentGets:0,missingDocuments:0,queryCalls:0,aggregateCalls:0,queryDocuments:0,
  emptyQueries:0,maxQueryDocuments:0,readCategories:{},queryCategories:{},attemptedWrites:0,
  committedWrites:0,writeCategories:{},transactionCalls:0,transactionAttempts:0,
  transactionRetries:0,readOnlyTransactions:0});
@@ -50,6 +50,9 @@ export class FirestoreMeter {
  }
  private read(snapshot:any){
   const c=this.active;if(!c)return;
+  // Aggregate RPCs are reported separately; do not pretend their result is one
+  // document read or change the historical R comparison accounting.
+  if(!snapshot.ref&&!Array.isArray(snapshot.docs)&&snapshot.query){c.aggregateCalls++;return;}
   if(Array.isArray(snapshot.docs)){
    c.queryCalls++;c.queryDocuments+=snapshot.size;c.emptyQueries+=Number(snapshot.empty);
    c.maxQueryDocuments=Math.max(c.maxQueryDocuments,snapshot.size);

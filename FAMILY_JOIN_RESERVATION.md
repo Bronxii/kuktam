@@ -1,3 +1,10 @@
+## 4B1B1 committed execution follow-up (2026-10-23)
+
+See [FAMILY_4B1B1_CHECKPOINT_2026-10-23.md](FAMILY_4B1B1_CHECKPOINT_2026-10-23.md)
+for committed snapshot execution through CLEAN_SOURCE. Source items/fence and
+reservation/structural lock remain intact; no cleanup or activation is implemented.
+The earlier 4B1A and Phase4A boundaries below are historical checkpoints.
+
 ## 4B1A implementation follow-up (2026-10-23)
 
 The original Phase4A history below is preserved. See
