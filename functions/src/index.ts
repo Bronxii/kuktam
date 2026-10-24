@@ -1,4 +1,6 @@
 import { JoinTransferStore } from './households/join-transfer';
+import { MemberLeaveStore } from './households/member-leave';
+import { memberLeaveHandler } from './households/member-leave-handler';
 import { joinTransferHandler } from './households/join-transfer-handler';
 import { FamilyJoinStore } from './households/family-join';
 import { ShoppingMutationStore } from './shopping/mutation-store';
@@ -54,6 +56,8 @@ export const prepareFamilyJoinTransfer=onCall(familyOptions,joinTransferHandler(
 export const getFamilyJoinTransferState=onCall(familyOptions,joinTransferHandler(joinTransferStore,'state'));
 export const confirmFamilyJoinDelete=onCall(familyOptions,joinTransferHandler(joinTransferStore,'confirm'));
 export const cancelFamilyJoin=onCall(familyOptions,joinTransferHandler(joinTransferStore,'cancel'));
+export const leaveFamilyShare=onCall(familyOptions,memberLeaveHandler(()=>new MemberLeaveStore(
+  getFirestore(getApps().find(a=>a.name==='[DEFAULT]')??initializeApp()))));
 export const createFamilyInvite=onCall(familyOptions,invites.create);
 export const revokeFamilyInvite=onCall(familyOptions,invites.revoke);
 export const previewFamilyInvite=onCall(familyOptions,invites.preview);

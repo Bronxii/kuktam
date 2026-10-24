@@ -1,3 +1,11 @@
+## Phase 5A member self-leave follow-up (2026-10-24)
+
+See [FAMILY_5A_MEMBER_LEAVE_CHECKPOINT_2026-10-24.md](FAMILY_5A_MEMBER_LEAVE_CHECKPOINT_2026-10-24.md)
+for atomic non-owner self-leave, own private routing, immutable completion evidence
+and unchanged family shopping data. It does not implement owner removal/dissolution,
+Family-aware deletion, re-JOIN admission or UI. Production remains OFF. Earlier
+phase results below remain historical evidence.
+
 ## 4B2 activation follow-up (2026-10-23)
 
 See [FAMILY_4B2_CHECKPOINT_2026-10-23.md](FAMILY_4B2_CHECKPOINT_2026-10-23.md)
