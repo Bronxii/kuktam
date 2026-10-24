@@ -1,3 +1,11 @@
+## Phase 5B owner-remove follow-up (2026-10-24)
+
+See [FAMILY_5B_OWNER_REMOVE_CHECKPOINT_2026-10-24.md](FAMILY_5B_OWNER_REMOVE_CHECKPOINT_2026-10-24.md)
+for owner-authorized atomic member removal using the shared Phase 5A exit primitive.
+Family shopping and historical JOIN evidence are preserved. Phase 5C/6, re-JOIN
+admission, UI and production rollout remain separate. Earlier results below are
+unchanged historical evidence.
+
 ## Phase 5A member self-leave follow-up (2026-10-24)
 
 See [FAMILY_5A_MEMBER_LEAVE_CHECKPOINT_2026-10-24.md](FAMILY_5A_MEMBER_LEAVE_CHECKPOINT_2026-10-24.md)

@@ -11,7 +11,7 @@ import {FamilyCreateStore} from '../src/households/family-create';
 const now=1800000000000;
 test('invite/state exports are CORE GEN2 secret-free, non-enforcing and reject arbitrary lookup',async()=>{
  const root=await import('../src/index');
- for(const name of ['leaveFamilyShare','acceptFamilyInvite','createFamilyInvite','revokeFamilyInvite','previewFamilyInvite','getFamilyShareState'] as const){
+ for(const name of ['removeFamilyMember','leaveFamilyShare','acceptFamilyInvite','createFamilyInvite','revokeFamilyInvite','previewFamilyInvite','getFamilyShareState'] as const){
   const f=root[name],e=(f as any).__endpoint;assert.equal(e.platform,'gcfv2');assert.deepEqual(e.region,['europe-west1']);
   assert.equal(e.serviceAccountEmail.name,cfg.coreIdentityParameter);assert.notEqual(e.callableTrigger.enforceAppCheck,true);
   assert.ok(!e.secretEnvironmentVariables?.length);assert.equal(e.timeoutSeconds,60);assert.equal(e.maxInstances,5);
@@ -78,7 +78,7 @@ test('root discovery has no secret/credential/Admin/network side effects and onl
  const http=require('node:http'),https=require('node:https');const hr=http.request,hs=https.request,fetch=globalThis.fetch;
  http.request=https.request=globalThis.fetch=()=>{throw new Error('NETWORK_FORBIDDEN');};
  try{const root=await import('../src/index');assert.equal(getApps().length,before);
- assert.deepEqual(Object.keys(root).sort(),['leaveFamilyShare','prepareFamilyJoinTransfer','getFamilyJoinTransferState','confirmFamilyJoinDelete','cancelFamilyJoin','ensureShoppingContext','processShoppingMutation','acceptFamilyInvite','createFamilyInvite','revokeFamilyInvite','previewFamilyInvite','getFamilyShareState','createFamilyShare','ensurePrivateHousehold','authUserDeleted','beginAccountDeletion','billingMaintenance','finalizeAccountDeletion','getEntitlementProof','playRtdn','prepareProPurchase','verifyProPurchase'].sort());
+ assert.deepEqual(Object.keys(root).sort(),['removeFamilyMember','leaveFamilyShare','prepareFamilyJoinTransfer','getFamilyJoinTransferState','confirmFamilyJoinDelete','cancelFamilyJoin','ensureShoppingContext','processShoppingMutation','acceptFamilyInvite','createFamilyInvite','revokeFamilyInvite','previewFamilyInvite','getFamilyShareState','createFamilyShare','ensurePrivateHousehold','authUserDeleted','beginAccountDeletion','billingMaintenance','finalizeAccountDeletion','getEntitlementProof','playRtdn','prepareProPurchase','verifyProPurchase'].sort());
  assert.equal((root.prepareProPurchase as any).__endpoint.platform,'gcfv2');
  assert.equal((root.authUserDeleted as any).__endpoint.platform,'gcfv1');
  assert.notEqual((root.prepareProPurchase as any).__endpoint.callableTrigger.enforceAppCheck,true);

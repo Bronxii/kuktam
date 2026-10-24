@@ -15,3 +15,18 @@ export function memberLeaveHandler(factory:()=>MemberLeaveStore){
       throw new HttpsError(code==='INVALID_ARGUMENT'?'invalid-argument':code==='RETRYABLE_UNAVAILABLE'?'unavailable':'failed-precondition',code);}
   };
 }
+
+/** Target UID is a selector, never authority; the store verifies same-family ownership. */
+export function ownerRemoveHandler(factory:()=>MemberLeaveStore){
+  return async(r:{auth?:{uid:string}|null;data:unknown})=>{
+    if(!r.auth)throw new HttpsError('unauthenticated','Authentication required');
+    const d=r.data as Record<string,unknown>;
+    if(!d||typeof d!=='object'||Array.isArray(d)||Object.keys(d).sort().join(',')!=='inviteId,targetUid'||
+      typeof d.inviteId!=='string'||!inviteIdPattern.test(d.inviteId)||typeof d.targetUid!=='string'||
+      !d.targetUid.length||d.targetUid.length>128||d.targetUid.includes('/')||d.targetUid.trim()!==d.targetUid)
+      throw new HttpsError('invalid-argument','INVALID_ARGUMENT');
+    try{return await factory().remove({uid:r.auth.uid},d.targetUid,d.inviteId);}
+    catch(e){const code=e instanceof FamilyLeaveError?e.code:'RETRYABLE_UNAVAILABLE';
+      throw new HttpsError(code==='INVALID_ARGUMENT'?'invalid-argument':code==='RETRYABLE_UNAVAILABLE'?'unavailable':'failed-precondition',code);}
+  };
+}
