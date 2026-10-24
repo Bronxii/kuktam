@@ -1,3 +1,12 @@
+## Phase 5C2A shopping preservation preparation (2026-10-24)
+
+See [FAMILY_5C2A_SHOPPING_PRESERVATION_PREPARATION_CHECKPOINT_2026-10-24.md](FAMILY_5C2A_SHOPPING_PRESERVATION_PREPARATION_CHECKPOINT_2026-10-24.md).
+The dissolution continuation atomically fences Family source and owner-private target,
+creates/verifies bounded exact source pages, then durably commits preservation.
+Normal shopping is intentionally blocked from fence acquisition onward. No merge,
+cleanup, member exit or routing change occurs; the structural lock stays held.
+5C2B execution and Phase 6 remain separate. Earlier evidence below is unchanged.
+
 ## Phase 5C1 dissolution preparation follow-up (2026-10-24)
 
 See [FAMILY_5C1_DISSOLUTION_PREPARATION_CHECKPOINT_2026-10-24.md](FAMILY_5C1_DISSOLUTION_PREPARATION_CHECKPOINT_2026-10-24.md).

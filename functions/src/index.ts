@@ -1,3 +1,5 @@
+import { DissolutionPreservationStore } from './households/dissolution-preservation';
+import { dissolutionPreservationHandler } from './households/dissolution-preservation-handler';
 import { DissolutionPreparationStore } from './households/dissolution-preparation';
 import { dissolutionPreparationHandler } from './households/dissolution-preparation-handler';
 import { JoinTransferStore } from './households/join-transfer';
@@ -58,6 +60,8 @@ export const prepareFamilyJoinTransfer=onCall(familyOptions,joinTransferHandler(
 export const getFamilyJoinTransferState=onCall(familyOptions,joinTransferHandler(joinTransferStore,'state'));
 export const confirmFamilyJoinDelete=onCall(familyOptions,joinTransferHandler(joinTransferStore,'confirm'));
 export const cancelFamilyJoin=onCall(familyOptions,joinTransferHandler(joinTransferStore,'cancel'));
+export const prepareFamilyShoppingPreservation=onCall(familyOptions,dissolutionPreservationHandler(()=>new DissolutionPreservationStore(
+  getFirestore(getApps().find(a=>a.name==='[DEFAULT]')??initializeApp()))));
 export const prepareFamilyDissolution=onCall(familyOptions,dissolutionPreparationHandler(()=>new DissolutionPreparationStore(
   getFirestore(getApps().find(a=>a.name==='[DEFAULT]')??initializeApp()))));
 export const leaveFamilyShare=onCall(familyOptions,memberLeaveHandler(()=>new MemberLeaveStore(
