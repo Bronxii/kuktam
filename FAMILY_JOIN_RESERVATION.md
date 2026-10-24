@@ -1,3 +1,12 @@
+## Phase 5C2B owner preservation merge (2026-10-24)
+
+See [FAMILY_5C2B_OWNER_PRESERVATION_MERGE_CHECKPOINT_2026-10-24.md](FAMILY_5C2B_OWNER_PRESERVATION_MERGE_CHECKPOINT_2026-10-24.md).
+The explicit local continuation reuses S1D ADD blocks and bounded durable child
+receipts to preserve the committed Family snapshot in the owner's private fallback.
+PRESERVATION_MERGE_COMPLETE retains source items, both fences, memberships,
+routing and the structural lock. Source disposition and final dissolution remain
+separate; earlier phase evidence below is unchanged.
+
 ## Phase 5C2A shopping preservation preparation (2026-10-24)
 
 See [FAMILY_5C2A_SHOPPING_PRESERVATION_PREPARATION_CHECKPOINT_2026-10-24.md](FAMILY_5C2A_SHOPPING_PRESERVATION_PREPARATION_CHECKPOINT_2026-10-24.md).

@@ -1,6 +1,6 @@
 import { HttpsError } from 'firebase-functions/v2/https';
 import { DissolutionPreservationStore } from './dissolution-preservation';
-export function dissolutionPreservationHandler(factory:()=>DissolutionPreservationStore){
+export function dissolutionPreservationHandler(factory:()=>Pick<DissolutionPreservationStore,'step'>){
  return async(r:{auth?:{uid:string}|null;data:unknown})=>{
   if(!r.auth)throw new HttpsError('unauthenticated','Authentication required');
   const d=r.data as Record<string,unknown>;

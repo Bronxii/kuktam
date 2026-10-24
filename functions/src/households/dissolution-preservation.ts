@@ -16,7 +16,7 @@ type Add=Extract<Child,{type:'ADD'}>;
 type Fence={householdId:string;operationId:string;epoch:string;at:Timestamp};
 type Cursor={pageIndex:number;count:number;hash:string;lastId:string|null};
 export type Preservation=Omit<DissolutionPreparation,'schemaVersion'|'phase'|'status'|'cursor'>&{
- schemaVersion:2;phase:'SNAPSHOT_SHOPPING'|'VERIFY_SHOPPING'|'PRESERVATION_COMMITTED';status:'READY'|'OPERATOR';
+ schemaVersion:2;phase:'SNAPSHOT_SHOPPING'|'VERIFY_SHOPPING'|'PRESERVATION_COMMITTED'|'PRESERVATION_MERGE_COMPLETE';status:'READY'|'OPERATOR';
  cursor:Cursor|null;sourceFence:Fence;targetFence:Fence;shoppingSnapshot:{version:1;count:number;pages:number;hash:string}|null;
  preservationCommittedAt:Timestamp|null;mergeContract:typeof PRESERVATION_MERGE_CONTRACT;lastOutcome:string|null;
 };
@@ -35,7 +35,7 @@ export function readPreservation(raw:any,id:string):Preservation {
  const o=raw as Preservation;proof(()=>base(o,id));
  const owner=o.participants.find(p=>p.role==='owner')!;
  const fence=(f:any,hid:string)=>exact(f,'at,epoch,householdId,operationId')&&f.householdId===hid&&f.operationId===id&&typeof f.epoch==='string'&&epochPattern.test(f.epoch)&&f.at instanceof Timestamp;
- if(o.schemaVersion!==2||!['SNAPSHOT_SHOPPING','VERIFY_SHOPPING','PRESERVATION_COMMITTED'].includes(o.phase)||!['READY','OPERATOR'].includes(o.status)||
+ if(o.schemaVersion!==2||!['SNAPSHOT_SHOPPING','VERIFY_SHOPPING','PRESERVATION_COMMITTED','PRESERVATION_MERGE_COMPLETE'].includes(o.phase)||!['READY','OPERATOR'].includes(o.status)||
   !fence(o.sourceFence,o.householdId)||!fence(o.targetFence,owner.privateHouseholdId)||o.sourceFence.epoch===o.targetFence.epoch||!o.sourceFence.at.isEqual(o.targetFence.at)||
   !(o.updatedAt instanceof Timestamp)||o.mergeContract!==PRESERVATION_MERGE_CONTRACT||!(o.lastOutcome===null||typeof o.lastOutcome==='string')||
   !(o.preservationCommittedAt===null||o.preservationCommittedAt instanceof Timestamp)||
@@ -43,7 +43,7 @@ export function readPreservation(raw:any,id:string):Preservation {
   !(o.cursor===null||exact(o.cursor,'count,hash,lastId,pageIndex')&&nonnegative(o.cursor.pageIndex)&&nonnegative(o.cursor.count)&&hashValue(o.cursor.hash)&&(o.cursor.lastId===null||typeof o.cursor.lastId==='string'&&o.cursor.lastId.length>0&&!o.cursor.lastId.includes('/'))))invalid();
  if(o.phase==='SNAPSHOT_SHOPPING'&&(!o.cursor||o.shoppingSnapshot!==null||o.preservationCommittedAt!==null)||
    o.phase==='VERIFY_SHOPPING'&&(!o.cursor||!o.shoppingSnapshot||o.preservationCommittedAt!==null)||
-   o.phase==='PRESERVATION_COMMITTED'&&(o.cursor!==null||!o.shoppingSnapshot||!o.preservationCommittedAt))invalid();
+   ['PRESERVATION_COMMITTED','PRESERVATION_MERGE_COMPLETE'].includes(o.phase)&&(o.cursor!==null||!o.shoppingSnapshot||!o.preservationCommittedAt))invalid();
  if(o.cursor&&(o.cursor.count>o.cursor.pageIndex*10||o.cursor.pageIndex!==Math.ceil(o.cursor.count/10)||(o.cursor.count===0)!==(o.cursor.lastId===null)))invalid();
  return o;
 }
@@ -65,7 +65,7 @@ export function readPreservationPage(raw:any,o:Preservation,n:number,previousHas
 /** One bounded transaction per call. No timer, no merge, no automatic 5C2B dispatch. */
 export class DissolutionPreservationStore {
  constructor(private readonly db:Firestore,private readonly clock=Timestamp.now){}
- private async validate(tx:Transaction,id:string,o:DissolutionPreparation|Preservation){
+ async validate(tx:Transaction,id:string,o:DissolutionPreparation|Preservation){
   const fenced=o.schemaVersion===2,p=fenced?o as Preservation:null;
   const capDoc=await tx.get(this.db.doc(`familyJoinCapacity/${o.householdId}`)),cap=proof(()=>readJoinCapacity(capDoc.data()));
   if(cap.schemaVersion!==3||cap.structuralOperationId!==id)invalid();
@@ -79,7 +79,7 @@ export class DissolutionPreservationStore {
    const u=participant.uid,r=reverse.get(u),m=members.docs.find(d=>d.id===u),user=await tx.get(this.db.doc(`users/${u}`));
    if(!r||r.value.state!=='ACTIVE'||r.value.role!==participant.role||!r.doc.updateTime!.isEqual(participant.reverseUpdateTime)||!m||m.get('role')!==participant.role||!m.updateTime!.isEqual(participant.memberUpdateTime)||user.get('activeHouseholdId')!==o.householdId||user.get('familyHouseholdId')!==o.householdId||user.get('privateHouseholdId')!==participant.privateHouseholdId||user.get('shoppingMigrationVersion')!==1)invalid();
    // After the point of no return lifecycle changes never reopen/abort the fences.
-   if(!p||p.phase!=='PRESERVATION_COMMITTED'){
+   if(!p||!['PRESERVATION_COMMITTED','PRESERVATION_MERGE_COMPLETE'].includes(p.phase)){
     const account=await tx.get(this.db.doc(`accountLifecycle/${u}`)),deletion=await tx.get(this.db.doc(`accountDeletions/${u}`));
     if(!account.exists||proof(()=>readAccount(account.data())).state!=='ACTIVE'||deletion.exists)invalid();
    }
@@ -116,7 +116,7 @@ export class DissolutionPreservationStore {
      next.cursor={pageIndex:0,count:0,hash:preservationSeed(id,next),lastId:null};readPreservation(next,id);
      tx.update(c.source.ref,{operationId:id,...sourceEpoch});tx.update(c.target.ref,{operationId:id,...targetEpoch});tx.set(ref,next);return next.phase;
     }
-    if(o.phase==='PRESERVATION_COMMITTED')return o.phase;
+    if(['PRESERVATION_COMMITTED','PRESERVATION_MERGE_COMPLETE'].includes(o.phase))return o.phase;
     const cursor=o.cursor!,n=cursor.pageIndex,seed=preservationSeed(id,o),pages=ref.collection('shoppingPreservation');
     if(n===0&&(cursor.count!==0||cursor.hash!==seed||cursor.lastId!==null))invalid();
     // Prior immutable page ties the durable cursor to its committed append.
