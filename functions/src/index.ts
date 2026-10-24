@@ -1,3 +1,5 @@
+import { DissolutionPreparationStore } from './households/dissolution-preparation';
+import { dissolutionPreparationHandler } from './households/dissolution-preparation-handler';
 import { JoinTransferStore } from './households/join-transfer';
 import { MemberLeaveStore } from './households/member-leave';
 import { memberLeaveHandler, ownerRemoveHandler } from './households/member-leave-handler';
@@ -56,6 +58,8 @@ export const prepareFamilyJoinTransfer=onCall(familyOptions,joinTransferHandler(
 export const getFamilyJoinTransferState=onCall(familyOptions,joinTransferHandler(joinTransferStore,'state'));
 export const confirmFamilyJoinDelete=onCall(familyOptions,joinTransferHandler(joinTransferStore,'confirm'));
 export const cancelFamilyJoin=onCall(familyOptions,joinTransferHandler(joinTransferStore,'cancel'));
+export const prepareFamilyDissolution=onCall(familyOptions,dissolutionPreparationHandler(()=>new DissolutionPreparationStore(
+  getFirestore(getApps().find(a=>a.name==='[DEFAULT]')??initializeApp()))));
 export const leaveFamilyShare=onCall(familyOptions,memberLeaveHandler(()=>new MemberLeaveStore(
   getFirestore(getApps().find(a=>a.name==='[DEFAULT]')??initializeApp()))));
 export const removeFamilyMember=onCall(familyOptions,ownerRemoveHandler(()=>new MemberLeaveStore(

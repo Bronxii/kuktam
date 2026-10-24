@@ -1,5 +1,5 @@
 import { readTransfer } from './join-transfer-contract';
-import { readJoinCapacity } from './join-capacity';
+import { readJoinCapacity, dissolutionLocked } from './join-capacity';
 import { createHash } from 'node:crypto';
 import { Firestore, Timestamp, Transaction } from 'firebase-admin/firestore';
 import { AuthContext, authenticatedUid } from '../billing/account-binding';
@@ -93,6 +93,7 @@ export class FamilyJoinStore {
       const p=await this.standalone(tx,uid),members=await this.family(tx,invite.createdByUid,invite.householdId);
       if(members.some(m=>m.memberId===uid))fail('ALREADY_MEMBER');
       const capRef=this.db.doc(`familyJoinCapacity/${invite.householdId}`),cap=await tx.get(capRef),capState=readJoinCapacity(cap.data()),ids=capState.operationIds;
+      if(dissolutionLocked(capState))fail('IN_PROGRESS');
       if(ids.includes(id))fail('INVITE_STATE_UNAVAILABLE');
       if(members.length+ids.length>=8)fail('FAMILY_FULL');
       const count=await tx.get(this.db.collection(`households/${p}/shoppingItems`).count());
@@ -118,6 +119,7 @@ export class FamilyJoinStore {
       const indexRef=this.db.doc(`familyMemberships/${op.actorUid}`),index=await tx.get(indexRef);
       const invRef=this.db.doc(`familyInvites/${op.inviteId}`),invDoc=await tx.get(invRef);
       const capRef=this.db.doc(`familyJoinCapacity/${op.householdId}`),cap=await tx.get(capRef),capState=readJoinCapacity(cap.data()),ids=capState.operationIds;
+      if(dissolutionLocked(capState))return 'IN_PROGRESS';
       const slotsRef=this.db.doc(`familyInviteSlots/${op.householdId}`),slots=await tx.get(slotsRef);
       const slotIds=slots.exists?readInviteSlots(slots.data()):[];
       const member=await tx.get(this.db.doc(`households/${op.householdId}/members/${op.actorUid}`));

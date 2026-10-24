@@ -2,7 +2,7 @@ import { FieldPath, Firestore, Timestamp, Transaction } from 'firebase-admin/fir
 import { authenticatedUid, AuthContext } from '../billing/account-binding';
 import { FamilyJoinStore, joinOperationId, localJoinRuntime, readJoinOperation } from './family-join';
 import { TransferOperation, readTransfer, hashValue } from './join-transfer-contract';
-import { readJoinCapacity } from './join-capacity';
+import { readJoinCapacity, dissolutionLocked } from './join-capacity';
 import { FamilyInviteStore } from './family-invites';
 import { FamilyInviteError, readInvite, readInviteSlots } from './invite-contract';
 import { hasPro } from './family-create';
@@ -27,6 +27,8 @@ export class JoinTransferStore {
     await this.db.runTransaction(async tx=>{
       const ref=this.db.doc(`familyOperations/${id}`),doc=await tx.get(ref),o=readJoinOperation(doc.data(),id);
       if(o.inviteId!==inviteId)fail('NOT_FOUND');
+      const capacity=readJoinCapacity((await tx.get(this.db.doc(`familyJoinCapacity/${o.householdId}`))).data());
+      if(dissolutionLocked(capacity))fail('IN_PROGRESS');
       if(o.schemaVersion===2)return;
       if(o.status!=='READY'||o.phase!=='READY_FOR_TRANSFER')fail('IN_PROGRESS');
       const gate=await tx.get(this.db.doc('familyRuntime/config'));if(gate.get('joinReservationEnabled')!==true)fail('FEATURE_DISABLED');
@@ -110,6 +112,7 @@ export class JoinTransferStore {
       if(post(o))return o.phase;
       if(o.status!=='READY'||o.phase!=='SOURCE_FENCED_WAITING_CONFIRMATION')fail('IN_PROGRESS');
       const c=await this.claims(tx,id,o);
+      if(dissolutionLocked(c.capacity))return 'IN_PROGRESS';
       try{await this.eligible(tx,o,c);}catch(e){if(e instanceof FamilyInviteError)return this.abort(tx,id,o,c,e.code);throw e;}
       return this.commit(tx,id,o,c,true);
     });
@@ -164,6 +167,7 @@ export class JoinTransferStore {
     try{c=await this.claims(tx,id,o);}catch(e){
       if(e instanceof Error&&['joinOwnershipInvariant','joinInviteInvariant','invalidJoinCapacity'].includes(e.message)){patch({status:'OPERATOR',nextAt:null,leaseId:null,leaseUntil:null,lastOutcome:'invariantViolation'});return 'OPERATOR';}throw e;
     }
+    if(dissolutionLocked(c.capacity))return 'IN_PROGRESS';
     try{await this.eligible(tx,o,c);}catch(e){if(e instanceof FamilyInviteError)return this.abort(tx,id,o,c,e.code);throw e;}
     if(o.phase==='READY_FOR_TRANSFER'){
       const epoch=advanceShoppingEpoch(now);tx.update(c.source.ref,{operationId:id,...epoch});

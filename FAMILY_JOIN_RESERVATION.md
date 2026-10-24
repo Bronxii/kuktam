@@ -1,3 +1,10 @@
+## Phase 5C1 dissolution preparation follow-up (2026-10-24)
+
+See [FAMILY_5C1_DISSOLUTION_PREPARATION_CHECKPOINT_2026-10-24.md](FAMILY_5C1_DISSOLUTION_PREPARATION_CHECKPOINT_2026-10-24.md).
+Owner preparation atomically stores a bounded participant snapshot and the v3
+structural guard. No shopping transfer, member exit or household dissolution.
+Normal Family shopping stays available; Phase 5C2 and Phase 6 are separate.
+
 ## Phase 5B owner-remove follow-up (2026-10-24)
 
 See [FAMILY_5B_OWNER_REMOVE_CHECKPOINT_2026-10-24.md](FAMILY_5B_OWNER_REMOVE_CHECKPOINT_2026-10-24.md)

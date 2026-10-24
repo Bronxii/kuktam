@@ -27,3 +27,11 @@ test('backend consent boundary rejects unauthenticated requests and arbitrary ro
   await assert.rejects(h({data:{}}),(e:any)=>e.code==='unauthenticated');
   await assert.rejects(h({auth:{uid:'u'},data:{operationId:'x',inviteId:'y',actorUid:'victim'}}),(e:any)=>e.code==='invalid-argument');
 });
+
+test('capacity v3 dissolution is separate from reserved seats; old JOIN locks stay strict',()=>{
+ const id='dissolve_'+'a'.repeat(64),join='join_'+'b'.repeat(64);
+ assert.equal(readJoinCapacity({schemaVersion:3,operationIds:[join],structuralOperationId:id}).structuralOperationId,id);
+ for(const structuralOperationId of [null,join,'bad'])assert.throws(()=>readJoinCapacity({schemaVersion:3,operationIds:[join],structuralOperationId}));
+ assert.throws(()=>readJoinCapacity({schemaVersion:2,operationIds:[],structuralOperationId:id}));
+ assert.throws(()=>readJoinCapacity({schemaVersion:3,operationIds:[id],structuralOperationId:id}));
+});
