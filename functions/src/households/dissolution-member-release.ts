@@ -1,4 +1,4 @@
-import {Firestore,Timestamp} from 'firebase-admin/firestore';
+import {Firestore,Timestamp,Transaction} from 'firebase-admin/firestore';
 import {authenticatedUid,AuthContext} from '../billing/account-binding';
 import {readAccount} from '../accounts/account-lifecycle';
 import {MutationError,epochPattern,revision} from '../shopping/mutation-contract';
@@ -21,18 +21,9 @@ const append=(h:string,r:any)=>digest(JSON.stringify([h,r.releaseId,r.uid,r.hous
  * The immutable participant set remains the only authority for release. */
 export class DissolutionMemberReleaseStore {
  constructor(private readonly db:Firestore,private readonly clock=Timestamp.now){}
- async step(auth:AuthContext,householdId:string){
-  const uid=authenticatedUid(auth);
-  if(typeof householdId!=='string'||!/^[A-Za-z0-9_-]{1,128}$/.test(householdId))throw new Error('INVALID_ARGUMENT');
-  if(process.env.K_SERVICE||process.env.FUNCTION_NAME||process.env.GCLOUD_PROJECT!=='demo-kuktam-local'||!/^(127\.0\.0\.1|localhost):[0-9]{1,5}$/.test(process.env.FIRESTORE_EMULATOR_HOST??''))throw new Error('FEATURE_DISABLED');
-  const id=dissolutionId(uid,householdId),ref=this.db.doc(`familyOperations/${id}`),state=ref.collection('participantRelease').doc('state'),journal=ref.collection('participantReleaseJournal');
-  return this.db.runTransaction(async tx=>{
-   const raw=(await tx.get(ref)).data();
-   if(!raw||raw.kind!=='FAMILY_DISSOLUTION'||raw.actorUid!==uid||raw.householdId!==householdId)throw new Error('NOT_FOUND');
-   if(raw.status==='OPERATOR')return 'OPERATOR';
-   if(!['PRESERVATION_SOURCE_CLEANED','RELEASING_NON_OWNERS','NON_OWNER_RELEASE_COMPLETE'].includes(raw.phase))throw new Error('INVALID_ARGUMENT');
-   try{
-    const o=readPreservation(raw,id),participants=o.participants.filter(p=>p.role==='member'),stored=await tx.get(state),records=await tx.get(journal.limit(8));
+ async validate(tx:Transaction,id:string,o:Preservation){
+  const ref=this.db.doc(`familyOperations/${id}`),state=ref.collection('participantRelease').doc('state'),journal=ref.collection('participantReleaseJournal');
+    const participants=o.participants.filter(p=>p.role==='member'),stored=await tx.get(state),records=await tx.get(journal.limit(8));
     const progress=stored.exists?stored.data()!:{version:1,snapshotHash:o.snapshotHash,cursor:0,hash:seed(o)};
     if(!exact(progress,'cursor,hash,snapshotHash,version')||progress.version!==1||progress.snapshotHash!==o.snapshotHash||!Number.isSafeInteger(progress.cursor)||progress.cursor<0||progress.cursor>participants.length||records.size!==progress.cursor||!stored.exists&&o.phase!=='PRESERVATION_SOURCE_CLEANED'||o.phase==='PRESERVATION_SOURCE_CLEANED'&&progress.cursor!==0)invalid();
     let chain=seed(o);const released=new Set<string>();
@@ -56,6 +47,21 @@ export class DissolutionMemberReleaseStore {
     const homes=await new DissolutionPreservationStore(this.db,this.clock).validate(tx,id,o,released);
     const merge=readMergeProgress((await tx.get(ref.collection('preservationMerge').doc('state'))).data(),o),clean=readCleanupState((await tx.get(ref.collection('preservationSourceCleanup').doc('state'))).data(),o),snapshot=o.shoppingSnapshot!;
     if(merge.stage!=='COMPLETE'||merge.count!==snapshot.count||merge.pageIndex!==snapshot.pages||merge.sourceHash!==snapshot.hash||merge.receiptHash!==merge.finalReceiptHash||snapshot.count&&revision(homes.target.get('shoppingRevision'))!==merge.sequence||clean.stage!=='COMPLETE'||clean.pageIndex!==snapshot.pages||clean.count!==snapshot.count||clean.sourceHash!==snapshot.hash||clean.mergeHash!==merge.receiptHash||clean.cleanupHash!==clean.finalCleanupHash||(await tx.get(homes.source.ref.collection('shoppingItems').limit(1))).size)invalid();
+    return {progress,participants,homes,stored};
+ }
+ async step(auth:AuthContext,householdId:string){
+  const uid=authenticatedUid(auth);
+  if(typeof householdId!=='string'||!/^[A-Za-z0-9_-]{1,128}$/.test(householdId))throw new Error('INVALID_ARGUMENT');
+  if(process.env.K_SERVICE||process.env.FUNCTION_NAME||process.env.GCLOUD_PROJECT!=='demo-kuktam-local'||!/^(127\.0\.0\.1|localhost):[0-9]{1,5}$/.test(process.env.FIRESTORE_EMULATOR_HOST??''))throw new Error('FEATURE_DISABLED');
+  const id=dissolutionId(uid,householdId),ref=this.db.doc(`familyOperations/${id}`),state=ref.collection('participantRelease').doc('state'),journal=ref.collection('participantReleaseJournal');
+  return this.db.runTransaction(async tx=>{
+   const raw=(await tx.get(ref)).data();
+   if(!raw||raw.kind!=='FAMILY_DISSOLUTION'||raw.actorUid!==uid||raw.householdId!==householdId)throw new Error('NOT_FOUND');
+   if(raw.status==='OPERATOR')return 'OPERATOR';
+   if(!['PRESERVATION_SOURCE_CLEANED','RELEASING_NON_OWNERS','NON_OWNER_RELEASE_COMPLETE'].includes(raw.phase))throw new Error('INVALID_ARGUMENT');
+   try{
+    const o=readPreservation(raw,id),{progress,participants,homes,stored}=await this.validate(tx,id,o);
+    const chain=progress.hash;
     if(o.phase==='NON_OWNER_RELEASE_COMPLETE'){if(progress.cursor!==participants.length)invalid();return o.phase;}
     const now=this.clock();
     if(progress.cursor===participants.length){

@@ -16,7 +16,7 @@ type Add=Extract<Child,{type:'ADD'}>;
 type Fence={householdId:string;operationId:string;epoch:string;at:Timestamp};
 type Cursor={pageIndex:number;count:number;hash:string;lastId:string|null};
 export type Preservation=Omit<DissolutionPreparation,'schemaVersion'|'phase'|'status'|'cursor'>&{
- schemaVersion:2;phase:'SNAPSHOT_SHOPPING'|'VERIFY_SHOPPING'|'PRESERVATION_COMMITTED'|'PRESERVATION_MERGE_COMPLETE'|'PRESERVATION_SOURCE_CLEANED'|'RELEASING_NON_OWNERS'|'NON_OWNER_RELEASE_COMPLETE';status:'READY'|'OPERATOR';
+ schemaVersion:2;phase:'SNAPSHOT_SHOPPING'|'VERIFY_SHOPPING'|'PRESERVATION_COMMITTED'|'PRESERVATION_MERGE_COMPLETE'|'PRESERVATION_SOURCE_CLEANED'|'RELEASING_NON_OWNERS'|'NON_OWNER_RELEASE_COMPLETE'|'DONE';status:'READY'|'OPERATOR'|'DONE';
  cursor:Cursor|null;sourceFence:Fence;targetFence:Fence;shoppingSnapshot:{version:1;count:number;pages:number;hash:string}|null;
  preservationCommittedAt:Timestamp|null;mergeContract:typeof PRESERVATION_MERGE_CONTRACT;lastOutcome:string|null;
 };
@@ -35,7 +35,7 @@ export function readPreservation(raw:any,id:string):Preservation {
  const o=raw as Preservation;proof(()=>base(o,id));
  const owner=o.participants.find(p=>p.role==='owner')!;
  const fence=(f:any,hid:string)=>exact(f,'at,epoch,householdId,operationId')&&f.householdId===hid&&f.operationId===id&&typeof f.epoch==='string'&&epochPattern.test(f.epoch)&&f.at instanceof Timestamp;
- if(o.schemaVersion!==2||!['SNAPSHOT_SHOPPING','VERIFY_SHOPPING','PRESERVATION_COMMITTED','PRESERVATION_MERGE_COMPLETE','PRESERVATION_SOURCE_CLEANED','RELEASING_NON_OWNERS','NON_OWNER_RELEASE_COMPLETE'].includes(o.phase)||!['READY','OPERATOR'].includes(o.status)||
+ if(o.schemaVersion!==2||!['SNAPSHOT_SHOPPING','VERIFY_SHOPPING','PRESERVATION_COMMITTED','PRESERVATION_MERGE_COMPLETE','PRESERVATION_SOURCE_CLEANED','RELEASING_NON_OWNERS','NON_OWNER_RELEASE_COMPLETE','DONE'].includes(o.phase)||!['READY','OPERATOR','DONE'].includes(o.status)||o.status==='DONE'&&o.phase!=='DONE'||o.phase==='DONE'&&!['DONE','OPERATOR'].includes(o.status)||
   !fence(o.sourceFence,o.householdId)||!fence(o.targetFence,owner.privateHouseholdId)||o.sourceFence.epoch===o.targetFence.epoch||!o.sourceFence.at.isEqual(o.targetFence.at)||
   !(o.updatedAt instanceof Timestamp)||o.mergeContract!==PRESERVATION_MERGE_CONTRACT||!(o.lastOutcome===null||typeof o.lastOutcome==='string')||
   !(o.preservationCommittedAt===null||o.preservationCommittedAt instanceof Timestamp)||
@@ -43,7 +43,7 @@ export function readPreservation(raw:any,id:string):Preservation {
   !(o.cursor===null||exact(o.cursor,'count,hash,lastId,pageIndex')&&nonnegative(o.cursor.pageIndex)&&nonnegative(o.cursor.count)&&hashValue(o.cursor.hash)&&(o.cursor.lastId===null||typeof o.cursor.lastId==='string'&&o.cursor.lastId.length>0&&!o.cursor.lastId.includes('/'))))invalid();
  if(o.phase==='SNAPSHOT_SHOPPING'&&(!o.cursor||o.shoppingSnapshot!==null||o.preservationCommittedAt!==null)||
    o.phase==='VERIFY_SHOPPING'&&(!o.cursor||!o.shoppingSnapshot||o.preservationCommittedAt!==null)||
-   ['PRESERVATION_COMMITTED','PRESERVATION_MERGE_COMPLETE','PRESERVATION_SOURCE_CLEANED','RELEASING_NON_OWNERS','NON_OWNER_RELEASE_COMPLETE'].includes(o.phase)&&(o.cursor!==null||!o.shoppingSnapshot||!o.preservationCommittedAt))invalid();
+   ['PRESERVATION_COMMITTED','PRESERVATION_MERGE_COMPLETE','PRESERVATION_SOURCE_CLEANED','RELEASING_NON_OWNERS','NON_OWNER_RELEASE_COMPLETE','DONE'].includes(o.phase)&&(o.cursor!==null||!o.shoppingSnapshot||!o.preservationCommittedAt))invalid();
  if(o.cursor&&(o.cursor.count>o.cursor.pageIndex*10||o.cursor.pageIndex!==Math.ceil(o.cursor.count/10)||(o.cursor.count===0)!==(o.cursor.lastId===null)))invalid();
  return o;
 }
@@ -80,7 +80,7 @@ export class DissolutionPreservationStore {
    const u=participant.uid,r=reverse.get(u),m=members.docs.find(d=>d.id===u),user=await tx.get(this.db.doc(`users/${u}`));
    if(!r||r.value.state!=='ACTIVE'||r.value.role!==participant.role||!r.doc.updateTime!.isEqual(participant.reverseUpdateTime)||!m||m.get('role')!==participant.role||!m.updateTime!.isEqual(participant.memberUpdateTime)||user.get('activeHouseholdId')!==o.householdId||user.get('familyHouseholdId')!==o.householdId||user.get('privateHouseholdId')!==participant.privateHouseholdId||user.get('shoppingMigrationVersion')!==1)invalid();
    // After the point of no return lifecycle changes never reopen/abort the fences.
-   if(!p||!['PRESERVATION_COMMITTED','PRESERVATION_MERGE_COMPLETE','PRESERVATION_SOURCE_CLEANED','RELEASING_NON_OWNERS','NON_OWNER_RELEASE_COMPLETE'].includes(p.phase)){
+   if(!p||!['PRESERVATION_COMMITTED','PRESERVATION_MERGE_COMPLETE','PRESERVATION_SOURCE_CLEANED','RELEASING_NON_OWNERS','NON_OWNER_RELEASE_COMPLETE','DONE'].includes(p.phase)){
     const account=await tx.get(this.db.doc(`accountLifecycle/${u}`)),deletion=await tx.get(this.db.doc(`accountDeletions/${u}`));
     if(!account.exists||proof(()=>readAccount(account.data())).state!=='ACTIVE'||deletion.exists)invalid();
    }
@@ -111,7 +111,7 @@ export class DissolutionPreservationStore {
     const o=raw.schemaVersion===1?proof(()=>readDissolutionPreparation(raw,id)):readPreservation(raw,id);
     // Later participant exits deliberately change the immutable snapshot's live
     // topology. Earlier preparation must never revalidate it as still ACTIVE.
-    if(['RELEASING_NON_OWNERS','NON_OWNER_RELEASE_COMPLETE'].includes(o.phase))return o.phase;
+    if(['RELEASING_NON_OWNERS','NON_OWNER_RELEASE_COMPLETE','DONE'].includes(o.phase))return o.phase;
     const c=await this.validate(tx,id,o),now=this.clock();
     if(o.schemaVersion===1){
      if((await tx.get(ref.collection('shoppingPreservation').limit(1))).size)invalid();
@@ -120,7 +120,7 @@ export class DissolutionPreservationStore {
      next.cursor={pageIndex:0,count:0,hash:preservationSeed(id,next),lastId:null};readPreservation(next,id);
      tx.update(c.source.ref,{operationId:id,...sourceEpoch});tx.update(c.target.ref,{operationId:id,...targetEpoch});tx.set(ref,next);return next.phase;
     }
-    if(['PRESERVATION_COMMITTED','PRESERVATION_MERGE_COMPLETE','PRESERVATION_SOURCE_CLEANED','RELEASING_NON_OWNERS','NON_OWNER_RELEASE_COMPLETE'].includes(o.phase))return o.phase;
+    if(['PRESERVATION_COMMITTED','PRESERVATION_MERGE_COMPLETE','PRESERVATION_SOURCE_CLEANED','RELEASING_NON_OWNERS','NON_OWNER_RELEASE_COMPLETE','DONE'].includes(o.phase))return o.phase;
     const cursor=o.cursor!,n=cursor.pageIndex,seed=preservationSeed(id,o),pages=ref.collection('shoppingPreservation');
     if(n===0&&(cursor.count!==0||cursor.hash!==seed||cursor.lastId!==null))invalid();
     // Prior immutable page ties the durable cursor to its committed append.

@@ -1,3 +1,13 @@
+## Phase 5C4B owner release and dissolution finalization
+
+See [FAMILY_5C4B_DISSOLUTION_FINALIZATION_CHECKPOINT_2026-10-25.md](FAMILY_5C4B_DISSOLUTION_FINALIZATION_CHECKPOINT_2026-10-25.md).
+Local acceptance: 41 PASS / 0 FAIL / 0 SKIP; Phase 5C and Phase 5 COMPLETE locally.
+Atomic finalization returns the owner to preserved private shopping, aborts pending
+reservations, revokes usable invites and marks the Family DISSOLVED / operation DONE.
+Fence epochs and structural-lock release commit together. Former-owner account
+deletion remains admission-guarded pending Phase 6 historical Family-root policy.
+Earlier checkpoint history below is unchanged.
+
 ## Phase 5C4A non-owner participant release
 
 See [FAMILY_5C4A_NON_OWNER_RELEASE_CHECKPOINT_2026-10-25.md](FAMILY_5C4A_NON_OWNER_RELEASE_CHECKPOINT_2026-10-25.md).

@@ -36,4 +36,8 @@ export async function assertNoCommittedJoin(db:Firestore,tx:Transaction,uid:stri
 export async function assertNoActiveFamilyDeletion(db:Firestore,tx:Transaction,uid:string){
   const index=await tx.get(db.doc(`familyMemberships/${uid}`));
   if(index.get('state')==='ACTIVE')throw new Error('FAMILY_LIFECYCLE_NOT_READY');
+  // Private deletion still cannot safely process preserved Family audit roots.
+  // Keep admission closed for former owners until the separate Phase 6 policy.
+  const retired=await tx.get(db.collection('households').where('ownerUid','==',uid).where('kind','==','family').where('state','==','DISSOLVED').limit(1));
+  if(!retired.empty)throw new Error('FAMILY_LIFECYCLE_NOT_READY');
 }

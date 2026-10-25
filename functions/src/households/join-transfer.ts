@@ -75,15 +75,25 @@ export class JoinTransferStore {
     if((await this.validation.members(tx,home)).length+c.capacity.operationIds.length>8)fail('FAMILY_FULL');
     if(c.invite.expiresAt.toMillis()<=this.clock().toMillis())fail('EXPIRED');
   }
-  private abort(tx:Transaction,id:string,o:TransferOperation,c:Awaited<ReturnType<JoinTransferStore['claims']>>,reason:string){
+  private abort(tx:Transaction,id:string,o:TransferOperation,c:Awaited<ReturnType<JoinTransferStore['claims']>>,reason:string,writeInventory=true){
     if(post(o))return 'IN_PROGRESS';
     if(c.capacity.structuralOperationId===id)throw new Error('uncommittedStructuralLock');
     if(o.sourceFence)tx.update(c.source.ref,{operationId:null,...advanceShoppingEpoch(this.clock())});
-    tx.delete(c.index.ref);tx.set(c.cap.ref,{...c.capacity,operationIds:c.capacity.operationIds.filter(x=>x!==id)});
+    tx.delete(c.index.ref);if(writeInventory)tx.set(c.cap.ref,{...c.capacity,operationIds:c.capacity.operationIds.filter(x=>x!==id)});
     tx.update(c.inv.ref,{status:'REVOKED',operationId:null});
-    tx.set(c.slots.ref,{schemaVersion:1,inviteIds:c.slotIds.filter(x=>x!==o.inviteId)});
+    if(writeInventory)tx.set(c.slots.ref,{schemaVersion:1,inviteIds:c.slotIds.filter(x=>x!==o.inviteId)});
     tx.update(this.db.doc(`familyOperations/${id}`),{status:'ABORTED',nextAt:null,leaseId:null,leaseUntil:null,lastOutcome:reason,updatedAt:this.clock()});
     return 'ABORTED';
+  }
+  /** Read phase for one bounded dissolution-owned abort. The caller atomically
+   * finalizes the shared capacity/invite inventories after preparing ALL claims. */
+  async prepareDissolutionAbort(tx:Transaction,id:string,dissolutionId:string){
+    const base=readJoinOperation((await tx.get(this.db.doc(`familyOperations/${id}`))).data(),id);
+    const o:TransferOperation=base.schemaVersion===2?base as TransferOperation:{...base,schemaVersion:2,committedAt:null,sourceFence:null,snapshot:null,cursor:null,deleteConsent:null};
+    if(o.status!=='READY'||post(o)||o.committedAt!==null)throw new Error('joinOwnershipInvariant');
+    const c=await this.claims(tx,id,o);
+    if(c.capacity.structuralOperationId!==dissolutionId||!dissolutionLocked(c.capacity)||c.user.get('activeHouseholdId')!==o.sourceHouseholdId||c.user.get('familyHouseholdId')!==null||c.user.get('privateHouseholdId')!==o.sourceHouseholdId)throw new Error('joinOwnershipInvariant');
+    return {operation:o,commit:()=>this.abort(tx,id,o,c,'familyDissolved',false)};
   }
   async cancel(context:AuthContext,id:string,inviteId:string){this.local();this.identity(context,id,inviteId);return this.db.runTransaction(tx=>this.cancelTransaction(tx,id,inviteId,authenticatedUid(context)));}
   async cancelTransaction(tx:Transaction,id:string,inviteId:string,uid:string){
