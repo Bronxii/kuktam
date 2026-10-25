@@ -1,4 +1,5 @@
 import { DissolutionSourceDispositionStore } from './households/dissolution-source-disposition';
+import { DissolutionMemberReleaseStore } from './households/dissolution-member-release';
 import { DissolutionMergeStore } from './households/dissolution-merge';
 import { DissolutionPreservationStore } from './households/dissolution-preservation';
 import { dissolutionPreservationHandler } from './households/dissolution-preservation-handler';
@@ -63,6 +64,8 @@ export const getFamilyJoinTransferState=onCall(familyOptions,joinTransferHandler
 export const confirmFamilyJoinDelete=onCall(familyOptions,joinTransferHandler(joinTransferStore,'confirm'));
 export const cancelFamilyJoin=onCall(familyOptions,joinTransferHandler(joinTransferStore,'cancel'));
 export const cleanFamilyShoppingSource=onCall(familyOptions,dissolutionPreservationHandler(()=>new DissolutionSourceDispositionStore(
+  getFirestore(getApps().find(a=>a.name==='[DEFAULT]')??initializeApp()))));
+export const releaseDissolutionMembers=onCall(familyOptions,dissolutionPreservationHandler(()=>new DissolutionMemberReleaseStore(
   getFirestore(getApps().find(a=>a.name==='[DEFAULT]')??initializeApp()))));
 export const mergeFamilyShoppingPreservation=onCall(familyOptions,dissolutionPreservationHandler(()=>new DissolutionMergeStore(
   getFirestore(getApps().find(a=>a.name==='[DEFAULT]')??initializeApp()))));

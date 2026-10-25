@@ -15,7 +15,7 @@ const nat=(v:any)=>Number.isSafeInteger(v)&&v>=0;
 const seed=(o:Preservation,mergeHash:string)=>digest(JSON.stringify(['source-disposition-v1',preservationSeed(o.structuralOperationId,o),o.shoppingSnapshot!.hash,mergeHash]));
 const append=(h:string,r:any)=>digest(JSON.stringify([h,r.cleanupId,r.transferId,r.sourceId,r.code]));
 type State={version:1;stage:'CHECK'|'DELETE'|'VERIFY'|'COMPLETE';pageIndex:number;count:number;lastId:string|null;sourceHash:string;mergeHash:string;cleanupHash:string;finalCleanupHash:string|null};
-function readState(raw:any,o:Preservation):State {
+export function readState(raw:any,o:Preservation):State {
  const s=o.shoppingSnapshot!;
  if(!exact(raw,'cleanupHash,count,finalCleanupHash,lastId,mergeHash,pageIndex,sourceHash,stage,version')||raw.version!==1||!['CHECK','DELETE','VERIFY','COMPLETE'].includes(raw.stage)||!nat(raw.pageIndex)||raw.pageIndex>s.pages||raw.count!==Math.min(raw.pageIndex*SOURCE_CLEANUP_BLOCK_SIZE,s.count)||!hash(raw.sourceHash)||!hash(raw.mergeHash)||!hash(raw.cleanupHash)||!(raw.lastId===null||typeof raw.lastId==='string'&&raw.lastId.length>0&&!raw.lastId.includes('/'))||
   (raw.pageIndex===0)!==(raw.lastId===null)||(['CHECK','DELETE'].includes(raw.stage)?raw.finalCleanupHash!==null:!hash(raw.finalCleanupHash)))invalid();

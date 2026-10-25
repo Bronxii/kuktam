@@ -1,3 +1,11 @@
+## Phase 5C4A non-owner participant release
+
+See [FAMILY_5C4A_NON_OWNER_RELEASE_CHECKPOINT_2026-10-25.md](FAMILY_5C4A_NON_OWNER_RELEASE_CHECKPOINT_2026-10-25.md).
+The committed dissolution releases only immutable snapshotted non-owner members,
+using the shared 5A/5B exit writes with atomic per-participant evidence.
+Owner, both shopping fences and structural ownership remain held for 5C4B.
+Earlier checkpoint history below is unchanged.
+
 ## Phase 5C3 Family source disposition
 
 See [FAMILY_5C3_SOURCE_DISPOSITION_CHECKPOINT_2026-10-25.md](FAMILY_5C3_SOURCE_DISPOSITION_CHECKPOINT_2026-10-25.md).

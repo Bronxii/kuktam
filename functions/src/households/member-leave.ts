@@ -1,5 +1,5 @@
 import { createHash } from 'node:crypto';
-import { Firestore, Timestamp } from 'firebase-admin/firestore';
+import { Firestore, Timestamp, Transaction, DocumentReference } from 'firebase-admin/firestore';
 import { authenticatedUid, AuthContext } from '../billing/account-binding';
 import { readAccount } from '../accounts/account-lifecycle';
 import { advanceShoppingEpoch } from '../shopping/mutation-store';
@@ -17,6 +17,16 @@ const fail=(code:LeaveCode):never=>{throw new FamilyLeaveError(code);};
 export const memberLeaveId=(uid:string,inviteId:string)=>'leave_'+createHash('sha256').update(JSON.stringify([uid,inviteId])).digest('hex');
 export const ownerRemoveId=(ownerUid:string,targetUid:string,inviteId:string)=>'remove_'+createHash('sha256').update(JSON.stringify([ownerUid,targetUid,inviteId])).digest('hex');
 const proof=<T>(read:()=>T):T=>{try{return read();}catch{return fail('INTEGRITY_REQUIRES_OPERATOR');}};
+
+/** Trusted commit primitive: callers must finish admission/identity reads first.
+ * Active capacity is the membership set, not a separately decremented counter. */
+export function commitMemberExit(tx:Transaction,refs:{member:DocumentReference;index:DocumentReference;user:DocumentReference;fallback:DocumentReference},now:Timestamp){
+  const epoch=advanceShoppingEpoch(now);
+  tx.delete(refs.member);tx.delete(refs.index);
+  tx.update(refs.user,{activeHouseholdId:refs.fallback.id,familyHouseholdId:null});
+  tx.update(refs.fallback,epoch);
+  return epoch;
+}
 
 /** One atomic operation, no worker/lease workflow. Immutable DONE evidence is
  * tied to the JOIN incarnation, so an old retry can never leave a new membership.
@@ -103,9 +113,7 @@ export class MemberLeaveStore {
       // Reads of the shared capacity guard and membership query serialize against
       // JOIN admission/commit. No externally visible leave lock/lease is necessary
       // for this single commit; no foreign reservation or lock is rewritten.
-      tx.delete(member.ref);tx.delete(index.ref);
-      tx.update(user.ref,{activeHouseholdId:p,familyHouseholdId:null});
-      tx.update(source.ref,advanceShoppingEpoch(now));
+      commitMemberExit(tx,{member:member.ref,index:index.ref,user:user.ref,fallback:source.ref},now);
       tx.create(ref,{schemaVersion:1,kind,actorUid,...(removal?{targetUid:uid}:{}),householdId:hid,privateHouseholdId:p,
         joinOperationId:joinId,inviteId,phase:'PRIVATE',status:'DONE',createdAt:now,updatedAt:now,
         nextAt:null,leaseId:null,leaseUntil:null});
