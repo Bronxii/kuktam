@@ -1,3 +1,13 @@
+## Phase 6A owner Pro-loss lifecycle
+
+See [FAMILY_6A_OWNER_PRO_LOSS_CHECKPOINT_2026-10-25.md](FAMILY_6A_OWNER_PRO_LOSS_CHECKPOINT_2026-10-25.md).
+Local acceptance: 38 PASS / 0 FAIL / 0 SKIP (20 new lifecycle + 18 targeted regression).
+Current authoritative grants admit one durable OWNER_PRO_LOSS intent and the
+existing Phase 5 dissolution. Committed JOIN completes first; fresh topology is
+then snapshotted. Stale events cannot initiate dissolution after Pro restoration.
+The original local-only Family gate and all account-deletion guards remain.
+6B/6C, production rollout and UI are not started by this milestone.
+
 ## Phase 5C4B owner release and dissolution finalization
 
 See [FAMILY_5C4B_DISSOLUTION_FINALIZATION_CHECKPOINT_2026-10-25.md](FAMILY_5C4B_DISSOLUTION_FINALIZATION_CHECKPOINT_2026-10-25.md).

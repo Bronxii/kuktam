@@ -1,3 +1,4 @@
+import {OwnerProLossStore,familyLifecycleEnabled} from './households/owner-pro-loss';
 import { DissolutionFinalizationStore } from './households/dissolution-finalization';
 import { DissolutionSourceDispositionStore } from './households/dissolution-source-disposition';
 import { DissolutionMemberReleaseStore } from './households/dissolution-member-release';
@@ -12,7 +13,7 @@ import { memberLeaveHandler, ownerRemoveHandler } from './households/member-leav
 import { joinTransferHandler } from './households/join-transfer-handler';
 import { FamilyJoinStore } from './households/family-join';
 import { ShoppingMutationStore } from './shopping/mutation-store';
-import { onDocumentCreated } from 'firebase-functions/v2/firestore';
+import { onDocumentCreated, onDocumentWritten } from 'firebase-functions/v2/firestore';
 import { acceptFamilyHandler } from './households/join-handler';
 import { getApps, initializeApp } from 'firebase-admin/app';
 import { getFirestore } from 'firebase-admin/firestore';
@@ -44,6 +45,15 @@ const invites=familyInviteHandlers(()=>{
 });
 const familyOptions={region:config.region,serviceAccount:coreIdentity,timeoutSeconds:60,maxInstances:5,enforceAppCheck:false};
 const shoppingStore=()=>new ShoppingMutationStore(getFirestore(getApps().find(a=>a.name==='[DEFAULT]')??initializeApp()));
+const ownerProLossStore=()=>new OwnerProLossStore(getFirestore(getApps().find(a=>a.name==='[DEFAULT]')??initializeApp()));
+export const familyOwnerEntitlementChanged=onDocumentWritten({document:'users/{uid}/entitlementGrants/{grantId}',region:config.region,serviceAccount:coreIdentity,timeoutSeconds:60,maxInstances:5,retry:true},async event=>{
+  if(!familyLifecycleEnabled())return;
+  await ownerProLossStore().observe(event.params.uid);
+});
+export const familyOwnerProLossMaintenance=onSchedule({region:config.region,serviceAccount:coreIdentity,schedule:'every 1 minutes',timeoutSeconds:540,maxInstances:1},async()=>{
+  if(!familyLifecycleEnabled())return;
+  await ownerProLossStore().sweep();
+});
 export const ensureShoppingContext=onCall(familyOptions,async request=>{
   if(!request.auth)throw new HttpsError('unauthenticated','Authentication required');
   if(!request.data||typeof request.data!=='object'||Array.isArray(request.data)||Object.keys(request.data).length)throw new HttpsError('invalid-argument','Empty request required');

@@ -7,6 +7,7 @@ import { readFamilyMembership } from './household-contract';
 import { privateHouseholdId } from './household-store';
 import { readJoinCapacity } from './join-capacity';
 import { readJoinOperation } from './family-join';
+import { hasPro } from './family-create';
 
 export type PreparationCode='INVALID_ARGUMENT'|'FEATURE_DISABLED'|'NOT_OWNER'|'WRONG_FAMILY'|'ACCOUNT_UNAVAILABLE'|'IN_PROGRESS'|'INTEGRITY_REQUIRES_OPERATOR';
 export class DissolutionPreparationError extends Error {constructor(readonly code:PreparationCode){super(code);}}
@@ -50,7 +51,10 @@ export function readDissolutionPreparation(raw:unknown,id:string):DissolutionPre
 export class DissolutionPreparationStore {
   private readonly validation:FamilyInviteStore;
   constructor(private readonly db:Firestore,private readonly clock=Timestamp.now){this.validation=new FamilyInviteStore(db,{resolve:async()=>{throw new Error('notRequired');}},clock);}
-  async prepare(context:AuthContext,householdId:string){
+  async prepare(context:AuthContext,householdId:string){return (await this.prepareInternal(context,householdId,false))!;}
+  /** Trusted worker admission; entitlement is checked inside the topology transaction. */
+  prepareForProLoss(ownerUid:string,householdId:string){return this.prepareInternal({uid:ownerUid},householdId,true);}
+  private async prepareInternal(context:AuthContext,householdId:string,proLoss:boolean){
     const ownerUid=authenticatedUid(context);
     if(!hid(householdId))fail('INVALID_ARGUMENT');
     if(process.env.K_SERVICE||process.env.FUNCTION_NAME||process.env.GCLOUD_PROJECT!=='demo-kuktam-local'||!/^(127\.0\.0\.1|localhost):[0-9]{1,5}$/.test(process.env.FIRESTORE_EMULATOR_HOST??''))fail('FEATURE_DISABLED');
@@ -64,6 +68,12 @@ export class DissolutionPreparationStore {
         const o=proof(()=>readDissolutionPreparation(existing.data(),id));
         if(cap.schemaVersion!==3||cap.structuralOperationId!==id||!o.householdCreatedAt.isEqual(home.get('createdAt')))fail('INTEGRITY_REQUIRES_OPERATOR');
         return {schemaVersion:1,operationId:id,phase:o.phase,status:o.status,participantCount:o.participantCount,snapshotHash:o.snapshotHash};
+      }
+      const intentRef=this.db.doc(`familyProLoss/${id}`);
+      if(proLoss){
+        const intent=await tx.get(intentRef);
+        if(intent.get('ownerUid')!==ownerUid||intent.get('householdId')!==householdId||intent.get('reason')!=='OWNER_PRO_LOSS'||intent.get('status')!=='PENDING')fail('INTEGRITY_REQUIRES_OPERATOR');
+        if(await hasPro(this.db,tx,ownerUid,this.clock()))return null;
       }
       if(cap.structuralOperationId)fail('IN_PROGRESS');
       const members=await this.validation.members(tx,family);
@@ -99,7 +109,12 @@ export class DissolutionPreparationStore {
       const operation:DissolutionPreparation={schemaVersion:1,kind:'FAMILY_DISSOLUTION',actorUid:ownerUid,ownerUid,householdId,householdCreatedAt:home.get('createdAt'),structuralOperationId:id,
         phase:'PREPARED',status:'READY',createdAt:now,updatedAt:now,nextAt:null,leaseId:null,leaseUntil:null,cursor:null,participantCount:participants.length,participants,snapshotHash:participantHash(participants),reservedJoinOperationIds:sort([...cap.operationIds]),inviteIds:sort([...inviteIds])};
       proof(()=>readDissolutionPreparation(operation,id));
-      tx.create(ref,operation);tx.set(capRef,{schemaVersion:3,operationIds:cap.operationIds,structuralOperationId:id});
+      tx.create(ref,operation);
+      if(proLoss){
+        tx.create(ref.collection('lifecycleAdmission').doc('state'),{version:1,reason:'OWNER_PRO_LOSS',ownerUid,householdId,intentId:id,checkedAt:now,entitled:false});
+        tx.update(intentRef,{status:'IN_PROGRESS',operationId:id,updatedAt:now});
+      }
+      tx.set(capRef,{schemaVersion:3,operationIds:cap.operationIds,structuralOperationId:id});
       return {schemaVersion:1,operationId:id,phase:operation.phase,status:operation.status,participantCount:operation.participantCount,snapshotHash:operation.snapshotHash};
     });}catch(e){if(e instanceof FamilyInviteError)fail(e.code==='NOT_OWNER'?'NOT_OWNER':e.code==='ACCOUNT_UNAVAILABLE'?'ACCOUNT_UNAVAILABLE':'INTEGRITY_REQUIRES_OPERATOR');throw e;}
   }
