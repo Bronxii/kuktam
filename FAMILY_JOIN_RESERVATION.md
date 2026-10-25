@@ -1,3 +1,12 @@
+## Phase 5C3 Family source disposition
+
+See [FAMILY_5C3_SOURCE_DISPOSITION_CHECKPOINT_2026-10-25.md](FAMILY_5C3_SOURCE_DISPOSITION_CHECKPOINT_2026-10-25.md).
+The bounded local continuation deletes only exact, durably preserved Family
+snapshot items, with atomic per-child cleanup evidence. SOURCE_CLEANED retains
+both fences, memberships, routing and structural ownership. The owner-private
+merge result stays unchanged. Participant release/final dissolution remain separate.
+Earlier phase evidence below is unchanged.
+
 ## Phase 5C2B owner preservation merge (2026-10-24)
 
 See [FAMILY_5C2B_OWNER_PRESERVATION_MERGE_CHECKPOINT_2026-10-24.md](FAMILY_5C2B_OWNER_PRESERVATION_MERGE_CHECKPOINT_2026-10-24.md).

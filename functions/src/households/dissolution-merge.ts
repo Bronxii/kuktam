@@ -10,17 +10,17 @@ const fail=():never=>{throw new Error('preservationMergeIntegrity');};
 const exact=(v:any,keys:string)=>v&&typeof v==='object'&&!Array.isArray(v)&&Object.keys(v).sort().join(',')===keys;
 const nat=(v:any)=>Number.isSafeInteger(v)&&v>=0;
 const hash=(v:any)=>typeof v==='string'&&/^[a-f0-9]{64}$/.test(v);
-const receiptSeed=(o:Preservation)=>digest(JSON.stringify(['preservation-merge-v1',preservationSeed(o.structuralOperationId,o),o.shoppingSnapshot!.version,o.shoppingSnapshot!.count,o.shoppingSnapshot!.pages,o.shoppingSnapshot!.hash]));
+export const receiptSeed=(o:Preservation)=>digest(JSON.stringify(['preservation-merge-v1',preservationSeed(o.structuralOperationId,o),o.shoppingSnapshot!.version,o.shoppingSnapshot!.count,o.shoppingSnapshot!.pages,o.shoppingSnapshot!.hash]));
 const append=(h:string,r:any)=>digest(JSON.stringify([h,r.transferId,r.childIndex,r.code,r.itemId,r.revision,r.created,r.epoch]));
 type Progress={version:1;stage:'APPLY'|'VERIFY'|'COMPLETE';pageIndex:number;offset:number;count:number;sourceHash:string;lastId:string|null;receiptHash:string;finalReceiptHash:string|null;sequence:number;baseSequence:number;blocks:number};
-function progress(raw:any,o:Preservation):Progress {
+export function progress(raw:any,o:Preservation):Progress {
  if(!exact(raw,'baseSequence,blocks,count,finalReceiptHash,lastId,offset,pageIndex,receiptHash,sequence,sourceHash,stage,version')||raw.version!==1||!['APPLY','VERIFY','COMPLETE'].includes(raw.stage)||
   !['pageIndex','offset','count','sequence','baseSequence','blocks'].every(k=>nat(raw[k]))||raw.offset>=10||raw.pageIndex>o.shoppingSnapshot!.pages||raw.count>o.shoppingSnapshot!.count||raw.count!==raw.pageIndex*10+raw.offset&&raw.count!==o.shoppingSnapshot!.count||
   raw.sequence<raw.baseSequence||!hash(raw.sourceHash)||!hash(raw.receiptHash)||!(raw.lastId===null||typeof raw.lastId==='string'&&raw.lastId.length>0&&!raw.lastId.includes('/'))||!(raw.finalReceiptHash===null||hash(raw.finalReceiptHash))||
   raw.stage==='APPLY'&&(raw.finalReceiptHash!==null||raw.sequence!==raw.baseSequence+raw.count)||raw.stage!=='APPLY'&&(raw.offset!==0||!hash(raw.finalReceiptHash)||raw.sequence!==raw.baseSequence+o.shoppingSnapshot!.count))fail();
  return raw;
 }
-function journal(raw:any,o:Preservation,n:number,entries:any[],priorHash:string,base:number){
+export function journal(raw:any,o:Preservation,n:number,entries:any[],priorHash:string,base:number){
  if(!exact(raw,'hash,pageId,pageIndex,previousHash,results,version')||raw.version!==1||raw.previousHash!==priorHash||!hash(priorHash)||raw.pageIndex!==n||raw.pageId!==preservationPageId(o,n)||!Array.isArray(raw.results)||raw.results.length>entries.length)fail();
  let h=priorHash;
  for(let i=0;i<raw.results.length;i++){
@@ -41,7 +41,7 @@ export class DissolutionMergeStore {
    const raw=(await tx.get(ref)).data();if(!raw||raw.actorUid!==uid||raw.householdId!==householdId||raw.kind!=='FAMILY_DISSOLUTION')throw new Error('NOT_FOUND');
    if(raw.status==='OPERATOR')return 'OPERATOR';
    // A premature call must not park a valid 5C2A operation.
-   if(!['PRESERVATION_COMMITTED','PRESERVATION_MERGE_COMPLETE'].includes(raw.phase))throw new Error('INVALID_ARGUMENT');
+   if(!['PRESERVATION_COMMITTED','PRESERVATION_MERGE_COMPLETE','PRESERVATION_SOURCE_CLEANED'].includes(raw.phase))throw new Error('INVALID_ARGUMENT');
    try{
     const o=readPreservation(raw,id),homes=await new DissolutionPreservationStore(this.db,this.clock).validate(tx,id,o),now=this.clock(),stored=await tx.get(state),seed=receiptSeed(o),sourceSeed=preservationSeed(id,o),snapshot=o.shoppingSnapshot!;
     if(!stored.exists){
@@ -54,7 +54,7 @@ export class DissolutionMergeStore {
     }
     const p=progress(stored.data(),o);
     if(snapshot.count&&revision(homes.target.get('shoppingRevision'))!==p.sequence)fail();
-    if(o.phase==='PRESERVATION_MERGE_COMPLETE'){
+    if(['PRESERVATION_MERGE_COMPLETE','PRESERVATION_SOURCE_CLEANED'].includes(o.phase)){
      if(p.stage!=='COMPLETE'||p.count!==snapshot.count||p.pageIndex!==snapshot.pages||p.sourceHash!==snapshot.hash||p.receiptHash!==p.finalReceiptHash)fail();return o.phase;
     }
     if(p.stage==='COMPLETE')fail();
