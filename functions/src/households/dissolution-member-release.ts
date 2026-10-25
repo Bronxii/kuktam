@@ -17,13 +17,8 @@ export const participantReleaseId=(o:Preservation,p:Participant)=>digest(JSON.st
 const seed=(o:Preservation)=>digest(JSON.stringify(['dissolution-release-progress-v1',o.structuralOperationId,o.snapshotHash]));
 const append=(h:string,r:any)=>digest(JSON.stringify([h,r.releaseId,r.uid,r.householdId,r.privateHouseholdId,r.epoch,r.completedAt.seconds,r.completedAt.nanoseconds,r.result]));
 
-/** Local explicit continuation. At most one member exits per atomic transaction.
- * The immutable participant set remains the only authority for release. */
-export class DissolutionMemberReleaseStore {
- constructor(private readonly db:Firestore,private readonly clock=Timestamp.now){}
- async validate(tx:Transaction,id:string,o:Preservation){
-  const ref=this.db.doc(`familyOperations/${id}`),state=ref.collection('participantRelease').doc('state'),journal=ref.collection('participantReleaseJournal');
-    const participants=o.participants.filter(p=>p.role==='member'),stored=await tx.get(state),records=await tx.get(journal.limit(8));
+export function readParticipantReleaseProgress(o:Preservation,stored:{exists:boolean;data():any},records:{size:number;docs:readonly {id:string;data():any}[]}){
+ const participants=o.participants.filter(p=>p.role==='member');
     const progress=stored.exists?stored.data()!:{version:1,snapshotHash:o.snapshotHash,cursor:0,hash:seed(o)};
     if(!exact(progress,'cursor,hash,snapshotHash,version')||progress.version!==1||progress.snapshotHash!==o.snapshotHash||!Number.isSafeInteger(progress.cursor)||progress.cursor<0||progress.cursor>participants.length||records.size!==progress.cursor||!stored.exists&&o.phase!=='PRESERVATION_SOURCE_CLEANED'||o.phase==='PRESERVATION_SOURCE_CLEANED'&&progress.cursor!==0)invalid();
     let chain=seed(o);const released=new Set<string>();
@@ -31,6 +26,20 @@ export class DissolutionMemberReleaseStore {
      const p=participants[i]!,rid=participantReleaseId(o,p),record=records.docs.find(d=>d.id===rid),r=record?.data();
      if(!exact(r,'completedAt,epoch,householdId,privateHouseholdId,releaseId,result,snapshotHash,uid,version')||r!.version!==1||r!.snapshotHash!==o.snapshotHash||r!.releaseId!==rid||r!.uid!==p.uid||r!.householdId!==o.householdId||r!.privateHouseholdId!==p.privateHouseholdId||r!.result!=='PRIVATE'||typeof r!.epoch!=='string'||!epochPattern.test(r!.epoch)||!(r!.completedAt instanceof Timestamp))invalid();
      chain=append(chain,r);released.add(p.uid);
+    }
+    if(chain!==progress.hash)invalid();
+    return {progress,participants,released};
+}
+
+/** Local explicit continuation. At most one member exits per atomic transaction.
+ * The immutable participant set remains the only authority for release. */
+export class DissolutionMemberReleaseStore {
+ constructor(private readonly db:Firestore,private readonly clock=Timestamp.now){}
+ async validate(tx:Transaction,id:string,o:Preservation){
+  const ref=this.db.doc(`familyOperations/${id}`),state=ref.collection('participantRelease').doc('state'),journal=ref.collection('participantReleaseJournal');
+    const participants=o.participants.filter(p=>p.role==='member'),stored=await tx.get(state),records=await tx.get(journal.limit(8));
+    const {progress,released}=readParticipantReleaseProgress(o,stored,records);
+    for(const p of participants.filter(p=>released.has(p.uid))){
      // Completed receipts are historical evidence. Fresh private writes/epoch
      // refresh and private-account deletion must not stall later participants.
      const user=await tx.get(this.db.doc(`users/${p.uid}`)),deletion=await tx.get(this.db.doc(`accountDeletions/${p.uid}`)),index=await tx.get(this.db.doc(`familyMemberships/${p.uid}`));
@@ -43,7 +52,6 @@ export class DissolutionMemberReleaseStore {
       try{validatePrivateRoot(home.data()!,p.uid);}catch{invalid();}
      }
     }
-    if(chain!==progress.hash)invalid();
     const homes=await new DissolutionPreservationStore(this.db,this.clock).validate(tx,id,o,released);
     const merge=readMergeProgress((await tx.get(ref.collection('preservationMerge').doc('state'))).data(),o),clean=readCleanupState((await tx.get(ref.collection('preservationSourceCleanup').doc('state'))).data(),o),snapshot=o.shoppingSnapshot!;
     if(merge.stage!=='COMPLETE'||merge.count!==snapshot.count||merge.pageIndex!==snapshot.pages||merge.sourceHash!==snapshot.hash||merge.receiptHash!==merge.finalReceiptHash||snapshot.count&&revision(homes.target.get('shoppingRevision'))!==merge.sequence||clean.stage!=='COMPLETE'||clean.pageIndex!==snapshot.pages||clean.count!==snapshot.count||clean.sourceHash!==snapshot.hash||clean.mergeHash!==merge.receiptHash||clean.cleanupHash!==clean.finalCleanupHash||(await tx.get(homes.source.ref.collection('shoppingItems').limit(1))).size)invalid();

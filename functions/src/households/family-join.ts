@@ -70,6 +70,7 @@ export class FamilyJoinStore {
     return this.db.runTransaction(async tx=>{
       const gate=await tx.get(this.db.doc('familyRuntime/config'));
       if(gate.get('joinReservationEnabled')!==true)fail('FEATURE_DISABLED');
+      if((await tx.get(this.db.doc(`familyMemberDeletions/${uid}`))).exists)fail('ACCOUNT_UNAVAILABLE');
       const opRef=this.db.doc(`familyOperations/${id}`),old=await tx.get(opRef);
       const indexRef=this.db.doc(`familyMemberships/${uid}`),index=await tx.get(indexRef);
       const inviteRef=this.db.doc(`familyInvites/${inviteId}`),doc=await tx.get(inviteRef);

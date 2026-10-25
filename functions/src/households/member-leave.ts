@@ -18,6 +18,18 @@ export const memberLeaveId=(uid:string,inviteId:string)=>'leave_'+createHash('sh
 export const ownerRemoveId=(ownerUid:string,targetUid:string,inviteId:string)=>'remove_'+createHash('sha256').update(JSON.stringify([ownerUid,targetUid,inviteId])).digest('hex');
 const proof=<T>(read:()=>T):T=>{try{return read();}catch{return fail('INTEGRITY_REQUIRES_OPERATOR');}};
 
+export function readMemberExitCompletion(v:any,actorUid:string,uid:string,inviteId:string,removal:boolean){
+ const kind=removal?'OWNER_REMOVE_MEMBER':'MEMBER_LEAVE',joinId=joinOperationId(uid),p=privateHouseholdId(uid);
+  const keys='actorUid,createdAt,householdId,inviteId,joinOperationId,kind,leaseId,leaseUntil,nextAt,phase,privateHouseholdId,schemaVersion,status,updatedAt'.split(',');
+  if(removal)keys.push('targetUid');
+  if(Object.keys(v).sort().join(',')!==keys.sort().join(',')||(removal&&v.targetUid!==uid)||
+    v.schemaVersion!==1||v.kind!==kind||v.actorUid!==actorUid||v.inviteId!==inviteId||v.joinOperationId!==joinId||v.privateHouseholdId!==p||
+    typeof v.householdId!=='string'||! /^[A-Za-z0-9_-]{1,128}$/.test(v.householdId)||v.householdId===p||
+    v.phase!=='PRIVATE'||v.status!=='DONE'||v.nextAt!==null||v.leaseId!==null||v.leaseUntil!==null||
+    !(v.createdAt instanceof Timestamp)||!(v.updatedAt instanceof Timestamp)||!v.createdAt.isEqual(v.updatedAt))fail('INTEGRITY_REQUIRES_OPERATOR');
+ return v;
+}
+
 /** Trusted commit primitive: callers must finish admission/identity reads first.
  * Active capacity is the membership set, not a separately decremented counter. */
 export function commitMemberExit(tx:Transaction,refs:{member:DocumentReference;index:DocumentReference;user:DocumentReference;fallback:DocumentReference},now:Timestamp){
@@ -46,7 +58,9 @@ export class MemberLeaveStore {
     if(actorUid===targetUid)fail('OWNER_CANNOT_REMOVE_SELF');
     return this.exit(actorUid,targetUid,inviteId,true);
   }
-  private async exit(actorUid:string,uid:string,inviteId:string,removal:boolean){
+  /** Same exit identity as self-leave; deletion intent supplies durable consent. */
+  leaveForAccountDeletion(uid:string,inviteId:string){authenticatedUid({uid});return this.exit(uid,uid,inviteId,false,true);}
+  private async exit(actorUid:string,uid:string,inviteId:string,removal:boolean,deletion=false){
     if(typeof inviteId!=='string'||!inviteIdPattern.test(inviteId))fail('INVALID_ARGUMENT');
     if(process.env.K_SERVICE||process.env.FUNCTION_NAME||process.env.GCLOUD_PROJECT!=='demo-kuktam-local'||
       !/^(127\.0\.0\.1|localhost):[0-9]{1,5}$/.test(process.env.FIRESTORE_EMULATOR_HOST??''))fail('FEATURE_DISABLED');
@@ -56,16 +70,12 @@ export class MemberLeaveStore {
       const ref=this.db.doc(`familyOperations/${id}`),receipt=await tx.get(ref);
       if(receipt.exists){
         const v=receipt.data()!;
-        const keys='actorUid,createdAt,householdId,inviteId,joinOperationId,kind,leaseId,leaseUntil,nextAt,phase,privateHouseholdId,schemaVersion,status,updatedAt'.split(',');
-        if(removal)keys.push('targetUid');
-        if(Object.keys(v).sort().join(',')!==keys.sort().join(',')||(removal&&v.targetUid!==uid)||
-          v.schemaVersion!==1||v.kind!==kind||v.actorUid!==actorUid||v.inviteId!==inviteId||v.joinOperationId!==joinId||v.privateHouseholdId!==p||
-          typeof v.householdId!=='string'||! /^[A-Za-z0-9_-]{1,128}$/.test(v.householdId)||v.householdId===p||
-          v.phase!=='PRIVATE'||v.status!=='DONE'||v.nextAt!==null||v.leaseId!==null||v.leaseUntil!==null||
-          !(v.createdAt instanceof Timestamp)||!(v.updatedAt instanceof Timestamp)||!v.createdAt.isEqual(v.updatedAt))fail('INTEGRITY_REQUIRES_OPERATOR');
+        readMemberExitCompletion(v,actorUid,uid,inviteId,removal);
         // Historical completion, not a claim about current membership/routing.
         return {schemaVersion:1,operationId:id,outcome:'DONE' as const};
       }
+      const deletionIntent=deletion?await tx.get(this.db.doc(`familyMemberDeletions/${uid}`)):null;
+      if(deletion&&(deletionIntent?.get('uid')!==uid||deletionIntent.get('reason')!=='ACCOUNT_DELETION_MEMBER_EXIT'||deletionIntent.get('phase')!=='WAITING_EXIT'||deletionIntent.get('inviteId')!==inviteId))fail('INTEGRITY_REQUIRES_OPERATOR');
       // Owner authorization is fresh on each attempt; historical receipts above
       // return only the authenticated original actor's completed result.
       let callerFamily:string|undefined;
@@ -76,6 +86,7 @@ export class MemberLeaveStore {
       }
       const account=await tx.get(this.db.doc(`accountLifecycle/${uid}`));
       if(!account.exists||proof(()=>readAccount(account.data())).state!=='ACTIVE')fail('ACCOUNT_UNAVAILABLE');
+      if(deletion&&account.get('generation')!==deletionIntent!.get('accountGeneration'))fail('INTEGRITY_REQUIRES_OPERATOR');
       if((await tx.get(this.db.doc(`accountDeletions/${uid}`))).exists)fail('ACCOUNT_UNAVAILABLE');
       const index=await tx.get(this.db.doc(`familyMemberships/${uid}`));
       if(!index.exists)fail('NOT_ACTIVE_MEMBER');
@@ -83,6 +94,7 @@ export class MemberLeaveStore {
       if(binding.role==='owner')fail('OWNER_CANNOT_LEAVE');
       if(binding.state!=='ACTIVE')fail('IN_PROGRESS');
       const user=await tx.get(this.db.doc(`users/${uid}`)),hid=binding.householdId;
+      if(deletion&&(hid!==deletionIntent!.get('householdId')||!index.updateTime!.isEqual(deletionIntent!.get('membershipUpdateTime'))))fail('INTEGRITY_REQUIRES_OPERATOR');
       if(removal&&callerFamily!==hid)fail('WRONG_FAMILY');
       if(user.get('activeHouseholdId')!==hid||user.get('familyHouseholdId')!==hid||user.get('privateHouseholdId')!==p||user.get('shoppingMigrationVersion')!==1||hid===p)fail('INTEGRITY_REQUIRES_OPERATOR');
       const cap=await tx.get(this.db.doc(`familyJoinCapacity/${hid}`)),capacity=proof(()=>readJoinCapacity(cap.data()));
@@ -117,6 +129,7 @@ export class MemberLeaveStore {
       tx.create(ref,{schemaVersion:1,kind,actorUid,...(removal?{targetUid:uid}:{}),householdId:hid,privateHouseholdId:p,
         joinOperationId:joinId,inviteId,phase:'PRIVATE',status:'DONE',createdAt:now,updatedAt:now,
         nextAt:null,leaseId:null,leaseUntil:null});
+      if(deletion)tx.update(deletionIntent!.ref,{phase:'EXIT_COMPLETE',exitEvidence:ref.path,updatedAt:now});
       return {schemaVersion:1,operationId:id,outcome:'DONE' as const};
     });
   }

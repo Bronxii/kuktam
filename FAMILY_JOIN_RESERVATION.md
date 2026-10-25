@@ -1,3 +1,13 @@
+## Phase 6B1 ACTIVE non-owner account deletion
+
+See [FAMILY_6B1_MEMBER_ACCOUNT_DELETION_CHECKPOINT_2026-10-25.md](FAMILY_6B1_MEMBER_ACCOUNT_DELETION_CHECKPOINT_2026-10-25.md).
+Local acceptance: 50 PASS / 0 FAIL / 0 SKIP (24 new + 26 affected regressions).
+The existing recent-auth deletion entry admits a durable member-exit intent,
+reuses Phase 5A/5B or dissolution evidence, then hands off to the original private
+deletion engine. No DELETING/Auth action before proven Family exit.
+New JOIN/CREATE is blocked during the handoff gap. Owner and historical-owner
+protections remain for 6B2/6C; no production rollout or UI changes.
+
 ## Phase 6A owner Pro-loss lifecycle
 
 See [FAMILY_6A_OWNER_PRO_LOSS_CHECKPOINT_2026-10-25.md](FAMILY_6A_OWNER_PRO_LOSS_CHECKPOINT_2026-10-25.md).

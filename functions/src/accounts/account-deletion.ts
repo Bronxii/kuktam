@@ -1,3 +1,5 @@
+import {MemberAccountDeletionStore} from '../households/member-account-deletion';
+import {familyLifecycleEnabled} from '../households/owner-pro-loss';
 import { Firestore, Timestamp } from 'firebase-admin/firestore';
 import { LifecycleStore } from '../billing/lifecycle-store';
 import { AuthContext, authenticatedUid } from '../billing/account-binding';
@@ -5,9 +7,9 @@ import { AuthUserDeletionApi, DeletionOutcome, DeletionPolicy, defaultDeletionPo
 import { bounded } from '../jobs/maintenance-policy';
 /** Bounded account and billing cleanup; no Play refund/revoke/consume calls. */
 export class AccountDeletionService {
- constructor(db:Firestore,private readonly auth:AuthUserDeletionApi,
- clock:()=>Timestamp=Timestamp.now,private readonly store=new LifecycleStore(db,clock),private readonly policy:DeletionPolicy=defaultDeletionPolicy){validateDeletionPolicy(policy);}
- beginAccountDeletion(context:AuthContext){return this.store.beginDeletion(authenticatedUid(context));}
+ constructor(private readonly db:Firestore,private readonly auth:AuthUserDeletionApi,
+ private readonly clock:()=>Timestamp=Timestamp.now,private readonly store=new LifecycleStore(db,clock),private readonly policy:DeletionPolicy=defaultDeletionPolicy){validateDeletionPolicy(policy);}
+ beginAccountDeletion(context:AuthContext){const uid=authenticatedUid(context);return familyLifecycleEnabled()?new MemberAccountDeletionStore(this.db,this.clock,this.store).begin(uid):this.store.beginDeletion(uid);}
  /** Trusted Auth deletion event ONLY; never exposed by the modern gateway. */
  async handleAuthUserDeleted(uid:string,maxSteps=10):Promise<DeletionOutcome>{
   authenticatedUid({uid});const result=await this.store.beginDeletion(uid,true);
