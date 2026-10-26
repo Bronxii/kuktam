@@ -64,7 +64,7 @@ export class FamilyCreateStore {
         if (old.status !== 'ABORTED') return operationId;
       }
       if (index.exists) { readFamilyMembership(index.data()); throw new Error('alreadyFamily'); }
-      if((await tx.get(this.db.doc(`familyMemberDeletions/${uid}`))).exists)throw new Error('accountUnavailable');
+      if((await tx.get(this.db.doc(`familyMemberDeletions/${uid}`))).exists||(await tx.get(this.db.doc(`familyOwnerDeletions/${uid}`))).exists)throw new Error('accountUnavailable');
       const gate = await tx.get(this.db.doc('familyRuntime/config'));
       if (gate.get('creationEnabled') !== true) throw new Error('featureDisabled');
       const marker = await tx.get(this.db.doc(`accountLifecycle/${uid}`));

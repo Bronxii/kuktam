@@ -7,6 +7,7 @@ import { readFamilyMembership } from './household-contract';
 import { privateHouseholdId } from './household-store';
 import { readJoinCapacity } from './join-capacity';
 import { readJoinOperation } from './family-join';
+import {readAccount} from '../accounts/account-lifecycle';
 import { hasPro } from './family-create';
 
 export type PreparationCode='INVALID_ARGUMENT'|'FEATURE_DISABLED'|'NOT_OWNER'|'WRONG_FAMILY'|'ACCOUNT_UNAVAILABLE'|'IN_PROGRESS'|'INTEGRITY_REQUIRES_OPERATOR';
@@ -54,7 +55,9 @@ export class DissolutionPreparationStore {
   async prepare(context:AuthContext,householdId:string){return (await this.prepareInternal(context,householdId,false))!;}
   /** Trusted worker admission; entitlement is checked inside the topology transaction. */
   prepareForProLoss(ownerUid:string,householdId:string){return this.prepareInternal({uid:ownerUid},householdId,true);}
-  private async prepareInternal(context:AuthContext,householdId:string,proLoss:boolean){
+  /** Only a durable authenticated owner-deletion intent authorizes this admission. */
+  prepareForAccountDeletion(ownerUid:string,householdId:string){return this.prepareInternal({uid:ownerUid},householdId,false,true);}
+  private async prepareInternal(context:AuthContext,householdId:string,proLoss:boolean,ownerDeletion=false){
     const ownerUid=authenticatedUid(context);
     if(!hid(householdId))fail('INVALID_ARGUMENT');
     if(process.env.K_SERVICE||process.env.FUNCTION_NAME||process.env.GCLOUD_PROJECT!=='demo-kuktam-local'||!/^(127\.0\.0\.1|localhost):[0-9]{1,5}$/.test(process.env.FIRESTORE_EMULATOR_HOST??''))fail('FEATURE_DISABLED');
@@ -74,6 +77,11 @@ export class DissolutionPreparationStore {
         const intent=await tx.get(intentRef);
         if(intent.get('ownerUid')!==ownerUid||intent.get('householdId')!==householdId||intent.get('reason')!=='OWNER_PRO_LOSS'||intent.get('status')!=='PENDING')fail('INTEGRITY_REQUIRES_OPERATOR');
         if(await hasPro(this.db,tx,ownerUid,this.clock()))return null;
+      }
+      const deletionIntentRef=this.db.doc(`familyOwnerDeletions/${ownerUid}`);
+      if(ownerDeletion){
+        const intent=await tx.get(deletionIntentRef),marker=await tx.get(this.db.doc(`accountLifecycle/${ownerUid}`)),account=proof(()=>readAccount(marker.data()));
+        if(intent.get('version')!==1||intent.get('uid')!==ownerUid||intent.get('householdId')!==householdId||intent.get('reason')!=='OWNER_ACCOUNT_DELETION'||intent.get('phase')!=='WAITING_DISSOLUTION'||intent.get('operationId')!==id||intent.get('accountGeneration')!==account.generation||account.state!=='ACTIVE')fail('INTEGRITY_REQUIRES_OPERATOR');
       }
       if(cap.structuralOperationId)fail('IN_PROGRESS');
       const members=await this.validation.members(tx,family);
@@ -113,6 +121,10 @@ export class DissolutionPreparationStore {
       if(proLoss){
         tx.create(ref.collection('lifecycleAdmission').doc('state'),{version:1,reason:'OWNER_PRO_LOSS',ownerUid,householdId,intentId:id,checkedAt:now,entitled:false});
         tx.update(intentRef,{status:'IN_PROGRESS',operationId:id,updatedAt:now});
+      }
+      if(ownerDeletion){
+        tx.create(ref.collection('lifecycleAdmission').doc('state'),{version:1,reason:'OWNER_ACCOUNT_DELETION',ownerUid,householdId,intentId:ownerUid,checkedAt:now});
+        tx.update(deletionIntentRef,{phase:'DISSOLUTION_IN_PROGRESS',updatedAt:now,lastOutcome:'dissolutionAdmitted'});
       }
       tx.set(capRef,{schemaVersion:3,operationIds:cap.operationIds,structuralOperationId:id});
       return {schemaVersion:1,operationId:id,phase:operation.phase,status:operation.status,participantCount:operation.participantCount,snapshotHash:operation.snapshotHash};

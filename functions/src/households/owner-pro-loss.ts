@@ -1,15 +1,9 @@
+import {DissolutionLifecycleDriver} from './dissolution-lifecycle-driver';
 import {FieldPath,FieldValue,Firestore,Timestamp} from 'firebase-admin/firestore';
 import {hasPro} from './family-create';
 import {authenticatedUid} from '../billing/account-binding';
 import {readFamilyMembership} from './household-contract';
 import {DissolutionPreparationStore,dissolutionId} from './dissolution-preparation';
-import {DissolutionPreservationStore} from './dissolution-preservation';
-import {DissolutionMergeStore} from './dissolution-merge';
-import {DissolutionSourceDispositionStore} from './dissolution-source-disposition';
-import {DissolutionMemberReleaseStore} from './dissolution-member-release';
-import {DissolutionFinalizationStore} from './dissolution-finalization';
-import {FamilyJoinStore,readJoinOperation} from './family-join';
-import {readJoinCapacity} from './join-capacity';
 
 /** Keep the accepted local-only Family gate. No deployed billing side effects. */
 export function familyLifecycleEnabled(){return !process.env.K_SERVICE&&!process.env.FUNCTION_NAME&&process.env.GCLOUD_PROJECT==='demo-kuktam-local'&&/^(127\.0\.0\.1|localhost):[0-9]{1,5}$/.test(process.env.FIRESTORE_EMULATOR_HOST??'');}
@@ -57,20 +51,10 @@ export class OwnerProLossStore {
   this.local();if(!/^dissolve_[a-f0-9]{64}$/.test(id))throw new Error('proLossIntegrity');
   const i=read((await this.db.doc(`familyProLoss/${id}`).get()).data(),id);
   if(['DONE','SUPERSEDED','OPERATOR'].includes(i.status))return i.status;
-  const ref=this.db.doc(`familyOperations/${id}`),op=await ref.get(),auth={uid:i.ownerUid};
+  const ref=this.db.doc(`familyOperations/${id}`),op=await ref.get();
   if(!op.exists){
-   // A committed JOIN owns forward completion. Never steal its structural lock.
-   const capDoc=await this.db.doc(`familyJoinCapacity/${i.householdId}`).get();
-   let cap;try{cap=readJoinCapacity(capDoc.data());}catch{return this.record(id,'OPERATOR','invalidCapacity');}
-   if(cap.structuralOperationId&&cap.structuralOperationId!==id){
-    const lock=await this.db.doc(`familyOperations/${cap.structuralOperationId}`).get();
-    if(lock.get('kind')!=='JOIN'||lock.get('householdId')!==i.householdId||lock.get('ownerUid')!==i.ownerUid)return this.record(id,'OPERATOR','unknownStructuralOwner');
-    let join;try{join=readJoinOperation(lock.data(),lock.id);}catch{return this.record(id,'OPERATOR','invalidJoin');}
-    if(join.status==='OPERATOR')return this.record(id,'OPERATOR','joinRequiresOperator');
-    if(lock.get('committedAt')==null)return this.record(id,'PENDING','structuralConflict');
-    await new FamilyJoinStore(this.db,this.clock).resume(lock.id);
-    return this.record(id,'PENDING','committedJoinForwardCompletion');
-   }
+   const conflict=await new DissolutionLifecycleDriver(this.db,this.clock).beforeAdmission(i.ownerUid,i.householdId);
+   if(conflict!=='AVAILABLE')return this.record(id,conflict==='OPERATOR'?'OPERATOR':'PENDING',conflict);
    try{
     const result=await new DissolutionPreparationStore(this.db,this.clock).prepareForProLoss(i.ownerUid,i.householdId);
     if(result===null)return this.record(id,'SUPERSEDED','currentProRestored');
@@ -82,13 +66,8 @@ export class OwnerProLossStore {
     throw e;
    }
   }
-  if(op.get('kind')!=='FAMILY_DISSOLUTION'||op.get('ownerUid')!==i.ownerUid||op.get('householdId')!==i.householdId)return this.record(id,'OPERATOR','operationIdentity');
-  if(op.get('status')==='OPERATOR')return this.record(id,'OPERATOR','dissolutionRequiresOperator');
-  const phase=op.get('phase');
-  const engine=['PREPARED','SNAPSHOT_SHOPPING','VERIFY_SHOPPING'].includes(phase)?new DissolutionPreservationStore(this.db,this.clock):phase==='PRESERVATION_COMMITTED'?new DissolutionMergeStore(this.db,this.clock):phase==='PRESERVATION_MERGE_COMPLETE'?new DissolutionSourceDispositionStore(this.db,this.clock):['PRESERVATION_SOURCE_CLEANED','RELEASING_NON_OWNERS'].includes(phase)?new DissolutionMemberReleaseStore(this.db,this.clock):['NON_OWNER_RELEASE_COMPLETE','DONE'].includes(phase)?new DissolutionFinalizationStore(this.db,this.clock):null;
-  if(!engine)return this.record(id,'OPERATOR','unknownDissolutionPhase');
-  try{const result=await engine.step(auth,i.householdId);return this.record(id,result==='DONE'?'DONE':result==='OPERATOR'?'OPERATOR':'IN_PROGRESS',result);}
-  catch(e){if(e instanceof Error&&e.message==='INVALID_ARGUMENT'&&(await ref.get()).get('phase')!==phase)return this.record(id,'IN_PROGRESS','concurrentPhaseAdvance');throw e;}
+  const result=await new DissolutionLifecycleDriver(this.db,this.clock).step(i.ownerUid,i.householdId);
+  return this.record(id,result==='DONE'?'DONE':result==='OPERATOR'?'OPERATOR':'IN_PROGRESS',result);
  }
  /** Bounded rotating owner scan catches timed grant expiry without a write event. */
  async sweep(){

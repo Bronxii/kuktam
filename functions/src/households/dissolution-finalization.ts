@@ -4,7 +4,7 @@ import {readAccount} from '../accounts/account-lifecycle';
 import {advanceShoppingEpoch} from '../shopping/mutation-store';
 import {MutationError,epochPattern} from '../shopping/mutation-contract';
 import {dissolutionId} from './dissolution-preparation';
-import {readPreservation} from './dissolution-preservation';
+import {readPreservation,Preservation} from './dissolution-preservation';
 import {DissolutionMemberReleaseStore} from './dissolution-member-release';
 import {commitMemberExit} from './member-leave';
 import {JoinTransferStore} from './join-transfer';
@@ -15,6 +15,12 @@ import {digest} from './join-snapshot';
 const invalid=():never=>{throw new Error('dissolutionFinalizationIntegrity');};
 const proof=<T>(fn:()=>T):T=>{try{return fn();}catch{return invalid();}};
 const receiptHash=(r:any)=>digest(JSON.stringify([r.version,r.operationId,r.snapshotHash,r.ownerUid,r.householdId,r.privateHouseholdId,r.sourceEpoch,r.targetEpoch,r.completedAt.seconds,r.completedAt.nanoseconds,r.revokedInviteIds,r.abortedJoinIds]));
+export function readDissolutionFinalizationReceipt(r:any,o:Preservation){
+ const id=o.structuralOperationId,uid=o.ownerUid,householdId=o.householdId,owner=o.participants.find(p=>p.role==='owner')!;
+     const array=(v:any,re:RegExp)=>Array.isArray(v)&&v.length<=8&&v.every((x:any,i:number)=>typeof x==='string'&&re.test(x)&&(i===0||v[i-1]<x));
+     if(!r||Object.keys(r).sort().join(',')!=='abortedJoinIds,completedAt,hash,householdId,operationId,ownerUid,privateHouseholdId,revokedInviteIds,snapshotHash,sourceEpoch,targetEpoch,version'||r.version!==1||r.operationId!==id||r.snapshotHash!==o.snapshotHash||r.ownerUid!==uid||r.householdId!==householdId||r.privateHouseholdId!==owner.privateHouseholdId||!(r.completedAt instanceof Timestamp)||!r.completedAt.isEqual(o.updatedAt)||!epochPattern.test(r.sourceEpoch)||!epochPattern.test(r.targetEpoch)||r.sourceEpoch===o.sourceFence.epoch||r.targetEpoch===o.targetFence.epoch||!array(r.revokedInviteIds,/^[a-f0-9]{64}$/)||!array(r.abortedJoinIds,/^join_[a-f0-9]{64}$/)||r.hash!==receiptHash(r))invalid();
+ return r;
+}
 export class DissolutionFinalizationStore {
  constructor(private readonly db:Firestore,private readonly clock=Timestamp.now){}
  async step(auth:AuthContext,householdId:string){
@@ -30,8 +36,7 @@ export class DissolutionFinalizationStore {
    try{
     const o=readPreservation(raw,id),prior=await tx.get(receipt),owner=o.participants.find(p=>p.role==='owner')!;
     if(o.phase==='DONE'){
-     const r=prior.data(),array=(v:any,re:RegExp)=>Array.isArray(v)&&v.length<=8&&v.every((x:any,i:number)=>typeof x==='string'&&re.test(x)&&(i===0||v[i-1]<x));
-     if(!r||Object.keys(r).sort().join(',')!=='abortedJoinIds,completedAt,hash,householdId,operationId,ownerUid,privateHouseholdId,revokedInviteIds,snapshotHash,sourceEpoch,targetEpoch,version'||r.version!==1||r.operationId!==id||r.snapshotHash!==o.snapshotHash||r.ownerUid!==uid||r.householdId!==householdId||r.privateHouseholdId!==owner.privateHouseholdId||!(r.completedAt instanceof Timestamp)||!r.completedAt.isEqual(o.updatedAt)||!epochPattern.test(r.sourceEpoch)||!epochPattern.test(r.targetEpoch)||r.sourceEpoch===o.sourceFence.epoch||r.targetEpoch===o.targetFence.epoch||!array(r.revokedInviteIds,/^[a-f0-9]{64}$/)||!array(r.abortedJoinIds,/^join_[a-f0-9]{64}$/)||r.hash!==receiptHash(r))invalid();
+     readDissolutionFinalizationReceipt(prior.data(),o);
      // Historical terminal evidence: do not re-read/rewrite later private state.
      return 'DONE';
     }

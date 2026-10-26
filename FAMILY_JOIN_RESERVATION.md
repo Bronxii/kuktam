@@ -1,3 +1,9 @@
+> Phase 6B2 (local, 2026-10-26): ACTIVE owner deletion now orchestrates the
+> existing dissolution engine and stops durably at WAITING_HISTORICAL_AUDIT.
+> No DELETING marker/job/Auth deletion is admitted; historical-owner protection
+> remains unchanged for 6C. See
+> [6B2 checkpoint](FAMILY_6B2_OWNER_ACCOUNT_DELETION_CHECKPOINT_2026-10-25.md).
+
 ## Phase 6B1 ACTIVE non-owner account deletion
 
 See [FAMILY_6B1_MEMBER_ACCOUNT_DELETION_CHECKPOINT_2026-10-25.md](FAMILY_6B1_MEMBER_ACCOUNT_DELETION_CHECKPOINT_2026-10-25.md).
