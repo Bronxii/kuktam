@@ -75,6 +75,36 @@ export class HistoricalFamilyAuditStore {
   const release=proof(()=>readParticipantReleaseProgress(o,released,journal));if(release.progress.cursor!==release.participants.length)invalid();
   return {o,r};
  }
+ /** 6C2: fresh, read-only proof in the SAME transaction as private deletion admission.
+  * Pages bound query payloads; the transaction reads all historical roots so no
+  * earlier page can change between validation and the account barrier commit. */
+ async verifyDeletionHandoff(tx:Transaction,uid:string){
+  this.local(uid);
+  const ref=this.db.doc(`familyOwnerDeletions/${uid}`),intentDoc=await tx.get(ref),i=proof(()=>readOwnerDeletionIntent(intentDoc.data(),uid));
+  if(i.phase!=='HISTORICAL_AUDIT_READY')invalid();
+  await this.privateAccount(tx,uid,i.accountGeneration);
+  const stateDoc=await tx.get(ref.collection('historicalAudit').doc('state')),p=proof(()=>progress(stateDoc.data(),uid,i.accountGeneration));
+  if(p.stage!=='COMPLETE'||p.count<1||p.verified!==p.count||p.verifyHash!==p.hash)invalid();
+  let hash=seed(uid,i.accountGeneration),after:string|null=null,count=0,primary=false;
+  const receipts=ref.collection('historicalFamilies');
+  for(;;){
+   let query=receipts.orderBy(FieldPath.documentId()).limit(10);if(after)query=query.startAfter(after);
+   const page=await tx.get(query);
+   for(const d of page.docs){
+    const r=d.data();
+    if(r.version!==1||r.uid!==uid||r.accountGeneration!==i.accountGeneration||r.householdId!==d.id||!(r.detachedAt instanceof Timestamp)||!(r.priorUpdateTime instanceof Timestamp)||!(r.householdCreatedAt instanceof Timestamp)||!hex(r.auditHash)||r.previousHash!==hash||r.hash!==proof(()=>receiptHash(r)))invalid();
+    const home=await tx.get(this.db.doc(`households/${d.id}`)),a=await this.audit(tx,uid,home,true);
+    if(home.get('auditOwnerUid')!==uid||home.get('auditDetachmentPath')!==d.ref.path||a.o.structuralOperationId!==r.operationId||a.r.hash!==r.finalizationHash||!a.o.householdCreatedAt.isEqual(r.householdCreatedAt))invalid();
+    if(d.id===i.householdId){if(r.operationId!==i.operationId||!i.householdCreatedAt.isEqual(r.householdCreatedAt))invalid();primary=true;}
+    hash=r.hash;count++;after=d.id;
+   }
+   if(page.size<10)break;
+  }
+  const roots=await tx.get(this.db.collection('households').where('auditOwnerUid','==',uid).count());
+  if(!primary||count!==p.count||hash!==p.hash||roots.data().count!==count)invalid();
+  await assertNoLiveFamilyDependency(this.db,tx,uid);
+  return i;
+ }
  private operation(d:DocumentSnapshot,uid:string,hid:string){
   const v=d.data()!;if(v.householdId!==hid||!['DONE','ABORTED'].includes(v.status))invalid();
   switch(v.kind){

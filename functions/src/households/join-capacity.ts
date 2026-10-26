@@ -41,9 +41,13 @@ export async function assertNoLiveFamilyDependency(db:Firestore,tx:Transaction,u
   const actorWork=await tx.get(db.collection('familyOperations').where('actorUid','==',uid).where('status','in',['READY','OPERATOR']).limit(1));
   if(!homes.empty||!ownedWork.empty||!actorWork.empty)throw new Error('FAMILY_LIFECYCLE_NOT_READY');
 }
-/** Explicit 6C1/6C2 boundary, including Auth-event fallback. No job may start yet. */
+/** Pending history cannot start a job; admitted retries require the exact bound job/generation. */
 export async function assertHistoricalAuditHandoffPending(db:Firestore,tx:Transaction,uid:string){
   const intent=await tx.get(db.doc(`familyOwnerDeletions/${uid}`));
+  if(['DELETION_IN_PROGRESS','DELETED'].includes(intent.get('phase'))){
+    const {readOwnerDeletionHandoff}=await import('./owner-deletion-handoff');
+    await readOwnerDeletionHandoff(db,tx,uid);return;
+  }
   if(intent.get('phase')==='WAITING_HISTORICAL_AUDIT')throw new Error('FAMILY_LIFECYCLE_NOT_READY');
   if(['DETACHING_HISTORICAL_AUDIT','HISTORICAL_AUDIT_READY'].includes(intent.get('phase'))||intent.get('lastOutcome')==='historicalAuditIntegrity'||
     (await tx.get(db.doc(`familyOwnerDeletions/${uid}/historicalAudit/state`))).exists)

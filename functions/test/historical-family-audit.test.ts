@@ -70,7 +70,6 @@ test('6C1 WAITING owner detaches only live root ownership and stops audit ready'
  const root=await f.source.get();assert.equal(root.get('state'),'DISSOLVED');assert.equal(root.get('ownerUid'),null);assert.equal(root.get('auditOwnerUid'),'owner');assert.equal(root.get('auditDetachmentPath'),f.receipts.doc(f.hid).path);
  assert.equal((await f.state.get()).get('count'),1);assert.equal((await f.intent.get()).get('phase'),'HISTORICAL_AUDIT_READY');await f.noLive();await f.preserved();
  const {DissolutionFinalizationStore}=await import('../src/households/dissolution-finalization');assert.equal(await new DissolutionFinalizationStore(db,f.clock).step({uid:'owner'},f.hid),'DONE');
- assert.equal((await f.service.beginAccountDeletion({uid:'owner'})).outcome,'historicalAuditReady');
  for(const authGone of [false,true])await assert.rejects(new LifecycleStore(db,f.clock).beginDeletion('owner',authGone),/HISTORICAL_AUDIT_HANDOFF_REQUIRED/);
  await assert.rejects(new LifecycleStore(db,f.clock).advanceAccountMarker({uid:'owner'},1,'DELETING'),/HISTORICAL_AUDIT_HANDOFF_REQUIRED/);await f.safety();
 });

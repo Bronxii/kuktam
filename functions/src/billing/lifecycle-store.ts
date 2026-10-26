@@ -1,3 +1,5 @@
+import {HistoricalFamilyAuditStore} from '../households/historical-family-audit';
+import {readOwnerDeletionHandoff} from '../households/owner-deletion-handoff';
 import { assertHistoricalAuditHandoffPending, assertNoCommittedJoin, assertNoActiveFamilyDeletion, blockingJoin } from '../households/join-capacity';
 import { cleanupPrivateHousehold } from '../households/household-store';
 import { workId as shoppingWorkId } from '../shopping/mutation-store';
@@ -373,15 +375,18 @@ export class LifecycleStore {
     });
   }
 
-  /** Durable account barrier and immediate access shutdown in one transaction. */
-  async beginDeletion(uid:string,authGone=false) {
+  /** Durable account barrier and immediate access shutdown in one transaction.
+   * historicalHandoff is server-only: it requests full 6C1 evidence validation,
+   * never bypasses the generation/dependency guards and is not a client field. */
+  async beginDeletion(uid:string,authGone=false,historicalHandoff=false) {
     authenticatedUid({uid});
     return this.db.runTransaction(async tx=>{
       const markerRef=this.db.doc(`accountLifecycle/${uid}`),jobRef=this.db.doc(`accountDeletions/${uid}`),effectiveRef=this.db.doc(`users/${uid}/entitlements/pro`);
       const markerDoc=await tx.get(markerRef),jobDoc=await tx.get(jobRef),effectiveDoc=await tx.get(effectiveRef),now=this.clock();
-      await assertHistoricalAuditHandoffPending(this.db,tx,uid);
+      const ownerHandoff=historicalHandoff?await new HistoricalFamilyAuditStore(this.db,this.clock).verifyDeletionHandoff(tx,uid):null;
+      if(!ownerHandoff)await assertHistoricalAuditHandoffPending(this.db,tx,uid);
       const blocking=await blockingJoin(this.db,tx,uid);
-      if(!blocking&&!authGone)await assertNoActiveFamilyDeletion(this.db,tx,uid);
+      if(!blocking&&!authGone&&!ownerHandoff)await assertNoActiveFamilyDeletion(this.db,tx,uid);
       if(blocking){
         if(!authGone)throw new Error('JOIN_COMMITTED_IN_PROGRESS');
         tx.update(this.db.doc(`familyOperations/${blocking}`),{status:'OPERATOR',nextAt:null,leaseId:null,leaseUntil:null,lastOutcome:'externalAuthDeletion',updatedAt:now});
@@ -395,6 +400,7 @@ export class LifecycleStore {
       if(prior && (prior.generation!==account.generation||prior.stage==='DONE'))throw new LifecycleError('internalConflict');
       const job=prior?readDeletion({...prior,authGone:prior.authGone||authGone}):readDeletion({schemaVersion:2,cleanupState:'PENDING',operationId:randomUUID(),generation:account.generation,stage:'BINDINGS_MARK',authGone,leaseId:null,leaseUntil:null,nextAt:null,lastOutcome:null,updatedAt:now});
       const effective=effectiveUpdate([],now,effectiveDoc.exists?readEffective(effectiveDoc.data()):null,false);
+      if(ownerHandoff)tx.update(this.db.doc(`familyOwnerDeletions/${uid}`),{phase:'DELETION_IN_PROGRESS',deletionOperationId:job.operationId,deletionGeneration:job.generation,handedOffAt:now,updatedAt:now,lastOutcome:'privateDeletionAdmitted'});
       if(!old||old.state==='ACTIVE')tx.set(markerRef,account);
       if(!prior||authGone&&!prior.authGone)tx.set(jobRef,job);
       if(effective)tx.set(effectiveRef,effective);
@@ -435,6 +441,7 @@ export class LifecycleStore {
       const markerDoc=await tx.get(markerRef),jobDoc=await tx.get(jobRef);
       if(!markerDoc.exists||!jobDoc.exists)throw new LifecycleError('internalConflict');
       const account=readAccount(markerDoc.data()),job=readDeletion(jobDoc.data()),now=this.clock();
+      const ownerHandoff=await readOwnerDeletionHandoff(this.db,tx,uid);
       if(account.state==='DELETED'&&job.stage==='DONE')return {kind:'done'};
       if(account.state==='ACTIVE'||account.generation!==job.generation)throw new LifecycleError('staleAccountGeneration');
       if (await cleanupPrivateHousehold(this.db,tx,uid,limit)) return {kind:'continue'};
@@ -503,6 +510,7 @@ export class LifecycleStore {
       if(job.authGone){
         tx.delete(this.db.doc(`users/${uid}/entitlements/pro`));
         const completed=account.state==='DELETED'?account:advanceAccount(account,'DELETED',account.generation,now);
+        if(ownerHandoff)tx.update(ownerHandoff.ref,{phase:'DELETED',deletedAt:now,updatedAt:now,lastOutcome:'privateDeletionCompleted'});
         if(completed!==account)tx.set(markerRef,completed);
         tx.set(jobRef,readDeletion({...job,cleanupState:'VERIFIED',stage:'DONE',generation:completed.generation,leaseId:null,leaseUntil:null,nextAt:null,lastOutcome:null,updatedAt:now}));
         return {kind:'done'};

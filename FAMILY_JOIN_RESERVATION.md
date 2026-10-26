@@ -1,3 +1,9 @@
+> Phase 6C2 (local, 2026-10-26): explicit final admission revalidates all historical
+> audit receipts and live dependencies in the private DELETING/job transaction.
+> The existing deletion engine owns cleanup/Auth; owner intent ends DELETED with
+> the existing DELETED/DONE account/job boundary. Audit stays detached and preserved.
+> See [6C2 checkpoint](FAMILY_6C2_FINAL_ACCOUNT_DELETION_CHECKPOINT_2026-10-26.md).
+
 > Phase 6C1 (local, 2026-10-26): DISSOLVED root live ownership can be detached
 > into preserved historical audit, with bounded per-Family evidence and generation
 > checks. HISTORICAL_AUDIT_READY still blocks deletion until a separate 6C2 handoff.

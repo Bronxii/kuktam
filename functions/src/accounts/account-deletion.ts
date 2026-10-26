@@ -12,6 +12,12 @@ export class AccountDeletionService {
  private readonly clock:()=>Timestamp=Timestamp.now,private readonly store=new LifecycleStore(db,clock),private readonly policy:DeletionPolicy=defaultDeletionPolicy){validateDeletionPolicy(policy);}
  async beginAccountDeletion(context:AuthContext){const uid=authenticatedUid(context);
   if(!familyLifecycleEnabled())return this.store.beginDeletion(uid);
+  const existingOwner=await this.db.doc(`familyOwnerDeletions/${uid}`).get();
+  if(existingOwner.get('phase')==='HISTORICAL_AUDIT_READY'){
+   try{return await this.store.beginDeletion(uid,false,true);}
+   catch(e){const current=await existingOwner.ref.get();if(['DELETION_IN_PROGRESS','DELETED'].includes(current.get('phase')))return this.store.beginDeletion(uid);throw e;}
+  }
+  if(['DELETION_IN_PROGRESS','DELETED'].includes(existingOwner.get('phase')))return this.store.beginDeletion(uid);
   const owner=await new OwnerAccountDeletionStore(this.db,this.clock).begin(uid);
   return owner??new MemberAccountDeletionStore(this.db,this.clock,this.store).begin(uid);
  }
