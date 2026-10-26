@@ -8,7 +8,7 @@ import {DissolutionPreparationStore,dissolutionId} from './dissolution-preparati
 /** Keep the accepted local-only Family gate. No deployed billing side effects. */
 export function familyLifecycleEnabled(){return !process.env.K_SERVICE&&!process.env.FUNCTION_NAME&&process.env.GCLOUD_PROJECT==='demo-kuktam-local'&&/^(127\.0\.0\.1|localhost):[0-9]{1,5}$/.test(process.env.FIRESTORE_EMULATOR_HOST??'');}
 type Intent={version:1;ownerUid:string;householdId:string;reason:'OWNER_PRO_LOSS';status:'PENDING'|'IN_PROGRESS'|'DONE'|'SUPERSEDED'|'OPERATOR';operationId:string|null;createdAt:Timestamp;updatedAt:Timestamp;nextAt?:Timestamp;lastOutcome:string};
-function read(raw:any,id:string):Intent {
+export function readOwnerProLossIntent(raw:any,id:string):Intent {
  if(!raw||raw.version!==1||typeof raw.ownerUid!=='string'||authenticatedUid({uid:raw.ownerUid})!==raw.ownerUid||typeof raw.householdId!=='string'||!/^[A-Za-z0-9_-]{1,128}$/.test(raw.householdId)||dissolutionId(raw.ownerUid,raw.householdId)!==id||raw.reason!=='OWNER_PRO_LOSS'||!['PENDING','IN_PROGRESS','DONE','SUPERSEDED','OPERATOR'].includes(raw.status)||!(raw.createdAt instanceof Timestamp)||!(raw.updatedAt instanceof Timestamp)||!([null,id].includes(raw.operationId))||typeof raw.lastOutcome!=='string'||(['PENDING','IN_PROGRESS'].includes(raw.status)&&!(raw.nextAt instanceof Timestamp)))throw new Error('proLossIntegrity');
  return raw;
 }
@@ -24,7 +24,7 @@ export class OwnerProLossStore {
    const m=readFamilyMembership(index.data());if(m.state!=='ACTIVE'||m.role!=='owner')return 'NOT_ACTIVE_OWNER';
    const hid=m.householdId,id=dissolutionId(uid,hid),ref=this.db.doc(`familyProLoss/${id}`),op=await tx.get(this.db.doc(`familyOperations/${id}`)),prior=await tx.get(ref),home=await tx.get(this.db.doc(`households/${hid}`));
    if(home.get('kind')!=='family'||home.get('state')!=='ACTIVE'||home.get('ownerUid')!==uid)throw new Error('proLossIntegrity');
-   if(prior.exists){const old=read(prior.data(),id);if(['IN_PROGRESS','DONE','OPERATOR'].includes(old.status))return id;}
+   if(prior.exists){const old=readOwnerProLossIntent(prior.data(),id);if(['IN_PROGRESS','DONE','OPERATOR'].includes(old.status))return id;}
    if(!op.exists&&await hasPro(this.db,tx,uid,this.clock()))return 'ENTITLED';
    if(op.exists&&(op.get('kind')!=='FAMILY_DISSOLUTION'||op.get('ownerUid')!==uid||op.get('householdId')!==hid))throw new Error('proLossIntegrity');
    if(prior.exists&&prior.get('status')==='PENDING')return id;
@@ -35,7 +35,7 @@ export class OwnerProLossStore {
  }
  private async record(id:string,status:Intent['status'],outcome:string){
   return this.db.runTransaction(async tx=>{
-   const ref=this.db.doc(`familyProLoss/${id}`),op=await tx.get(this.db.doc(`familyOperations/${id}`)),i=read((await tx.get(ref)).data(),id);
+   const ref=this.db.doc(`familyProLoss/${id}`),op=await tx.get(this.db.doc(`familyOperations/${id}`)),i=readOwnerProLossIntent((await tx.get(ref)).data(),id);
    if(['DONE','OPERATOR'].includes(i.status))return i.status;
    // A concurrent admission wins over stale restoration/no-family observations.
    if(status==='SUPERSEDED'&&op.exists)return i.status;
@@ -49,7 +49,7 @@ export class OwnerProLossStore {
  /** One existing engine transaction per invocation; scheduler supplies durable continuation. */
  async step(id:string){
   this.local();if(!/^dissolve_[a-f0-9]{64}$/.test(id))throw new Error('proLossIntegrity');
-  const i=read((await this.db.doc(`familyProLoss/${id}`).get()).data(),id);
+  const i=readOwnerProLossIntent((await this.db.doc(`familyProLoss/${id}`).get()).data(),id);
   if(['DONE','SUPERSEDED','OPERATOR'].includes(i.status))return i.status;
   const ref=this.db.doc(`familyOperations/${id}`),op=await ref.get();
   if(!op.exists){

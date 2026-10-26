@@ -31,13 +31,25 @@ export async function assertNoCommittedJoin(db:Firestore,tx:Transaction,uid:stri
   if(await blockingJoin(db,tx,uid))throw new Error('JOIN_COMMITTED_IN_PROGRESS');
   await assertNoActiveFamilyDeletion(db,tx,uid);
 }
-/** Temporary admission barrier, not a Family deletion implementation. Unexpected
- * external Auth deletion still records its access barrier and fails cleanup closed. */
+/** Pure Family dependency classification, reusable by the later 6C2 handoff. */
+export async function assertNoLiveFamilyDependency(db:Firestore,tx:Transaction,uid:string){
+  const index=await tx.get(db.doc(`familyMemberships/${uid}`)),user=await tx.get(db.doc(`users/${uid}`));
+  if(index.exists||user.get('familyHouseholdId')!=null)throw new Error('FAMILY_LIFECYCLE_NOT_READY');
+  // ownerUid is live ownership. Detached DISSOLVED roots retain auditOwnerUid instead.
+  const homes=await tx.get(db.collection('households').where('ownerUid','==',uid).where('kind','==','family').limit(1));
+  const ownedWork=await tx.get(db.collection('familyOperations').where('ownerUid','==',uid).where('status','in',['READY','OPERATOR']).limit(1));
+  const actorWork=await tx.get(db.collection('familyOperations').where('actorUid','==',uid).where('status','in',['READY','OPERATOR']).limit(1));
+  if(!homes.empty||!ownedWork.empty||!actorWork.empty)throw new Error('FAMILY_LIFECYCLE_NOT_READY');
+}
+/** Explicit 6C1/6C2 boundary, including Auth-event fallback. No job may start yet. */
+export async function assertHistoricalAuditHandoffPending(db:Firestore,tx:Transaction,uid:string){
+  const intent=await tx.get(db.doc(`familyOwnerDeletions/${uid}`));
+  if(intent.get('phase')==='WAITING_HISTORICAL_AUDIT')throw new Error('FAMILY_LIFECYCLE_NOT_READY');
+  if(['DETACHING_HISTORICAL_AUDIT','HISTORICAL_AUDIT_READY'].includes(intent.get('phase'))||intent.get('lastOutcome')==='historicalAuditIntegrity'||
+    (await tx.get(db.doc(`familyOwnerDeletions/${uid}/historicalAudit/state`))).exists)
+    throw new Error('HISTORICAL_AUDIT_HANDOFF_REQUIRED');
+}
 export async function assertNoActiveFamilyDeletion(db:Firestore,tx:Transaction,uid:string){
-  const index=await tx.get(db.doc(`familyMemberships/${uid}`));
-  if(index.get('state')==='ACTIVE')throw new Error('FAMILY_LIFECYCLE_NOT_READY');
-  // Private deletion still cannot safely process preserved Family audit roots.
-  // Keep admission closed for former owners until the separate Phase 6 policy.
-  const retired=await tx.get(db.collection('households').where('ownerUid','==',uid).where('kind','==','family').where('state','==','DISSOLVED').limit(1));
-  if(!retired.empty)throw new Error('FAMILY_LIFECYCLE_NOT_READY');
+  await assertHistoricalAuditHandoffPending(db,tx,uid);
+  await assertNoLiveFamilyDependency(db,tx,uid);
 }

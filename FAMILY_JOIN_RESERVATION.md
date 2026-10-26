@@ -1,3 +1,8 @@
+> Phase 6C1 (local, 2026-10-26): DISSOLVED root live ownership can be detached
+> into preserved historical audit, with bounded per-Family evidence and generation
+> checks. HISTORICAL_AUDIT_READY still blocks deletion until a separate 6C2 handoff.
+> See [6C1 checkpoint](FAMILY_6C1_HISTORICAL_AUDIT_DETACHMENT_CHECKPOINT_2026-10-26.md).
+
 > Phase 6B2 (local, 2026-10-26): ACTIVE owner deletion now orchestrates the
 > existing dissolution engine and stops durably at WAITING_HISTORICAL_AUDIT.
 > No DELETING marker/job/Auth deletion is admitted; historical-owner protection

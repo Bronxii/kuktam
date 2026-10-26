@@ -1,4 +1,4 @@
-import { assertNoCommittedJoin, assertNoActiveFamilyDeletion, blockingJoin } from '../households/join-capacity';
+import { assertHistoricalAuditHandoffPending, assertNoCommittedJoin, assertNoActiveFamilyDeletion, blockingJoin } from '../households/join-capacity';
 import { cleanupPrivateHousehold } from '../households/household-store';
 import { workId as shoppingWorkId } from '../shopping/mutation-store';
 import { readDeletion, AuthUserDeletionApi, DeletionPolicy, defaultDeletionPolicy, validateDeletionPolicy } from '../accounts/deletion-contract';
@@ -379,6 +379,7 @@ export class LifecycleStore {
     return this.db.runTransaction(async tx=>{
       const markerRef=this.db.doc(`accountLifecycle/${uid}`),jobRef=this.db.doc(`accountDeletions/${uid}`),effectiveRef=this.db.doc(`users/${uid}/entitlements/pro`);
       const markerDoc=await tx.get(markerRef),jobDoc=await tx.get(jobRef),effectiveDoc=await tx.get(effectiveRef),now=this.clock();
+      await assertHistoricalAuditHandoffPending(this.db,tx,uid);
       const blocking=await blockingJoin(this.db,tx,uid);
       if(!blocking&&!authGone)await assertNoActiveFamilyDeletion(this.db,tx,uid);
       if(blocking){
