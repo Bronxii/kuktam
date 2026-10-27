@@ -1,3 +1,5 @@
+import '../family/family_screen.dart';
+import '../family/family_repository.dart';
 import '../sharing/recipe_file_receiver.dart';
 import '../shopping/data/mutations/production_shopping_coordinator.dart';
 import '../sharing/recipe_share_codec.dart';
@@ -15,8 +17,9 @@ import '../pro/monetization_host.dart';
 import '../pro/profile_pro_card.dart';
 
 class SettingsScreen extends StatefulWidget {
-  const SettingsScreen({super.key, this.authRepository, this.deletionRepository, this.exportControllerFactory, this.recipeFiles});
+  const SettingsScreen({super.key, this.authRepository, this.deletionRepository, this.exportControllerFactory, this.recipeFiles, this.familyRepository});
 
+  final FamilyRepository? familyRepository;
   final RecipeFileReceiver? recipeFiles;
   final RecipeExportController Function()? exportControllerFactory;
   final AuthRepository? authRepository;
@@ -34,6 +37,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   bool _deletionDialogOpen = false;
   bool _isSigningOut = false;
   bool _exportOpen = false;
+  bool _familyOpen = false;
   bool _pickingRecipe = false;
 
   Future<void> _deleteAccount() async {
@@ -136,6 +140,20 @@ class _SettingsScreenState extends State<SettingsScreen> {
         children: [
           const SizedBox(height: 8),
           ProfileProCard(controller: ProScope.maybeOf(context)),
+          if (user != null)
+            ListTile(
+              leading: const Icon(Icons.family_restroom_outlined),
+              title: const Text('Családi megosztás'),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () async {
+                if (_familyOpen) return;
+                _familyOpen = true;
+                try {
+                  await Navigator.of(context).push(MaterialPageRoute<void>(
+                    builder: (_) => FamilyScreen(repository: widget.familyRepository)));
+                } finally { _familyOpen = false; }
+              },
+            ),
           ListTile(
             leading: const Icon(Icons.file_open_outlined),
             title: const Text('Kuktám recept importálása'),

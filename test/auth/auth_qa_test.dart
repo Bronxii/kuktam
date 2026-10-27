@@ -403,6 +403,7 @@ void main() {
       MaterialApp(home: SettingsScreen(authRepository: UiRepo())),
     );
     await tester.pumpAndSettle();
+    await tester.scrollUntilVisible(find.text('E-mail-cím módosítása'), 150);
     await tester.tap(find.text('E-mail-cím módosítása'));
     await tester.pumpAndSettle();
     final controllers = tester
@@ -464,6 +465,7 @@ void main() {
       expect(find.text('B@example.com'), findsOneWidget);
       expect(find.text('A@example.com'), findsNothing);
       expect(find.text('Jelszó módosítása'), findsNothing);
+      await tester.scrollUntilVisible(find.text('Fiók törlése'), 150);
       expect(find.text('Fiók törlése'), findsOneWidget);
       await tester.binding.handlePopRoute();
       await tester.pumpAndSettle();
