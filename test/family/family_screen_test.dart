@@ -12,6 +12,9 @@ import 'fakes.dart';
 import 'family_test.dart' show response;
 
 class Repo implements FamilyRepository {
+  @override
+  dynamic noSuchMethod(Invocation invocation) =>
+      throw StateError("Unexpected mutation");
   int calls = 0;
   final events = StreamController<void>.broadcast(sync: true);
   Future<FamilyState> Function() reply = () async => FamilyState.fromResponse({

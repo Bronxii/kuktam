@@ -18,8 +18,20 @@ class FamilyParticipant {
 }
 
 /// Read model only. No Firestore objects, mutation methods or platform APIs.
+class FamilyPendingInvite {
+  const FamilyPendingInvite(this.expiresAt, this.reserved);
+  final DateTime expiresAt;
+  final bool reserved;
+}
+
 class FamilyState {
-  const FamilyState._(this.status, this.participants, this.currentUid);
+  const FamilyState._(
+    this.status,
+    this.participants,
+    this.currentUid, [
+    this.pendingInvites = const [],
+  ]);
+  final List<FamilyPendingInvite> pendingInvites;
   factory FamilyState.inProgress(String uid) =>
       FamilyState._(FamilyStatus.inProgress, const [], uid);
   final FamilyStatus status;
@@ -85,10 +97,31 @@ class FamilyState {
           ? (a.role == FamilyRole.owner ? -1 : 1)
           : a.uid.compareTo(b.uid),
     );
+    final pending = <FamilyPendingInvite>[];
+    final invites = value['invites'];
+    if (invites != null) {
+      if (role != 'owner' || invites is! List || invites.length > 8) invalid();
+      for (final invite in invites) {
+        if (invite is! Map ||
+            !['PENDING', 'RESERVED'].contains(invite['status']) ||
+            invite['expiresAt'] is! int ||
+            (invite['expiresAt'] as int) <= 0 ||
+            (invite['expiresAt'] as int) > 8640000000000000) {
+          invalid();
+        }
+        pending.add(
+          FamilyPendingInvite(
+            DateTime.fromMillisecondsSinceEpoch(invite['expiresAt'] as int),
+            invite['status'] == 'RESERVED',
+          ),
+        );
+      }
+    }
     return FamilyState._(
       role == 'owner' ? FamilyStatus.activeOwner : FamilyStatus.activeMember,
       List.unmodifiable(members),
       uid,
+      List.unmodifiable(pending),
     );
   }
 }
