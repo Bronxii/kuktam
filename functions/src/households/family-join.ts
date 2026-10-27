@@ -10,7 +10,17 @@ import { privateHouseholdId } from './household-store';
 import { claimFamilyLease } from './operation-lease';
 
 export type JoinMode='ADD'|'DELETE';
-export const joinOperationId=(uid:string)=>'join_'+createHash('sha256').update(authenticatedUid({uid})).digest('hex');
+export const joinOperationId=(uid:string,inviteId?:string)=>'join_'+createHash('sha256').update(inviteId===undefined?authenticatedUid({uid}):JSON.stringify([authenticatedUid({uid}),inviteId])).digest('hex');
+export function isJoinIdentity(id:string,uid:string,inviteId:string):boolean {
+  return /^[a-f0-9]{64}$/.test(inviteId)&&(id===joinOperationId(uid)||id===joinOperationId(uid,inviteId));
+}
+/** Server-owned current generation; absence preserves pre-generation users. */
+export function currentJoinId(uid:string,binding:unknown):string {
+  if(binding===undefined)return joinOperationId(uid);
+  const b=binding as {operationId:string;inviteId:string};
+  if(!b||Object.keys(b).sort().join(',')!=='inviteId,operationId'||typeof b.inviteId!=='string'||typeof b.operationId!=='string'||!isJoinIdentity(b.operationId,uid,b.inviteId))throw new Error('invalidCurrentJoin');
+  return b.operationId;
+}
 export interface JoinOperation {
   schemaVersion:1|2; kind:'JOIN'; actorUid:string; ownerUid:string; inviteId:string;
   householdId:string; sourceHouseholdId:string; mode:JoinMode;
@@ -26,7 +36,7 @@ export function readJoinOperation(raw:unknown,id:string):JoinOperation {
   if((raw as JoinOperation)?.schemaVersion===2)return readTransfer(raw,id);
   const v=raw as JoinOperation;
   if(!v||Object.keys(v).sort().join(',')!==fields||v.schemaVersion!==1||v.kind!=='JOIN'||
-    !uidValue(v.actorUid)||!uidValue(v.ownerUid)||v.actorUid===v.ownerUid||id!==joinOperationId(v.actorUid)||
+    !uidValue(v.actorUid)||!uidValue(v.ownerUid)||v.actorUid===v.ownerUid||!isJoinIdentity(id,v.actorUid,v.inviteId)||
     !identifier(v.householdId)||v.sourceHouseholdId!==privateHouseholdId(v.actorUid)||v.householdId===v.sourceHouseholdId||
     !/^[a-f0-9]{64}$/.test(v.inviteId)||!['ADD','DELETE'].includes(v.mode)||
     v.deleteReconfirmationRequired!==(v.mode==='DELETE')||!Number.isSafeInteger(v.sourceItemCount)||v.sourceItemCount<0||
@@ -64,31 +74,43 @@ export class FamilyJoinStore {
     return this.validation.members(tx,family);
   }
   async reserve(context:AuthContext,token:string,mode:JoinMode):Promise<string> {
-    const uid=authenticatedUid(context),inviteId=hashInviteToken(token),id=joinOperationId(uid);
+    const uid=authenticatedUid(context),inviteId=hashInviteToken(token);
     if(mode!=='ADD'&&mode!=='DELETE')fail('INVALID_ARGUMENT');
     if(process.env.K_SERVICE||process.env.FUNCTION_NAME||!localJoinRuntime(process.env.GCLOUD_PROJECT,process.env.FIRESTORE_EMULATOR_HOST))fail('FEATURE_DISABLED');
     return this.db.runTransaction(async tx=>{
       const gate=await tx.get(this.db.doc('familyRuntime/config'));
       if(gate.get('joinReservationEnabled')!==true)fail('FEATURE_DISABLED');
       if((await tx.get(this.db.doc(`familyMemberDeletions/${uid}`))).exists||(await tx.get(this.db.doc(`familyOwnerDeletions/${uid}`))).exists)fail('ACCOUNT_UNAVAILABLE');
-      const opRef=this.db.doc(`familyOperations/${id}`),old=await tx.get(opRef);
+      const userRef=this.db.doc(`users/${uid}`),currentUser=await tx.get(userRef);
+      const previousId=currentJoinId(uid,currentUser.get('familyJoinBinding'));
+      const previous=await tx.get(this.db.doc(`familyOperations/${previousId}`));
+      const prior=previous.exists?readJoinOperation(previous.data(),previousId):null;
+      if(prior&&(prior.actorUid!==uid||currentUser.get('familyJoinBinding')!==undefined&&currentUser.get('familyJoinBinding.inviteId')!==prior.inviteId)||!prior&&currentUser.get('familyJoinBinding')!==undefined)fail('INVITE_STATE_UNAVAILABLE');
+      const id=prior&&prior.inviteId!==inviteId?joinOperationId(uid,inviteId):previousId;
+      const opRef=this.db.doc(`familyOperations/${id}`);
+      const old=id===previousId?previous:await tx.get(opRef);
       const indexRef=this.db.doc(`familyMemberships/${uid}`),index=await tx.get(indexRef);
       const inviteRef=this.db.doc(`familyInvites/${inviteId}`),doc=await tx.get(inviteRef);
       if(!doc.exists)fail('NOT_FOUND');
       const invite=readInvite(doc.data());
       if(old.exists) {
         const op=readJoinOperation(old.data(),id);
-        if(op.status!=='ABORTED') {
-          if(op.inviteId!==inviteId||op.mode!==mode)fail('IN_PROGRESS');
-          if(invite.status!=='RESERVED'||invite.operationId!==id||index.get('operationId')!==id||
-            index.get('state')!=='RESERVED'||index.get('householdId')!==op.householdId||index.get('role')!=='member')fail('INVITE_STATE_UNAVAILABLE');
-          return id;
+        if(op.actorUid!==uid||op.inviteId!==inviteId)fail('INVITE_STATE_UNAVAILABLE');
+        if(op.mode!==mode)fail('IN_PROGRESS');
+        if(op.status==='DONE') {
+          if(previousId===id&&index.get('state')==='ACTIVE'&&index.get('role')==='member'&&index.get('householdId')===op.householdId&&invite.status==='USED'&&invite.operationId===id&&invite.usedByUid===uid)return id;
+          fail('USED');
         }
+        if(op.status==='ABORTED')fail('REVOKED');
+        if(previousId!==id||invite.status!=='RESERVED'||invite.operationId!==id||index.get('operationId')!==id||index.get('state')!=='RESERVED'||index.get('householdId')!==op.householdId||index.get('role')!=='member')fail('INVITE_STATE_UNAVAILABLE');
+        return id;
       }
+      if(prior&&!['DONE','ABORTED'].includes(prior.status))fail('IN_PROGRESS');
       if(invite.status!=='PENDING')fail(invite.status==='RESERVED'?'IN_PROGRESS':invite.status);
       const now=this.clock();if(invite.expiresAt.toMillis()<=now.toMillis())fail('EXPIRED');
       if(invite.createdByUid===uid)fail('SELF_INVITE');
       if(index.exists)fail('ALREADY_IN_FAMILY');
+      if(prior&&(await tx.get(this.db.doc(`households/${prior.householdId}/members/${uid}`))).exists)fail('INVITE_STATE_UNAVAILABLE');
       const create=await tx.get(this.db.doc(`familyOperations/${createOperationId(uid)}`));
       if(create.exists&&create.get('status')!=='ABORTED')fail('IN_PROGRESS');
       const p=await this.standalone(tx,uid),members=await this.family(tx,invite.createdByUid,invite.householdId);
@@ -102,7 +124,7 @@ export class FamilyJoinStore {
         householdId:invite.householdId,sourceHouseholdId:p,mode,phase:'RESERVED',status:'READY',
         sourceItemCount:count.data().count,deleteReconfirmationRequired:mode==='DELETE',createdAt:now,updatedAt:now,
         nextAt:now,leaseId:null,leaseUntil:null,lastOutcome:null};
-      tx.set(opRef,op);tx.update(inviteRef,{status:'RESERVED',operationId:id});
+      tx.create(opRef,op);tx.update(userRef,{familyJoinBinding:{operationId:id,inviteId}});tx.update(inviteRef,{status:'RESERVED',operationId:id});
       tx.create(indexRef,{householdId:invite.householdId,role:'member',state:'RESERVED',operationId:id});
       tx.set(capRef,{...capState,operationIds:[...ids,id]});
       return id;

@@ -6,7 +6,7 @@ import {readDeletion} from '../accounts/deletion-contract';
 import {familyLifecycleEnabled} from './owner-pro-loss';
 import {readFamilyMembership,validatePrivateRoot} from './household-contract';
 import {privateHouseholdId} from './household-store';
-import {readJoinOperation,joinOperationId} from './family-join';
+import {readJoinOperation,currentJoinId,isJoinIdentity} from './family-join';
 import {readJoinCapacity} from './join-capacity';
 import {MemberLeaveStore,memberLeaveId,ownerRemoveId,readMemberExitCompletion,FamilyLeaveError} from './member-leave';
 import {dissolutionId} from './dissolution-preparation';
@@ -18,7 +18,7 @@ type Intent={version:1;uid:string;accountGeneration:number;householdId:string;ow
 const invalid=():never=>{throw new Error('memberDeletionIntegrity');};
 const proof=<T>(fn:()=>T):T=>{try{return fn();}catch{return invalid();}};
 function read(v:any,uid:string):Intent {
- if(!v||v.version!==1||v.uid!==uid||v.reason!=='ACCOUNT_DELETION_MEMBER_EXIT'||!Number.isSafeInteger(v.accountGeneration)||v.accountGeneration<1||v.privateHouseholdId!==privateHouseholdId(uid)||v.joinOperationId!==joinOperationId(uid)||typeof v.ownerUid!=='string'||v.ownerUid===uid||typeof v.householdId!=='string'||!/^[A-Za-z0-9_-]{1,128}$/.test(v.householdId)||!/^[a-f0-9]{64}$/.test(v.inviteId)||!(v.membershipUpdateTime instanceof Timestamp)||!(v.createdAt instanceof Timestamp)||!(v.updatedAt instanceof Timestamp)||!['WAITING_EXIT','EXIT_COMPLETE','HANDED_OFF','OPERATOR'].includes(v.phase)||!(v.exitEvidence===null||typeof v.exitEvidence==='string')||!(v.deletionOperationId===null||typeof v.deletionOperationId==='string')||['EXIT_COMPLETE','HANDED_OFF'].includes(v.phase)&&typeof v.exitEvidence!=='string'||v.phase==='HANDED_OFF'&&typeof v.deletionOperationId!=='string'||['WAITING_EXIT','EXIT_COMPLETE'].includes(v.phase)&&!(v.nextAt instanceof Timestamp))invalid();
+ if(!v||v.version!==1||v.uid!==uid||v.reason!=='ACCOUNT_DELETION_MEMBER_EXIT'||!Number.isSafeInteger(v.accountGeneration)||v.accountGeneration<1||v.privateHouseholdId!==privateHouseholdId(uid)||!isJoinIdentity(v.joinOperationId,uid,v.inviteId)||typeof v.ownerUid!=='string'||v.ownerUid===uid||typeof v.householdId!=='string'||!/^[A-Za-z0-9_-]{1,128}$/.test(v.householdId)||!/^[a-f0-9]{64}$/.test(v.inviteId)||!(v.membershipUpdateTime instanceof Timestamp)||!(v.createdAt instanceof Timestamp)||!(v.updatedAt instanceof Timestamp)||!['WAITING_EXIT','EXIT_COMPLETE','HANDED_OFF','OPERATOR'].includes(v.phase)||!(v.exitEvidence===null||typeof v.exitEvidence==='string')||!(v.deletionOperationId===null||typeof v.deletionOperationId==='string')||['EXIT_COMPLETE','HANDED_OFF'].includes(v.phase)&&typeof v.exitEvidence!=='string'||v.phase==='HANDED_OFF'&&typeof v.deletionOperationId!=='string'||['WAITING_EXIT','EXIT_COMPLETE'].includes(v.phase)&&!(v.nextAt instanceof Timestamp))invalid();
  return v;
 }
 /** Recent authentication is enforced by the existing DeletionGateway before begin. */
@@ -39,9 +39,10 @@ export class MemberAccountDeletionStore {
    const marker=await tx.get(this.db.doc(`accountLifecycle/${uid}`)),account=proof(()=>readAccount(marker.data()));
    if(account.state!=='ACTIVE'||(await tx.get(this.db.doc(`accountDeletions/${uid}`))).exists)invalid();
    const user=await tx.get(this.db.doc(`users/${uid}`)),home=await tx.get(this.db.doc(`households/${m.householdId}`));
-   const joinDoc=await tx.get(this.db.doc(`familyOperations/${joinOperationId(uid)}`)),join=proof(()=>readJoinOperation(joinDoc.data(),joinOperationId(uid)));
-   if(join.phase!=='ACTIVE'||join.status!=='DONE'||join.householdId!==m.householdId||home.get('kind')!=='family'||home.get('state')!=='ACTIVE'||home.get('ownerUid')!==join.ownerUid||user.get('activeHouseholdId')!==m.householdId||user.get('privateHouseholdId')!==privateHouseholdId(uid)||user.get('familyHouseholdId')!==m.householdId)invalid();
-   const now=this.clock(),i:Intent={version:1,uid,accountGeneration:account.generation,householdId:m.householdId,ownerUid:join.ownerUid,privateHouseholdId:privateHouseholdId(uid),joinOperationId:joinOperationId(uid),inviteId:join.inviteId,membershipUpdateTime:index.updateTime!,reason:'ACCOUNT_DELETION_MEMBER_EXIT',phase:'WAITING_EXIT',exitEvidence:null,deletionOperationId:null,createdAt:now,updatedAt:now,nextAt:now,lastOutcome:'admitted'};
+   const joinId=proof(()=>currentJoinId(uid,user.get('familyJoinBinding')));
+   const joinDoc=await tx.get(this.db.doc(`familyOperations/${joinId}`)),join=proof(()=>readJoinOperation(joinDoc.data(),joinId));
+   if(join.actorUid!==uid||user.get('familyJoinBinding')!==undefined&&user.get('familyJoinBinding.inviteId')!==join.inviteId||join.phase!=='ACTIVE'||join.status!=='DONE'||join.householdId!==m.householdId||home.get('kind')!=='family'||home.get('state')!=='ACTIVE'||home.get('ownerUid')!==join.ownerUid||user.get('activeHouseholdId')!==m.householdId||user.get('privateHouseholdId')!==privateHouseholdId(uid)||user.get('familyHouseholdId')!==m.householdId)invalid();
+   const now=this.clock(),i:Intent={version:1,uid,accountGeneration:account.generation,householdId:m.householdId,ownerUid:join.ownerUid,privateHouseholdId:privateHouseholdId(uid),joinOperationId:joinId,inviteId:join.inviteId,membershipUpdateTime:index.updateTime!,reason:'ACCOUNT_DELETION_MEMBER_EXIT',phase:'WAITING_EXIT',exitEvidence:null,deletionOperationId:null,createdAt:now,updatedAt:now,nextAt:now,lastOutcome:'admitted'};
    tx.create(ref,i);return i;
   });
  }

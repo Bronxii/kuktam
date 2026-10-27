@@ -74,13 +74,13 @@ for(const mode of ['ADD','DELETE'] as const)test(`${mode} reserves atomically wi
  assert.equal(op.sourceItemCount,1);assert.equal(op.deleteReconfirmationRequired,mode==='DELETE');
  assert.equal((await db.doc(`familyInvites/${invite.inviteId}`).get()).get('status'),'RESERVED');
  assert.deepEqual((await db.doc('familyMemberships/guest').get()).data(),{state:'RESERVED',role:'member',householdId:'family-test',operationId:id});
- assert.deepEqual((await db.doc('users/guest').get()).data(),before);
+ assert.deepEqual((await db.doc('users/guest').get()).data(),{...before,familyJoinBinding:{operationId:id,inviteId:invite.inviteId}});
  assert.deepEqual((await db.doc(`households/${p}/shoppingItems/a`).get()).data(),item);
  assert.equal((await db.doc('households/family-test/members/guest').get()).exists,false);
  assert.equal(JSON.stringify(await snapshot()).includes(invite.token),false);
  assert.equal(await join.resume(id),'READY_FOR_TRANSFER');
  assert.deepEqual(await new HouseholdStore(db).ensure({uid:'guest'}),{schemaVersion:1,householdId:p,ready:true});
- assert.deepEqual((await db.doc('users/guest').get()).data(),before);
+ assert.deepEqual((await db.doc('users/guest').get()).data(),{...before,familyJoinBinding:{operationId:id,inviteId:invite.inviteId}});
 });
 for(const variant of ['absentGate','disabledGate','cloudRuntime','self','expired','revoked','used','reserved','missing',
  'ownerFree','ownerDELETING','ownerDELETED','guestDELETING','guestDELETED','PREPARING','DISSOLVING','missingFamily',
@@ -224,10 +224,11 @@ test('maintenance and callable compete safely; invalid job cannot block JOIN; bi
  assert.equal(play.calls,0);assert.equal(ack.calls,0);
  assert.equal((await db.doc('households/family-test/members/guest').get()).exists,false);
 });
-test('deletion cannot declare DONE with reserved relationship; abort releases it without resurrecting root',async()=>{
+test('deletion admission blocks reserved relationship; abort releases it without resurrecting root',async()=>{
  const s=await joined(),deletion=new AccountDeletionService(db,new FakeAuthDeletionApi());
- await deletion.beginAccountDeletion({uid:'guest'});assert.equal(await deletion.resume('guest',1),'cleanupRetryRequired');
- assert.notEqual((await db.doc('accountDeletions/guest').get()).get('stage'),'DONE');
+ await assert.rejects(deletion.beginAccountDeletion({uid:'guest'}),/JOIN_COMMITTED_IN_PROGRESS/);
+ assert.equal((await db.doc('accountDeletions/guest').get()).exists,false);
+ assert.equal((await db.doc('accountLifecycle/guest').get()).get('state'),'ACTIVE');
  await db.doc('users/guest').delete();assert.equal(await s.join.resume(s.id),'ABORTED');
  assert.equal((await db.doc('users/guest').get()).exists,false);
  assert.equal((await db.doc('familyMemberships/guest').get()).exists,false);

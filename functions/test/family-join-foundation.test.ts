@@ -108,7 +108,12 @@ for(const cause of ['cancel','revoke','expiry','pro','lifecycle'])test(`precommi
  if(cause==='revoke')await s.store.revoke({uid:'owner'},s.invite.inviteId);
  if(cause==='expiry')s.advance(INVITE_SECONDS*1000);
  if(cause==='pro')await db.doc('users/owner/entitlementGrants/pro').delete();
- if(cause==='lifecycle')await new LifecycleStore(db,s.clock).beginDeletion('guest');
+ if(cause==='lifecycle'){
+  // Phase 6 admission guards the reserved relationship; simulate a later trusted
+  // lifecycle change to exercise the precommit worker's existing abort safety.
+  await assert.rejects(new LifecycleStore(db,s.clock).beginDeletion('guest'),/FAMILY_LIFECYCLE_NOT_READY|JOIN_COMMITTED_IN_PROGRESS/);
+  await db.doc('accountLifecycle/guest').update({state:'DELETING',deletionStartedAt:s.clock(),updatedAt:s.clock()});
+ }
  await s.tick();assert.equal((await s.op()).status,'ABORTED');assert.equal((await db.doc(`households/${s.p}`).get()).get('operationId'),null);
  assert.notEqual((await db.doc(`households/${s.p}`).get()).get('shoppingEpoch'),epoch);
  assert.equal((await db.collection(`households/${s.p}/shoppingItems`).get()).size,11);
@@ -192,12 +197,15 @@ test('final capacity overflow rejects commit and safely aborts',async()=>{
  assert.equal(await s.engine.confirm({uid:'guest'},await s.consent()),'ABORTED');
  assert.equal((await db.doc(`households/${s.p}`).get()).get('operationId'),null);
 });
-test('stale invitation incarnation cannot confirm or cancel a reused per-UID slot',async()=>{
+test('stale invitation incarnation cannot confirm or cancel a new generation',async()=>{
  const s=await foundation('DELETE');await s.wait();const old=await s.consent();await s.engine.cancel({uid:'guest'},s.id,s.invite.inviteId);
- const next=await s.create();assert.notEqual(next.inviteId,s.invite.inviteId);
- await s.join.reserve({uid:'guest'},next.token,'DELETE');await s.join.resume(s.id);await s.engine.prepare({uid:'guest'},s.id,next.inviteId);
- await assert.rejects(s.engine.confirm({uid:'guest'},old));await assert.rejects(s.engine.cancel({uid:'guest'},s.id,s.invite.inviteId));
- assert.equal((await s.op()).inviteId,next.inviteId);
+ const oldDoc=await db.doc(`familyOperations/${s.id}`).get(),next=await s.create();
+ const nextId=await s.join.reserve({uid:'guest'},next.token,'DELETE');assert.notEqual(nextId,s.id);
+ await s.join.resume(nextId);await s.engine.prepare({uid:'guest'},nextId,next.inviteId);
+ await assert.rejects(s.engine.confirm({uid:'guest'},{...old,operationId:nextId}));
+ await assert.rejects(s.engine.cancel({uid:'guest'},nextId,s.invite.inviteId));
+ assert.equal((await db.doc(`familyOperations/${nextId}`).get()).get('inviteId'),next.inviteId);
+ assert.deepEqual((await db.doc(`familyOperations/${s.id}`).get()).data(),oldDoc.data());
 });
 
 test('corrupt manifest enters OPERATOR without releasing source or looping retries',async()=>{

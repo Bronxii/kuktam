@@ -7,7 +7,7 @@ import { FamilyInviteStore } from './family-invites';
 import { readInvite, inviteIdPattern, FamilyInviteError } from './invite-contract';
 import { readFamilyMembership, validatePrivateRoot } from './household-contract';
 import { privateHouseholdId } from './household-store';
-import { joinOperationId, readJoinOperation } from './family-join';
+import { currentJoinId, isJoinIdentity, readJoinOperation } from './family-join';
 import { readJoinCapacity } from './join-capacity';
 
 export type LeaveCode='INVALID_ARGUMENT'|'FEATURE_DISABLED'|'NOT_ACTIVE_MEMBER'|'OWNER_CANNOT_LEAVE'|
@@ -19,11 +19,11 @@ export const ownerRemoveId=(ownerUid:string,targetUid:string,inviteId:string)=>'
 const proof=<T>(read:()=>T):T=>{try{return read();}catch{return fail('INTEGRITY_REQUIRES_OPERATOR');}};
 
 export function readMemberExitCompletion(v:any,actorUid:string,uid:string,inviteId:string,removal:boolean){
- const kind=removal?'OWNER_REMOVE_MEMBER':'MEMBER_LEAVE',joinId=joinOperationId(uid),p=privateHouseholdId(uid);
+ const kind=removal?'OWNER_REMOVE_MEMBER':'MEMBER_LEAVE',p=privateHouseholdId(uid);
   const keys='actorUid,createdAt,householdId,inviteId,joinOperationId,kind,leaseId,leaseUntil,nextAt,phase,privateHouseholdId,schemaVersion,status,updatedAt'.split(',');
   if(removal)keys.push('targetUid');
   if(Object.keys(v).sort().join(',')!==keys.sort().join(',')||(removal&&v.targetUid!==uid)||
-    v.schemaVersion!==1||v.kind!==kind||v.actorUid!==actorUid||v.inviteId!==inviteId||v.joinOperationId!==joinId||v.privateHouseholdId!==p||
+    v.schemaVersion!==1||v.kind!==kind||v.actorUid!==actorUid||v.inviteId!==inviteId||!isJoinIdentity(v.joinOperationId,uid,inviteId)||v.privateHouseholdId!==p||
     typeof v.householdId!=='string'||! /^[A-Za-z0-9_-]{1,128}$/.test(v.householdId)||v.householdId===p||
     v.phase!=='PRIVATE'||v.status!=='DONE'||v.nextAt!==null||v.leaseId!==null||v.leaseUntil!==null||
     !(v.createdAt instanceof Timestamp)||!(v.updatedAt instanceof Timestamp)||!v.createdAt.isEqual(v.updatedAt))fail('INTEGRITY_REQUIRES_OPERATOR');
@@ -65,13 +65,21 @@ export class MemberLeaveStore {
     if(process.env.K_SERVICE||process.env.FUNCTION_NAME||process.env.GCLOUD_PROJECT!=='demo-kuktam-local'||
       !/^(127\.0\.0\.1|localhost):[0-9]{1,5}$/.test(process.env.FIRESTORE_EMULATOR_HOST??''))fail('FEATURE_DISABLED');
     const kind=removal?'OWNER_REMOVE_MEMBER':'MEMBER_LEAVE';
-    const id=removal?ownerRemoveId(actorUid,uid,inviteId):memberLeaveId(uid,inviteId),joinId=joinOperationId(uid),p=privateHouseholdId(uid);
+    const id=removal?ownerRemoveId(actorUid,uid,inviteId):memberLeaveId(uid,inviteId),p=privateHouseholdId(uid);
     return this.db.runTransaction(async tx=>{
       const ref=this.db.doc(`familyOperations/${id}`),receipt=await tx.get(ref);
       if(receipt.exists){
         const v=receipt.data()!;
         readMemberExitCompletion(v,actorUid,uid,inviteId,removal);
-        // Historical completion, not a claim about current membership/routing.
+        const live=await tx.get(this.db.doc(`familyMemberships/${uid}`));
+        if(live.exists){
+          const u=await tx.get(this.db.doc(`users/${uid}`));
+          const current=proof(()=>currentJoinId(uid,u.get('familyJoinBinding')));
+          if(current!==v.joinOperationId||live.get('householdId')!==v.householdId)fail('STALE_MEMBERSHIP');
+          // A completed exit and a still-present same-generation membership contradict.
+          fail('INTEGRITY_REQUIRES_OPERATOR');
+        }
+        // Historical receipt is safe only while no later membership is present.
         return {schemaVersion:1,operationId:id,outcome:'DONE' as const};
       }
       const deletionIntent=deletion?await tx.get(this.db.doc(`familyMemberDeletions/${uid}`)):null;
@@ -94,6 +102,7 @@ export class MemberLeaveStore {
       if(binding.role==='owner')fail('OWNER_CANNOT_LEAVE');
       if(binding.state!=='ACTIVE')fail('IN_PROGRESS');
       const user=await tx.get(this.db.doc(`users/${uid}`)),hid=binding.householdId;
+      const joinId=proof(()=>currentJoinId(uid,user.get('familyJoinBinding')));
       if(deletion&&(hid!==deletionIntent!.get('householdId')||!index.updateTime!.isEqual(deletionIntent!.get('membershipUpdateTime'))))fail('INTEGRITY_REQUIRES_OPERATOR');
       if(removal&&callerFamily!==hid)fail('WRONG_FAMILY');
       if(user.get('activeHouseholdId')!==hid||user.get('familyHouseholdId')!==hid||user.get('privateHouseholdId')!==p||user.get('shoppingMigrationVersion')!==1||hid===p)fail('INTEGRITY_REQUIRES_OPERATOR');
@@ -116,6 +125,7 @@ export class MemberLeaveStore {
       if(family.householdId!==hid||members.length+capacity.operationIds.length>8||!members.some(m=>m.memberId===uid&&m.role==='member'))fail('INTEGRITY_REQUIRES_OPERATOR');
       const joinDoc=await tx.get(this.db.doc(`familyOperations/${joinId}`));
       const join=proof(()=>readJoinOperation(joinDoc.data(),joinId));
+      if(join.actorUid!==uid||user.get('familyJoinBinding')!==undefined&&user.get('familyJoinBinding.inviteId')!==join.inviteId)fail('INTEGRITY_REQUIRES_OPERATOR');
       if(join.inviteId!==inviteId)fail('STALE_MEMBERSHIP');
       if(join.phase!=='ACTIVE'||join.status!=='DONE'||join.householdId!==hid||join.sourceHouseholdId!==p||join.ownerUid!==home.get('ownerUid'))fail('INTEGRITY_REQUIRES_OPERATOR');
       const inviteDoc=await tx.get(this.db.doc(`familyInvites/${inviteId}`));

@@ -1,6 +1,6 @@
 import { FieldPath, Firestore, Timestamp, Transaction } from 'firebase-admin/firestore';
 import { authenticatedUid, AuthContext } from '../billing/account-binding';
-import { FamilyJoinStore, joinOperationId, localJoinRuntime, readJoinOperation } from './family-join';
+import { FamilyJoinStore, isJoinIdentity, joinOperationId, localJoinRuntime, readJoinOperation } from './family-join';
 import { TransferOperation, readTransfer, hashValue } from './join-transfer-contract';
 import { readJoinCapacity, dissolutionLocked } from './join-capacity';
 import { FamilyInviteStore } from './family-invites';
@@ -21,7 +21,7 @@ export class JoinTransferStore {
     this.validation=new FamilyInviteStore(db,{resolve:async()=>{throw new Error('notRequired');}},clock);
   }
   private local(){if(process.env.K_SERVICE||process.env.FUNCTION_NAME||!localJoinRuntime(process.env.GCLOUD_PROJECT,process.env.FIRESTORE_EMULATOR_HOST))fail('FEATURE_DISABLED');}
-  private identity(context:AuthContext,id:string,inviteId:string){const uid=authenticatedUid(context);if(id!==joinOperationId(uid)||!/^[a-f0-9]{64}$/.test(inviteId))fail('INVALID_ARGUMENT');return uid;}
+  private identity(context:AuthContext,id:string,inviteId:string){const uid=authenticatedUid(context);if(!isJoinIdentity(id,uid,inviteId))fail('INVALID_ARGUMENT');return uid;}
   async prepare(context:AuthContext,id:string,inviteId:string){
     this.local();this.identity(context,id,inviteId);
     await this.db.runTransaction(async tx=>{
@@ -153,9 +153,10 @@ export class JoinTransferStore {
           const sourceExpires=c.source.get('shoppingEpochExpiresAt'),familyExpires=home.get('shoppingEpochExpiresAt');
           if(epoch!==undefined&&!Number.isFinite(expiry)||!(sourceExpires instanceof Timestamp)||sourceExpires.toMillis()!==epochExpiry(o.sourceFence!.epoch))throw new Error('transferIntegrity');
           if(Number.isFinite(expiry)&&(!(familyExpires instanceof Timestamp)||familyExpires.toMillis()!==expiry))throw new Error('transferIntegrity');
-          // Preserve a valid live family epoch. Renew only missing/expired context;
-          // no canonical item or sequence is changed by activation.
-          if(!(expiry>now.toMillis()))tx.update(home.ref,advanceShoppingEpoch(now));
+          // A later membership must not revive a request accepted during an older
+          // membership of the same Family. Rotate the existing shared context at
+          // rejoin activation; quantities and household sequencing stay unchanged.
+          if(id!==joinOperationId(o.actorUid)||!(expiry>now.toMillis()))tx.update(home.ref,advanceShoppingEpoch(now));
           tx.create(home.ref.collection('members').doc(o.actorUid),{role:'member'});
           tx.set(c.index.ref,{householdId:o.householdId,role:'member',state:'ACTIVE',operationId:null});
           tx.update(c.user.ref,{activeHouseholdId:o.householdId,familyHouseholdId:o.householdId});
