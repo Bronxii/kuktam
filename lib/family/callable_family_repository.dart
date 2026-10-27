@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'package:crypto/crypto.dart';
+import 'family_join.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'family_repository.dart';
@@ -102,7 +105,11 @@ class CallableFamilyRepository implements FamilyRepository {
   Future<FamilyInviteResult> createInvite() async =>
       FamilyInviteResult.fromResponse(await _mutate('createFamilyInvite'));
 
-  Future<Object?> _mutate(String name) async {
+  Future<Object?> _mutate(
+    String name, {
+    Map<String, Object?> data = const {},
+    bool join = false,
+  }) async {
     final uid = _uid;
     var changed = false;
     final subscription = sessionChanges.listen((_) => changed = true);
@@ -119,11 +126,12 @@ class CallableFamilyRepository implements FamilyRepository {
             name,
             options: HttpsCallableOptions(timeout: const Duration(seconds: 65)),
           )
-          .call<Object?>({});
+          .call<Object?>(data);
       check();
       return result.data;
     } on FirebaseFunctionsException catch (error) {
       check();
+      if (join) throw FamilyJoinException(error.message ?? 'UNAVAILABLE');
       final reason = switch (error.message) {
         'proRequired' || 'OWNER_NOT_PRO' => FamilyMutationFailure.proRequired,
         'alreadyFamily' ||
@@ -143,12 +151,117 @@ class CallableFamilyRepository implements FamilyRepository {
         _ => FamilyMutationFailure.unavailable,
       };
       throw FamilyMutationException(reason);
+    } on FamilyJoinException {
+      rethrow;
     } on FamilyMutationException {
       rethrow;
     } catch (_) {
       throw const FamilyMutationException(FamilyMutationFailure.unavailable);
     } finally {
       await subscription.cancel();
+    }
+  }
+
+  @override
+  Future<FamilyInvitePreview> previewInvite(String code) async =>
+      FamilyInvitePreview.parse(
+        await _mutate(
+          'previewFamilyInvite',
+          data: {'token': code.trim()},
+          join: true,
+        ),
+      );
+  @override
+  Future<FamilyJoinHandle> startJoin(String code, FamilyJoinMode mode) async {
+    final token = code.trim();
+    final raw = await _mutate(
+      'acceptFamilyInvite',
+      data: {'token': token, 'mode': mode.wire},
+      join: true,
+    );
+    final expected = 'join_${sha256.convert(utf8.encode(_uid!))}';
+    if (raw is! Map ||
+        raw['schemaVersion'] != 1 ||
+        raw['operationId'] != expected) {
+      throw const FamilyJoinException('UNAVAILABLE');
+    }
+    if (raw['outcome'] == 'ABORTED') throw const FamilyJoinException('REVOKED');
+    if (![
+      'RESERVED',
+      'READY_FOR_TRANSFER',
+      'SNAPSHOT_SOURCE',
+      'SOURCE_FENCED_WAITING_CONFIRMATION',
+      'COMMITTED_TRANSFER',
+      'CLEAN_SOURCE',
+      'TRANSFER_COMPLETE',
+      'ACTIVE',
+      'DONE',
+      'IN_PROGRESS',
+      'notDueOrBusy',
+      'retry',
+      'OPERATOR',
+    ].contains(raw['outcome'])) {
+      throw const FamilyJoinException('UNAVAILABLE');
+    }
+    return FamilyJoinHandle(
+      expected,
+      sha256.convert(utf8.encode(token)).toString(),
+      mode,
+    );
+  }
+
+  @override
+  Future<FamilyJoinProgress> prepareJoin(FamilyJoinHandle handle) async =>
+      FamilyJoinProgress.parse(
+        await _mutate(
+          'prepareFamilyJoinTransfer',
+          data: handle.request,
+          join: true,
+        ),
+        handle,
+      );
+  @override
+  Future<FamilyJoinProgress> readJoin(FamilyJoinHandle handle) async =>
+      FamilyJoinProgress.parse(
+        await _mutate(
+          'getFamilyJoinTransferState',
+          data: handle.request,
+          join: true,
+        ),
+        handle,
+      );
+  @override
+  Future<void> confirmJoinDelete(FamilyJoinProgress progress) async {
+    final raw = await _mutate(
+      'confirmFamilyJoinDelete',
+      data: progress.consent,
+      join: true,
+    );
+    if (raw is! Map ||
+        raw['schemaVersion'] != 1 ||
+        ![
+          'COMMITTED_TRANSFER',
+          'CLEAN_SOURCE',
+          'TRANSFER_COMPLETE',
+          'ACTIVE',
+          'IN_PROGRESS',
+          'ABORTED',
+        ].contains(raw['outcome'])) {
+      throw const FamilyJoinException('UNAVAILABLE');
+    }
+  }
+
+  @override
+  Future<void> cancelJoin(FamilyJoinHandle handle) async {
+    final raw = await _mutate(
+      'cancelFamilyJoin',
+      data: handle.request,
+      join: true,
+    );
+    if (raw is! Map ||
+        raw['schemaVersion'] != 1 ||
+        !['ABORTED', 'IN_PROGRESS'].contains(raw['outcome'])) {
+      throw const FamilyJoinException('UNAVAILABLE');
     }
   }
 }

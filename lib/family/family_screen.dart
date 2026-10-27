@@ -7,6 +7,7 @@ import 'callable_family_repository.dart';
 import 'family_repository.dart';
 import 'family_state.dart';
 import 'family_mutation.dart';
+import 'family_join_screen.dart';
 
 class FamilyScreen extends StatefulWidget {
   const FamilyScreen({super.key, this.repository});
@@ -64,6 +65,21 @@ class _FamilyScreenState extends State<FamilyScreen> {
       }
     } finally {
       if (mounted && request == _request) setState(() => _loading = false);
+    }
+  }
+
+  Future<void> _join() async {
+    if (_busy || _state?.status != FamilyStatus.privateOnly) return;
+    setState(() => _busy = true);
+    try {
+      await Navigator.of(context).push(
+        MaterialPageRoute<bool>(
+          builder: (_) => FamilyJoinScreen(repository: _repository),
+        ),
+      );
+      if (mounted && _failure != FamilyFailure.signedOut) await _load();
+    } finally {
+      if (mounted) setState(() => _busy = false);
     }
   }
 
@@ -282,6 +298,10 @@ class _FamilyScreenState extends State<FamilyScreen> {
                       Icons.family_restroom_outlined,
                       'Még nem vagy család tagja',
                       'A családi megosztással közös bevásárlólistát használhattok. Jelenleg a saját privát listádat használod.',
+                    ),
+                    OutlinedButton(
+                      onPressed: _busy ? null : _join,
+                      child: const Text('Meghívókód megadása'),
                     ),
                     if (ProScope.maybeOf(context)?.isPro == true)
                       FilledButton(
