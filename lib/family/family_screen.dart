@@ -183,6 +183,61 @@ class _FamilyScreenState extends State<FamilyScreen> {
     }
   }
 
+  Future<void> _dissolve() async {
+    if (_busy || _state?.status != FamilyStatus.activeOwner) return;
+    final request = _request;
+    setState(() {
+      _busy = true;
+      _message = null;
+      _invite = null;
+    });
+    try {
+      final yes = await showDialog<bool>(
+        context: context,
+        builder: (dialogContext) => AlertDialog(
+          scrollable: true,
+          title: const Text('Család megszüntetése'),
+          content: const Text(
+            'Ez az egész családot érinti. A családtagok visszatérnek a saját privát bevásárlólistájukhoz. A közös lista tartalma a te privát listádba kerül; az összeillő tételek összevonódhatnak. A függő meghívók többé nem lesznek használhatók. A megszüntetést nem tudod visszavonni.',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext, false),
+              child: const Text('Mégse'),
+            ),
+            FilledButton(
+              style: FilledButton.styleFrom(
+                backgroundColor: Theme.of(context).colorScheme.error,
+              ),
+              onPressed: () => Navigator.pop(dialogContext, true),
+              child: const Text('Család végleges megszüntetése'),
+            ),
+          ],
+        ),
+      );
+      if (!mounted || request != _request || yes != true) return;
+      Object? failure;
+      try {
+        await _repository.startDissolution();
+      } catch (error) {
+        failure = error;
+      }
+      if (!mounted || request != _request) return;
+      final refreshRequest = _request + 1;
+      await _load();
+      if (!mounted || _request != refreshRequest || _failure != null) return;
+      if (_state?.status == FamilyStatus.activeOwner) {
+        setState(
+          () => _message = failure is FamilyDissolutionException
+              ? failure.message
+              : const FamilyDissolutionException('UNAVAILABLE').message,
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+
   Future<void> _exit(FamilyParticipant target, {required bool removal}) async {
     final state = _state;
     if (_busy ||
@@ -485,6 +540,14 @@ class _FamilyScreenState extends State<FamilyScreen> {
                         ],
                       ),
                     ),
+                    if (state.status == FamilyStatus.activeOwner)
+                      OutlinedButton(
+                        onPressed: _busy ? null : _dissolve,
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: Theme.of(context).colorScheme.error,
+                        ),
+                        child: const Text('Család megszüntetése'),
+                      ),
                     if (state.status == FamilyStatus.activeMember)
                       OutlinedButton(
                         onPressed: _busy

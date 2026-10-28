@@ -86,3 +86,19 @@ class FamilyInviteResult {
     );
   }
 }
+
+class FamilyDissolutionException implements Exception {
+  const FamilyDissolutionException(this.code);
+  final String code;
+  String get message => switch (code) {
+    'NOT_OWNER' =>
+      'Csak az aktív család tulajdonosa szüntetheti meg a családot.',
+    'IN_PROGRESS' => 'Családi művelet van folyamatban. Frissíts később.',
+    'ACCOUNT_UNAVAILABLE' =>
+      'A fiók jelenlegi állapotában ez a művelet nem érhető el.',
+    'FEATURE_DISABLED' =>
+      'Ez a művelet ebben a környezetben még nem érhető el.',
+    _ =>
+      'Nem sikerült megerősíteni a megszüntetés indítását. Ellenőrizd a friss családi állapotot, mielőtt újra próbálod.',
+  };
+}

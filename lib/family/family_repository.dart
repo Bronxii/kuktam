@@ -10,6 +10,7 @@ abstract interface class FamilyRepository {
   Future<FamilyJoinProgress> readJoin(FamilyJoinHandle handle);
   Future<void> confirmJoinDelete(FamilyJoinProgress progress);
   Future<void> cancelJoin(FamilyJoinHandle handle);
+  Future<void> startDissolution();
   Future<FamilyCreation> createFamily();
   Future<FamilyInviteResult> createInvite();
   Future<void> leaveFamily(FamilyParticipant member);

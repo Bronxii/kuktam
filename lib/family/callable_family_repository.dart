@@ -74,6 +74,18 @@ class CallableFamilyRepository implements FamilyRepository {
   }
 
   @override
+  Future<void> startDissolution() async {
+    final raw = await _mutate('startFamilyDissolution', dissolution: true);
+    if (raw is! Map ||
+        raw['schemaVersion'] != 1 ||
+        raw['outcome'] != 'IN_PROGRESS' ||
+        raw['operationId'] is! String ||
+        (raw['operationId'] as String).isEmpty) {
+      throw const FamilyDissolutionException('UNAVAILABLE');
+    }
+  }
+
+  @override
   Future<FamilyCreation> createFamily() async {
     final raw = await _mutate('createFamilyShare');
     if (raw is! Map ||
@@ -144,6 +156,7 @@ class CallableFamilyRepository implements FamilyRepository {
     Map<String, Object?> data = const {},
     bool join = false,
     bool exit = false,
+    bool dissolution = false,
   }) async {
     final uid = _uid;
     var changed = false;
@@ -166,6 +179,9 @@ class CallableFamilyRepository implements FamilyRepository {
       return result.data;
     } on FirebaseFunctionsException catch (error) {
       check();
+      if (dissolution) {
+        throw FamilyDissolutionException(error.message ?? 'UNAVAILABLE');
+      }
       if (exit) throw FamilyExitException(error.message ?? 'UNAVAILABLE');
       if (join) throw FamilyJoinException(error.message ?? 'UNAVAILABLE');
       final reason = switch (error.message) {
