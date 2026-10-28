@@ -105,10 +105,45 @@ class CallableFamilyRepository implements FamilyRepository {
   Future<FamilyInviteResult> createInvite() async =>
       FamilyInviteResult.fromResponse(await _mutate('createFamilyInvite'));
 
+  @override
+  Future<void> leaveFamily(FamilyParticipant member) =>
+      _exit(member, removal: false);
+
+  @override
+  Future<void> removeMember(FamilyParticipant target) =>
+      _exit(target, removal: true);
+
+  Future<void> _exit(FamilyParticipant target, {required bool removal}) async {
+    final inviteId = target.membershipInviteId;
+    if (target.role != FamilyRole.member ||
+        target.uid.isEmpty ||
+        target.uid.length > 128 ||
+        target.uid.contains('/') ||
+        target.uid.trim() != target.uid ||
+        (removal ? target.uid == _uid : target.uid != _uid) ||
+        inviteId == null ||
+        !RegExp(r'^[a-f0-9]{64}$').hasMatch(inviteId)) {
+      throw const FamilyExitException('UNAVAILABLE');
+    }
+    final raw = await _mutate(
+      removal ? 'removeFamilyMember' : 'leaveFamilyShare',
+      data: {'inviteId': inviteId, if (removal) 'targetUid': target.uid},
+      exit: true,
+    );
+    if (raw is! Map ||
+        raw['schemaVersion'] != 1 ||
+        raw['outcome'] != 'DONE' ||
+        raw['operationId'] is! String ||
+        (raw['operationId'] as String).isEmpty) {
+      throw const FamilyExitException('UNAVAILABLE');
+    }
+  }
+
   Future<Object?> _mutate(
     String name, {
     Map<String, Object?> data = const {},
     bool join = false,
+    bool exit = false,
   }) async {
     final uid = _uid;
     var changed = false;
@@ -131,6 +166,7 @@ class CallableFamilyRepository implements FamilyRepository {
       return result.data;
     } on FirebaseFunctionsException catch (error) {
       check();
+      if (exit) throw FamilyExitException(error.message ?? 'UNAVAILABLE');
       if (join) throw FamilyJoinException(error.message ?? 'UNAVAILABLE');
       final reason = switch (error.message) {
         'proRequired' || 'OWNER_NOT_PRO' => FamilyMutationFailure.proRequired,
@@ -151,6 +187,8 @@ class CallableFamilyRepository implements FamilyRepository {
         _ => FamilyMutationFailure.unavailable,
       };
       throw FamilyMutationException(reason);
+    } on FamilyExitException {
+      rethrow;
     } on FamilyJoinException {
       rethrow;
     } on FamilyMutationException {

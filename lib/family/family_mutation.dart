@@ -37,6 +37,30 @@ class FamilyMutationException implements Exception {
 
 enum FamilyCreation { complete, inProgress }
 
+class FamilyExitException implements Exception {
+  const FamilyExitException(this.code);
+  final String code;
+  String get message => switch (code) {
+    'STALE_MEMBERSHIP' =>
+      'A tagság időközben megváltozott. Ellenőrizd a friss családi állapotot.',
+    'NOT_ACTIVE_MEMBER' =>
+      'Ez a tagság már nem aktív. A családi állapot frissült.',
+    'OWNER_CANNOT_LEAVE' || 'OWNER_CANNOT_REMOVE_SELF' =>
+      'A tulajdonos ezzel a művelettel nem léphet ki a családból.',
+    'NOT_OWNER' ||
+    'WRONG_FAMILY' => 'Ezt a tagot csak a család tulajdonosa távolíthatja el.',
+    'IN_PROGRESS' => 'Családi művelet van folyamatban. Frissíts később.',
+    'ACCOUNT_UNAVAILABLE' =>
+      'A fiók jelenlegi állapotában ez a művelet nem érhető el.',
+    'FEATURE_DISABLED' =>
+      'Ez a művelet ebben a környezetben még nem érhető el.',
+    'INTEGRITY_REQUIRES_OPERATOR' =>
+      'A tagság most nem ellenőrizhető biztonságosan. Próbáld újra később.',
+    _ =>
+      'Nem sikerült megerősíteni a művelet eredményét. Ellenőrizd a friss családi állapotot, mielőtt újra próbálod.',
+  };
+}
+
 /// Transient bearer credential from the existing API, never persisted/logged.
 class FamilyInviteResult {
   const FamilyInviteResult({required this.code, required this.expiresAt});

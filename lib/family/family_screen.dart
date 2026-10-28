@@ -183,6 +183,94 @@ class _FamilyScreenState extends State<FamilyScreen> {
     }
   }
 
+  Future<void> _exit(FamilyParticipant target, {required bool removal}) async {
+    final state = _state;
+    if (_busy ||
+        state == null ||
+        state.status !=
+            (removal ? FamilyStatus.activeOwner : FamilyStatus.activeMember)) {
+      return;
+    }
+    if (!state.participants.contains(target) ||
+        target.role != FamilyRole.member ||
+        (removal
+            ? target.uid == state.currentUid
+            : target.uid != state.currentUid) ||
+        target.membershipInviteId == null) {
+      setState(
+        () => _message = const FamilyExitException('UNAVAILABLE').message,
+      );
+      return;
+    }
+    final request = _request;
+    setState(() {
+      _busy = true;
+      _message = null;
+      _invite = null;
+    });
+    try {
+      final yes = await showDialog<bool>(
+        context: context,
+        builder: (dialogContext) => AlertDialog(
+          scrollable: true,
+          title: Text(removal ? 'Tag eltávolítása' : 'Kilépés a családból'),
+          content: Text(
+            removal
+                ? '${target.label} kikerül a családból, és visszatér a saját privát bevásárlólistájához. A közös családi lista a többi tagnál megmarad. A tag fiókja és privát adatai nem törlődnek.'
+                : 'Kilépsz a családból, és visszatérsz a saját privát bevásárlólistádhoz. A közös családi lista többé nem lesz az aktív listád. A többi családtag és a családi bevásárlólista változatlanul megmarad.',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext, false),
+              child: const Text('Mégse'),
+            ),
+            FilledButton(
+              style: FilledButton.styleFrom(
+                backgroundColor: Theme.of(context).colorScheme.error,
+              ),
+              onPressed: () => Navigator.pop(dialogContext, true),
+              child: Text(removal ? 'Tag eltávolítása' : 'Kilépés'),
+            ),
+          ],
+        ),
+      );
+      if (!mounted || request != _request || yes != true) return;
+      Object? failure;
+      try {
+        if (removal) {
+          await _repository.removeMember(target);
+        } else {
+          await _repository.leaveFamily(target);
+        }
+      } catch (error) {
+        failure = error;
+      }
+      if (!mounted || request != _request) return;
+      // Read after success AND uncertainty/staleness. Never replay the captured
+      // binding automatically, and never manufacture a private/removed state.
+      final refreshRequest = _request + 1;
+      await _load();
+      if (!mounted || _request != refreshRequest || _failure != null) return;
+      final fresh = _state!;
+      final completed = removal
+          ? fresh.status == FamilyStatus.activeOwner &&
+                !fresh.participants.any((p) => p.uid == target.uid)
+          : fresh.status == FamilyStatus.privateOnly;
+      if (!completed) {
+        setState(
+          () => _message = failure == null
+              ? 'A friss családi állapot még nem igazolja a művelet befejezését. Ellenőrizd az állapotot később.'
+              : (failure is FamilyExitException
+                        ? failure
+                        : const FamilyExitException('UNAVAILABLE'))
+                    .message,
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+
   @override
   void dispose() {
     _request++;
@@ -371,10 +459,44 @@ class _FamilyScreenState extends State<FamilyScreen> {
                               subtitle: Text(
                                 '${member.role == FamilyRole.owner ? 'Tulajdonos' : 'Tag'}${member.uid == state.currentUid ? ' · Te' : ''}',
                               ),
+                              trailing:
+                                  state.status == FamilyStatus.activeOwner &&
+                                      member.role == FamilyRole.member &&
+                                      member.uid != state.currentUid
+                                  ? PopupMenuButton<String>(
+                                      key: ValueKey(
+                                        'family-member-menu-${member.uid}',
+                                      ),
+                                      tooltip: 'Tag kezelése',
+                                      enabled:
+                                          !_busy &&
+                                          member.membershipInviteId != null,
+                                      onSelected: (_) =>
+                                          _exit(member, removal: true),
+                                      itemBuilder: (_) => const [
+                                        PopupMenuItem(
+                                          value: 'remove',
+                                          child: Text('Tag eltávolítása'),
+                                        ),
+                                      ],
+                                    )
+                                  : null,
                             ),
                         ],
                       ),
                     ),
+                    if (state.status == FamilyStatus.activeMember)
+                      OutlinedButton(
+                        onPressed: _busy
+                            ? null
+                            : () => _exit(
+                                state.participants.firstWhere(
+                                  (p) => p.uid == state.currentUid,
+                                ),
+                                removal: false,
+                              ),
+                        child: const Text('Kilépés a családból'),
+                      ),
                   ],
                 ],
               ),

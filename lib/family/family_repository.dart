@@ -12,6 +12,8 @@ abstract interface class FamilyRepository {
   Future<void> cancelJoin(FamilyJoinHandle handle);
   Future<FamilyCreation> createFamily();
   Future<FamilyInviteResult> createInvite();
+  Future<void> leaveFamily(FamilyParticipant member);
+  Future<void> removeMember(FamilyParticipant target);
 
   /// Session invalidation only; no member/household listeners.
   Stream<void> get sessionChanges;
