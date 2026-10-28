@@ -21,7 +21,7 @@ export class FamilyInviteStore {
     try {if(readAccount(doc.data()).state!=='ACTIVE')fail('ACCOUNT_UNAVAILABLE');}
     catch {fail('ACCOUNT_UNAVAILABLE');}
   }
-  private async context(tx:Transaction,uid:string):Promise<FamilyContext|null> {
+  private async context(tx:Transaction,uid:string,progressRead=false):Promise<FamilyContext|null> {
     await this.active(tx,uid);
     const user=await tx.get(this.db.doc(`users/${uid}`)), reverse=await tx.get(this.db.doc(`familyMemberships/${uid}`));
     if(!reverse.exists) {
@@ -38,9 +38,33 @@ export class FamilyInviteStore {
     if(home.get('state')==='PREPARING')fail('FAMILY_PREPARING');
     if(home.get('state')==='DISSOLVING')fail('FAMILY_DISSOLVING');
     if(!home.exists || home.get('schemaVersion')!==2 || home.get('kind')!=='family' || home.get('state')!=='ACTIVE' ||
-        home.get('operationId')!==null || !(home.get('createdAt') instanceof Timestamp) ||
+        !(home.get('createdAt') instanceof Timestamp) ||
         typeof home.get('ownerUid')!=='string' || !member.exists || member.get('role')!==binding.role ||
         (binding.role==='owner')!==(home.get('ownerUid')===uid))fail('FAMILY_UNAVAILABLE');
+    if(progressRead){
+      const {dissolutionId}=await import('./dissolution-preparation');
+      const {readJoinCapacity}=await import('./join-capacity');
+      const {readOwnerProLossIntent}=await import('./owner-pro-loss');
+      const {readOwnerDeletionIntent}=await import('./owner-account-deletion');
+      const ownerUid=home.get('ownerUid') as string,id=dissolutionId(ownerUid,hid);
+      const [operation,capacity,intent,deletion]=await tx.getAll(this.db.doc(`familyOperations/${id}`),this.db.doc(`familyJoinCapacity/${hid}`),this.db.doc(`familyProLoss/${id}`),this.db.doc(`familyOwnerDeletions/${ownerUid}`));
+      let pending=false;
+      try{
+        const cap=readJoinCapacity(capacity!.data());
+        if(operation!.exists){
+          if(operation!.get('kind')!=='FAMILY_DISSOLUTION'||operation!.get('ownerUid')!==ownerUid||operation!.get('householdId')!==hid||operation!.get('status')==='DONE'||cap.structuralOperationId!==id)throw new Error('invalidDissolution');
+          pending=true;
+        }
+        if(cap.structuralOperationId){
+          if(cap.schemaVersion===3&&!operation!.exists)throw new Error('missingDissolution');
+          pending=true;
+        }
+        if(intent!.exists){const i=readOwnerProLossIntent(intent!.data(),id);if(['PENDING','IN_PROGRESS','OPERATOR'].includes(i.status))pending=true;}
+        if(deletion!.exists){const i=readOwnerDeletionIntent(deletion!.data(),ownerUid);if(i.householdId===hid&&['WAITING_DISSOLUTION','DISSOLUTION_IN_PROGRESS','OPERATOR'].includes(i.phase))pending=true;}
+      }catch{return fail('FAMILY_UNAVAILABLE');}
+      if(pending)fail('IN_PROGRESS');
+    }
+    if(home.get('operationId')!==null)fail('FAMILY_UNAVAILABLE');
     await this.privateHome(tx,uid,p);
     return {householdId:hid,ownerUid:home.get('ownerUid') as string,role:binding.role};
   }
@@ -161,7 +185,7 @@ export class FamilyInviteStore {
   async state(context:AuthContext) {
     const uid=authenticatedUid(context);
     const result=await this.db.runTransaction(async tx=>{
-      const family=await this.context(tx,uid);if(!family)return null;
+      const family=await this.context(tx,uid,true);if(!family)return null;
       const members=await this.members(tx,family);
         const targets=members.filter(m=>m.role==='member'&&(family.role==='owner'||m.memberId===uid));
         const bindings=new Map<string,string>();

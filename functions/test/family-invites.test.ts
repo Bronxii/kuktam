@@ -84,7 +84,8 @@ for(const variant of ['free','expiredPro','member','nonmember','DELETING','DELET
   if(variant==='reverse')await db.doc('familyMemberships/owner').update({state:'RESERVED',operationId:'op'});
   if(variant==='role')await db.doc('households/family-test/members/owner').update({role:'member'});
   if(variant==='locked')await db.doc('households/family-test').update({operationId:'operation'});
-  await assert.rejects(s.store.create({uid:caller}));assert.equal((await db.collection('familyInvites').get()).size,0);
+  const beforeInvites=(await db.collection('familyInvites').get()).docs.map(d=>({id:d.id,data:d.data()}));
+  await assert.rejects(s.store.create({uid:caller}));assert.deepEqual((await db.collection('familyInvites').get()).docs.map(d=>({id:d.id,data:d.data()})),beforeInvites);
 });
 test('another valid grant permits creation despite revoked grant and stale effective cache',async()=>{
  const s=await setup();await db.doc('users/owner/entitlementGrants/revoked').set(grant({status:'REVOKED',revokedAt:now}));
@@ -231,14 +232,15 @@ for(const variant of ['missingIndex','missingMember','pointer','role'])test(`inc
  if(variant==='role')await db.doc('familyMemberships/member').update({role:'owner'});
  await assert.rejects(s.store.state({uid:'member'}));assert.equal(s.emails.calls.length,0);
 });
-test('Phase 2 output supports invite creation and deletion remains fail-closed with pending invite',async()=>{
+test('Phase 2 output supports invite creation and deletion waits for Family lifecycle with pending invite',async()=>{
  await new HouseholdStore(db).ensure({uid:'realCreator'});await db.doc('users/realCreator/entitlementGrants/pro').set(grant());
  await db.doc('familyRuntime/config').set({creationEnabled:true,inviteCreationEnabled:true});
  const engine=new FamilyCreateStore(db),id=await engine.reserve({uid:'realCreator'});
  for(let i=0;i<10&&(await db.doc(`familyOperations/${id}`).get()).get('status')!=='DONE';i++)await engine.resume(id);
  const store=new FamilyInviteStore(db,new Emails());await store.create({uid:'realCreator'});
  const deletion=new AccountDeletionService(db,new FakeAuthDeletionApi());
- await assert.rejects(deletion.beginAccountDeletion({uid:'realCreator'}),/FAMILY_LIFECYCLE_NOT_READY/);
+ assert.equal((await deletion.beginAccountDeletion({uid:'realCreator'})).outcome,'familyDissolutionPending');
+ assert.equal((await db.doc('familyOwnerDeletions/realCreator').get()).get('phase'),'DISSOLUTION_IN_PROGRESS');
  assert.equal((await db.doc('accountDeletions/realCreator').get()).exists,false);
  assert.equal((await db.doc('accountLifecycle/realCreator').get()).get('state'),'ACTIVE');
  assert.equal((await db.collection('familyInvites').get()).size,1);
@@ -273,7 +275,7 @@ test('7D0 max eight participants uses four bounded binding batches',async()=>{
  const batches:number[]=[],original=db.runTransaction.bind(db);
  const wrapped=new Proxy(db,{get(t,k){if(k==='runTransaction')return (cb:any,options:any)=>original(tx=>cb(new Proxy(tx,{get(t,k){if(k==='getAll')return (...refs:any[])=>{batches.push(refs.length);return (t.getAll as any)(...refs);};const v=(t as any)[k];return typeof v==='function'?v.bind(t):v;}})),options);const v=(t as any)[k];return typeof v==='function'?v.bind(t):v;}});
  const state=await new FamilyInviteStore(wrapped,s.emails,s.clock).state({uid:'owner'});assert.ok(state.familyActive);
- assert.equal(state.members.length,8);assert.equal(state.members.filter(m=>m.membershipInviteId).length,7);assert.deepEqual(batches,[7,7,7,7]);
+ assert.equal(state.members.length,8);assert.equal(state.members.filter(m=>m.membershipInviteId).length,7);assert.deepEqual(batches,[4,7,7,7,7]);
 });
 test('7D0 read callable cannot select arbitrary Family, UID or invitation',async()=>{
  let calls=0;const handler=familyInviteHandlers(()=>{calls++;throw new Error('notCalled');}).state;

@@ -1,3 +1,4 @@
+import {ownerDissolutionHandler} from './households/owner-dissolution-handler';
 import {OwnerAccountDeletionStore} from './households/owner-account-deletion';
 import {MemberAccountDeletionStore} from './households/member-account-deletion';
 import {OwnerProLossStore,familyLifecycleEnabled} from './households/owner-pro-loss';
@@ -48,6 +49,7 @@ const invites=familyInviteHandlers(()=>{
 const familyOptions={region:config.region,serviceAccount:coreIdentity,timeoutSeconds:60,maxInstances:5,enforceAppCheck:false};
 const shoppingStore=()=>new ShoppingMutationStore(getFirestore(getApps().find(a=>a.name==='[DEFAULT]')??initializeApp()));
 const ownerProLossStore=()=>new OwnerProLossStore(getFirestore(getApps().find(a=>a.name==='[DEFAULT]')??initializeApp()));
+export const startFamilyDissolution=onCall(familyOptions,ownerDissolutionHandler(ownerProLossStore));
 export const familyOwnerEntitlementChanged=onDocumentWritten({document:'users/{uid}/entitlementGrants/{grantId}',region:config.region,serviceAccount:coreIdentity,timeoutSeconds:60,maxInstances:5,retry:true},async event=>{
   if(!familyLifecycleEnabled())return;
   await ownerProLossStore().observe(event.params.uid);
