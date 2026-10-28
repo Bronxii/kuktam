@@ -41,5 +41,14 @@
         "lib/test"
       ]
     }
-  ]
+  ],
+  "hosting": {
+    "site": "kuktam-67768",
+    "public": "hosting",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ]
+  }
 }
