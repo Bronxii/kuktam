@@ -14,6 +14,8 @@ Map<String, Object?> response({String role = 'owner', int count = 2}) => {
     (n) => {
       'memberId': n == 0 ? 'a' : 'm$n',
       'role': n == 0 ? 'owner' : 'member',
+      if (n > 0 && (role == 'owner' || n == 1))
+        'membershipInviteId': n.toString().padLeft(64, '0'),
       'email': n == 0 ? 'owner@example.test' : null,
       'displayIdentity': n == 0 ? 'owner@example.test' : 'Ismeretlen tag',
     },

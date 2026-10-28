@@ -96,6 +96,8 @@ for(const removal of [false,true])for(const mode of ['ADD','DELETE'] as const)te
  assert.equal(await f.join.reserve({uid:'guest'},f.invite.token,'ADD'),f.id); // active same-JOIN retry
  const leaveA=()=>removal?exit.remove({uid:'owner'},'guest',f.invite.inviteId):exit.leave({uid:'guest'},f.invite.inviteId);
  assert.equal((await leaveA()).outcome,'DONE');
+ assert.equal((await f.invites.state({uid:'guest'})).familyActive,false);
+ {const state=await f.invites.state({uid:'owner'});assert.ok(state.familyActive);assert.equal(state.members.some(m=>m.memberId==='guest'),false);}
  assert.equal((await db.doc('users/guest').get()).get('activeHouseholdId'),privateHouseholdId('guest'));
  await assert.rejects(f.join.reserve({uid:'guest'},f.invite.token,'ADD'),/USED/);
  await f.source.doc('new-private').set({...milk(2,'l'),isChecked:false,createdAt:now});
@@ -106,6 +108,7 @@ for(const removal of [false,true])for(const mode of ['ADD','DELETE'] as const)te
  await assert.rejects(leaveA(),/STALE_MEMBERSHIP/);
  await Promise.all([f.join.reserve({uid:'guest'},b.token,mode),assert.rejects(f.join.reserve({uid:'guest'},f.invite.token,'ADD'),/USED|IN_PROGRESS/)]);
  const current=await complete(f,id,b.inviteId);assert.equal(current.inviteId,b.inviteId);
+ for(const uid of ['owner','guest']){const state=await f.invites.state({uid});assert.ok(state.familyActive);assert.equal(state.members?.find(m=>m.memberId==='guest')?.membershipInviteId,b.inviteId);}
  const activatedEpoch=(await f.home.get()).get('shoppingEpoch');assert.notEqual(activatedEpoch,oldContext.epoch);
  assert.equal(await f.shopping.process('guest',oldRequest),'REJECTED_CONTEXT_CHANGED');
  assert.equal((await f.shopping.ensureContext({uid:'guest'})).epoch,activatedEpoch);
@@ -116,6 +119,10 @@ for(const removal of [false,true])for(const mode of ['ADD','DELETE'] as const)te
  assert.equal((await db.doc(`familyInvites/${f.invite.inviteId}`).get()).get('status'),'USED');
  assert.equal((await db.doc(`familyInvites/${b.inviteId}`).get()).get('status'),'USED');
  assert.deepEqual((await db.doc('users/guest').get()).get('familyJoinBinding'),{operationId:id,inviteId:b.inviteId});
+ await db.doc('users/guest').update({familyJoinBinding:{operationId:f.id,inviteId:f.invite.inviteId}});
+ await assert.rejects(f.invites.state({uid:'owner'}),/FAMILY_UNAVAILABLE/);
+ await db.doc('users/guest').update({familyJoinBinding:{operationId:id,inviteId:b.inviteId}});
+
  await assert.rejects(exit.leave({uid:'guest'},f.invite.inviteId),/STALE_MEMBERSHIP/);
  await assert.rejects(exit.remove({uid:'owner'},'guest',f.invite.inviteId),/STALE_MEMBERSHIP/);
  const list=await f.home.collection('shoppingItems').get();assert.equal(list.size,1);assert.equal(list.docs[0]!.get('quantity'),mode==='ADD'?2300:300);
@@ -126,6 +133,7 @@ for(const removal of [false,true])for(const mode of ['ADD','DELETE'] as const)te
  const cId=await f.join.reserve({uid:'guest'},c.token,'ADD');assert.notEqual(cId,id);await complete(f,cId,c.inviteId);
  assert.equal((await db.doc(`familyOperations/${id}`).get()).get('status'),'DONE');
  assert.equal((await db.doc(`familyOperations/${cId}`).get()).get('status'),'DONE');
+ {const state=await f.invites.state({uid:'guest'});assert.ok(state.familyActive);assert.equal(state.members.find(m=>m.memberId==='guest')?.membershipInviteId,c.inviteId);}
 });
 
 test('7D0A member deletion admission resolves B, preserving existing exit engine',async()=>{
@@ -150,6 +158,7 @@ test('7D0A corrupt current binding and surviving prior member cannot admit B',as
 });
 test('7D0A legacy no-pointer user leaves and joins different Family without migration',async()=>{
  const f=await ready();const {FieldValue}=await import('firebase-admin/firestore');await db.doc('users/guest').update({familyJoinBinding:FieldValue.delete()});
+ const legacy=await f.invites.state({uid:'guest'});assert.ok(legacy.familyActive);assert.equal(legacy.members.find(m=>m.memberId==='guest')?.membershipInviteId,f.invite.inviteId);
  const exit=new MemberLeaveStore(db,f.clock);await exit.leave({uid:'guest'},f.invite.inviteId);
  await new HouseholdStore(db).ensure({uid:'owner2'});await db.doc('users/owner2/entitlementGrants/pro').set(grant());
  await db.doc('households/family-second').set({schemaVersion:2,kind:'family',state:'ACTIVE',operationId:null,ownerUid:'owner2',createdAt:now});

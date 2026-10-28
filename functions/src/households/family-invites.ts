@@ -163,12 +163,43 @@ export class FamilyInviteStore {
     const result=await this.db.runTransaction(async tx=>{
       const family=await this.context(tx,uid);if(!family)return null;
       const members=await this.members(tx,family);
+        const targets=members.filter(m=>m.role==='member'&&(family.role==='owner'||m.memberId===uid));
+        const bindings=new Map<string,string>();
+        if(targets.length){
+          const {currentJoinId,readJoinOperation}=await import('./family-join');
+          const users=await tx.getAll(...targets.map(m=>this.db.doc(`users/${m.memberId}`)));
+          const indexes=await tx.getAll(...targets.map(m=>this.db.doc(`familyMemberships/${m.memberId}`)));
+          let ids:string[];
+          try{ids=users.map((u,i)=>currentJoinId(targets[i]!.memberId,u.get('familyJoinBinding')));}catch{return fail('FAMILY_UNAVAILABLE');}
+          const operations=await tx.getAll(...ids.map(id=>this.db.doc(`familyOperations/${id}`)));
+          const joins=operations.map((d,i)=>{
+            try{
+              const memberId=targets[i]!.memberId,u=users[i]!,index=readFamilyMembership(indexes[i]!.data()),op=readJoinOperation(d.data(),ids[i]!);
+              if(!d.updateTime?.isEqual(indexes[i]!.updateTime!)||index.state!=='ACTIVE'||index.role!=='member'||index.householdId!==family.householdId||
+                u.get('activeHouseholdId')!==family.householdId||u.get('familyHouseholdId')!==family.householdId||
+                u.get('privateHouseholdId')!==privateHouseholdId(memberId)||u.get('shoppingMigrationVersion')!==1||
+                op.actorUid!==memberId||op.ownerUid!==family.ownerUid||op.householdId!==family.householdId||
+                op.phase!=='ACTIVE'||op.status!=='DONE'||
+                u.get('familyJoinBinding')!==undefined&&u.get('familyJoinBinding.inviteId')!==op.inviteId)throw new Error('invalidCurrentMembership');
+              return op;
+            }catch{return fail('FAMILY_UNAVAILABLE');}
+          });
+          const invitations=await tx.getAll(...joins.map(op=>this.db.doc(`familyInvites/${op.inviteId}`)));
+          invitations.forEach((d,i)=>{
+            try{
+              const invite=readInvite(d.data()),op=joins[i]!;
+              if(invite.status!=='USED'||invite.operationId!==ids[i]||invite.usedByUid!==op.actorUid||
+                invite.householdId!==family.householdId||invite.createdByUid!==family.ownerUid)throw new Error('invalidMembershipInvite');
+              bindings.set(op.actorUid,op.inviteId);
+            }catch{fail('FAMILY_UNAVAILABLE');}
+          });
+        }
       let invites:{inviteId:string;createdAt:number;expiresAt:number;status:string}[]|undefined;
       if(family.role==='owner'){
         const now=this.clock(),slots=await this.slots(tx,family.householdId);
         invites=slots.entries.filter(e=>this.live(e.invite,now)).map(e=>({inviteId:e.id,createdAt:e.invite.createdAt.toMillis(),expiresAt:e.invite.expiresAt.toMillis(),status:e.invite.status}));
       }
-      return {family,members,invites};
+        return {family,members:members.map(m=>({...m,...(bindings.has(m.memberId)?{membershipInviteId:bindings.get(m.memberId)!}:{})})),invites};
     },{readOnly:true});
     if(!result)return {schemaVersion:1 as const,familyActive:false as const};
     const identities=await this.emails.resolve(result.members.map(m=>m.memberId));

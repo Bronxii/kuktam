@@ -10,10 +10,19 @@ class FamilyReadException implements Exception {
 }
 
 class FamilyParticipant {
-  const FamilyParticipant({required this.uid, required this.role, this.email});
+  const FamilyParticipant({
+    required this.uid,
+    required this.role,
+    this.email,
+    this.membershipInviteId,
+  });
   final String uid;
   final FamilyRole role;
   final String? email;
+
+  /// Server-verified current membership metadata; never presentation text.
+  /// Absent for owner and other members viewed by a non-owner.
+  final String? membershipInviteId;
   String get label => email ?? 'Ismeretlen tag';
 }
 
@@ -67,6 +76,13 @@ class FamilyState {
     for (final row in rows) {
       if (row is! Map) invalid();
       final id = row['memberId'], r = row['role'], email = row['email'];
+      final binding = row['membershipInviteId'];
+      final needsBinding = r == 'member' && (role == 'owner' || id == uid);
+      if (needsBinding
+          ? binding is! String || !RegExp(r'^[a-f0-9]{64}$').hasMatch(binding)
+          : row.containsKey('membershipInviteId')) {
+        invalid();
+      }
       if (id is! String ||
           id.isEmpty ||
           id.length > 128 ||
@@ -80,6 +96,7 @@ class FamilyState {
         FamilyParticipant(
           uid: id,
           role: r == 'owner' ? FamilyRole.owner : FamilyRole.member,
+          membershipInviteId: binding as String?,
           email: email is String && email.trim().isNotEmpty
               ? email.trim()
               : null,

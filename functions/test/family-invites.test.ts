@@ -1,3 +1,6 @@
+import { familyInviteHandlers } from '../src/households/invite-handler';
+import { joinOperationId } from '../src/households/family-join';
+import { advanceShoppingEpoch } from '../src/shopping/mutation-store';
 import { after, beforeEach, test } from 'node:test';
 import assert from 'node:assert/strict';
 import { initializeApp, deleteApp } from 'firebase-admin/app';
@@ -34,8 +37,15 @@ async function setup() {
 async function member(uid:string,role='member',hid='family-test') {
   if(uid!=='owner')await new HouseholdStore(db).ensure({uid});
   await db.doc(`users/${uid}`).update({familyHouseholdId:hid,activeHouseholdId:hid});
-  await db.doc(`familyMemberships/${uid}`).set({householdId:hid,role,state:'ACTIVE',operationId:null});
+  if(role!=='member')await db.doc(`familyMemberships/${uid}`).set({householdId:hid,role,state:'ACTIVE',operationId:null});
   await db.doc(`households/${hid}/members/${uid}`).set({role});
+  if(role==='member'){
+    const inviteId=hashInviteToken(Buffer.from(uid.padEnd(32,'_')).toString('base64url')),id=joinOperationId(uid,inviteId);
+    await db.doc(`users/${uid}`).update({familyJoinBinding:{operationId:id,inviteId}});
+    const batch=db.batch();batch.set(db.doc(`familyMemberships/${uid}`),{householdId:hid,role,state:'ACTIVE',operationId:null});
+    batch.set(db.doc(`familyOperations/${id}`),{schemaVersion:2,kind:'JOIN',actorUid:uid,ownerUid:'owner',inviteId,householdId:hid,sourceHouseholdId:privateHouseholdId(uid),mode:'ADD',phase:'ACTIVE',status:'DONE',sourceItemCount:0,deleteReconfirmationRequired:false,createdAt:now,updatedAt:now,nextAt:null,leaseId:null,leaseUntil:null,lastOutcome:'joinActivated',committedAt:now,sourceFence:{epoch:advanceShoppingEpoch(now).shoppingEpoch,at:now},snapshot:{version:1,count:0,hash:'a'.repeat(64)},cursor:{pageIndex:0,childOffset:0},deleteConsent:null});await batch.commit();
+    await db.doc(`familyInvites/${inviteId}`).set({schemaVersion:1,householdId:hid,createdByUid:'owner',createdAt:now,expiresAt:Timestamp.fromMillis(now.toMillis()+INVITE_SECONDS*1000),status:'USED',operationId:id,usedAt:now,usedByUid:uid});
+  }
 }
 const denied=(code:string)=>(e:unknown)=>e instanceof FamilyInviteError&&e.code===code;
 async function snapshot() {
@@ -185,7 +195,7 @@ test('email changes are visible on next call; missing/no-email members never dis
  const s=await setup();await member('member');await member('missing');await member('noemail');s.emails.users.set('noemail',{exists:true,email:null});
  await s.store.state({uid:'owner'});s.emails.users.set('member',{exists:true,email:'new@example.test'});
  const state=await s.store.state({uid:'owner'});assert.ok(state.familyActive);assert.equal(state.members?.find(m=>m.memberId==='member')?.displayIdentity,'new@example.test');
- for(const uid of ['missing','noemail'])assert.deepEqual(state.members?.find(m=>m.memberId===uid),{memberId:uid,role:'member',email:null,displayIdentity:'Ismeretlen tag'});
+ for(const uid of ['missing','noemail'])assert.deepEqual(state.members?.find(m=>m.memberId===uid),{memberId:uid,role:'member',email:null,displayIdentity:'Ismeretlen tag',membershipInviteId:(await db.doc(`users/${uid}`).get()).get('familyJoinBinding.inviteId')});
 });
 test('owner with no email previews using neutral identity, not UID',async()=>{
  const s=await setup(),r=await s.create();s.emails.users.set('owner',{exists:true,email:null});
@@ -232,4 +242,41 @@ test('Phase 2 output supports invite creation and deletion remains fail-closed w
  assert.equal((await db.doc('accountDeletions/realCreator').get()).exists,false);
  assert.equal((await db.doc('accountLifecycle/realCreator').get()).get('state'),'ACTIVE');
  assert.equal((await db.collection('familyInvites').get()).size,1);
+});
+
+for(const caller of ['owner','member'])test(`7D0 ${caller} receives only authorized exact current bindings`,async()=>{
+ const s=await setup();await member('member');await member('peer');await member('foreign','member','other-family');
+ const state=await s.store.state({uid:caller});assert.ok(state.familyActive);
+ assert.equal(state.members.find(m=>m.memberId==='owner')?.membershipInviteId,undefined);
+ for(const uid of ['member','peer'])assert.equal(state.members.find(m=>m.memberId===uid)?.membershipInviteId,caller==='owner'||uid===caller?(await db.doc(`users/${uid}`).get()).get('familyJoinBinding.inviteId'):undefined);
+ assert.equal(state.members.some(m=>m.memberId==='foreign'),false);
+});
+for(const defect of ['missingPointerOperation','corruptPointer','wrongInvite','wrongIndex','wrongFamily','wrongActor','unfinished','revoked'])test(`7D0 malformed ${defect} fails before identity lookup`,async()=>{
+ const s=await setup();await member('member');const u=await db.doc('users/member').get(),binding=u.get('familyJoinBinding');
+ if(defect==='missingPointerOperation')await db.doc(`familyOperations/${binding.operationId}`).delete();
+ if(defect==='corruptPointer')await u.ref.update({familyJoinBinding:{operationId:'bad',inviteId:binding.inviteId}});
+ if(defect==='wrongInvite')await u.ref.update({'familyJoinBinding.inviteId':'f'.repeat(64)});
+ if(defect==='wrongIndex')await db.doc('familyMemberships/member').update({householdId:'other'});
+ if(defect==='wrongFamily')await db.doc(`familyOperations/${binding.operationId}`).update({householdId:'other'});
+ if(defect==='wrongActor')await db.doc(`familyOperations/${binding.operationId}`).update({actorUid:'other'});
+ if(defect==='unfinished')await db.doc(`familyOperations/${binding.operationId}`).update({phase:'TRANSFER_COMPLETE',status:'READY',nextAt:now});
+ if(defect==='revoked')await db.doc(`familyInvites/${binding.inviteId}`).update({status:'REVOKED'});
+ await assert.rejects(s.store.state({uid:'owner'}),denied('FAMILY_UNAVAILABLE'));assert.equal(s.emails.calls.length,0);
+});
+test('7D0 historical DISSOLVED records do not supply live binding',async()=>{
+ const s=await setup();await db.doc('households/old').set({kind:'family',state:'DISSOLVED',ownerUid:'guest'});
+ assert.deepEqual(await s.store.state({uid:'guest'}),{schemaVersion:1,familyActive:false});
+});
+
+test('7D0 max eight participants uses four bounded binding batches',async()=>{
+ const s=await setup();for(let n=0;n<7;n++)await member(`m${n}`);
+ const batches:number[]=[],original=db.runTransaction.bind(db);
+ const wrapped=new Proxy(db,{get(t,k){if(k==='runTransaction')return (cb:any,options:any)=>original(tx=>cb(new Proxy(tx,{get(t,k){if(k==='getAll')return (...refs:any[])=>{batches.push(refs.length);return (t.getAll as any)(...refs);};const v=(t as any)[k];return typeof v==='function'?v.bind(t):v;}})),options);const v=(t as any)[k];return typeof v==='function'?v.bind(t):v;}});
+ const state=await new FamilyInviteStore(wrapped,s.emails,s.clock).state({uid:'owner'});assert.ok(state.familyActive);
+ assert.equal(state.members.length,8);assert.equal(state.members.filter(m=>m.membershipInviteId).length,7);assert.deepEqual(batches,[7,7,7,7]);
+});
+test('7D0 read callable cannot select arbitrary Family, UID or invitation',async()=>{
+ let calls=0;const handler=familyInviteHandlers(()=>{calls++;throw new Error('notCalled');}).state;
+ for(const data of [{householdId:'other'},{uid:'other'},{inviteId:'a'.repeat(64)}])await assert.rejects(handler({auth:{uid:'owner'},data}),(e:any)=>e.code==='invalid-argument');
+ assert.equal(calls,0);
 });

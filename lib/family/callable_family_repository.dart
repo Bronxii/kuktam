@@ -179,10 +179,13 @@ class CallableFamilyRepository implements FamilyRepository {
       data: {'token': token, 'mode': mode.wire},
       join: true,
     );
-    final expected = 'join_${sha256.convert(utf8.encode(_uid!))}';
     if (raw is! Map ||
         raw['schemaVersion'] != 1 ||
-        raw['operationId'] != expected) {
+        raw['operationId'] is! String ||
+        (raw['operationId'] as String).isEmpty ||
+        (raw['operationId'] as String).length > 128 ||
+        (raw['operationId'] as String).trim() != raw['operationId'] ||
+        (raw['operationId'] as String).contains('/')) {
       throw const FamilyJoinException('UNAVAILABLE');
     }
     if (raw['outcome'] == 'ABORTED') throw const FamilyJoinException('REVOKED');
@@ -204,7 +207,7 @@ class CallableFamilyRepository implements FamilyRepository {
       throw const FamilyJoinException('UNAVAILABLE');
     }
     return FamilyJoinHandle(
-      expected,
+      raw['operationId'] as String,
       sha256.convert(utf8.encode(token)).toString(),
       mode,
     );
