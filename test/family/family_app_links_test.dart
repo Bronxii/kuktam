@@ -9,6 +9,7 @@ import 'package:kuktam/family/family_state.dart';
 import 'package:kuktam/family/family_join.dart';
 import 'family_join_test.dart' show JoinRepo, code;
 import 'family_test.dart' show response;
+import 'pending_invite_fake.dart';
 
 String link(String token) =>
     'https://kuktam-67768.web.app/family/invite?token=$token';
@@ -156,9 +157,15 @@ void main() {
           messenger: messenger,
           currentUid: () => uid,
           repository: repo,
+          pendingStore: MemoryPendingInviteStore(),
           child: child!,
         ),
-        home: const Scaffold(body: Text('Home')),
+        home: uid == null
+            ? const Scaffold(body: Text('Home'))
+            : FamilyInviteAdmission(
+                uid: uid,
+                child: const Scaffold(body: Text('Home')),
+              ),
       ),
     );
     await t.pumpAndSettle();
@@ -206,7 +213,7 @@ void main() {
     expect(repo.calls, 0);
     expect(repo.actions, isEmpty);
     expect(
-      find.text('Jelentkezz be, majd nyisd meg újra a meghívólinket.'),
+      find.text('Családi meghívó vár rád. Bejelentkezés után folytatjuk.'),
       findsOneWidget,
     );
   });

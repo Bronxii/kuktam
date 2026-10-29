@@ -1,4 +1,5 @@
 import '../../../../households/household_gate.dart';
+import '../../../../family/family_link_host.dart';
 import 'dart:async';
 import '../../../../shopping/data/mutations/production_shopping_coordinator.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -37,9 +38,9 @@ class _AuthGateState extends State<AuthGate> {
         // Registry lookup can fail synchronously before returning a Future
         // (for example with injected auth and no global Firebase app). Keep it
         // inside the same failure boundary as asynchronous initialization.
-        Future.sync(() => productionShoppingCoordinator())
-            .then<void>((_) {})
-            .catchError((Object _) {}),
+        Future.sync(
+          () => productionShoppingCoordinator(),
+        ).then<void>((_) {}).catchError((Object _) {}),
       );
     }
     _repository = widget.authRepository ?? AuthRepository();
@@ -76,9 +77,17 @@ class _AuthGateState extends State<AuthGate> {
         if (user != null && !AuthRepository.requiresEmailVerification(user)) {
           return KeyedSubtree(
             key: ValueKey(user.uid),
-            child:
-                widget.mainBuilder?.call(context) ??
-                const HouseholdGate(child: MainScreen()),
+            child: widget.mainBuilder != null
+                ? FamilyInviteAdmission(
+                    uid: user.uid,
+                    child: widget.mainBuilder!(context),
+                  )
+                : HouseholdGate(
+                    child: FamilyInviteAdmission(
+                      uid: user.uid,
+                      child: const MainScreen(),
+                    ),
+                  ),
           );
         }
         final files = widget.recipeFiles ?? RecipeFileReceiver.instance;

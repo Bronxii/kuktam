@@ -174,6 +174,21 @@ class MainActivity : FlutterActivity() {
                 } else result.notImplemented()
             }
         }
+        MethodChannel(messenger, "kuktam/family_invite_durability",
+            StandardMethodCodec.INSTANCE, messenger.makeBackgroundTaskQueue())
+            .setMethodCallHandler { call, result ->
+                if (call.method != "flush" || call.arguments != null) result.notImplemented()
+                else try {
+                    val names = listOf("kuktam_family_invite",
+                        "FlutterSecureKeyStorage:kuktam_family_invite",
+                        "FlutterSecureStorageConfiguration:kuktam_family_invite")
+                    val success = names.map {
+                        applicationContext.getSharedPreferences(it, MODE_PRIVATE).edit().commit()
+                    }.all { it }
+                    if (success) result.success(null)
+                    else result.error("storage-failure", "Storage unavailable", null)
+                } catch (_: Exception) { result.error("storage-failure", "Storage unavailable", null) }
+            }
         MethodChannel(messenger, "kuktam/entitlement_durability",
             StandardMethodCodec.INSTANCE, messenger.makeBackgroundTaskQueue())
             .setMethodCallHandler { call, result ->

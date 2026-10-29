@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <full-backup-content>
     <exclude domain="sharedpref" path="kuktam_entitlement.xml" />
+    <exclude domain="sharedpref" path="kuktam_family_invite.xml" />
     <exclude domain="sharedpref" path="FlutterSecureKeyStorage:kuktam_entitlement.xml" />
+    <exclude domain="sharedpref" path="FlutterSecureKeyStorage:kuktam_family_invite.xml" />
     <exclude domain="sharedpref" path="FlutterSecureStorageConfiguration:kuktam_entitlement.xml" />
+    <exclude domain="sharedpref" path="FlutterSecureStorageConfiguration:kuktam_family_invite.xml" />
 </full-backup-content>
