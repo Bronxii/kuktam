@@ -84,3 +84,30 @@ Platform references: https://developer.android.com/training/app-links/configure-
 Backend business semantics, Firestore rules, invite tokens, manual JOIN semantics, dependencies, login UX and Family production gates unchanged. No production data access. No deploy, commit or push. 8A PASS (input); 8C NOT STARTED; final Family QA NOT STARTED. STOP before Hosting deployment.
 
 Final gates: 8B LOCAL IMPLEMENTATION PASS. 8B LIVE VERIFICATION BLOCKED UNTIL EXPLICIT HOSTING DEPLOYMENT GO and a matching Play-signed installed build. HOSTING DEPLOYED NO. APP LINKS LIVE VERIFIED NO. No local implementation blockers remain.
+
+
+## LIVE VERIFICATION — 2026-10-29
+
+Current status: HOSTING LIVE — PLAY-SIGNED DEVICE VERIFICATION DEFERRED.
+This section supersedes the earlier awaiting-deployment status. The user reports manually executing `node .\functions\node_modules\firebase-tools\lib\bin\firebase.js deploy --only hosting --project kuktam-67768` successfully, publishing exactly one file. The assistant did NOT deploy again.
+
+Public ordinary HTTPS GET from the development machine, with redirect handling explicitly disabled:
+- URL: https://kuktam-67768.web.app/.well-known/assetlinks.json
+- HTTP 200; Content-Type application/json; exact URL retained, no redirect.
+- JSON parses successfully and is structurally identical to intended local assetlinks.json.
+- Exactly one relation: delegate_permission/common.handle_all_urls.
+- Namespace android_app; package com.bronxii.kuktam.
+- Exactly one fingerprint: AF:21:94:5C:B6:95:4A:D8:F1:8A:00:D4:85:78:FF:B0:AD:60:58:77:A5:9E:3A:D0:96:6E:91:6D:23:A2:E5:CD.
+- No unexpected, debug or upload fingerprint. PUBLIC DAL ASSOCIATION PASS.
+
+Device inspection used C:/Users/gabor/AppData/Local/Android/sdk/platform-tools/adb.exe devices -l. Result: `List of devices attached` with zero device entries. No connected device/emulator was available. Installed app/version/signing cannot be inspected; this does NOT establish that no app exists on the user's disconnected phone. Android version/API: not testable. Domain verification state: not testable. No pm state reset, re-verification or link launch was attempted without a device. No emulator was started or APK installed.
+
+Therefore automatic `verified` domain state and live canonical-link routing remain DEFERRED, not an implementation failure. This is the no-device case (D), not a diagnosed debug/upload signing mismatch. The existing 139/139 local tests, analyze, build and merged-manifest PASS remain the evidence for local implementation; none were rerun.
+
+Optional browser fallback observation: GET https://kuktam-67768.web.app/family/invite?token=test returned HTTP 404, Content-Type text/html; charset=utf-8. No Family backend was invoked and no real invite was used. Missing browser fallback content does not invalidate the separate published DAL association. No fallback implementation was added.
+
+Remaining proof: connect an Android 12+ device with a Play-signed Kuktam build containing the 8B intent filter/adapter, verify the installed certificate and version, then perform the already documented automatic re-verification and unforced canonical-link routing check. A previously published Play build without the new manifest is insufficient. No Play upload/rollout was initiated. No further Hosting deployment is required by the observed public association result.
+
+HOSTING DEPLOY PASS (manual user action). 8A PASS; 8B LOCAL IMPLEMENTATION PASS; 8B HOSTING ASSOCIATION PASS; 8B PLAY-SIGNED DEVICE VERIFICATION DEFERRED (no connected device). AUTO VERIFIED NOT TESTABLE. CANONICAL LINK ANDROID ROUTING DEFERRED. FLUTTER ROUTING existing local PASS, live deferred. 8C and final Family QA NOT STARTED. Production Family rollout NO.
+
+This verification pass changed only this checkpoint document. No application/source, rules, signing, Hosting content or Family gate changes; no production Family data access; public Hosting GET only. No second deploy, Functions/rules deploy, commit or push. STOP.
