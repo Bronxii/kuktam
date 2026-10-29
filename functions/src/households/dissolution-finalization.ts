@@ -46,7 +46,7 @@ export class DissolutionFinalizationStore {
     const account=await tx.get(this.db.doc(`accountLifecycle/${uid}`)),deletion=await tx.get(this.db.doc(`accountDeletions/${uid}`));
     if(!account.exists||proof(()=>readAccount(account.data())).state!=='ACTIVE'||deletion.exists)invalid();
     const capRef=this.db.doc(`familyJoinCapacity/${householdId}`),capDoc=await tx.get(capRef),cap=proof(()=>readJoinCapacity(capDoc.data()));
-    const slotsRef=this.db.doc(`familyInviteSlots/${householdId}`),slotsDoc=await tx.get(slotsRef),slots=proof(()=>readInviteSlots(slotsDoc.data())),now=this.clock();
+    const slotsRef=this.db.doc(`familyInviteSlots/${householdId}`),slotsDoc=await tx.get(slotsRef),slots=slotsDoc.exists?proof(()=>readInviteSlots(slotsDoc.data())):[],now=this.clock();
     const invites=slots.length?await tx.getAll(...slots.map(x=>this.db.doc(`familyInvites/${x}`))):[];
     const live=await tx.get(this.db.collection('familyInvites').where('householdId','==',householdId).where('status','==','PENDING').where('expiresAt','>',now).limit(9));
     const reserved=await tx.get(this.db.collection('familyInvites').where('householdId','==',householdId).where('status','==','RESERVED').limit(9));
