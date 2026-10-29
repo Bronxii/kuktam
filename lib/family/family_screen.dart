@@ -10,7 +10,8 @@ import 'family_mutation.dart';
 import 'family_join_screen.dart';
 
 class FamilyScreen extends StatefulWidget {
-  const FamilyScreen({super.key, this.repository});
+  const FamilyScreen({super.key, this.repository, this.initialInviteToken});
+  final String? initialInviteToken;
   final FamilyRepository? repository;
   @override
   State<FamilyScreen> createState() => _FamilyScreenState();
@@ -23,6 +24,7 @@ class _FamilyScreenState extends State<FamilyScreen> {
   FamilyFailure? _failure;
   bool _loading = true, _busy = false;
   int _request = 0;
+  bool _incomingHandled = false;
   String? _message;
   FamilyInviteResult? _invite;
   @override
@@ -64,17 +66,35 @@ class _FamilyScreenState extends State<FamilyScreen> {
         );
       }
     } finally {
-      if (mounted && request == _request) setState(() => _loading = false);
+      if (mounted && request == _request) {
+        setState(() => _loading = false);
+        final token = widget.initialInviteToken;
+        if (!_incomingHandled && token != null && _failure == null) {
+          _incomingHandled = true;
+          if (_state?.status == FamilyStatus.privateOnly) {
+            unawaited(_join(initialToken: token));
+          } else if (_state?.status != FamilyStatus.inProgress &&
+              _failure == null) {
+            setState(
+              () => _message =
+                  'Már családhoz tartozol. Új meghívóval most nem csatlakozhatsz.',
+            );
+          }
+        }
+      }
     }
   }
 
-  Future<void> _join() async {
+  Future<void> _join({String? initialToken}) async {
     if (_busy || _state?.status != FamilyStatus.privateOnly) return;
     setState(() => _busy = true);
     try {
       await Navigator.of(context).push(
         MaterialPageRoute<bool>(
-          builder: (_) => FamilyJoinScreen(repository: _repository),
+          builder: (_) => FamilyJoinScreen(
+            repository: _repository,
+            initialToken: initialToken,
+          ),
         ),
       );
       if (mounted && _failure != FamilyFailure.signedOut) await _load();

@@ -47,8 +47,20 @@
     "public": "hosting",
     "ignore": [
       "firebase.json",
-      "**/.*",
-      "**/node_modules/**"
+      "**/node_modules/**",
+      "**/.git/**",
+      "**/.gitkeep"
+    ],
+    "headers": [
+      {
+        "source": "/.well-known/assetlinks.json",
+        "headers": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ]
+      }
     ]
   }
 }

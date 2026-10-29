@@ -7,7 +7,12 @@ import 'family_state.dart';
 
 /// Uses the existing Family repository. Credentials and consent are route-local.
 class FamilyJoinScreen extends StatefulWidget {
-  const FamilyJoinScreen({super.key, required this.repository});
+  const FamilyJoinScreen({
+    super.key,
+    required this.repository,
+    this.initialToken,
+  });
+  final String? initialToken;
   final FamilyRepository repository;
   @override
   State<FamilyJoinScreen> createState() => _FamilyJoinScreenState();
@@ -31,6 +36,13 @@ class _FamilyJoinScreenState extends State<FamilyJoinScreen> {
   @override
   void initState() {
     super.initState();
+    final initialToken = widget.initialToken;
+    if (initialToken != null) {
+      _input.text = initialToken;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted && !_invalidSession) unawaited(_validate());
+      });
+    }
     _session = widget.repository.sessionChanges.listen((_) {
       if (!mounted) return;
       _generation++;

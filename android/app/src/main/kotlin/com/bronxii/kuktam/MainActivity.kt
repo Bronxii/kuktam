@@ -16,6 +16,8 @@ class MainActivity : FlutterActivity() {
         private var recipeActivity = java.lang.ref.WeakReference<MainActivity>(null)
         private val recipeReader = java.util.concurrent.Executors.newSingleThreadExecutor()
     }
+    private var familyChannel: MethodChannel? = null
+    private var pendingFamilyLink: String? = null
     private var imagePicker: ImageImportPicker? = null
     private var imageChannel: MethodChannel? = null
     private var recipePicker: RecipeDocumentPicker? = null
@@ -27,13 +29,30 @@ class MainActivity : FlutterActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         // A restored Activity must not replay the launch share.
-        if (savedInstanceState == null && !receiveRecipe(intent)) receiveText(intent)
+        if (savedInstanceState == null && !receiveFamilyLink(intent) && !receiveRecipe(intent)) receiveText(intent)
     }
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         setIntent(intent)
-        if (!receiveRecipe(intent)) receiveText(intent)
+        if (!receiveFamilyLink(intent) && !receiveRecipe(intent)) receiveText(intent)
+    }
+
+    private fun receiveFamilyLink(incoming: Intent): Boolean {
+        if (incoming.action != Intent.ACTION_VIEW) return false
+        val uri = incoming.data ?: return false
+        if (uri.scheme != "https" && uri.scheme != "http") return false
+        val raw = uri.toString()
+        incoming.action = Intent.ACTION_MAIN
+        incoming.data = null
+        // One bounded volatile slot; Dart alone validates and authorizes routing.
+        if (pendingFamilyLink == null && raw.length <= 256) {
+            pendingFamilyLink = raw
+            familyChannel?.invokeMethod("pending", null)
+        } else {
+            Toast.makeText(this, "Nyisd meg újra a meghívólinket az alkalmazásban.", Toast.LENGTH_LONG).show()
+        }
+        return true
     }
 
     private fun receiveRecipe(incoming: Intent): Boolean {
@@ -98,6 +117,9 @@ class MainActivity : FlutterActivity() {
     }
 
     override fun cleanUpFlutterEngine(flutterEngine: FlutterEngine) {
+        familyChannel?.setMethodCallHandler(null)
+        familyChannel = null
+        pendingFamilyLink = null
         imageChannel?.setMethodCallHandler(null)
         imageChannel = null
         imagePicker?.dispose()
@@ -119,6 +141,15 @@ class MainActivity : FlutterActivity() {
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
         val messenger = flutterEngine.dartExecutor.binaryMessenger
+        familyChannel = MethodChannel(messenger, "kuktam/family_links").also { channel ->
+            channel.setMethodCallHandler { call, result ->
+                if (call.method == "take" && call.arguments == null) {
+                    val value = pendingFamilyLink
+                    pendingFamilyLink = null
+                    result.success(value)
+                } else result.notImplemented()
+            }
+        }
         recipeActivity = java.lang.ref.WeakReference(this)
         imagePicker = ImageImportPicker(this)
         imageChannel = MethodChannel(messenger, "kuktam/image_import").also { channel ->
