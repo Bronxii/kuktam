@@ -1,3 +1,4 @@
+import {familyInviteUrl} from './invite-url';
 import { Firestore, Timestamp, Transaction } from 'firebase-admin/firestore';
 import { AuthContext, authenticatedUid } from '../billing/account-binding';
 import { readAccount } from '../accounts/account-lifecycle';
@@ -102,7 +103,7 @@ export class FamilyInviteStore {
     return invite.status==='RESERVED' || invite.status==='PENDING' && compareTime(invite.expiresAt,now)>0;
   }
   async create(context:AuthContext) {
-    const uid=authenticatedUid(context),token=this.tokenFactory(),id=hashInviteToken(token);
+    const uid=authenticatedUid(context),token=this.tokenFactory(),id=hashInviteToken(token),inviteUrl=familyInviteUrl(token);
     return this.db.runTransaction(async tx=>{
       const now=this.clock(),gate=await tx.get(this.db.doc('familyRuntime/config'));
       if(gate.get('inviteCreationEnabled')!==true)fail('FEATURE_DISABLED');
@@ -119,7 +120,7 @@ export class FamilyInviteStore {
       tx.create(ref,invite);
       // Every create/revoke (and future JOIN) uses this bounded common guard.
       tx.set(slots.ref,{schemaVersion:1,inviteIds:[...live.map(e=>e.id),id]});
-      return {schemaVersion:1,inviteId:id,token,expiresAt:expiresAt.toMillis()};
+      return {schemaVersion:1,inviteId:id,token,inviteUrl,expiresAt:expiresAt.toMillis()};
     });
   }
   async revoke(context:AuthContext,inviteId:string) {

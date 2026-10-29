@@ -40,7 +40,7 @@ async function fixture(items:Item[],mode:'ADD'|'DELETE'='ADD',pending=false){
     await shopping.submit({uid:'guest'},{schemaVersion:1,actorUid:'guest',...old,mutationId:oldMutationId,kind:'ADD',payloadJson:JSON.stringify({type:'ADD',...milk()}),submittedAt:clock()});}
   const p=privateHouseholdId('guest'),source=db.collection(`households/${p}/shoppingItems`);
   const batch=db.batch();items.forEach((item,i)=>batch.create(source.doc(`i${String(i).padStart(4,'0')}`),{...item,isChecked:true,createdAt:now}));if(items.length)await batch.commit();
-  const invites=new FamilyInviteStore(db,{resolve:async()=>new Map()},clock),invite=await invites.create({uid:'owner'});
+  const invites=new FamilyInviteStore(db,{resolve:async(uids)=>new Map(uids.map(uid=>[uid,{exists:true,email:null}]))},clock),invite=await invites.create({uid:'owner'});
   const join=new FamilyJoinStore(db,clock,1000),id=await join.reserve({uid:'guest'},invite.token,mode),ref=db.doc(`familyOperations/${id}`);
   const op=async()=>readJoinOperation((await ref.get()).data(),id) as TransferOperation;
   await join.resume(id);const engine=new JoinTransferStore(db,clock);await engine.prepare({uid:'guest'},id,invite.inviteId);
@@ -100,6 +100,9 @@ for(const removal of [false,true])for(const mode of ['ADD','DELETE'] as const)te
  {const state=await f.invites.state({uid:'owner'});assert.ok(state.familyActive);assert.equal(state.members.some(m=>m.memberId==='guest'),false);}
  assert.equal((await db.doc('users/guest').get()).get('activeHouseholdId'),privateHouseholdId('guest'));
  await assert.rejects(f.join.reserve({uid:'guest'},f.invite.token,'ADD'),/USED/);
+ assert.notEqual(f.invite.inviteUrl,b.inviteUrl);assert.equal(new URL(f.invite.inviteUrl).searchParams.get('token'),f.invite.token);assert.equal(new URL(b.inviteUrl).searchParams.get('token'),b.token);
+ assert.equal((await f.invites.preview({uid:'guest'},new URL(f.invite.inviteUrl).searchParams.get('token')!)).code,'USED');
+ assert.equal((await f.invites.preview({uid:'guest'},new URL(b.inviteUrl).searchParams.get('token')!)).code,'VALID');
  await f.source.doc('new-private').set({...milk(2,'l'),isChecked:false,createdAt:now});
  const ids=await Promise.all([f.join.reserve({uid:'guest'},b.token,mode),f.join.reserve({uid:'guest'},b.token,mode)]);
  const id=ids[0]!;assert.equal(ids[1],id);assert.notEqual(id,f.id);
@@ -186,3 +189,16 @@ test('7D0A B committed restart and lost completion ACK preserve DELETE consent b
  assert.equal(await f.join.reserve({uid:'guest'},b.token,'DELETE'),id);
 });
 
+
+test('8A real leave then new invite URL B retains single-use A and activates B',async()=>{
+ const f=await ready(),aBefore=(await f.ref.get()).data();
+ await new MemberLeaveStore(db,f.clock).leave({uid:'guest'},f.invite.inviteId);
+ const b=await f.invites.create({uid:'owner'}),token=new URL(b.inviteUrl).searchParams.get('token')!;
+ assert.equal(token,b.token);assert.notEqual(b.inviteUrl,f.invite.inviteUrl);
+ assert.equal((await f.invites.preview({uid:'guest'},new URL(f.invite.inviteUrl).searchParams.get('token')!)).code,'USED');
+ await assert.rejects(f.join.reserve({uid:'guest'},f.invite.token,'ADD'),/USED/);
+ assert.equal((await f.invites.preview({uid:'guest'},token)).code,'VALID');
+ const id=await f.join.reserve({uid:'guest'},token,'ADD');assert.notEqual(id,f.id);await complete(f,id,b.inviteId);
+ assert.equal((await db.doc('users/guest').get()).get('familyJoinBinding.inviteId'),b.inviteId);
+ assert.equal((await db.doc(`familyInvites/${b.inviteId}`).get()).get('status'),'USED');assert.deepEqual((await f.ref.get()).data(),aBefore);
+});

@@ -30,8 +30,11 @@ class Mutations extends Repo {
   int creates = 0, invites = 0;
   Future<FamilyCreation> Function() create = () async =>
       FamilyCreation.complete;
-  Future<FamilyInviteResult> Function() invite = () async =>
-      FamilyInviteResult(code: 'A' * 43, expiresAt: DateTime(2027));
+  Future<FamilyInviteResult> Function() invite = () async => FamilyInviteResult(
+    inviteUrl: 'https://kuktam-67768.web.app/family/invite?token=${'A' * 43}',
+    code: 'A' * 43,
+    expiresAt: DateTime(2027),
+  );
   @override
   Future<FamilyCreation> createFamily() {
     creates++;
@@ -51,6 +54,7 @@ void main() {
     'schemaVersion': 1,
     'inviteId': 'a' * 64,
     'token': 'A' * 43,
+    'inviteUrl': 'https://kuktam-67768.web.app/family/invite?token=${'A' * 43}',
     'expiresAt': 1800000000000,
   };
   test(
@@ -255,7 +259,12 @@ void main() {
     await t.pump();
     expect(repo.invites, 1);
     barrier.complete(
-      FamilyInviteResult(code: 'A' * 43, expiresAt: DateTime(2027)),
+      FamilyInviteResult(
+        inviteUrl:
+            'https://kuktam-67768.web.app/family/invite?token=${'A' * 43}',
+        code: 'A' * 43,
+        expiresAt: DateTime(2027),
+      ),
     );
     await t.pumpAndSettle();
     expect(find.text('Meghívó elkészült'), findsOneWidget);
@@ -377,7 +386,12 @@ void main() {
     await t.pump();
     repo.events.add(null);
     barrier.complete(
-      FamilyInviteResult(code: 'A' * 43, expiresAt: DateTime(2027)),
+      FamilyInviteResult(
+        inviteUrl:
+            'https://kuktam-67768.web.app/family/invite?token=${'A' * 43}',
+        code: 'A' * 43,
+        expiresAt: DateTime(2027),
+      ),
     );
     await t.pumpAndSettle();
     expect(

@@ -1,3 +1,4 @@
+import {familyInviteUrl} from '../src/households/invite-url';
 import { familyInviteHandlers } from '../src/households/invite-handler';
 import { joinOperationId } from '../src/households/family-join';
 import { advanceShoppingEpoch } from '../src/shopping/mutation-store';
@@ -281,4 +282,15 @@ test('7D0 read callable cannot select arbitrary Family, UID or invitation',async
  let calls=0;const handler=familyInviteHandlers(()=>{calls++;throw new Error('notCalled');}).state;
  for(const data of [{householdId:'other'},{uid:'other'},{inviteId:'a'.repeat(64)}])await assert.rejects(handler({auth:{uid:'owner'},data}),(e:any)=>e.code==='invalid-argument');
  assert.equal(calls,0);
+});
+
+test('8A created link is response-only same credential same expiry no stored URL or token',async()=>{
+ const s=await setup(),r=await s.create(),url=new URL(r.inviteUrl),ref=db.doc(`familyInvites/${r.inviteId}`),before=await ref.get();
+ assert.equal(url.searchParams.get('token'),r.token);assert.equal(r.inviteUrl,familyInviteUrl(r.token));assert.equal(r.expiresAt,before.get('expiresAt').toMillis());
+ assert.deepEqual(Object.keys(Object.fromEntries(url.searchParams)),['token']);assert.equal(url.pathname,'/family/invite');
+ const whole=JSON.stringify(await snapshot());assert.equal(whole.includes(r.token),false);assert.equal(whole.includes(r.inviteUrl),false);
+ const state=await s.store.state({uid:'owner'});assert.ok(state.familyActive);assert.ok(state.invites!.every(i=>!('token' in i)&&!('inviteUrl' in i)));
+ assert.equal((await s.store.preview({uid:'guest'},url.searchParams.get('token')!)).code,'VALID');assert.deepEqual((await ref.get()).data(),before.data());
+ await s.store.revoke({uid:'owner'},r.inviteId);assert.equal((await s.store.preview({uid:'guest'},url.searchParams.get('token')!)).code,'REVOKED');
+ const expired=await s.create();s.advance(INVITE_SECONDS*1000);assert.equal((await s.store.preview({uid:'guest'},new URL(expired.inviteUrl).searchParams.get('token')!)).code,'EXPIRED');
 });

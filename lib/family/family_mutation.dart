@@ -63,7 +63,12 @@ class FamilyExitException implements Exception {
 
 /// Transient bearer credential from the existing API, never persisted/logged.
 class FamilyInviteResult {
-  const FamilyInviteResult({required this.code, required this.expiresAt});
+  const FamilyInviteResult({
+    required this.code,
+    required this.expiresAt,
+    required this.inviteUrl,
+  });
+  final String inviteUrl;
   final String code;
   final DateTime expiresAt;
   factory FamilyInviteResult.fromResponse(Object? raw) {
@@ -80,7 +85,25 @@ class FamilyInviteResult {
         (raw['expiresAt'] as int) > 8640000000000000) {
       throw const FamilyMutationException(FamilyMutationFailure.unavailable);
     }
+    final value = raw['inviteUrl'];
+    final uri = value is String ? Uri.tryParse(value) : null;
+    if (value is! String ||
+        uri == null ||
+        value != value.trim() ||
+        value != uri.toString() ||
+        !value.startsWith('https://') ||
+        uri.scheme != 'https' ||
+        uri.authority != 'kuktam-67768.web.app' ||
+        uri.path != '/family/invite' ||
+        uri.hasFragment ||
+        uri.query != 'token=${raw['token']}' ||
+        uri.queryParametersAll.length != 1 ||
+        uri.queryParametersAll['token']?.length != 1 ||
+        uri.queryParameters['token'] != raw['token']) {
+      throw const FamilyMutationException(FamilyMutationFailure.unavailable);
+    }
     return FamilyInviteResult(
+      inviteUrl: value,
       code: raw['token'] as String,
       expiresAt: DateTime.fromMillisecondsSinceEpoch(raw['expiresAt'] as int),
     );

@@ -166,15 +166,19 @@ class _FamilyScreenState extends State<FamilyScreen> {
     }
   }
 
-  Future<void> _copy() async {
+  Future<void> _copy({bool link = false}) async {
     final invite = _invite;
     if (invite == null) return;
     try {
-      await Clipboard.setData(ClipboardData(text: invite.code));
+      await Clipboard.setData(
+        ClipboardData(text: link ? invite.inviteUrl : invite.code),
+      );
       if (mounted && identical(_invite, invite)) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text('Meghívókód másolva')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(link ? 'Meghívólink másolva' : 'Meghívókód másolva'),
+          ),
+        );
       }
     } catch (_) {
       if (mounted) {
@@ -364,12 +368,19 @@ class _FamilyScreenState extends State<FamilyScreen> {
               style: Theme.of(context).textTheme.titleMedium,
             ),
             const Text(
-              'A kódot csak annak add át, akit meg szeretnél hívni. E-mailt nem küldtünk. A meghívó elfogadása ebben a verzióban még nem érhető el.',
+              'A linket vagy a kódot csak annak add át, akit meg szeretnél hívni. E-mailt nem küldtünk. A link megnyitása még nem indít csatlakozást az alkalmazásban; a meghívókód kézzel megadható.',
             ),
             Text('Lejárat: $expiry'),
+            SelectableText(invite.inviteUrl),
+            FilledButton.icon(
+              onPressed: () => _copy(link: true),
+              icon: const Icon(Icons.link),
+              label: const Text('Link másolása'),
+            ),
+            const Text('Meghívókód kézi megadáshoz'),
             SelectableText(invite.code),
             OutlinedButton.icon(
-              onPressed: _copy,
+              onPressed: () => _copy(),
               icon: const Icon(Icons.copy),
               label: const Text('Kód másolása'),
             ),
