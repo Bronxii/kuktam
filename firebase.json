@@ -51,6 +51,12 @@
       "**/.git/**",
       "**/.gitkeep"
     ],
+    "rewrites": [
+      {
+        "source": "/family/invite",
+        "destination": "/family-invite.html"
+      }
+    ],
     "headers": [
       {
         "source": "/.well-known/assetlinks.json",
