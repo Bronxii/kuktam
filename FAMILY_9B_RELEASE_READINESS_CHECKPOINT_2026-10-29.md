@@ -1,5 +1,7 @@
 # Family 9B — release readiness review — 2026-10-29
 
+> Current status (2026-10-30): **CONDITIONAL PASS — EXTERNAL / ROLLOUT BLOCKERS REMAIN**. The post-9B0 delta at the end supersedes the original R1 OPEN / FAIL classification below. The original review is preserved as historical evidence.
+
 ## Scope and evidence
 Read-only code review of current Family stores/handlers, Dart repository/screens, link router, secure pending storage, auth gate, Android adapter/backup policy, Hosting config and Firestore rules. Reuses 9A evidence (new repository/Auth/Firestore chain, 13 backend and 221 Flutter regressions). No full suite/build rerun. No production Firestore/config/account read or mutation. Only two expressly authorized public HTTPS GETs and adb device inventory. Live deployed Functions/rules/gate values have NOT been independently queried; local source and prior checkpoint are distinguished below.
 
@@ -88,3 +90,52 @@ Next: dedicated R1 lifecycle correction and targeted verification; then close Pl
 Final negative checks: 2/2 PASS — corrupted invite and unindexed actual invite both prevent partial finalization. Total existing affected backend regression: 5/5 PASS. The new focused script reports corrected no-invite dissolution PASS and deliberately reproduces the two remaining R1 failures; its successful exit is diagnostic completion, NOT product readiness PASS. Logs: C:/Users/gabor/AppData/Local/Temp/family9b-review.log, family9b-integrity.log, family9b-build.log.
 
 FINAL GATES: Family core implemented; 8A PASS; 8B LOCAL + HOSTING PASS, Play device deferred; 8C PASS; 9A prior bounded PASS; 9B FAIL (R1); production Family rollout NO; commit NO; push NO. No security or cost guarantees beyond the reviewed code and specified evidence are implied.
+
+## Post-9B0 delta review — 2026-10-30
+
+**CONDITIONAL PASS — EXTERNAL / ROLLOUT BLOCKERS REMAIN. R1 CLOSED.** No actual Family functional/security blocker remains identified within the original review plus this bounded delta. This is not a new full security audit or production approval.
+
+### Exact reproductions rerun
+
+Used the existing `family-qa-bridge.cjs` with real local Auth sign-in/token verification, callable handler factories, Firestore transactions and existing worker/lifecycle engines. Project `demo-kuktam-local`, Auth `127.0.0.1:9098`, Firestore `127.0.0.1:8088`. Scheduler dispatch is the existing test substitution; this is not a deployed Functions HTTP or native Flutter E2E claim.
+
+- **R1A PASS:** CREATE A → owner-only dissolution → authoritative non-active/private state → new CREATE B → `familyActive: true`, role owner. B operation and household differ from A; the current CREATE binding points to B.
+- **R1B PASS:** fresh CREATE A → dissolution → private state → another owner's Family B/invite → preview VALID → accept ADD and existing transfer preparation/worker completion → `familyActive: true`, role member in B. Recipient Pro was removed before preview/JOIN. Current JOIN operation and membership invite binding belong to the new invitation.
+- **Historical isolation PASS:** after each path, CREATE A remains DONE, dissolution A remains DONE and household A remains DISSOLVED. Their complete data and update timestamps remain unchanged. The authoritative read is private after dissolution and reflects only the new owner/member state afterward.
+- **R2 owner-only dissolution PASS:** the real create path initially has no invite-slot document. Dissolution completes, owner reads private and finalization leaves an empty slot index. No invite is invented or required.
+- **R2 negative integrity PASS, 2/2:** `5C4B integrity invite cannot partially finalize` and `5C4B integrity unindexedInvite cannot partially finalize`. Corrupt invite ownership and an actual unindexed invite still prevent finalization; protected state is unchanged and no finalization receipt is written.
+
+No broad lifecycle permutations were rerun. Temporary test harnesses `C:/Users/gabor/AppData/Local/Temp/family9b-delta.cjs` and `family9b-delta-runner.cjs` adapt the original local reproduction to assert corrected outcomes, with a separate reset between A and B scenarios. They emit no credentials or invite URLs. The old `functions/scripts/family-9b-review.cjs` remains a historical defect-reproduction script; its old failure expectations must not be interpreted as current acceptance tests.
+
+Executed `node C:/Users/gabor/AppData/Local/Temp/family9b-delta-runner.cjs`. It invokes the project-local Firebase CLI with `emulators:exec --only firestore,auth --project demo-kuktam-local --config C:/Users/gabor/kuktam/firebase.family-qa.emulators.json`, then the two exact journeys and the two selected integrity tests. Exit 0. Log: `C:/Users/gabor/AppData/Local/Temp/family9b-delta.log`.
+
+### Security delta and reused evidence
+
+Read inspection of current CREATE/JOIN admission confirms ACTIVE account generation, deletion barriers, current membership/owned-family exclusion, private routing/fences, current Pro grants for new owner CREATE, capacity and structural locks remain authoritative. JOIN admits a former owner only after the bounded terminal dissolution proof; it does not require member Pro. No new historical scan or client authority was introduced.
+
+Reuse the 9B0 checkpoint and its 5/5 new + 20/20 affected regression evidence for concurrent/lost-ACK CREATE, stale CREATE/dissolution isolation, running dissolution rejection, malformed terminal evidence, newer account generation and deletion admission. No additional broad regression or Functions build was run: backend source is unchanged by this review and the 9B0 build evidence is sufficient. Flutter tests, Android build, full 9A/9B, H2 and performance tests were not run.
+
+The empty `createFamilyShare({})` remains a current-state command, not a request-ID-bearing replay protocol. After B exists it resolves B; a delayed empty request after terminal A is indistinguishable from a new create intent and must pass normal admission. Old identified internal operations cannot mutate B. This explicitly documented 9B0 contract remains unchanged.
+
+### Final blocker list (supersedes original list)
+
+**Before Family production rollout:**
+
+1. Play-signed Android device App Links verification — **DEFERRED / ROLLOUT BLOCKER**. Reuse existing local implementation, public DAL and Hosting PASS evidence; no new suitable-device evidence is available in this delta. Require automatic `verified` domain state and canonical link routing on a suitable Play-signed build. No debug fingerprint added and no live verification claimed.
+2. Explicit production activation/deployment/runtime plan and separate GO — **OPEN / ROLLOUT BLOCKER**. Current local-only runtime/worker guards require coordinated review of production continuation, gates, IAM/App Check and matching client/server/rules versions. A config toggle alone is not the rollout plan. No plan implementation or activation is authorized by this review.
+
+**Before 1.0 public release:**
+
+3. Browser Family invite fallback — **OPEN RELEASE TODO / REQUIRED BEFORE 1.0**. The last authorized HTTP observation was 404; it was not fetched or fixed again here. A safe minimal fallback is required before public/no-app invite distribution: no token rendering/logging, web JOIN/login or Family backend calls. It remains non-blocking only for a restricted installed-app Family rollout after the two rollout blockers close.
+
+**Non-blocking follow-up:** the original aggregate monitoring/read-volume follow-up remains; no new code blocker or speculative optimization is added.
+
+### Final gates and changes
+
+- Former-owner CREATE/JOIN, historical CREATE/dissolution isolation, owner-only dissolution: PASS.
+- One-Family invariant, Pro CREATE rule, member JOIN without Pro, account-generation and deletion safety: PASS within inspected delta and reused targeted evidence.
+- 9A PASS; 9B0 PASS; **9B delta CONDITIONAL PASS**.
+- Actual identified Family code blockers: **none remaining**.
+- Only repository change: this checkpoint document. Backend/Flutter/native/rules/Hosting source unchanged.
+- No production data access, deployment, production rollout, commit or push.
+- Next, under separate authorization: prepare the production rollout plan and close Play-signed device verification plus browser fallback release work. STOP; no next-phase implementation started.
