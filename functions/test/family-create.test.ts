@@ -125,7 +125,7 @@ test('Pro loss immediately before activation aborts; explicit retry can allocate
  await db.doc(`users/${s.uid}/entitlementGrants/pro`).delete();
  assert.equal(await finish(s,id),'ABORTED');assert.equal((await s.source.get()).size,5);
  await db.doc(`users/${s.uid}/entitlementGrants/pro`).set(grant());
- assert.equal(await s.service.reserve({uid:s.uid}),id);assert.equal(await finish(s,id),'DONE');await assertDone(s,id);
+ const retry=await s.service.reserve({uid:s.uid});assert.notEqual(retry,id);assert.equal(await finish(s,retry),'DONE');await assertDone(s,retry,2);assert.equal((await db.doc(`familyOperations/${id}`).get()).get('status'),'ABORTED');
  assert.equal((await db.doc(`households/${oldHome}`).get()).exists,false);
 });
 test('worker failure leaves durable retry and a new instance resumes without duplicate copy',async()=>{

@@ -5,7 +5,7 @@ import { Firestore, Timestamp, Transaction } from 'firebase-admin/firestore';
 import { AuthContext, authenticatedUid } from '../billing/account-binding';
 import { FamilyInviteStore } from './family-invites';
 import { FamilyInviteError, hashInviteToken, readInvite, readInviteSlots } from './invite-contract';
-import { createOperationId, hasPro } from './family-create';
+import { currentCreateId, readCreateOperation, terminalOwnedFamily, hasPro } from './family-create';
 import { privateHouseholdId } from './household-store';
 import { claimFamilyLease } from './operation-lease';
 
@@ -111,8 +111,17 @@ export class FamilyJoinStore {
       if(invite.createdByUid===uid)fail('SELF_INVITE');
       if(index.exists)fail('ALREADY_IN_FAMILY');
       if(prior&&(await tx.get(this.db.doc(`households/${prior.householdId}/members/${uid}`))).exists)fail('INVITE_STATE_UNAVAILABLE');
-      const create=await tx.get(this.db.doc(`familyOperations/${createOperationId(uid)}`));
-      if(create.exists&&create.get('status')!=='ABORTED')fail('IN_PROGRESS');
+      const createId=currentCreateId(uid,currentUser.get('familyCreateBinding'));
+      const create=await tx.get(this.db.doc(`familyOperations/${createId}`));
+      if(currentUser.get('familyCreateBinding')!==undefined&&!create.exists)fail('ACCOUNT_UNAVAILABLE');
+      if(create.exists&&create.get('status')!=='ABORTED'){
+        try{const c=readCreateOperation(create.data());
+          const {readAccount}=await import('../accounts/account-lifecycle');
+          const account=readAccount((await tx.get(this.db.doc(`accountLifecycle/${uid}`))).data());
+          if(c.actorUid!==uid||(c.accountGeneration??1)!==account.generation)fail('ACCOUNT_UNAVAILABLE');
+          await terminalOwnedFamily(this.db,tx,createId,c);
+        }catch{fail('IN_PROGRESS');}
+      }
       const p=await this.standalone(tx,uid),members=await this.family(tx,invite.createdByUid,invite.householdId);
       if(members.some(m=>m.memberId===uid))fail('ALREADY_MEMBER');
       const capRef=this.db.doc(`familyJoinCapacity/${invite.householdId}`),cap=await tx.get(capRef),capState=readJoinCapacity(cap.data()),ids=capState.operationIds;

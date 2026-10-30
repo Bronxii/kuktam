@@ -11,7 +11,7 @@ import {readDissolutionFinalizationReceipt} from './dissolution-finalization';
 import {readJoinCapacity,assertNoLiveFamilyDependency} from './join-capacity';
 import {readInvite,readInviteSlots} from './invite-contract';
 import {readJoinOperation} from './family-join';
-import {readCreateOperation,createOperationId} from './family-create';
+import {readCreateOperation,isCreateIdentity} from './family-create';
 import {readMemberExitCompletion,memberLeaveId,ownerRemoveId} from './member-leave';
 import {readParticipantReleaseProgress} from './dissolution-member-release';
 import {digest,sourceFingerprint} from './join-snapshot';
@@ -110,7 +110,7 @@ export class HistoricalFamilyAuditStore {
   switch(v.kind){
    case 'FAMILY_DISSOLUTION':{const o=readPreservation(v,d.id);if(o.ownerUid!==uid||o.phase!=='DONE'||o.status!=='DONE')invalid();break;}
    case 'JOIN':{const o=readJoinOperation(v,d.id);if(o.ownerUid!==uid||o.status==='DONE'&&o.phase!=='ACTIVE')invalid();break;}
-   case 'CREATE':{const o=readCreateOperation(v);if(o.actorUid!==uid||d.id!==createOperationId(uid))invalid();break;}
+   case 'CREATE':{const o=readCreateOperation(v);if(o.actorUid!==uid||!isCreateIdentity(d.id,o))invalid();break;}
    case 'MEMBER_LEAVE':readMemberExitCompletion(v,v.actorUid,v.actorUid,v.inviteId,false);if(d.id!==memberLeaveId(v.actorUid,v.inviteId))invalid();break;
    case 'OWNER_REMOVE_MEMBER':readMemberExitCompletion(v,uid,v.targetUid,v.inviteId,true);if(d.id!==ownerRemoveId(uid,v.targetUid,v.inviteId))invalid();break;
    default:invalid();
