@@ -16,8 +16,9 @@ const admin=getFirestore(adminApp),processor=new ShoppingMutationStore(admin);
 let env:RulesTestEnvironment,n=0;
 const expiry=Date.now()+86400000,epoch=`${expiry}-${'a'.repeat(32)}`;
 const request=()=>{const mutationId=`${epoch}_${(++n).toString(16).padStart(64,'0')}`;return {schemaVersion:1,mutationId,actorUid:'u',householdId:'home',epoch,kind:'ADD',payloadJson:JSON.stringify({type:'ADD',name:'x',quantity:1,unit:'g'}),submittedAt:serverTimestamp()};};
+const transition=process.env.KUKTAM_TEST_SHOPPING_TRANSITION==='1';
 before(async()=>{
- env=await initializeTestEnvironment({projectId:'demo-kuktam-local',firestore:{host:'127.0.0.1',port:8088,rules:readFileSync(resolve(__dirname,'../../../firestore.rules'),'utf8')}});await env.clearFirestore();
+ env=await initializeTestEnvironment({projectId:'demo-kuktam-local',firestore:{host:'127.0.0.1',port:8088,rules:readFileSync(resolve(__dirname,transition?'../../../firestore.shopping-transition.rules':'../../../firestore.rules'),'utf8')}});await env.clearFirestore();
  await env.withSecurityRulesDisabled(async ctx=>{const db=ctx.firestore();
  for(const [path,data] of Object.entries({'shoppingRuntime/config':{enabled:true},'accountLifecycle/u':{state:'ACTIVE'},'users/u':{activeHouseholdId:'home',privateHouseholdId:'home',familyHouseholdId:null,shoppingMigrationVersion:1},'households/home':{schemaVersion:2,kind:'private',state:'ACTIVE',operationId:null,ownerUid:'u',shoppingEpoch:epoch,shoppingEpochExpiresAt:Timestamp.fromMillis(expiry)},'households/home/members/u':{role:'owner'},'households/home/shoppingItems/a':{name:'x',revision:1}}))await setDoc(doc(db,path),data);
  });
@@ -213,4 +214,33 @@ test('S1C trusted legacy migration remains functional, lifecycle still fences re
   const r={schemaVersion:1,mutationId:newMutationId(f.epoch),actorUid:uid,householdId:f.householdId,epoch:f.epoch,kind:'ADD',payloadJson:JSON.stringify(milk(1)),submittedAt:serverTimestamp()};
   await denied(setDoc(doc(f.db,`users/${uid}/shoppingMutations/${r.mutationId}`),r));
  }
+});
+
+test('9D1 two installations: migration residue, private write cutoff and stale replay',async()=>{
+ const uid='two-installations',db=env.authenticatedContext(uid).firestore();
+ const legacy=collection(db,`users/${uid}/shopping`);
+ const row={name:'Milk',unit:'ml',quantity:1,isChecked:false,createdAt:serverTimestamp()};
+ await assertSucceeds(setDoc(doc(legacy,'a'),row));
+ await assertSucceeds(setDoc(doc(legacy,'b'),row));
+ const store=new HouseholdStore(admin);
+ await store.page(uid,1);
+ await denied(deleteDoc(doc(legacy,'b')));
+ await store.ensure({uid});
+ await store.ensure({uid});
+ const hid=(await admin.doc(`users/${uid}`).get()).get('activeHouseholdId');
+ const items=collection(db,`households/${hid}/shoppingItems`);
+ assert.deepEqual((await getDocs(items)).docs.map(d=>d.id),['a','b']);
+ assert.equal((await getDocs(legacy)).size,0);
+ const oldRow=doc(items,'a');
+ if(transition){
+   await assertSucceeds(updateDoc(oldRow,{quantity:2}));
+   await assertSucceeds(setDoc(doc(items,'old'),row));
+   await assertSucceeds(deleteDoc(doc(items,'old')));
+ }else await denied(updateDoc(oldRow,{quantity:2}));
+ const ctx=await processor.ensureContext({uid});
+ await denied(updateDoc(oldRow,{quantity:100}));
+ await denied(deleteDoc(oldRow));
+ await execute({uid,db,...ctx},{type:'SET_CHECKED',itemId:'a',expectedRevision:0,isChecked:true});
+ await admin.doc(`households/${hid}`).update({shoppingEpochExpiresAt:AdminTimestamp.fromMillis(1)});
+ await denied(setDoc(oldRow,row));
 });

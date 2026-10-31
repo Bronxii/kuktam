@@ -27,11 +27,10 @@ service cloud.firestore {
         allow create, update: if isOwner(uid) && canEditContent(uid);
       }
       match /shopping/{itemId} {
-        allow read, delete: if isOwner(uid);
+        allow read: if isOwner(uid);
         // Compatibility only until this user's server-side migration begins.
-        allow create, update: if isOwner(uid) && canEditContent(uid) &&
-          (!exists(/databases/$(database)/documents/users/$(uid)) ||
-           !('activeHouseholdId' in get(/databases/$(database)/documents/users/$(uid)).data));
+        allow delete: if isOwner(uid) && legacyShoppingOpen(uid);
+        allow create, update: if isOwner(uid) && canEditContent(uid) && legacyShoppingOpen(uid);
       }
       match /entitlements/pro {
         allow read: if isOwner(uid);
@@ -47,6 +46,10 @@ service cloud.firestore {
       }
     }
 
+    function legacyShoppingOpen(uid) {
+      return !exists(/databases/$(database)/documents/users/$(uid)) ||
+        !('activeHouseholdId' in get(/databases/$(database)/documents/users/$(uid)).data);
+    }
     function householdMember(hid) {
       return request.auth != null &&
         exists(/databases/$(database)/documents/households/$(hid)/members/$(request.auth.uid));
