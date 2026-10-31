@@ -32,11 +32,15 @@ beforeEach(async()=>{
  assert.equal(app.options.projectId,'demo-kuktam-local');
 });
 afterEach(restore);after(()=>deleteApp(app));
-async function fixture(){
+const smokeConfig = {
+ creationEnabled:false, inviteCreationEnabled:false, joinReservationEnabled:false,
+ smokeAdmissionEnabled:true, smokeAllowedUids:{owner:'owner', member:'guest'},
+};
+async function fixture(scoped=false){
  let ms=now.toMillis()+1000;const clock=()=>Timestamp.fromMillis(ms),advance=()=>{ms+=300001;};
  for(const uid of ['owner','guest','fresh'])await new HouseholdStore(db).ensure({uid});
  for(const uid of ['owner','fresh'])await db.doc(`users/${uid}/entitlementGrants/pro`).set(grant());
- await db.doc('familyRuntime/config').set({creationEnabled:true,inviteCreationEnabled:true,joinReservationEnabled:true});
+ await db.doc('familyRuntime/config').set(scoped ? smokeConfig : {creationEnabled:true,inviteCreationEnabled:true,joinReservationEnabled:true});
  const create=new FamilyCreateStore(db,clock),join=new FamilyJoinStore(db,clock),transfer=new JoinTransferStore(db,clock);
  const invites=new FamilyInviteStore(db,{resolve:async uids=>new Map(uids.map(uid=>[uid,{exists:true,email:null}]))},clock);
  const cid=await create.reserve({uid:'owner'});for(let n=0;n<15&&(await db.doc(`familyOperations/${cid}`).get()).get('status')!=='DONE';n++){advance();await create.resume(cid);}
@@ -44,7 +48,15 @@ async function fixture(){
  const off=()=>db.doc('familyRuntime/config').set({creationEnabled:false,inviteCreationEnabled:false,joinReservationEnabled:false});
  async function admitted(mode:'ADD'|'DELETE'='ADD'){
   await db.doc(`households/${privateHouseholdId('guest')}/shoppingItems/one`).set({name:'Milk',quantity:1,unit:'l',revision:1});
-  const invite=await invites.create({uid:'owner'}),id=await join.reserve({uid:'guest'},invite.token,mode);if(mode==='DELETE'){await off();assert.equal(await join.reserve({uid:'guest'},invite.token,mode),id);}
+  const invite=await invites.create({uid:'owner'});
+  if(scoped){
+   await assert.rejects(create.reserve({uid:'fresh'}),/featureDisabled/);
+   await assert.rejects(invites.create({uid:'fresh'}),/FEATURE_DISABLED/);
+   assert.equal((await invites.preview({uid:'fresh'},invite.token)).code,'VALID');
+   await assert.rejects(join.reserve({uid:'fresh'},invite.token,mode),/FEATURE_DISABLED/);
+   assert.equal((await db.doc(`familyInvites/${invite.inviteId}`).get()).get('status'),'PENDING');
+  }
+  const id=await join.reserve({uid:'guest'},invite.token,mode);if(mode==='DELETE'){await off();assert.equal(await join.reserve({uid:'guest'},invite.token,mode),id);}
   await join.resume(id);
   await transfer.prepare({uid:'guest'},id,invite.inviteId);const ref=db.doc(`familyOperations/${id}`);
   for(let n=0;n<30&&(await ref.get()).get('phase')!=='COMMITTED_TRANSFER';n++){
@@ -59,8 +71,8 @@ async function fixture(){
  return {clock,advance,create,cid,hid,join,transfer,invites,off,admitted,activate};
 }
 test('9C deployed policy is fail closed and internal phase transports stay test only',()=>{
- for(const config of [undefined,null,{}, {creationEnabled:false},{creationEnabled:'true'},[]])assert.equal(familyAdmissionEnabled(config,'creationEnabled'),false);
- assert.equal(familyAdmissionEnabled({creationEnabled:true},'creationEnabled'),true);
+ for(const config of [undefined,null,{}, {creationEnabled:false},{creationEnabled:'true'},[]])assert.equal(familyAdmissionEnabled(config,'creationEnabled','owner'),false);
+ assert.equal(familyAdmissionEnabled({creationEnabled:true},'creationEnabled','owner'),true);
  assert.equal(internalFamilyPhaseCallsAllowed(),false);
 });
 test('9C new admission missing false and unreadable denies without writes; CREATE retry survives OFF',async()=>{
@@ -121,3 +133,35 @@ test('9C deployed exports invoke injected store methods and internal phase calls
  }finally{[OwnerProLossStore.prototype.observe,OwnerProLossStore.prototype.sweep,MemberAccountDeletionStore.prototype.sweep,OwnerAccountDeletionStore.prototype.sweep]=originals;}
 });
 
+
+test('9E fail-closed role slots and per-operation global precedence',()=>{
+ for(const field of ['creationEnabled','inviteCreationEnabled','joinReservationEnabled'] as const){
+  const uid=field==='joinReservationEnabled'?'guest':'owner';
+  for(const cohort of [undefined,null,[],['owner','guest'],{},'owner',{owner:'owner'},
+   {owner:'owner',member:'guest',extra:'fresh'},{owner:'owner',member:'owner'},
+   {owner:'owner',member:' '},{owner:'owner',member:'a/b'},{owner:'owner',member:'a'.repeat(129)}]){
+   assert.equal(familyAdmissionEnabled({...smokeConfig,smokeAllowedUids:cohort},field,uid),false);
+  }
+  for(const enabled of [undefined,null,false,'true',1]){
+   assert.equal(familyAdmissionEnabled({...smokeConfig,smokeAdmissionEnabled:enabled},field,uid),false);
+  }
+  assert.equal(familyAdmissionEnabled({...smokeConfig,[field]:undefined},field,uid),false);
+  assert.equal(familyAdmissionEnabled(smokeConfig,field,uid),true);
+  assert.equal(familyAdmissionEnabled(smokeConfig,field,uid==='guest'?'owner':'guest'),false);
+  assert.equal(familyAdmissionEnabled(smokeConfig,field,'fresh'),false);
+  assert.equal(familyAdmissionEnabled({...smokeConfig,[field]:true},field,'fresh'),true);
+ }
+});
+for(const mode of ['ADD','DELETE'] as const)test(`9E scoped ${mode}: outsider denied; admitted retry, release and dissolution survive OFF`,async()=>{
+ const f=await fixture(true),j=await f.admitted(mode);
+ await f.off();
+ assert.equal(await f.join.reserve({uid:'guest'},j.invite.token,mode),j.id);
+ await f.activate(j.id);
+ await new MemberLeaveStore(db,f.clock).leave({uid:'guest'},j.invite.inviteId);
+ const life=new OwnerProLossStore(db,f.clock),{operationId}=await life.startOwner('owner');
+ for(let n=0;n<60&&(await db.doc(`familyProLoss/${operationId}`).get()).get('status')!=='DONE';n++){
+  f.advance();await life.sweep();
+ }
+ assert.equal((await db.doc(`households/${f.hid}`).get()).get('state'),'DISSOLVED');
+ for(const uid of ['owner','guest'])assert.equal((await f.invites.state({uid})).familyActive,false);
+});

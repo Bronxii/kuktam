@@ -100,7 +100,7 @@ export class FamilyJoinStore {
         return id;
       }
       const gate=await tx.get(this.db.doc('familyRuntime/config'));
-      if(!familyAdmissionEnabled(gate.data(),'joinReservationEnabled'))fail('FEATURE_DISABLED');
+      if(!familyAdmissionEnabled(gate.data(),'joinReservationEnabled',uid))fail('FEATURE_DISABLED');
       if(prior&&!['DONE','ABORTED'].includes(prior.status))fail('IN_PROGRESS');
       if(invite.status!=='PENDING')fail(invite.status==='RESERVED'?'IN_PROGRESS':invite.status);
       const now=this.clock();if(invite.expiresAt.toMillis()<=now.toMillis())fail('EXPIRED');
