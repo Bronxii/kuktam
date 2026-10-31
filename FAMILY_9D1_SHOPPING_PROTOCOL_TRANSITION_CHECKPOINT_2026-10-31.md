@@ -1,10 +1,18 @@
 # Family 9D1 • Shopping protocol transition • 2026-10-31
 
-**CONDITIONAL PASS — Play distribution evidence remains.** The compatibility bridge is implemented and tested locally. The Firebase default config still selects final S1C. No production action was performed. Do not approve rollout based solely on a local AAB.
+**PASS — SAFE TRANSITION DEFINED AND IMPLEMENTED.** Operator-supplied Play Console evidence closes the distribution question. The compatibility bridge is implemented and tested locally. The Firebase default config still selects final S1C. No production action was performed. Do not approve rollout based solely on a local AAB.
 
 ## Artifact evidence
 
-Local build/app/outputs/bundle/release/app-release.aab: manifest package com.bronxii.kuktam, versionName 1.0.9, versionCode 10. SHA-256 39a5993b245eb90d96c3652575ca37f704225ff8911ebc1c117ccb9e6acfe1e3. Its arm64 Dart binary contains ensurePrivateHousehold and shoppingItems, with no matching strings for ensureShoppingContext, shoppingMutations, previewFamilyInvite or startFamilyDissolution. Consistent with the household-direct generation. This does not identify the active downloadable Play artifact. No authenticated Play-track listing or signed release-to-source mapping was available. Production, open and closed track versions, percentages and rollout status are unknown. Operator must match active tracks/version codes to uploaded bundle provenance and check historical installations before selecting the transition. Do not use 10 as a minimum compatible build.
+Local build/app/outputs/bundle/release/app-release.aab: manifest package com.bronxii.kuktam, versionName 1.0.9, versionCode 10. SHA-256 39a5993b245eb90d96c3652575ca37f704225ff8911ebc1c117ccb9e6acfe1e3. Its arm64 Dart binary contains ensurePrivateHousehold and shoppingItems, with no matching strings for ensureShoppingContext, shoppingMutations, previewFamilyInvite or startFamilyDissolution. Consistent with the household-direct generation. The operator reports the following Google Play Console evidence for Kuktám.
+
+| Track | Artifact | Support decision |
+|---|---|---|
+| Closed testing — Alpha | 1.0.1 (2), rollout 100% within Alpha | Historical and unsupported for Family rollout. Permission denial, stale or empty views and failed old writes are accepted. |
+| Internal testing | 1.0.9 (10), active | Latest known pre-Family protocol reference. The corresponding local AAB uses direct household shopping writes. |
+| Future Family-capable release | Later versionCode, unassigned | Requires mutation shopping, epoch-aware routing and current Family contracts. VersionCode 10 is not the Family minimum. |
+
+Version/package/track correspondence is sufficient for transition planning. The recorded SHA-256 belongs to the local AAB only. No Play-side checksum or signed source mapping was supplied, so exact binary identity is unproven. This evidence does not establish an open or production track release.
 
 | Generation and source evidence | Read/write and routing | Family support |
 |---|---|---|
@@ -12,7 +20,7 @@ Local build/app/outputs/bundle/release/app-release.aab: manifest package com.bro
 | Household direct, c4225d2 through parent of 8b6255c | ensurePrivateHousehold, active route, reads and writes households/HID/shoppingItems. Can migrate legacy data at usable auth startup. Batch create uses name, quantity, unit, isChecked, createdAt. Local-accept helper can complete on pending snapshot, with delayed onSyncFailure only while callback/session survives. | pre-Family |
 | Mutation cutover 8b6255c; present 8C/9C source includes Family | Reads active household, submits immutable users/UID/shoppingMutations; context/epoch and expected revisions, processor and receipts. Recipe details/scaling and text import both enter addOrMergeItems, bulk or individual children. Dispatcher checks authoritative receipt on permission denial and handles context/authority failure. | mutation capability predates Family. Require tested full Family client for CREATE/JOIN UX |
 
-Repository pubspec snapshots for these source boundaries give 1.0.0+1. Build flags can override them. Exact Play version/track for each remains unknown.
+Repository pubspec snapshots for these source boundaries give 1.0.0+1. Build flags can override them. The table above identifies the operator-confirmed test tracks. The exact source commit of the Alpha binary remains unverified and its continued functionality is outside the support policy.
 
 ## Two distinct migration moments
 
@@ -45,11 +53,27 @@ Fixed legacy DELETE in both sources. Once a user's root contains activeHousehold
 
 Local Firestore emulator demo-kuktam-local. Final shopping, household (including DISSOLVED) and general rules suites: 91/91. Transition shopping suite: 27/27. Tests include authenticated legacy source writes, forced two-page migration and denied delete of the uncopied second row, repeat ensure, intact source-to-target rows, old private CRUD before epoch, stale update/delete/replace after issuance/expiry, actual mutation with receipt, ADD/EDIT/check/uncheck/DELETE and bulk, Family direct-write attack cases. Both rule sources were loaded separately. No Functions or Flutter build required. Index manifest unchanged.
 
-1. Identify the current downloadable artifacts, track/status and protocol. Confirm the five-field legacy write envelope against any additionally identified released binary. If a different writer exists, hold here. Provide clear upgrade guidance for affected old devices.
+1. T0 artifact reconciliation is complete for the stated support policy. Use internal 1.0.9 (10) as the direct-write reference. Provide clear upgrade guidance for affected old devices.
 2. With Family admission OFF, separately authorize prerequisites: required indexes READY, compatible household/mutation processor and recovery deployed and operational. Do not expose a mutation client to the existing command-denying live rules. Prevent early context issuance to public clients until the bridge is available.
 3. Separately deploy the reviewed TRANSITION source using an explicit stage-specific rules mapping, verifying the exact source diff and resulting ruleset. The default firebase.json still points at S1C and must not be used for this transitional stage. Verify untouched unmarked private clients, migration barrier, new command processing and stale-write denial in an authorized smoke. Set shared shopping runtime ready before releasing the mutation client. Keep Family growth OFF.
-4. Release verified compatible shopping/Family build. At authenticated launch a migrating account may render older software read-only/empty as documented. No client writes in both protocols. Monitor denied-write/support and mutation receipt outcomes. No server-trusted app-version signal exists; epoch/context and final rules supply security. Operational minimum = signed tested artifact with routing, mutation/epoch, current Family contracts and recovery. Numeric version requires Play evidence.
+4. Release verified compatible shopping/Family build. At authenticated launch a migrating account may render older software read-only/empty as documented. No client writes in both protocols. Monitor denied-write/support and mutation receipt outcomes. No server-trusted app-version signal exists; epoch/context and final rules supply security. Operational minimum = signed tested artifact with routing, mutation/epoch, current Family contracts and recovery. The future Family-capable versionCode remains unassigned.
 5. After support for remaining never-upgraded direct writers is explicitly retired (or proven no longer needed), separately deploy final S1C. Verify final denial even for an unmarked private home. This global cutoff can interrupt still-unmigrated household-direct installations, independently of Family; it requires a deliberate release decision. Do not restore permissive rules after Family activity.
 6. Before Family smoke require final rules, READY indexes, functioning processor/lifecycle maintenance, compatible signed client, limited smoke plan and separate authorization. Before Family ON also close Play-signed link verification, smoke results, monitoring and separate activation GO.
 
 Known 9D billingMaintenance read-cost investigation stays separate. No production data access/mutation, rules/index/Functions/Hosting deployment, Play rollout, gate change, commit or push.
+
+## Delta closure and remaining rollout gates
+
+9C PASS. Original 9D FAIL, compatibility blocker resolved through 9D1. Final 9D1 PASS with no open technical or artifact blocker. Existing evidence is 91/91 final rules tests and 27/27 transition tests. This delta changed documentation only and reran no tests.
+
+Data safety is enforced when the server evaluates each write. After epoch issuance, stale queued direct writes are rejected. Old clients cannot switch routing, write Family or hidden fallback shopping after JOIN, or delete pending migration source rows. Final S1C denies every direct household shopping write. Historical Alpha functionality, a forced-update mechanism and server-side version enforcement are not prerequisites for data integrity.
+
+| Stage | Prerequisite or decision |
+|---|---|
+| T0 | Pre-Family direct-write reference identified. Alpha support retired. |
+| T1 → T2 transitional rules | Required indexes READY, compatible processor/runtime and recovery operational, Family admission OFF, stage-specific rules mapping verified and separate deployment GO. |
+| T3 → T4 → T5 final S1C | Release the tested mutation/Family client, monitor command receipts and rejections, explicitly close the direct-write support window, approve final S1C. |
+| T6 controlled Family smoke | Verify final S1C denial on unmarked homes, ready indexes, healthy maintenance and compatible signed client. Obtain scoped smoke authorization. |
+| T7 Family ON | Successful controlled smoke, Play-signed Android App Links verification, monitoring/rollback readiness and separate activation GO. |
+
+Production Family rollout remains OFF. No deploy, commit or push. Next milestone is the staged rollout runbook.
