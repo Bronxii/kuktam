@@ -1,4 +1,4 @@
-import { FamilyJoinStore, joinOperationId, readJoinOperation, localJoinRuntime } from '../src/households/family-join';
+import { FamilyJoinStore, joinOperationId, readJoinOperation } from '../src/households/family-join';
 import { acceptFamilyHandler } from '../src/households/join-handler';
 import { Maintenance } from '../src/jobs/maintenance';
 import { FakePlayApi } from './fake-play-api';
@@ -59,12 +59,6 @@ async function joined(mode:'ADD'|'DELETE'='ADD') {
  const id=await join.reserve({uid:'guest'},invite.token,mode);
  return {...s,invite,join,id,op:async()=>readJoinOperation((await db.doc(`familyOperations/${id}`).get()).data(),id)};
 }
-test('production runtime never enabled by demo-host or config alone',()=>{
- assert.equal(localJoinRuntime('kuktam-67768','127.0.0.1:8088'),false);
- assert.equal(localJoinRuntime('demo-test',undefined),false);
- assert.equal(localJoinRuntime('demo-test','remote:8088'),false);
- assert.equal(localJoinRuntime('demo-test','127.0.0.1:8088'),true);
-});
 for(const mode of ['ADD','DELETE'] as const)test(`${mode} reserves atomically without changing shopping or user pointers`,async()=>{
  const s=await setup(),p=privateHouseholdId('guest'),item={name:'milk',quantity:2,unknown:{future:true},createdAt:now};
  await db.doc(`households/${p}/shoppingItems/a`).set(item);
@@ -82,7 +76,7 @@ for(const mode of ['ADD','DELETE'] as const)test(`${mode} reserves atomically wi
  assert.deepEqual(await new HouseholdStore(db).ensure({uid:'guest'}),{schemaVersion:1,householdId:p,ready:true});
  assert.deepEqual((await db.doc('users/guest').get()).data(),{...before,familyJoinBinding:{operationId:id,inviteId:invite.inviteId}});
 });
-for(const variant of ['absentGate','disabledGate','cloudRuntime','self','expired','revoked','used','reserved','missing',
+for(const variant of ['absentGate','disabledGate','self','expired','revoked','used','reserved','missing',
  'ownerFree','ownerDELETING','ownerDELETED','guestDELETING','guestDELETED','PREPARING','DISSOLVING','missingFamily',
  'sameFamily','otherFamily','migration','private','pointer','createInProgress'])test(`validation denies ${variant} without reservation`,async()=>{
  const s=await setup(),i=await s.create(),j=new FamilyJoinStore(db,s.clock);let uid='guest';
@@ -104,9 +98,7 @@ for(const variant of ['absentGate','disabledGate','cloudRuntime','self','expired
  if(variant==='private')await db.doc(`households/${privateHouseholdId('guest')}`).delete();
  if(variant==='pointer')await db.doc('users/guest').update({activeHouseholdId:'wrong'});
  if(variant==='createInProgress') {const {createOperationId}=await import('../src/households/family-create');await db.doc(`familyOperations/${createOperationId('guest')}`).set({status:'READY'});}
- const before=await snapshot();const saved=process.env.K_SERVICE;
- try{if(variant==='cloudRuntime')process.env.K_SERVICE='deployed';await assert.rejects(j.reserve({uid},i.token,'ADD'));}
- finally{if(saved===undefined)delete process.env.K_SERVICE;else process.env.K_SERVICE=saved;}
+ const before=await snapshot();await assert.rejects(j.reserve({uid},i.token,'ADD'));
  assert.deepEqual(await snapshot(),before);
 });
 test('Free or Pro invitee eligible; canonical multiple owner grants remain effective',async()=>{

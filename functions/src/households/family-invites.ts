@@ -1,3 +1,4 @@
+import {familyAdmissionEnabled} from './runtime-policy';
 import {familyInviteUrl} from './invite-url';
 import { Firestore, Timestamp, Transaction } from 'firebase-admin/firestore';
 import { AuthContext, authenticatedUid } from '../billing/account-binding';
@@ -106,7 +107,7 @@ export class FamilyInviteStore {
     const uid=authenticatedUid(context),token=this.tokenFactory(),id=hashInviteToken(token),inviteUrl=familyInviteUrl(token);
     return this.db.runTransaction(async tx=>{
       const now=this.clock(),gate=await tx.get(this.db.doc('familyRuntime/config'));
-      if(gate.get('inviteCreationEnabled')!==true)fail('FEATURE_DISABLED');
+      if(!familyAdmissionEnabled(gate.data(),'inviteCreationEnabled'))fail('FEATURE_DISABLED');
       const family=await this.owner(tx,uid);
       if(!await hasPro(this.db,tx,uid,now))fail('OWNER_NOT_PRO');
       if((await this.members(tx,family)).length>=MAX_FAMILY_MEMBERS)fail('FAMILY_FULL');

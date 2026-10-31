@@ -3,7 +3,7 @@ import { canonicalValue, digest, sourceFingerprint } from '../src/households/joi
 import { ShoppingMutationStore } from '../src/shopping/mutation-store';
 import { newMutationId } from '../src/shopping/mutation-contract';
 import { LifecycleStore } from '../src/billing/lifecycle-store';
-import { FamilyJoinStore, joinOperationId, readJoinOperation, localJoinRuntime } from '../src/households/family-join';
+import { FamilyJoinStore, joinOperationId, readJoinOperation } from '../src/households/family-join';
 import { acceptFamilyHandler } from '../src/households/join-handler';
 import { Maintenance } from '../src/jobs/maintenance';
 import { FakePlayApi } from './fake-play-api';

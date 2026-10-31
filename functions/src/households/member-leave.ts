@@ -62,8 +62,6 @@ export class MemberLeaveStore {
   leaveForAccountDeletion(uid:string,inviteId:string){authenticatedUid({uid});return this.exit(uid,uid,inviteId,false,true);}
   private async exit(actorUid:string,uid:string,inviteId:string,removal:boolean,deletion=false){
     if(typeof inviteId!=='string'||!inviteIdPattern.test(inviteId))fail('INVALID_ARGUMENT');
-    if(process.env.K_SERVICE||process.env.FUNCTION_NAME||process.env.GCLOUD_PROJECT!=='demo-kuktam-local'||
-      !/^(127\.0\.0\.1|localhost):[0-9]{1,5}$/.test(process.env.FIRESTORE_EMULATOR_HOST??''))fail('FEATURE_DISABLED');
     const kind=removal?'OWNER_REMOVE_MEMBER':'MEMBER_LEAVE';
     const id=removal?ownerRemoveId(actorUid,uid,inviteId):memberLeaveId(uid,inviteId),p=privateHouseholdId(uid);
     return this.db.runTransaction(async tx=>{

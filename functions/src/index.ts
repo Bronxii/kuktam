@@ -1,7 +1,7 @@
 import {ownerDissolutionHandler} from './households/owner-dissolution-handler';
 import {OwnerAccountDeletionStore} from './households/owner-account-deletion';
 import {MemberAccountDeletionStore} from './households/member-account-deletion';
-import {OwnerProLossStore,familyLifecycleEnabled} from './households/owner-pro-loss';
+import {OwnerProLossStore} from './households/owner-pro-loss';
 import { DissolutionFinalizationStore } from './households/dissolution-finalization';
 import { DissolutionSourceDispositionStore } from './households/dissolution-source-disposition';
 import { DissolutionMemberReleaseStore } from './households/dissolution-member-release';
@@ -51,19 +51,15 @@ const shoppingStore=()=>new ShoppingMutationStore(getFirestore(getApps().find(a=
 const ownerProLossStore=()=>new OwnerProLossStore(getFirestore(getApps().find(a=>a.name==='[DEFAULT]')??initializeApp()));
 export const startFamilyDissolution=onCall(familyOptions,ownerDissolutionHandler(ownerProLossStore));
 export const familyOwnerEntitlementChanged=onDocumentWritten({document:'users/{uid}/entitlementGrants/{grantId}',region:config.region,serviceAccount:coreIdentity,timeoutSeconds:60,maxInstances:5,retry:true},async event=>{
-  if(!familyLifecycleEnabled())return;
   await ownerProLossStore().observe(event.params.uid);
 });
 export const familyOwnerDeletionMaintenance=onSchedule({region:config.region,serviceAccount:coreIdentity,schedule:'every 1 minutes',timeoutSeconds:540,maxInstances:1},async()=>{
-  if(!familyLifecycleEnabled())return;
   await new OwnerAccountDeletionStore(getFirestore(getApps().find(a=>a.name==='[DEFAULT]')??initializeApp())).sweep();
 });
 export const familyMemberDeletionMaintenance=onSchedule({region:config.region,serviceAccount:coreIdentity,schedule:'every 1 minutes',timeoutSeconds:540,maxInstances:1},async()=>{
-  if(!familyLifecycleEnabled())return;
   await new MemberAccountDeletionStore(getFirestore(getApps().find(a=>a.name==='[DEFAULT]')??initializeApp())).sweep();
 });
 export const familyOwnerProLossMaintenance=onSchedule({region:config.region,serviceAccount:coreIdentity,schedule:'every 1 minutes',timeoutSeconds:540,maxInstances:1},async()=>{
-  if(!familyLifecycleEnabled())return;
   await ownerProLossStore().sweep();
 });
 export const ensureShoppingContext=onCall(familyOptions,async request=>{

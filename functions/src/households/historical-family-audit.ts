@@ -1,7 +1,7 @@
 import {FieldPath,FieldValue,Firestore,Timestamp,Transaction,DocumentSnapshot} from 'firebase-admin/firestore';
 import {authenticatedUid,AuthContext} from '../billing/account-binding';
 import {readAccount} from '../accounts/account-lifecycle';
-import {familyLifecycleEnabled,readOwnerProLossIntent} from './owner-pro-loss';
+import {readOwnerProLossIntent} from './owner-pro-loss';
 import {readOwnerDeletionIntent} from './owner-account-deletion';
 import {privateHouseholdId} from './household-store';
 import {validatePrivateRoot} from './household-contract';
@@ -30,10 +30,9 @@ function progress(v:any,uid:string,g:number):Progress {
  if(v.current!==null){const c=v.current;if(!c||Object.keys(c).sort().join(',')!=='after,auditHash,householdId,stage,updateTime'||typeof c.householdId!=='string'||!/^[A-Za-z0-9_-]{1,128}$/.test(c.householdId)||!(c.updateTime instanceof Timestamp)||!['INVITES','OPERATIONS','DETACH'].includes(c.stage)||!(c.after===null||typeof c.after==='string')||!hex(c.auditHash))invalid();}
  return v;
 }
-/** Explicit trusted local preparation. Never dispatches private deletion or Auth. */
+/** Explicit trusted preparation. Never dispatches private deletion or Auth. */
 export class HistoricalFamilyAuditStore {
  constructor(private readonly db:Firestore,private readonly clock=Timestamp.now){}
- private local(uid:string){if(!familyLifecycleEnabled())throw new Error('FEATURE_DISABLED');authenticatedUid({uid});}
  private async privateAccount(tx:Transaction,uid:string,g?:number){
   const marker=await tx.get(this.db.doc(`accountLifecycle/${uid}`)),a=proof(()=>readAccount(marker.data()));
   const job=await tx.get(this.db.doc(`accountDeletions/${uid}`)),index=await tx.get(this.db.doc(`familyMemberships/${uid}`)),user=await tx.get(this.db.doc(`users/${uid}`)),p=privateHouseholdId(uid);
@@ -47,7 +46,7 @@ export class HistoricalFamilyAuditStore {
  }
  /** Shared for freshly dissolved 6B2 owners and later private historical owners. */
  async admitHistorical(context:AuthContext){
-  const uid=authenticatedUid(context);this.local(uid);
+  const uid=authenticatedUid(context);authenticatedUid({uid});
   return this.db.runTransaction(async tx=>{
    const ref=this.db.doc(`familyOwnerDeletions/${uid}`),old=await tx.get(ref);
    if(old.exists)return proof(()=>readOwnerDeletionIntent(old.data(),uid));
@@ -79,7 +78,7 @@ export class HistoricalFamilyAuditStore {
   * Pages bound query payloads; the transaction reads all historical roots so no
   * earlier page can change between validation and the account barrier commit. */
  async verifyDeletionHandoff(tx:Transaction,uid:string){
-  this.local(uid);
+  authenticatedUid({uid});
   const ref=this.db.doc(`familyOwnerDeletions/${uid}`),intentDoc=await tx.get(ref),i=proof(()=>readOwnerDeletionIntent(intentDoc.data(),uid));
   if(i.phase!=='HISTORICAL_AUDIT_READY')invalid();
   await this.privateAccount(tx,uid,i.accountGeneration);
@@ -117,7 +116,7 @@ export class HistoricalFamilyAuditStore {
   }
  }
  async step(uid:string){
-  this.local(uid);
+  authenticatedUid({uid});
   try{return await this.db.runTransaction(async tx=>{
    const ref=this.db.doc(`familyOwnerDeletions/${uid}`),intentDoc=await tx.get(ref),i=proof(()=>readOwnerDeletionIntent(intentDoc.data(),uid));
    if(i.phase==='OPERATOR')return 'OPERATOR';

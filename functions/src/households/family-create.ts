@@ -1,3 +1,4 @@
+import {familyAdmissionEnabled} from './runtime-policy';
 import { claimFamilyLease } from './operation-lease';
 import { advanceShoppingEpoch } from '../shopping/mutation-store';
 import { createHash, randomUUID } from 'node:crypto';
@@ -117,7 +118,7 @@ export class FamilyCreateStore {
       const owned=await tx.get(this.db.collection('households').where('ownerUid','==',uid).where('kind','==','family').where('state','in',['ACTIVE','PREPARING','DISSOLVING']).limit(1));
       if(!owned.empty)throw new Error('alreadyFamily');
       const gate=await tx.get(this.db.doc('familyRuntime/config'));
-      if(gate.get('creationEnabled')!==true)throw new Error('featureDisabled');
+      if(!familyAdmissionEnabled(gate.data(),'creationEnabled'))throw new Error('featureDisabled');
       if(!await hasPro(this.db,tx,uid,now))throw new Error('proRequired');
       const sourceRef = this.db.doc(`households/${p}`), source = await tx.get(sourceRef);
       const member = await tx.get(sourceRef.collection('members').doc(uid));

@@ -102,7 +102,6 @@ export class DissolutionPreservationStore {
  }
  async step(context:AuthContext,householdId:string){
   const owner=authenticatedUid(context);if(typeof householdId!=='string'||!/^[A-Za-z0-9_-]{1,128}$/.test(householdId))throw new Error('INVALID_ARGUMENT');
-  if(process.env.K_SERVICE||process.env.FUNCTION_NAME||process.env.GCLOUD_PROJECT!=='demo-kuktam-local'||!/^(127\.0\.0\.1|localhost):[0-9]{1,5}$/.test(process.env.FIRESTORE_EMULATOR_HOST??''))throw new Error('FEATURE_DISABLED');
   const id=dissolutionId(owner,householdId),ref=this.db.doc(`familyOperations/${id}`);
   return this.db.runTransaction(async tx=>{
    const d=await tx.get(ref),raw=d.data();if(!d.exists||raw?.kind!=='FAMILY_DISSOLUTION'||raw.actorUid!==owner||raw.householdId!==householdId)throw new Error('NOT_FOUND');

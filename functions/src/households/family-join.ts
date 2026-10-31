@@ -1,3 +1,4 @@
+import {familyAdmissionEnabled} from './runtime-policy';
 import { readTransfer } from './join-transfer-contract';
 import { readJoinCapacity, dissolutionLocked } from './join-capacity';
 import { createHash } from 'node:crypto';
@@ -47,10 +48,6 @@ export function readJoinOperation(raw:unknown,id:string):JoinOperation {
     !(v.lastOutcome===null||typeof v.lastOutcome==='string'))throw new Error('invalidJoinOperation');
   return v;
 }
-/** Phase 4A cannot complete a JOIN. Even an enabled production config cannot reserve. */
-export function localJoinRuntime(project:string|undefined,host:string|undefined):boolean {
-  return !!project?.startsWith('demo-')&&!!host&&/^(127\.0\.0\.1|localhost):[0-9]{1,5}$/.test(host);
-}
 const fail=(code:ConstructorParameters<typeof FamilyInviteError>[0]):never=>{throw new FamilyInviteError(code);};
 export class FamilyJoinStore {
   private readonly validation:FamilyInviteStore;
@@ -76,10 +73,7 @@ export class FamilyJoinStore {
   async reserve(context:AuthContext,token:string,mode:JoinMode):Promise<string> {
     const uid=authenticatedUid(context),inviteId=hashInviteToken(token);
     if(mode!=='ADD'&&mode!=='DELETE')fail('INVALID_ARGUMENT');
-    if(process.env.K_SERVICE||process.env.FUNCTION_NAME||!localJoinRuntime(process.env.GCLOUD_PROJECT,process.env.FIRESTORE_EMULATOR_HOST))fail('FEATURE_DISABLED');
     return this.db.runTransaction(async tx=>{
-      const gate=await tx.get(this.db.doc('familyRuntime/config'));
-      if(gate.get('joinReservationEnabled')!==true)fail('FEATURE_DISABLED');
       if((await tx.get(this.db.doc(`familyMemberDeletions/${uid}`))).exists||(await tx.get(this.db.doc(`familyOwnerDeletions/${uid}`))).exists)fail('ACCOUNT_UNAVAILABLE');
       const userRef=this.db.doc(`users/${uid}`),currentUser=await tx.get(userRef);
       const previousId=currentJoinId(uid,currentUser.get('familyJoinBinding'));
@@ -105,6 +99,8 @@ export class FamilyJoinStore {
         if(previousId!==id||invite.status!=='RESERVED'||invite.operationId!==id||index.get('operationId')!==id||index.get('state')!=='RESERVED'||index.get('householdId')!==op.householdId||index.get('role')!=='member')fail('INVITE_STATE_UNAVAILABLE');
         return id;
       }
+      const gate=await tx.get(this.db.doc('familyRuntime/config'));
+      if(!familyAdmissionEnabled(gate.data(),'joinReservationEnabled'))fail('FEATURE_DISABLED');
       if(prior&&!['DONE','ABORTED'].includes(prior.status))fail('IN_PROGRESS');
       if(invite.status!=='PENDING')fail(invite.status==='RESERVED'?'IN_PROGRESS':invite.status);
       const now=this.clock();if(invite.expiresAt.toMillis()<=now.toMillis())fail('EXPIRED');

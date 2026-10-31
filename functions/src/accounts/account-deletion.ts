@@ -1,6 +1,5 @@
 import {OwnerAccountDeletionStore} from '../households/owner-account-deletion';
 import {MemberAccountDeletionStore} from '../households/member-account-deletion';
-import {familyLifecycleEnabled} from '../households/owner-pro-loss';
 import { Firestore, Timestamp } from 'firebase-admin/firestore';
 import { LifecycleStore } from '../billing/lifecycle-store';
 import { AuthContext, authenticatedUid } from '../billing/account-binding';
@@ -11,7 +10,6 @@ export class AccountDeletionService {
  constructor(private readonly db:Firestore,private readonly auth:AuthUserDeletionApi,
  private readonly clock:()=>Timestamp=Timestamp.now,private readonly store=new LifecycleStore(db,clock),private readonly policy:DeletionPolicy=defaultDeletionPolicy){validateDeletionPolicy(policy);}
  async beginAccountDeletion(context:AuthContext){const uid=authenticatedUid(context);
-  if(!familyLifecycleEnabled())return this.store.beginDeletion(uid);
   const existingOwner=await this.db.doc(`familyOwnerDeletions/${uid}`).get();
   if(existingOwner.get('phase')==='HISTORICAL_AUDIT_READY'){
    try{return await this.store.beginDeletion(uid,false,true);}

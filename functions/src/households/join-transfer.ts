@@ -1,6 +1,6 @@
 import { FieldPath, Firestore, Timestamp, Transaction } from 'firebase-admin/firestore';
 import { authenticatedUid, AuthContext } from '../billing/account-binding';
-import { FamilyJoinStore, isJoinIdentity, joinOperationId, localJoinRuntime, readJoinOperation } from './family-join';
+import { FamilyJoinStore, isJoinIdentity, joinOperationId, readJoinOperation } from './family-join';
 import { TransferOperation, readTransfer, hashValue } from './join-transfer-contract';
 import { readJoinCapacity, dissolutionLocked } from './join-capacity';
 import { FamilyInviteStore } from './family-invites';
@@ -20,10 +20,9 @@ export class JoinTransferStore {
   constructor(private readonly db:Firestore,private readonly clock=Timestamp.now){
     this.validation=new FamilyInviteStore(db,{resolve:async()=>{throw new Error('notRequired');}},clock);
   }
-  private local(){if(process.env.K_SERVICE||process.env.FUNCTION_NAME||!localJoinRuntime(process.env.GCLOUD_PROJECT,process.env.FIRESTORE_EMULATOR_HOST))fail('FEATURE_DISABLED');}
   private identity(context:AuthContext,id:string,inviteId:string){const uid=authenticatedUid(context);if(!isJoinIdentity(id,uid,inviteId))fail('INVALID_ARGUMENT');return uid;}
   async prepare(context:AuthContext,id:string,inviteId:string){
-    this.local();this.identity(context,id,inviteId);
+    this.identity(context,id,inviteId);
     await this.db.runTransaction(async tx=>{
       const ref=this.db.doc(`familyOperations/${id}`),doc=await tx.get(ref),o=readJoinOperation(doc.data(),id);
       if(o.inviteId!==inviteId)fail('NOT_FOUND');
@@ -31,14 +30,13 @@ export class JoinTransferStore {
       if(dissolutionLocked(capacity))fail('IN_PROGRESS');
       if(o.schemaVersion===2)return;
       if(o.status!=='READY'||o.phase!=='READY_FOR_TRANSFER')fail('IN_PROGRESS');
-      const gate=await tx.get(this.db.doc('familyRuntime/config'));if(gate.get('joinReservationEnabled')!==true)fail('FEATURE_DISABLED');
       tx.update(ref,{schemaVersion:2,committedAt:null,sourceFence:null,snapshot:null,cursor:null,deleteConsent:null,leaseId:null,leaseUntil:null,nextAt:this.clock()});
     });
     await new FamilyJoinStore(this.db,this.clock).resume(id);
     return this.state(context,id,inviteId);
   }
   async state(context:AuthContext,id:string,inviteId:string){
-    this.local();this.identity(context,id,inviteId);
+    this.identity(context,id,inviteId);
     return this.db.runTransaction(async tx=>{
       const o=readTransfer((await tx.get(this.db.doc(`familyOperations/${id}`))).data(),id);
       if(o.inviteId!==inviteId)fail('NOT_FOUND');
@@ -95,7 +93,7 @@ export class JoinTransferStore {
     if(c.capacity.structuralOperationId!==dissolutionId||!dissolutionLocked(c.capacity)||c.user.get('activeHouseholdId')!==o.sourceHouseholdId||c.user.get('familyHouseholdId')!==null||c.user.get('privateHouseholdId')!==o.sourceHouseholdId)throw new Error('joinOwnershipInvariant');
     return {operation:o,commit:()=>this.abort(tx,id,o,c,'familyDissolved',false)};
   }
-  async cancel(context:AuthContext,id:string,inviteId:string){this.local();this.identity(context,id,inviteId);return this.db.runTransaction(tx=>this.cancelTransaction(tx,id,inviteId,authenticatedUid(context)));}
+  async cancel(context:AuthContext,id:string,inviteId:string){this.identity(context,id,inviteId);return this.db.runTransaction(tx=>this.cancelTransaction(tx,id,inviteId,authenticatedUid(context)));}
   async cancelTransaction(tx:Transaction,id:string,inviteId:string,uid:string){
     const base=readJoinOperation((await tx.get(this.db.doc(`familyOperations/${id}`))).data(),id);
     const o:TransferOperation=base.schemaVersion===2?base as TransferOperation:{...base,schemaVersion:2,committedAt:null,sourceFence:null,snapshot:null,cursor:null,deleteConsent:null};
@@ -115,7 +113,7 @@ export class JoinTransferStore {
     return 'COMMITTED_TRANSFER';
   }
   async confirm(context:AuthContext,input:{operationId:string;inviteId:string;sourceEpoch:string;snapshotHash:string;sourceItemCount:number;consentVersion:number}){
-    this.local();const {operationId:id,inviteId}=input;this.identity(context,id,inviteId);
+    const {operationId:id,inviteId}=input;this.identity(context,id,inviteId);
     return this.db.runTransaction(async tx=>{
       const o=readTransfer((await tx.get(this.db.doc(`familyOperations/${id}`))).data(),id);
       if(o.inviteId!==inviteId||o.mode!=='DELETE'||input.consentVersion!==1||input.sourceEpoch!==o.sourceFence?.epoch||input.snapshotHash!==o.snapshot?.hash||input.sourceItemCount!==o.snapshot?.count)fail('INVALID_ARGUMENT');

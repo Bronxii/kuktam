@@ -1,8 +1,7 @@
-import {FieldValue,Firestore,Timestamp} from 'firebase-admin/firestore';
+import {FieldPath,FieldValue,Firestore,Timestamp} from 'firebase-admin/firestore';
 import {authenticatedUid} from '../billing/account-binding';
 import {epochPattern} from '../shopping/mutation-contract';
 import {readAccount} from '../accounts/account-lifecycle';
-import {familyLifecycleEnabled} from './owner-pro-loss';
 import {readFamilyMembership,validatePrivateRoot} from './household-contract';
 import {privateHouseholdId} from './household-store';
 import {DissolutionPreparationStore,dissolutionId} from './dissolution-preparation';
@@ -21,12 +20,11 @@ export function readOwnerDeletionIntent(v:any,uid:string):Intent {
  if(!v||v.version!==1||v.uid!==uid||v.role!=='owner'||v.reason!=='OWNER_ACCOUNT_DELETION'||!Number.isSafeInteger(v.accountGeneration)||v.accountGeneration<1||typeof v.householdId!=='string'||!/^[A-Za-z0-9_-]{1,128}$/.test(v.householdId)||v.privateHouseholdId!==privateHouseholdId(uid)||v.operationId!==dissolutionId(uid,v.householdId)||!(v.householdCreatedAt instanceof Timestamp)||!(v.createdAt instanceof Timestamp)||!(v.updatedAt instanceof Timestamp)||!['WAITING_DISSOLUTION','DISSOLUTION_IN_PROGRESS','WAITING_HISTORICAL_AUDIT','DETACHING_HISTORICAL_AUDIT','HISTORICAL_AUDIT_READY','DELETION_IN_PROGRESS','DELETED','OPERATOR'].includes(v.phase)||typeof v.lastOutcome!=='string'||!(v.completionEvidence===null||v.completionEvidence===`familyOperations/${v.operationId}/finalization/state`)||['WAITING_HISTORICAL_AUDIT','DETACHING_HISTORICAL_AUDIT','HISTORICAL_AUDIT_READY','DELETION_IN_PROGRESS','DELETED'].includes(v.phase)&&v.completionEvidence===null||!terminal(v.phase)&&!(v.nextAt instanceof Timestamp))invalid();
  return v;
 }
-/** Preparation only. This class deliberately has no deletion engine or Auth API. */
+/** Family preparation and bounded handoff. No Auth API: private cleanup retains its own worker. */
 export class OwnerAccountDeletionStore {
  constructor(private readonly db:Firestore,private readonly clock=Timestamp.now){}
- private local(){if(!familyLifecycleEnabled())throw new Error('FEATURE_DISABLED');}
  async admit(uid:string){
-  this.local();authenticatedUid({uid});
+  authenticatedUid({uid});
   return this.db.runTransaction(async tx=>{
    const ref=this.db.doc(`familyOwnerDeletions/${uid}`),old=await tx.get(ref);
    if(old.exists)return readOwnerDeletionIntent(old.data(),uid);
@@ -81,7 +79,7 @@ export class OwnerAccountDeletionStore {
   });
  }
  async step(uid:string):Promise<Phase>{
-  this.local();authenticatedUid({uid});
+  authenticatedUid({uid});
   const i=readOwnerDeletionIntent((await this.db.doc(`familyOwnerDeletions/${uid}`).get()).data(),uid);if(terminal(i.phase))return i.phase;
   const ref=this.db.doc(`familyOperations/${i.operationId}`),driver=new DissolutionLifecycleDriver(this.db,this.clock);
   try{
@@ -111,10 +109,26 @@ export class OwnerAccountDeletionStore {
   return {outcome:phase==='HISTORICAL_AUDIT_READY'?'historicalAuditReady' as const:phase==='DETACHING_HISTORICAL_AUDIT'?'historicalAuditPending' as const:phase==='WAITING_HISTORICAL_AUDIT'?'waitingHistoricalAudit' as const:phase==='OPERATOR'?'supportRequired' as const:'familyDissolutionPending' as const,operationId:i.operationId,phase};
  }
  async sweep(){
-  this.local();const due=await this.db.collection('familyOwnerDeletions').where('nextAt','<=',this.clock()).orderBy('nextAt').limit(20).get();let failed=false;
+  const due=await this.db.collection('familyOwnerDeletions').where('nextAt','<=',this.clock()).orderBy('nextAt').limit(20).get();let failed=false;
   for(const d of due.docs){try{await this.step(d.id);}catch{failed=true;}
    await this.db.runTransaction(async tx=>{const current=await tx.get(d.ref);if(current.get('nextAt') instanceof Timestamp)tx.update(d.ref,{nextAt:Timestamp.fromMillis(this.clock().toMillis()+60000)});});
   }
-  if(failed)throw new Error('ownerDeletionRetryRequired');return due.size;
+  // Historical stages deliberately have no dissolution nextAt. Continue them via
+  // a bounded rotating scan, including pre-9C intents, without rewriting history.
+  const cursorRef=this.db.doc('familyLifecycleMaintenance/ownerDeletionAuditScan');
+  const cursor=await cursorRef.get();
+  let query=this.db.collection('familyOwnerDeletions').where('phase','in',
+    ['WAITING_HISTORICAL_AUDIT','DETACHING_HISTORICAL_AUDIT','HISTORICAL_AUDIT_READY'])
+    .orderBy(FieldPath.documentId()).limit(20);
+  if(typeof cursor.get('after')==='string')query=query.startAfter(cursor.get('after'));
+  const audits=await query.get();
+  const {HistoricalFamilyAuditStore}=await import('./historical-family-audit');
+  const {LifecycleStore}=await import('../billing/lifecycle-store');
+  for(const d of audits.docs){try{
+    const phase=await new HistoricalFamilyAuditStore(this.db,this.clock).step(d.id);
+    if(phase==='HISTORICAL_AUDIT_READY')await new LifecycleStore(this.db,this.clock).beginDeletion(d.id,false,true);
+  }catch{failed=true;}}
+  await cursorRef.set({after:audits.size===20?audits.docs[audits.size-1]!.id:null});
+  if(failed)throw new Error('ownerDeletionRetryRequired');return due.size+audits.size;
  }
 }

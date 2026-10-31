@@ -181,11 +181,11 @@ for(const damage of ['snapshot','lock','generation'])test(`5C1 corrupt prepared 
  const f=await preparedFixture();await f.run();if(damage==='snapshot')await f.ref.update({snapshotHash:'a'.repeat(64)});if(damage==='lock')await f.cap.update({structuralOperationId:'dissolve_'+'b'.repeat(64)});if(damage==='generation')await f.home.update({createdAt:Timestamp.fromMillis(1)});
  const before=await database();await assert.rejects(f.run(),/INTEGRITY_REQUIRES_OPERATOR/);assert.deepEqual(await database(),before);
 });
-test('5C1 callable denies arbitrary routing and local-only runtime stays guarded',async()=>{
+test('5C1 callable denies arbitrary routing and legacy phase transport stays guarded',async()=>{
  let calls=0;const h=dissolutionPreparationHandler(()=>{calls++;throw new Error('secret');});await assert.rejects(h({data:{householdId:'family-test'}}),(e:any)=>e.code==='unauthenticated');
  for(const data of [null,{},[],{householdId:'a/b'},{householdId:'family-test',ownerUid:'owner'}])await assert.rejects(h({auth:{uid:'owner'},data}),(e:any)=>e.code==='invalid-argument');assert.equal(calls,0);
  await assert.rejects(h({auth:{uid:'owner'},data:{householdId:'family-test'}}),(e:any)=>e.code==='unavailable'&&e.message==='RETRYABLE_UNAVAILABLE');
- const f=await preparedFixture(),project=process.env.GCLOUD_PROJECT;try{process.env.GCLOUD_PROJECT='not-demo';await assert.rejects(f.run(),/FEATURE_DISABLED/);}finally{process.env.GCLOUD_PROJECT=project;}
+ const f=await preparedFixture(),project=process.env.GCLOUD_PROJECT;try{process.env.GCLOUD_PROJECT='not-demo';await assert.rejects(dissolutionPreparationHandler(()=>f.preparation)({auth:{uid:'owner'},data:{householdId:f.home.id}}),/FEATURE_DISABLED/);}finally{process.env.GCLOUD_PROJECT=project;}
  await f.unchanged();assert.equal((await dissolutionPreparationHandler(()=>f.preparation)({auth:{uid:'owner'},data:{householdId:f.home.id}})).phase,'PREPARED');await f.boundary();
 });
 

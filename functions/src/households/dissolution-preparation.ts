@@ -60,7 +60,6 @@ export class DissolutionPreparationStore {
   private async prepareInternal(context:AuthContext,householdId:string,proLoss:boolean,ownerDeletion=false){
     const ownerUid=authenticatedUid(context);
     if(!hid(householdId))fail('INVALID_ARGUMENT');
-    if(process.env.K_SERVICE||process.env.FUNCTION_NAME||process.env.GCLOUD_PROJECT!=='demo-kuktam-local'||!/^(127\.0\.0\.1|localhost):[0-9]{1,5}$/.test(process.env.FIRESTORE_EMULATOR_HOST??''))fail('FEATURE_DISABLED');
     const id=dissolutionId(ownerUid,householdId);
     try{return await this.db.runTransaction(async tx=>{
       const family=await this.validation.owner(tx,ownerUid);if(family.householdId!==householdId)fail('WRONG_FAMILY');

@@ -6,8 +6,6 @@ import {authenticatedUid} from '../billing/account-binding';
 import {readFamilyMembership} from './household-contract';
 import {DissolutionPreparationStore,dissolutionId} from './dissolution-preparation';
 
-/** Keep the accepted local-only Family gate. No deployed billing side effects. */
-export function familyLifecycleEnabled(){return !process.env.K_SERVICE&&!process.env.FUNCTION_NAME&&process.env.GCLOUD_PROJECT==='demo-kuktam-local'&&/^(127\.0\.0\.1|localhost):[0-9]{1,5}$/.test(process.env.FIRESTORE_EMULATOR_HOST??'');}
 type Intent={version:1;ownerUid:string;householdId:string;reason:'OWNER_PRO_LOSS'|'OWNER_REQUEST';status:'PENDING'|'IN_PROGRESS'|'DONE'|'SUPERSEDED'|'OPERATOR';operationId:string|null;createdAt:Timestamp;updatedAt:Timestamp;nextAt?:Timestamp;lastOutcome:string;ownerRequestedAt?:Timestamp};
 export function readOwnerProLossIntent(raw:any,id:string):Intent {
  if(!raw||raw.ownerRequestedAt!==undefined&&!(raw.ownerRequestedAt instanceof Timestamp)||raw.version!==1||typeof raw.ownerUid!=='string'||authenticatedUid({uid:raw.ownerUid})!==raw.ownerUid||typeof raw.householdId!=='string'||!/^[A-Za-z0-9_-]{1,128}$/.test(raw.householdId)||dissolutionId(raw.ownerUid,raw.householdId)!==id||!['OWNER_PRO_LOSS','OWNER_REQUEST'].includes(raw.reason)||!['PENDING','IN_PROGRESS','DONE','SUPERSEDED','OPERATOR'].includes(raw.status)||!(raw.createdAt instanceof Timestamp)||!(raw.updatedAt instanceof Timestamp)||!([null,id].includes(raw.operationId))||typeof raw.lastOutcome!=='string'||(['PENDING','IN_PROGRESS'].includes(raw.status)&&!(raw.nextAt instanceof Timestamp)))throw new Error('proLossIntegrity');
@@ -15,11 +13,10 @@ export function readOwnerProLossIntent(raw:any,id:string):Intent {
 }
 export class OwnerProLossStore {
  constructor(private readonly db:Firestore,private readonly clock=Timestamp.now){}
- private local(){if(!familyLifecycleEnabled())throw new Error('FEATURE_DISABLED');}
  /** Auth-derived manual admission into the existing durable maintenance queue.
   * The historical collection name stays unchanged; reason preserves provenance. */
  async startOwner(uid:string){
-  this.local();authenticatedUid({uid});
+  authenticatedUid({uid});
   const id=await this.db.runTransaction(async tx=>{
    const validation=new FamilyInviteStore(this.db,{resolve:async()=>new Map()},this.clock);
    await validation.active(tx,uid);
@@ -46,7 +43,7 @@ export class OwnerProLossStore {
  }
  /** Event payloads are hints only: recompute the complete current grant set. */
  async observe(uid:string){
-  this.local();authenticatedUid({uid});
+  authenticatedUid({uid});
   return this.db.runTransaction(async tx=>{
    const index=await tx.get(this.db.doc(`familyMemberships/${uid}`));
    if(!index.exists)return 'NO_ACTIVE_FAMILY';
@@ -77,7 +74,7 @@ export class OwnerProLossStore {
  }
  /** One existing engine transaction per invocation; scheduler supplies durable continuation. */
  async step(id:string){
-  this.local();if(!/^dissolve_[a-f0-9]{64}$/.test(id))throw new Error('proLossIntegrity');
+  if(!/^dissolve_[a-f0-9]{64}$/.test(id))throw new Error('proLossIntegrity');
   const i=readOwnerProLossIntent((await this.db.doc(`familyProLoss/${id}`).get()).data(),id);
   if(['DONE','SUPERSEDED','OPERATOR'].includes(i.status))return i.status;
   const ref=this.db.doc(`familyOperations/${id}`),op=await ref.get();
@@ -101,7 +98,7 @@ export class OwnerProLossStore {
  }
  /** Bounded rotating owner scan catches timed grant expiry without a write event. */
  async sweep(){
-  this.local();const cursorRef=this.db.doc('familyLifecycleMaintenance/ownerScan'),cursor=await cursorRef.get();
+  const cursorRef=this.db.doc('familyLifecycleMaintenance/ownerScan'),cursor=await cursorRef.get();
   let query=this.db.collection('familyMemberships').orderBy(FieldPath.documentId()).limit(20);
   if(typeof cursor.get('after')==='string')query=query.startAfter(cursor.get('after'));
   const page=await query.get();

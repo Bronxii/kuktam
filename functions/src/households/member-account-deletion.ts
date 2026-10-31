@@ -3,7 +3,6 @@ import {authenticatedUid} from '../billing/account-binding';
 import {LifecycleStore} from '../billing/lifecycle-store';
 import {readAccount} from '../accounts/account-lifecycle';
 import {readDeletion} from '../accounts/deletion-contract';
-import {familyLifecycleEnabled} from './owner-pro-loss';
 import {readFamilyMembership,validatePrivateRoot} from './household-contract';
 import {privateHouseholdId} from './household-store';
 import {readJoinOperation,currentJoinId,isJoinIdentity} from './family-join';
@@ -24,9 +23,8 @@ function read(v:any,uid:string):Intent {
 /** Recent authentication is enforced by the existing DeletionGateway before begin. */
 export class MemberAccountDeletionStore {
  constructor(private readonly db:Firestore,private readonly clock=Timestamp.now,private readonly deletion=new LifecycleStore(db,clock)){}
- private local(){if(!familyLifecycleEnabled())throw new Error('FEATURE_DISABLED');}
  async admit(uid:string){
-  this.local();authenticatedUid({uid});
+  authenticatedUid({uid});
   return this.db.runTransaction(async tx=>{
    const ref=this.db.doc(`familyMemberDeletions/${uid}`),old=await tx.get(ref);
    if(old.exists)return read(old.data(),uid);
@@ -87,7 +85,7 @@ export class MemberAccountDeletionStore {
   });
  }
  async step(uid:string){
-  this.local();authenticatedUid({uid});const i=read((await this.db.doc(`familyMemberDeletions/${uid}`).get()).data(),uid);
+  authenticatedUid({uid});const i=read((await this.db.doc(`familyMemberDeletions/${uid}`).get()).data(),uid);
   if(i.phase==='OPERATOR'||i.phase==='HANDED_OFF')return i.phase;
   try{
    const state=await this.reconcile(uid);
@@ -117,7 +115,7 @@ export class MemberAccountDeletionStore {
   return {outcome:state==='OPERATOR'?'supportRequired' as const:'familyExitPending' as const,operationId:undefined};
  }
  async sweep(){
-  this.local();const due=await this.db.collection('familyMemberDeletions').where('nextAt','<=',this.clock()).orderBy('nextAt').limit(20).get();let failed=false;
+  const due=await this.db.collection('familyMemberDeletions').where('nextAt','<=',this.clock()).orderBy('nextAt').limit(20).get();let failed=false;
   for(const d of due.docs){try{await this.step(d.id);}catch{failed=true;}
    await this.db.runTransaction(async tx=>{const current=await tx.get(d.ref);if(current.get('nextAt') instanceof Timestamp)tx.update(d.ref,{nextAt:Timestamp.fromMillis(this.clock().toMillis()+60000)});});
   }
