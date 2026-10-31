@@ -133,14 +133,14 @@ test('family member cannot read or write hidden private list',async()=>{
  const db=env.authenticatedContext('member').firestore(), ref=doc(db,'households/private-member/shoppingItems/a');
  await assertFails(getDoc(ref));await assertFails(setDoc(ref,{name:'hidden'}));await assertFails(deleteDoc(ref));
 });
-for(const variation of ['RESERVED','PREPARING','DISSOLVING','activeMismatch','familyMismatch','indexMismatch','missingIndex','wrongPrivateKind'])test(`family ${variation} fails closed`,async()=>{
+for(const variation of ['RESERVED','PREPARING','DISSOLVING','DISSOLVED','activeMismatch','familyMismatch','indexMismatch','missingIndex','wrongPrivateKind'])test(`family ${variation} fails closed`,async()=>{
  const uid=`case-${variation}`, hid=`family-${variation}`, p=`private-${variation}`;
  await env.withSecurityRulesDisabled(async ctx=>{const db=ctx.firestore();
   await setDoc(doc(db,`users/${uid}`),{activeHouseholdId:variation==='activeMismatch'?p:hid,privateHouseholdId:p,familyHouseholdId:variation==='familyMismatch'?null:hid,shoppingMigrationVersion:1});
   await setDoc(doc(db,`accountLifecycle/${uid}`),{state:'ACTIVE'});
   await setDoc(doc(db,`households/${p}`),{schemaVersion:2,state:'ACTIVE',operationId:null,kind:variation==='wrongPrivateKind'?'family':'private',ownerUid:uid});
   await setDoc(doc(db,`households/${p}/members/${uid}`),{role:'owner'});
-  await setDoc(doc(db,`households/${hid}`),{schemaVersion:2,kind:'family',ownerUid:'owner',state:['PREPARING','DISSOLVING'].includes(variation)?variation:'ACTIVE',operationId:null});
+  await setDoc(doc(db,`households/${hid}`),{schemaVersion:2,kind:'family',ownerUid:'owner',state:['PREPARING','DISSOLVING','DISSOLVED'].includes(variation)?variation:'ACTIVE',operationId:null});
   await setDoc(doc(db,`households/${hid}/members/${uid}`),{role:'member'});
   if(variation!=='missingIndex')await setDoc(doc(db,`familyMemberships/${uid}`),{householdId:variation==='indexMismatch'?'other':hid,role:'member',state:variation==='RESERVED'?'RESERVED':'ACTIVE',operationId:variation==='RESERVED'?'op':null});
  });

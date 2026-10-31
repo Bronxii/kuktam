@@ -197,10 +197,12 @@ test('S1C original stale direct ADD and +500 edit/delete attacks; protocol epoch
 
 test('S1C trusted legacy migration remains functional, lifecycle still fences reads and commands',async()=>{
  const uid=`s1c-legacy-${++n}`;
- await admin.doc(`users/${uid}/shopping/legacy`).set({name:'milk',quantity:2,unit:'ml'});
+ const legacy=doc(env.authenticatedContext(uid).firestore(),`users/${uid}/shopping/legacy`);
+ await assertSucceeds(setDoc(legacy,{name:'milk',quantity:2,unit:'ml'}));
  await new HouseholdStore(admin).ensure({uid});
  const f={uid,db:env.authenticatedContext(uid).firestore(),...await processor.ensureContext({uid})};
  const ref=doc(f.db,`households/${f.householdId}/shoppingItems/legacy`);
+ await denied(setDoc(legacy,{name:'stale',quantity:3,unit:'ml'}));
  assert.equal((await getDoc(ref)).get('quantity'),2);
  assert.equal((await admin.doc(`users/${uid}/shopping/legacy`).get()).exists,false);
  await denied(updateDoc(ref,{quantity:3}));
